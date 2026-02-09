@@ -1,1 +1,870 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Wallet</title>
 
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --text:#eaf1ff;
+      --muted:rgba(234,241,255,.72);
+      --glass:rgba(255,255,255,.08);
+      --glass2:rgba(255,255,255,.05);
+      --line:rgba(255,255,255,.10);
+      --neon:#3b82f6;
+      --neon2:#60a5fa;
+
+      --radius:18px;
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+      --safe-top: env(safe-area-inset-top, 0px);
+    }
+
+    *{ box-sizing:border-box; font-family:'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
+
+    html, body{
+      height:100%;
+      margin:0;
+      overflow:hidden;
+      color:var(--text);
+      background:#020617;
+    }
+
+    body{
+      background-image:url("https://i.postimg.cc/15xyK3Xr/Picsart-26-01-30-00-16-57-552.png");
+      background-size:cover;
+      background-position:center;
+      background-repeat:no-repeat;
+    }
+
+    body::before{
+      content:"";
+      position:fixed;
+      inset:0;
+      background:
+        radial-gradient(900px 600px at 30% 10%, rgba(59,130,246,.14), transparent 60%),
+        radial-gradient(700px 500px at 80% 30%, rgba(96,165,250,.10), transparent 60%),
+        linear-gradient(180deg, rgba(0,0,0,.42), rgba(0,0,0,.62));
+      pointer-events:none;
+    }
+
+    .app{
+      position:relative;
+      height:100%;
+      overflow:auto;
+      padding: calc(18px + var(--safe-top)) 16px calc(98px + var(--safe-bottom)) 16px;
+    }
+
+    .content{
+      margin-top: 18px;
+      display:flex;
+      flex-direction:column;
+      gap: 16px;
+      max-width: 520px;
+      margin-left:auto;
+      margin-right:auto;
+      position:relative;
+      z-index:1;
+      align-items: center; /* ✅ центрируем блок баланса */
+    }
+
+    /* =========================
+       ✅ Новый дизайн баланса: меньше + по центру
+       ========================= */
+    .balance-pill{
+      width: min(380px, 92%);
+      border-radius: 999px;
+      padding: 10px 14px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap: 10px;
+      position:relative;
+      overflow:hidden;
+
+      border: 1px solid transparent;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.06)) padding-box,
+        linear-gradient(135deg, rgba(96,165,250,.85), rgba(255,255,255,.10), rgba(59,130,246,.85)) border-box;
+
+      backdrop-filter: blur(16px);
+      box-shadow:
+        0 16px 45px rgba(0,0,0,.40),
+        0 0 35px rgba(59,130,246,.14);
+    }
+
+    .balance-pill::before{
+      content:"";
+      position:absolute;
+      inset:-2px;
+      background:
+        radial-gradient(260px 120px at 20% 10%, rgba(96,165,250,.22), transparent 65%),
+        radial-gradient(260px 140px at 85% 90%, rgba(59,130,246,.18), transparent 65%);
+      pointer-events:none;
+      opacity:1;
+    }
+
+    .balance-inner{
+      position:relative;
+      z-index:1;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap: 10px;
+      width:100%;
+    }
+
+    .wallet-logo-btn{
+      width:40px;
+      height:40px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.14);
+      background:
+        radial-gradient(120px 90px at 30% 25%, rgba(96,165,250,.18), transparent 60%),
+        rgba(0,0,0,.18);
+      box-shadow:
+        0 14px 26px rgba(0,0,0,.45),
+        0 0 16px rgba(59,130,246,.18);
+      display:grid;
+      place-items:center;
+      padding:0;
+      cursor:pointer;
+      overflow:hidden;
+      flex:0 0 auto;
+    }
+
+    .wallet-logo-btn img{
+      width:70%;
+      height:70%;
+      object-fit:contain;
+      filter: drop-shadow(0 10px 18px rgba(0,0,0,.35));
+    }
+
+    .balance-stack{
+      display:flex;
+      flex-direction:column;
+      align-items:center; /* ✅ по центру */
+      justify-content:center;
+      gap:2px;
+      min-width:0;
+    }
+
+    .balance-label{
+      font-size: 11px;
+      font-weight: 800;
+      color: var(--muted);
+      letter-spacing:.25px;
+    }
+
+    .balance-value{
+      font-size: 20px; /* ✅ меньше */
+      font-weight: 900;
+      line-height: 1.1;
+      text-shadow: 0 12px 22px rgba(0,0,0,.55);
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      max-width: 240px;
+    }
+
+    /* =========================
+       ✅ Баннеры
+       ========================= */
+    .slider{
+      width: 100%;
+      max-width: 520px;
+      border-radius: var(--radius);
+    }
+
+    .slides{
+      display:flex;
+      gap: 12px;
+      overflow-x:auto;
+      scroll-snap-type: x mandatory;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+      padding-bottom: 4px;
+    }
+    .slides::-webkit-scrollbar{ display:none; }
+
+    .slide{
+      scroll-snap-align: start;
+      flex: 0 0 100%;
+      height: 170px;
+      border-radius: var(--radius);
+      position:relative;
+      overflow:hidden;
+      background:#000;
+      box-shadow: 0 18px 55px rgba(0,0,0,.40);
+    }
+
+    .slide img{
+      width:100%;
+      height:100%;
+      object-fit: cover;
+      display:block;
+      transform: scale(1.02);
+    }
+
+    .slide::after{
+      content:"";
+      position:absolute;
+      inset:0;
+      background: linear-gradient(180deg, rgba(0,0,0,.10), rgba(0,0,0,.38));
+      pointer-events:none;
+    }
+
+    .dots{
+      display:flex;
+      justify-content:center;
+      gap: 8px;
+      margin-top: 10px;
+    }
+    .dot{
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background: rgba(234,241,255,.26);
+      transition: transform .2s ease, background .2s ease, width .2s ease;
+    }
+    .dot.active{
+      background: rgba(96,165,250,.95);
+      width: 18px;
+      transform: translateY(-.5px);
+      box-shadow: 0 0 12px rgba(59,130,246,.55);
+    }
+
+    /* =========================
+       ✅ 3 кнопки (увеличены)
+       ========================= */
+    .actions{
+      width: 100%;
+      max-width: 520px;
+      display:grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+
+    .action-btn{
+      position:relative;
+      height: 138px;
+      border:none;
+      border-radius: 18px;
+      overflow:hidden;
+      cursor:pointer;
+      padding: 0;
+      background: #0b102a;
+      box-shadow:
+        0 16px 34px rgba(0,0,0,.28),
+        0 0 0 1px rgba(255,255,255,.06) inset;
+      transition: transform .15s ease;
+    }
+    .action-btn:active{ transform: scale(.985); }
+
+    .action-btn .bg{
+      position:absolute;
+      inset:0;
+      background-image: var(--bg);
+      background-size: cover;
+      background-position: center;
+      background-repeat:no-repeat;
+      transform: scale(1.03);
+      filter: saturate(1.03) contrast(1.02);
+    }
+    .action-btn .bg::after{
+      content:"";
+      position:absolute;
+      inset:0;
+      background: linear-gradient(180deg, rgba(0,0,0,.05), rgba(0,0,0,.48));
+      pointer-events:none;
+    }
+
+    .action-btn::before,
+    .action-btn::after{
+      content:"";
+      position:absolute;
+      top:-18px;
+      bottom:-18px;
+      width: 18px;
+      filter: blur(10px);
+      opacity: .95;
+      pointer-events:none;
+    }
+    .action-btn::before{
+      left:-10px;
+      background: linear-gradient(180deg, rgba(59,130,246,.0), rgba(59,130,246,.95), rgba(96,165,250,.0));
+    }
+    .action-btn::after{
+      right:-10px;
+      background: linear-gradient(180deg, rgba(59,130,246,.0), rgba(96,165,250,.95), rgba(59,130,246,.0));
+    }
+
+    .action-btn .label{
+      position:absolute;
+      left:0; right:0; bottom:0;
+      padding: 12px 10px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-weight: 900;
+      font-size: 13px;
+      letter-spacing: .2px;
+      color: rgba(234,241,255,.95);
+      background: linear-gradient(180deg, rgba(0,0,0,.00), rgba(0,0,0,.60));
+      text-shadow: 0 10px 18px rgba(0,0,0,.55);
+    }
+
+    /* =========================
+       ✅ Центральная кнопка меню
+       ========================= */
+    .bottom-center{
+      position:fixed;
+      left:0; right:0;
+      bottom: calc(16px + var(--safe-bottom));
+      display:flex;
+      justify-content:center;
+      z-index: 50;
+      pointer-events:none;
+    }
+
+    .menu-btn{
+      pointer-events:auto;
+      width: 66px;
+      height: 66px;
+      border-radius: 26px;
+      border:none;
+      cursor:pointer;
+
+      background: rgba(255,255,255,.10);
+      backdrop-filter: blur(14px);
+      box-shadow:
+        0 22px 70px rgba(0,0,0,.48),
+        0 0 0 1px rgba(255,255,255,.10) inset,
+        0 0 32px rgba(59,130,246,.18);
+      display:grid;
+      place-items:center;
+      transition: transform .15s ease;
+    }
+    .menu-btn:active{ transform: scale(.99); }
+
+    .burger{
+      width:22px;
+      height:16px;
+      display:grid;
+      gap:4px;
+    }
+    .burger span{
+      height:2px;
+      border-radius:999px;
+      background: rgba(234,241,255,.92);
+      display:block;
+    }
+
+    /* =========================
+       ✅ Новая менюшка: выше + больше + красивее
+       ========================= */
+    .sheet-overlay{
+      position:fixed;
+      inset:0;
+      background: rgba(0,0,0,.58);
+      opacity:0;
+      pointer-events:none;
+      transition: opacity .25s ease;
+      z-index: 80;
+    }
+    .sheet-overlay.show{
+      opacity:1;
+      pointer-events:auto;
+    }
+
+    .sheet{
+      position:fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+
+      /* ✅ открывается чуть выше */
+      transform: translateY(110%);
+      transition: transform .30s cubic-bezier(.2,.9,.2,1);
+      z-index: 90;
+
+      padding: 0 14px calc(14px + var(--safe-bottom)) 14px;
+    }
+    .sheet.show{ transform: translateY(0); }
+
+    .sheet-panel{
+      margin: 0 auto;
+      width: min(520px, calc(100% - 10px));
+      /* ✅ выше (больше места) */
+      padding-bottom: 6px;
+
+      border-radius: 28px;
+      overflow:hidden;
+
+      background:
+        linear-gradient(180deg, rgba(16, 24, 70, .92), rgba(8, 12, 36, .92));
+      border: 1px solid rgba(255,255,255,.10);
+      box-shadow:
+        0 34px 90px rgba(0,0,0,.62),
+        0 0 38px rgba(59,130,246,.14);
+      backdrop-filter: blur(18px);
+      position:relative;
+    }
+
+    /* красивая подсветка по краям */
+    .sheet-panel::before{
+      content:"";
+      position:absolute;
+      inset:-2px;
+      background:
+        radial-gradient(280px 160px at 20% 5%, rgba(96,165,250,.22), transparent 60%),
+        radial-gradient(240px 160px at 85% 95%, rgba(59,130,246,.18), transparent 60%);
+      pointer-events:none;
+      opacity:1;
+    }
+
+    .sheet-handle{
+      height: 22px;
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      background: rgba(255,255,255,.04);
+      position:relative;
+      z-index:1;
+    }
+    .sheet-handle span{
+      width: 52px;
+      height: 6px;
+      border-radius: 999px;
+      background: rgba(234,241,255,.20);
+      box-shadow: 0 0 18px rgba(59,130,246,.20);
+    }
+
+    .sheet-head{
+      position:relative;
+      z-index:1;
+      padding: 12px 16px 10px 16px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 10px;
+    }
+    .sheet-title{
+      font-weight: 900;
+      letter-spacing:.2px;
+      font-size: 14px;
+      color: rgba(234,241,255,.92);
+    }
+    .sheet-sub{
+      font-size: 12px;
+      color: rgba(234,241,255,.60);
+      font-weight: 700;
+    }
+
+    .sheet-list{
+      position:relative;
+      z-index:1;
+      display:flex;
+      flex-direction:column;
+      padding: 6px 10px 10px 10px;
+      gap: 8px;
+    }
+
+    .sheet-item{
+      border:none;
+      background: rgba(255,255,255,.06);
+      color: var(--text);
+      text-align:left;
+      padding: 14px 14px;
+      font-weight: 900;
+      cursor:pointer;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      border-radius: 16px;
+      box-shadow:
+        0 10px 26px rgba(0,0,0,.22),
+        0 0 0 1px rgba(255,255,255,.06) inset;
+      transition: transform .12s ease, background .12s ease;
+    }
+    .sheet-item:active{
+      transform: scale(.995);
+      background: rgba(255,255,255,.09);
+    }
+
+    .sheet-item .left{
+      display:flex;
+      align-items:center;
+      gap: 10px;
+      min-width:0;
+    }
+
+    .ico{
+      width: 34px;
+      height: 34px;
+      border-radius: 12px;
+      display:grid;
+      place-items:center;
+      font-size: 16px;
+      background:
+        radial-gradient(80px 60px at 30% 20%, rgba(96,165,250,.20), transparent 60%),
+        rgba(0,0,0,.18);
+      border: 1px solid rgba(255,255,255,.10);
+      box-shadow: 0 0 18px rgba(59,130,246,.10);
+      flex: 0 0 auto;
+    }
+
+    .sheet-item .name{
+      font-size: 13px;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+
+    .chev{
+      color: rgba(234,241,255,.65);
+      font-weight: 900;
+      margin-left: 10px;
+    }
+
+    .ref-box{
+      position:relative;
+      z-index:1;
+      margin: 8px 14px 14px 14px;
+      padding: 12px 12px;
+      border-radius: 18px;
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.08);
+      box-shadow: 0 12px 30px rgba(0,0,0,.25);
+      display:flex;
+      gap: 10px;
+      align-items:center;
+      justify-content:space-between;
+    }
+    .ref-text{
+      min-width:0;
+    }
+    .ref-title{
+      font-weight: 900;
+      font-size: 12px;
+      color: rgba(234,241,255,.85);
+      margin-bottom: 2px;
+    }
+    .ref-link{
+      font-size: 12px;
+      font-weight: 800;
+      color: rgba(96,165,250,.95);
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      max-width: 250px;
+    }
+    .copy-btn{
+      border:none;
+      cursor:pointer;
+      padding: 10px 12px;
+      border-radius: 14px;
+      font-weight: 900;
+      color: rgba(234,241,255,.92);
+      background: linear-gradient(135deg, rgba(59,130,246,.95), rgba(37,99,235,.95));
+      box-shadow: 0 14px 30px rgba(37,99,235,.25);
+      transition: transform .12s ease;
+      flex:0 0 auto;
+    }
+    .copy-btn:active{ transform: scale(.99); }
+
+    .toast{
+      position:fixed;
+      left:50%;
+      bottom: calc(90px + var(--safe-bottom));
+      transform: translateX(-50%) translateY(20px);
+      opacity:0;
+      pointer-events:none;
+      transition: opacity .25s ease, transform .25s ease;
+      background: rgba(0,0,0,.55);
+      border: 1px solid rgba(255,255,255,.10);
+      color: rgba(234,241,255,.92);
+      padding: 10px 14px;
+      border-radius: 14px;
+      backdrop-filter: blur(12px);
+      font-weight: 900;
+      z-index: 100;
+    }
+    .toast.show{
+      opacity:1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    @media (max-width: 360px){
+      .action-btn{ height: 129px; }
+      .balance-value{ font-size: 19px; }
+      .balance-pill{ width: 94%; }
+    }
+
+    @media (prefers-reduced-motion: reduce){
+      *{ transition:none !important; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="app">
+    <div class="content">
+
+      <!-- ✅ Новый маленький баланс по центру -->
+      <div class="balance-pill" aria-label="Баланс">
+        <div class="balance-inner">
+          <button class="wallet-logo-btn" id="walletLogoBtn" aria-label="Открыть кошелёк">
+            <img
+              src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAQAAAAEACAYAAABccqhmAACPpElEQVR4nO2dW3Bb1R3Hf3c3xVY0mJw6m7o2Qq9p0o4o0u0i5QqkB6mU6m0o3cQmJtqZrQmKqQq2oJYyY0Cq0oFq0aQmQw0m0q0gq9m2H3x9n0p3i7m9f+7xk7r3m9v7z3v0o0xk8yGmQAAABg7m3m8gAAABg9xq8AAACw1i0AAABg5zYAAABg5zYAAABg5zYAAABg5zYAAABg5zYAAABg5zYAAABg5zYAAABg5zYAAABg5zYAAABg5zYAAABg5zYAAABg5zYAAABg5zYAAABg5zYAAABg5zYAAABg5zYAAABg5zYAAABg5zYAAABg5zYAAABg5zYAAABg5zYAAABg5zYAAABg5zYAAABg5zYAAABg5zYAAABg5zYAAABg5zYAAABg5zYAAABg5zYAAABg5zYAAABg5zYAAABg5zYAAABg5zYAAABg5zYAAABg5zYAAABg5zYAAABg5zYAAABg5zYAAABg5zYAAABg5zYAAABg5zYAAABg5zYAAABg5zYAAABg5zYAAABg5zYAAABg5zYAAABg5zYAAABg5zYAAABg5zYAAABg5zYAAABg5zYAAABg5zYAAABg5zYAAABg5zYAAAA=="
+              alt="Wallet Logo"
+            />
+          </button>
+
+          <div class="balance-stack">
+            <div class="balance-label">Баланс</div>
+            <div class="balance-value" id="balanceValue">0 VC</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ✅ Баннеры -->
+      <div class="slider" aria-label="Баннеры">
+        <div class="slides" id="slides">
+          <div class="slide">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/Blackpink_PUBG_Mobile.png" alt="PUBG Mobile Banner 1">
+          </div>
+          <div class="slide">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/b/bd/BLACKPINK_PUBG_Mobile_Sept_2020_ad.png" alt="PUBG Mobile Banner 2">
+          </div>
+          <div class="slide">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/c/c2/BLACKPINK-inspired_PUBG_Mobile_incentives.png" alt="PUBG Mobile Banner 3">
+          </div>
+        </div>
+
+        <div class="dots" id="dots" aria-label="Индикатор баннера">
+          <div class="dot active"></div>
+          <div class="dot"></div>
+          <div class="dot"></div>
+        </div>
+      </div>
+
+      <!-- ✅ 3 кнопки в ряд -->
+      <div class="actions" aria-label="Разделы">
+        <button class="action-btn" id="btnGames"
+          style="--bg:url('https://i.postimg.cc/8khGybLS/d9e9d314-fd90-4cad-ad74-b2ed14a51f38.png');">
+          <div class="bg" aria-hidden="true"></div>
+          <div class="label">Игры</div>
+        </button>
+
+        <button class="action-btn" id="btnShop"
+          style="--bg:url('https://i.postimg.cc/8khGybLS/d9e9d314-fd90-4cad-ad74-b2ed14a51f38.png');">
+          <div class="bg" aria-hidden="true"></div>
+          <div class="label">UC Shop</div>
+        </button>
+
+        <button class="action-btn" id="btnCustom"
+          style="--bg:url('https://i.postimg.cc/8khGybLS/d9e9d314-fd90-4cad-ad74-b2ed14a51f38.png');">
+          <div class="bg" aria-hidden="true"></div>
+          <div class="label">Кастомки</div>
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ✅ Только одна кнопка меню -->
+  <div class="bottom-center">
+    <button class="menu-btn" id="menuBtn" aria-label="Открыть меню">
+      <div class="burger" aria-hidden="true">
+        <span></span><span></span><span></span>
+      </div>
+    </button>
+  </div>
+
+  <!-- ✅ Меню снизу -->
+  <div class="sheet-overlay" id="sheetOverlay"></div>
+
+  <div class="sheet" id="sheet">
+    <div class="sheet-panel" role="dialog" aria-modal="true" aria-label="Меню">
+      <div class="sheet-handle"><span></span></div>
+
+      <div class="sheet-head">
+        <div>
+          <div class="sheet-title">Меню</div>
+          <div class="sheet-sub">Выберите раздел</div>
+        </div>
+        <div style="font-weight:900;color:rgba(96,165,250,.92);">Wallet</div>
+      </div>
+
+      <div class="sheet-list">
+        <button class="sheet-item" data-action="vouchers">
+          <div class="left">
+            <div class="ico">🎟️</div>
+            <div class="name">Ваучеры</div>
+          </div>
+          <div class="chev">›</div>
+        </button>
+
+        <button class="sheet-item" data-action="profile">
+          <div class="left">
+            <div class="ico">👤</div>
+            <div class="name">Профиль</div>
+          </div>
+          <div class="chev">›</div>
+        </button>
+
+        <button class="sheet-item" data-action="history">
+          <div class="left">
+            <div class="ico">🕘</div>
+            <div class="name">История</div>
+          </div>
+          <div class="chev">›</div>
+        </button>
+
+        <button class="sheet-item" data-action="support">
+          <div class="left">
+            <div class="ico">💬</div>
+            <div class="name">Поддержка</div>
+          </div>
+          <div class="chev">›</div>
+        </button>
+
+        <!-- ✅ Реферальная ссылка как пункт -->
+        <button class="sheet-item" data-action="ref">
+          <div class="left">
+            <div class="ico">🔗</div>
+            <div class="name">Реферальная ссылка</div>
+          </div>
+          <div class="chev">›</div>
+        </button>
+      </div>
+
+      <!-- ✅ Блок с реф-ссылкой + копирование -->
+      <div class="ref-box" aria-label="Реферальная ссылка">
+        <div class="ref-text">
+          <div class="ref-title">Ваша реферальная ссылка</div>
+          <div class="ref-link" id="refLink">https://example.com/ref/USER123</div>
+        </div>
+        <button class="copy-btn" id="copyRefBtn">Копировать</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast">Скопировано!</div>
+
+  <script>
+    // ===== Баланс (заглушка) =====
+    document.getElementById('balanceValue').textContent = '0 VC';
+
+    // Клик по лого кошелька (позже — переход на файл кошелька)
+    document.getElementById('walletLogoBtn').addEventListener('click', () => {
+      alert('Позже здесь будет переход на страницу кошелька (депозит/вывод).');
+    });
+
+    // ===== Баннеры: точки по scroll =====
+    const slides = document.getElementById('slides');
+    const dots = Array.from(document.getElementById('dots').querySelectorAll('.dot'));
+    function clamp(n, min, max){ return Math.max(min, Math.min(max, n)); }
+
+    function updateDotsByScroll(){
+      const w = slides.clientWidth || 1;
+      const idx = clamp(Math.round(slides.scrollLeft / w), 0, dots.length - 1);
+      dots.forEach((d,i)=>d.classList.toggle('active', i === idx));
+    }
+
+    let rafId = null;
+    slides.addEventListener('scroll', () => {
+      if (rafId) return;
+      rafId = requestAnimationFrame(() => {
+        updateDotsByScroll();
+        rafId = null;
+      });
+    });
+
+    dots.forEach((dot, i) => {
+      dot.addEventListener('click', () => {
+        slides.scrollTo({ left: i * slides.clientWidth, behavior: 'smooth' });
+      });
+    });
+
+    window.addEventListener('load', updateDotsByScroll);
+    window.addEventListener('resize', updateDotsByScroll);
+
+    // ===== Меню: bottom sheet =====
+    const sheet = document.getElementById('sheet');
+    const overlay = document.getElementById('sheetOverlay');
+    const menuBtn = document.getElementById('menuBtn');
+
+    function openSheet(){
+      overlay.classList.add('show');
+      sheet.classList.add('show');
+      document.body.style.overflow = 'hidden';
+    }
+    function closeSheet(){
+      overlay.classList.remove('show');
+      sheet.classList.remove('show');
+      document.body.style.overflow = '';
+    }
+
+    menuBtn.addEventListener('click', openSheet);
+    overlay.addEventListener('click', closeSheet);
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeSheet(); });
+
+    document.querySelectorAll('.sheet-item').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const action = btn.getAttribute('data-action');
+        // оставим меню открытым для "ref", чтобы люди копировали
+        if (action !== 'ref') {
+          closeSheet();
+          alert('Открыть: ' + action);
+        } else {
+          // прокрутка к блоку рефки
+          document.querySelector('.ref-box').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+      });
+    });
+
+    // ===== 3 кнопки (заглушки) =====
+    document.getElementById('btnGames').addEventListener('click', () => alert('Игры (позже сделаем переход)'));
+    document.getElementById('btnShop').addEventListener('click', () => alert('UC Shop (позже сделаем переход)'));
+    document.getElementById('btnCustom').addEventListener('click', () => alert('Кастомки (позже сделаем переход)'));
+
+    // ===== Копирование реф-ссылки =====
+    const refLinkEl = document.getElementById('refLink');
+    const copyBtn = document.getElementById('copyRefBtn');
+    const toast = document.getElementById('toast');
+
+    function showToast(text){
+      toast.textContent = text;
+      toast.classList.add('show');
+      setTimeout(()=>toast.classList.remove('show'), 1800);
+    }
+
+    async function copyText(text){
+      try{
+        if (navigator.clipboard && window.isSecureContext) {
+          await navigator.clipboard.writeText(text);
+        } else {
+          const ta = document.createElement('textarea');
+          ta.value = text;
+          ta.style.position='fixed';
+          ta.style.left='-9999px';
+          document.body.appendChild(ta);
+          ta.focus();
+          ta.select();
+          document.execCommand('copy');
+          ta.remove();
+        }
+        showToast('Ссылка скопирована!');
+      } catch(e){
+        showToast('Не удалось скопировать');
+      }
+    }
+
+    copyBtn.addEventListener('click', () => copyText(refLinkEl.textContent.trim()));
+  </script>
+</body>
+</html>
