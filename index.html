@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Wallet</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --text:#eaf1ff;
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+      --safe-top: env(safe-area-inset-top, 0px);
+      --radius:18px;
+
+      --neon:#2AABEE;
+      --neon2:#3b82f6;
+    }
+
+    *{ box-sizing:border-box; font-family:'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
+    html, body{ height:100%; margin:0; overflow:hidden; color:var(--text); background:#020617; }
+
+    body{
+      background-image:url("https://i.postimg.cc/15xyK3Xr/Picsart-26-01-30-00-16-57-552.png");
+      background-size:cover;
+      background-position:center;
+      background-repeat:no-repeat;
+    }
+
+    body::before{
+      content:"";
+      position:fixed;
+      inset:0;
+      background:
+        radial-gradient(900px 600px at 30% 10%, rgba(42,171,238,.10), transparent 60%),
+        linear-gradient(180deg, rgba(0,0,0,.40), rgba(0,0,0,.62));
+      pointer-events:none;
+    }
+
+    .app{
+      position:relative;
+      height:100%;
+      overflow:auto;
+      padding: calc(18px + var(--safe-top)) 16px calc(28px + var(--safe-bottom)) 16px;
+    }
+
+    .content{
+      margin-top: 18px;
+      display:flex;
+      flex-direction:column;
+      gap: 16px;
+      max-width: 520px;
+      margin-left:auto;
+      margin-right:auto;
+      position:relative;
+      z-index:1;
+      align-items:center;
+    }
+
+    /* =========================
+       ✅ Верхняя строка: меню слева + баланс по центру (группой)
+       ========================= */
+    .top-row{
+      width:100%;
+      max-width:520px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap: 10px;
+    }
+
+    /* =========================
+       ✅ Кнопка меню (слева от баланса) — закруглённый квадрат
+       ========================= */
+    .menu-btn{
+      width: 42px;
+      height: 42px;
+      border-radius: 14px;
+      border: 1px solid rgba(46, 180, 255, .22);
+      cursor:pointer;
+      background: rgba(8, 12, 22, .72);
+      box-shadow:
+        0 12px 34px rgba(0,0,0,.55),
+        0 0 22px rgba(42,171,238,.14);
+      display:grid;
+      place-items:center;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      transition: transform .15s ease;
+      flex: 0 0 auto;
+    }
+    .menu-btn:active{ transform: scale(.98); }
+
+    .burger{ width:18px; height:14px; display:grid; gap:3px; }
+    .burger span{
+      height:2px;
+      border-radius:999px;
+      background: rgba(234,241,255,.92);
+      display:block;
+    }
+
+    /* =========================
+       ✅ Баланс: ещё короче, неон, без синего кружочка
+       ========================= */
+    .balance-mini{
+      width: min(210px, 70%);          /* короче */
+      height: 38px;                    /* компактнее */
+      border-radius: 999px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 10px;
+      padding: 6px 7px 6px 12px;
+      position:relative;
+      overflow:hidden;
+
+      background: rgba(8, 12, 22, .72);
+      border: 1px solid rgba(46, 180, 255, .22);
+      box-shadow:
+        0 14px 40px rgba(0,0,0,.55),
+        0 0 0 1px rgba(255,255,255,.04) inset,
+        0 0 24px rgba(42,171,238,.16);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+
+    .balance-mini::before{
+      content:"";
+      position:absolute;
+      inset:auto -40px 0 -40px;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, rgba(42,171,238,.95), rgba(59,130,246,.95), transparent);
+      opacity:.70;
+      pointer-events:none;
+    }
+
+    .balance-mini::after{
+      content:"";
+      position:absolute;
+      inset:-120px -160px auto auto;
+      width:300px;
+      height:300px;
+      background: radial-gradient(circle at 30% 30%, rgba(42,171,238,.16), transparent 62%);
+      pointer-events:none;
+      transform: rotate(10deg);
+    }
+
+    .bal-title{
+      position:relative;
+      z-index:1;
+      font-size:12px;
+      font-weight:900;
+      letter-spacing:.2px;
+      color: rgba(234,241,255,.92);
+      white-space:nowrap;
+    }
+
+    .bal-amount{
+      position:relative;
+      z-index:1;
+      height: 26px;
+      border:none;
+      border-radius: 999px;
+      cursor:pointer;
+      padding: 0 10px;
+
+      display:flex;
+      align-items:center;
+      justify-content:center;
+
+      background: linear-gradient(180deg, rgba(42,171,238,.22), rgba(59,130,246,.14));
+      border: 1px solid rgba(42,171,238,.24);
+      box-shadow:
+        0 10px 18px rgba(0,0,0,.35),
+        0 0 16px rgba(42,171,238,.12);
+      color: rgba(234,241,255,.98);
+      font-weight: 900;
+      font-size: 13px;
+      white-space:nowrap;
+    }
+    .bal-amount:active{ transform: scale(.99); }
+
+    /* =========================
+       ✅ Баннеры
+       ========================= */
+    .slider{ width:100%; max-width:520px; border-radius: var(--radius); }
+
+    .slides{
+      display:flex; gap:12px;
+      overflow-x:auto; scroll-snap-type:x mandatory;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width:none;
+      padding-bottom:4px;
+    }
+    .slides::-webkit-scrollbar{ display:none; }
+
+    .slide{
+      scroll-snap-align:start;
+      flex:0 0 100%;
+      height:170px;
+      border-radius: var(--radius);
+      position:relative;
+      overflow:hidden;
+      background:#000;
+      box-shadow: 0 18px 55px rgba(0,0,0,.40);
+    }
+    .slide img{ width:100%; height:100%; object-fit:cover; display:block; transform:scale(1.02); }
+    .slide::after{ content:""; position:absolute; inset:0; background: linear-gradient(180deg, rgba(0,0,0,.10), rgba(0,0,0,.38)); pointer-events:none; }
+
+    .dots{ display:flex; justify-content:center; gap:8px; margin-top:10px; }
+    .dot{
+      width:8px; height:8px; border-radius:999px;
+      background: rgba(234,241,255,.26);
+      transition: transform .2s ease, background .2s ease, width .2s ease;
+      cursor:pointer;
+    }
+    .dot.active{
+      background: rgba(42,171,238,.95);
+      width:18px;
+      transform: translateY(-.5px);
+      box-shadow: 0 0 12px rgba(42,171,238,.55);
+    }
+
+    /* =========================
+       ✅ 3 кнопки
+       ========================= */
+    .actions{
+      width:100%;
+      max-width:520px;
+      display:grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap:10px;
+    }
+
+    .action-btn{
+      position:relative;
+      height: 138px;
+      border:none;
+      border-radius:18px;
+      overflow:hidden;
+      cursor:pointer;
+      padding:0;
+      background:#0b102a;
+      box-shadow:
+        0 16px 34px rgba(0,0,0,.28),
+        0 0 0 1px rgba(255,255,255,.06) inset;
+      transition: transform .15s ease;
+    }
+    .action-btn:active{ transform: scale(.985); }
+
+    .action-btn .bg{
+      position:absolute; inset:0;
+      background-image: var(--bg);
+      background-size: cover;
+      background-position: center;
+      background-repeat:no-repeat;
+      transform: scale(1.03);
+      filter: saturate(1.03) contrast(1.02);
+    }
+    .action-btn .bg::after{
+      content:"";
+      position:absolute; inset:0;
+      background: linear-gradient(180deg, rgba(0,0,0,.05), rgba(0,0,0,.48));
+      pointer-events:none;
+    }
+
+    .action-btn::before,
+    .action-btn::after{
+      content:"";
+      position:absolute;
+      top:-18px; bottom:-18px;
+      width:18px;
+      filter: blur(10px);
+      opacity:.95;
+      pointer-events:none;
+    }
+    .action-btn::before{
+      left:-10px;
+      background: linear-gradient(180deg, rgba(42,171,238,.0), rgba(42,171,238,.95), rgba(59,130,246,.0));
+    }
+    .action-btn::after{
+      right:-10px;
+      background: linear-gradient(180deg, rgba(59,130,246,.0), rgba(42,171,238,.95), rgba(59,130,246,.0));
+    }
+
+    .action-btn .label{
+      position:absolute; left:0; right:0; bottom:0;
+      padding:12px 10px;
+      display:flex; align-items:center; justify-content:center;
+      font-weight:900;
+      font-size:13px;
+      letter-spacing:.2px;
+      color: rgba(234,241,255,.95);
+      background: linear-gradient(180deg, rgba(0,0,0,.00), rgba(0,0,0,.60));
+      text-shadow: 0 10px 18px rgba(0,0,0,.55);
+    }
+
+    /* =========================
+       ✅ Меню снизу
+       ========================= */
+    .sheet-overlay{
+      position:fixed;
+      inset:0;
+      background: rgba(0,0,0,.62);
+      opacity:0;
+      pointer-events:none;
+      transition: opacity .25s ease;
+      z-index:80;
+    }
+    .sheet-overlay.show{ opacity:1; pointer-events:auto; }
+
+    .sheet{
+      position:fixed;
+      left:0; right:0; bottom:0;
+      transform: translateY(110%);
+      transition: transform .30s cubic-bezier(.2,.9,.2,1);
+      z-index:90;
+      padding: 0 14px calc(28px + var(--safe-bottom)) 14px;
+    }
+    .sheet.show{ transform: translateY(-12px); }
+
+    .sheet-panel{
+      margin:0 auto;
+      width:min(520px, calc(100% - 10px));
+      border-radius:28px;
+      overflow:hidden;
+      background: rgba(12,18,34,.96);
+      box-shadow: 0 34px 90px rgba(0,0,0,.62);
+    }
+
+    .sheet-handle{
+      height:26px;
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      background: rgba(255,255,255,.04);
+    }
+    .sheet-handle span{
+      width:58px;
+      height:6px;
+      border-radius:999px;
+      background: rgba(234,241,255,.18);
+    }
+
+    .sheet-list{
+      display:flex;
+      flex-direction:column;
+      padding: 12px 12px 14px 12px;
+      gap: 10px;
+    }
+
+    .sheet-item{
+      border:none;
+      background: rgba(255,255,255,.06);
+      color:#eaf1ff;
+      text-align:left;
+      padding: 15px 14px;
+      font-weight: 900;
+      cursor:pointer;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      border-radius:16px;
+      box-shadow: 0 10px 26px rgba(0,0,0,.22);
+    }
+    .sheet-item:active{ background: rgba(255,255,255,.09); }
+
+    .sheet-item .left{ display:flex; align-items:center; gap:10px; min-width:0; }
+    .ico{
+      width:36px; height:36px; border-radius:12px;
+      display:grid; place-items:center;
+      font-size:16px;
+      background: rgba(42,171,238,.12);
+      box-shadow: 0 0 16px rgba(42,171,238,.10);
+      flex:0 0 auto;
+    }
+    .sheet-item .name{
+      font-size:13px;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+    .chev{ color: rgba(234,241,255,.65); font-weight:900; margin-left:10px; }
+
+    @media (max-width: 360px){
+      .balance-mini{ width: min(196px, 68%); height: 36px; }
+      .bal-amount{ height: 25px; font-size: 12px; }
+      .menu-btn{ width: 40px; height: 40px; border-radius: 13px; }
+      .action-btn{ height: 129px; }
+    }
+    @media (prefers-reduced-motion: reduce){
+      *{ transition:none !important; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="app">
+    <div class="content">
+
+      <!-- ✅ Меню слева + баланс -->
+      <div class="top-row">
+        <button class="menu-btn" id="menuBtn" aria-label="Открыть меню">
+          <div class="burger" aria-hidden="true">
+            <span></span><span></span><span></span>
+          </div>
+        </button>
+
+        <div class="balance-mini" aria-label="Баланс">
+          <span class="bal-title">Баланс</span>
+          <button class="bal-amount" id="balanceChip" aria-label="Открыть кошелёк">
+            <span id="balanceValue">0 VC</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- ✅ Баннеры -->
+      <div class="slider" aria-label="Баннеры">
+        <div class="slides" id="slides">
+          <div class="slide">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/Blackpink_PUBG_Mobile.png" alt="PUBG Mobile Banner 1">
+          </div>
+          <div class="slide">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/b/bd/BLACKPINK_PUBG_Mobile_Sept_2020_ad.png" alt="PUBG Mobile Banner 2">
+          </div>
+          <div class="slide">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/c/c2/BLACKPINK-inspired_PUBG_Mobile_incentives.png" alt="PUBG Mobile Banner 3">
+          </div>
+        </div>
+
+        <div class="dots" id="dots" aria-label="Индикатор баннера">
+          <div class="dot active"></div>
+          <div class="dot"></div>
+          <div class="dot"></div>
+        </div>
+      </div>
+
+      <!-- ✅ 3 кнопки -->
+      <div class="actions" aria-label="Разделы">
+        <button class="action-btn" id="btnGames"
+          style="--bg:url('https://i.postimg.cc/8khGybLS/d9e9d314-fd90-4cad-ad74-b2ed14a51f38.png');">
+          <div class="bg" aria-hidden="true"></div>
+          <div class="label">Игры</div>
+        </button>
+
+        <button class="action-btn" id="btnShop"
+          style="--bg:url('https://i.postimg.cc/8khGybLS/d9e9d314-fd90-4cad-ad74-b2ed14a51f38.png');">
+          <div class="bg" aria-hidden="true"></div>
+          <div class="label">UC Shop</div>
+        </button>
+
+        <button class="action-btn" id="btnCustom"
+          style="--bg:url('https://i.postimg.cc/8khGybLS/d9e9d314-fd90-4cad-ad74-b2ed14a51f38.png');">
+          <div class="bg" aria-hidden="true"></div>
+          <div class="label">Кастомки</div>
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ✅ Меню снизу -->
+  <div class="sheet-overlay" id="sheetOverlay"></div>
+
+  <div class="sheet" id="sheet">
+    <div class="sheet-panel" role="dialog" aria-modal="true" aria-label="Меню">
+      <div class="sheet-handle"><span></span></div>
+
+      <div class="sheet-list">
+        <button class="sheet-item" data-action="vouchers">
+          <div class="left"><div class="ico">🎟️</div><div class="name">Ваучеры</div></div>
+          <div class="chev">›</div>
+        </button>
+
+        <button class="sheet-item" data-action="profile">
+          <div class="left"><div class="ico">👤</div><div class="name">Профиль</div></div>
+          <div class="chev">›</div>
+        </button>
+
+        <button class="sheet-item" data-action="history">
+          <div class="left"><div class="ico">🕘</div><div class="name">История</div></div>
+          <div class="chev">›</div>
+        </button>
+
+        <button class="sheet-item" data-action="support">
+          <div class="left"><div class="ico">💬</div><div class="name">Поддержка</div></div>
+          <div class="chev">›</div>
+        </button>
+
+        <button class="sheet-item" data-action="ref">
+          <div class="left"><div class="ico">🔗</div><div class="name">Реферальная ссылка</div></div>
+          <div class="chev">›</div>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Баланс (заглушка)
+    document.getElementById('balanceValue').textContent = '0 VC';
+
+    // Клик по сумме (позже — переход на файл кошелька)
+    document.getElementById('balanceChip').addEventListener('click', () => {
+      alert('Позже здесь будет переход на страницу кошелька (депозит/вывод).');
+      // window.location.href = 'wallet.html';
+    });
+
+    // Баннеры: точки по scroll
+    const slides = document.getElementById('slides');
+    const dots = Array.from(document.getElementById('dots').querySelectorAll('.dot'));
+    function clamp(n, min, max){ return Math.max(min, Math.min(max, n)); }
+
+    function updateDotsByScroll(){
+      const w = slides.clientWidth || 1;
+      const idx = clamp(Math.round(slides.scrollLeft / w), 0, dots.length - 1);
+      dots.forEach((d,i)=>d.classList.toggle('active', i === idx));
+    }
+
+    let rafId = null;
+    slides.addEventListener('scroll', () => {
+      if (rafId) return;
+      rafId = requestAnimationFrame(() => {
+        updateDotsByScroll();
+        rafId = null;
+      });
+    });
+
+    dots.forEach((dot, i) => {
+      dot.addEventListener('click', () => {
+        slides.scrollTo({ left: i * slides.clientWidth, behavior: 'smooth' });
+      });
+    });
+
+    window.addEventListener('load', updateDotsByScroll);
+    window.addEventListener('resize', updateDotsByScroll);
+
+    // Меню (bottom sheet)
+    const sheet = document.getElementById('sheet');
+    const overlay = document.getElementById('sheetOverlay');
+    const menuBtn = document.getElementById('menuBtn');
+
+    function openSheet(){
+      overlay.classList.add('show');
+      sheet.classList.add('show');
+      document.body.style.overflow = 'hidden';
+    }
+    function closeSheet(){
+      overlay.classList.remove('show');
+      sheet.classList.remove('show');
+      document.body.style.overflow = '';
+    }
+
+    menuBtn.addEventListener('click', openSheet);
+    overlay.addEventListener('click', closeSheet);
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeSheet(); });
+
+    document.querySelectorAll('.sheet-item').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const action = btn.getAttribute('data-action');
+        closeSheet();
+        alert('Открыть: ' + action);
+      });
+    });
+
+    // 3 кнопки (заглушки)
+    document.getElementById('btnGames').addEventListener('click', () => alert('Игры (позже сделаем переход)'));
+    document.getElementById('btnShop').addEventListener('click', () => alert('UC Shop (позже сделаем переход)'));
+    document.getElementById('btnCustom').addEventListener('click', () => alert('Кастомки (позже сделаем переход)'));
+  </script>
+</body>
+</html>
