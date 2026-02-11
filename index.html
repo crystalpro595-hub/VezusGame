@@ -58,25 +58,23 @@
       align-items:center;
     }
 
-    /* ✅ Верхняя строка: КАК БЫЛО (группа по центру) */
+    /* ✅ Верхняя строка */
     .top-row{
       width:100%;
       max-width:520px;
       display:flex;
       align-items:center;
       justify-content:center;
-      gap: 16px; /* расстояние до баланса */
+      gap:16px;
     }
 
-    /* ✅ Блок слева: бургер + профиль */
     .left-buttons{
       display:flex;
       align-items:center;
       gap:10px;
-      transform: translateX(-10px); /* ✅ чуть левее */
+      transform: translateX(-10px);
     }
 
-    /* ✅ Кнопка меню */
     .menu-btn{
       width: 42px;
       height: 42px;
@@ -92,7 +90,6 @@
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
       transition: transform .15s ease;
-      flex: 0 0 auto;
       padding:0;
     }
     .menu-btn:active{ transform: scale(.98); }
@@ -105,7 +102,6 @@
       display:block;
     }
 
-    /* ✅ Кнопка профиля (такая же, ничего не вылезает) */
     .profile-btn{
       width: 42px;
       height: 42px;
@@ -122,7 +118,7 @@
       -webkit-backdrop-filter: blur(12px);
       transition: transform .15s ease;
       padding:0;
-      overflow:hidden; /* ✅ чтобы точно ничего не торчало */
+      overflow:hidden;
     }
     .profile-btn:active{ transform: scale(.98); }
 
@@ -135,10 +131,9 @@
       stroke-width: 2;
       stroke-linecap: round;
       stroke-linejoin: round;
-      margin:0;
     }
 
-    /* ✅ Баланс: КАК БЫЛО */
+    /* ✅ Баланс (как было) */
     .balance-mini{
       width: min(210px, 70%);
       height: 38px;
@@ -200,7 +195,6 @@
       border-radius: 999px;
       cursor:pointer;
       padding: 0 10px;
-
       display:flex;
       align-items:center;
       justify-content:center;
@@ -217,12 +211,14 @@
     }
     .bal-amount:active{ transform: scale(.99); }
 
-    /* ✅ Баннеры */
+    /* ✅ БАННЕРЫ — ВАРИАНТ B (3:1 + cover, одинаково на устройствах) */
     .slider{ width:100%; max-width:520px; border-radius: var(--radius); }
 
     .slides{
-      display:flex; gap:12px;
-      overflow-x:auto; scroll-snap-type:x mandatory;
+      display:flex;
+      gap:12px;
+      overflow-x:auto;
+      scroll-snap-type:x mandatory;
       -webkit-overflow-scrolling: touch;
       scrollbar-width:none;
       padding-bottom:4px;
@@ -232,15 +228,36 @@
     .slide{
       scroll-snap-align:start;
       flex:0 0 100%;
-      height:170px;
       border-radius: var(--radius);
       position:relative;
       overflow:hidden;
       background:#000;
       box-shadow: 0 18px 55px rgba(0,0,0,.40);
     }
-    .slide img{ width:100%; height:100%; object-fit:cover; display:block; transform:scale(1.02); }
-    .slide::after{ content:""; position:absolute; inset:0; background: linear-gradient(180deg, rgba(0,0,0,.10), rgba(0,0,0,.38)); pointer-events:none; }
+
+    .slide::before{
+      content:"";
+      display:block;
+      padding-top: 33.3333%;
+    }
+
+    .slide img{
+      position:absolute;
+      inset:0;
+      width:100%;
+      height:100%;
+      object-fit: cover;
+      object-position: center;
+      display:block;
+    }
+
+    .slide::after{
+      content:"";
+      position:absolute;
+      inset:0;
+      background: linear-gradient(180deg, rgba(0,0,0,.10), rgba(0,0,0,.38));
+      pointer-events:none;
+    }
 
     .dots{ display:flex; justify-content:center; gap:8px; margin-top:10px; }
     .dot{
@@ -457,16 +474,17 @@
         </div>
       </div>
 
+      <!-- ✅ Баннеры (3:1) -->
       <div class="slider" aria-label="Баннеры">
         <div class="slides" id="slides">
           <div class="slide">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/Blackpink_PUBG_Mobile.png" alt="PUBG Mobile Banner 1">
+            <img src="YOUR_BANNER_1200x400.png" alt="Banner 1">
           </div>
           <div class="slide">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/b/bd/BLACKPINK_PUBG_Mobile_Sept_2020_ad.png" alt="PUBG Mobile Banner 2">
+            <img src="YOUR_BANNER_1200x400.png" alt="Banner 2">
           </div>
           <div class="slide">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/c/c2/BLACKPINK-inspired_PUBG_Mobile_incentives.png" alt="PUBG Mobile Banner 3">
+            <img src="YOUR_BANNER_1200x400.png" alt="Banner 3">
           </div>
         </div>
 
@@ -512,8 +530,6 @@
           <div class="chev">›</div>
         </button>
 
-        <!-- ✅ Профиль убран из меню -->
-
         <button class="sheet-item" data-action="history">
           <div class="left"><div class="ico">🕘</div><div class="name">История</div></div>
           <div class="chev">›</div>
@@ -533,25 +549,37 @@
   </div>
 
   <script>
+    // Баланс (заглушка)
     document.getElementById('balanceValue').textContent = '0 VC';
 
+    // Переход в кошелек
     document.getElementById('balanceChip').addEventListener('click', () => {
       window.location.href = 'wallet.html';
     });
 
-    // ✅ Профиль (пока заглушка)
+    // Профиль (заглушка)
     document.getElementById('profileBtn').addEventListener('click', () => {
       alert('Профиль (позже сделаем переход)');
       // window.location.href = 'profile.html';
     });
 
+    // Баннеры: точки по scroll (учитываем gap)
     const slides = document.getElementById('slides');
     const dots = Array.from(document.getElementById('dots').querySelectorAll('.dot'));
+
+    function getStep(){
+      const first = slides.querySelector('.slide');
+      if (!first) return slides.clientWidth || 1;
+      const w = first.getBoundingClientRect().width || 1;
+      const gap = parseFloat(getComputedStyle(slides).gap || '0') || 0;
+      return w + gap;
+    }
+
     function clamp(n, min, max){ return Math.max(min, Math.min(max, n)); }
 
     function updateDotsByScroll(){
-      const w = slides.clientWidth || 1;
-      const idx = clamp(Math.round(slides.scrollLeft / w), 0, dots.length - 1);
+      const step = getStep();
+      const idx = clamp(Math.round(slides.scrollLeft / step), 0, dots.length - 1);
       dots.forEach((d,i)=>d.classList.toggle('active', i === idx));
     }
 
@@ -566,13 +594,14 @@
 
     dots.forEach((dot, i) => {
       dot.addEventListener('click', () => {
-        slides.scrollTo({ left: i * slides.clientWidth, behavior: 'smooth' });
+        slides.scrollTo({ left: i * getStep(), behavior: 'smooth' });
       });
     });
 
     window.addEventListener('load', updateDotsByScroll);
     window.addEventListener('resize', updateDotsByScroll);
 
+    // Меню (bottom sheet)
     const sheet = document.getElementById('sheet');
     const overlay = document.getElementById('sheetOverlay');
     const menuBtn = document.getElementById('menuBtn');
@@ -600,8 +629,14 @@
       });
     });
 
+    // 3 кнопки
     document.getElementById('btnGames').addEventListener('click', () => alert('Игры (позже сделаем переход)'));
-    document.getElementById('btnShop').addEventListener('click', () => alert('UC Shop (позже сделаем переход)'));
+
+    // ✅ ПЕРЕХОД НА ucshop.html
+    document.getElementById('btnShop').addEventListener('click', () => {
+      window.location.href = 'ucshop.html';
+    });
+
     document.getElementById('btnCustom').addEventListener('click', () => alert('Кастомки (позже сделаем переход)'));
   </script>
 </body>
