@@ -178,9 +178,9 @@ body{
 .pay:hover{box-shadow:0 20px 40px rgba(37,99,235,.45);}
 .pay:active{transform:scale(.97);}
 
-/* ✅ Градиентная кнопка "Назад" */
+/* ✅ Градиентная кнопка "Назад" (по центру) */
 .back-gradient-btn{
-  margin: 10px 16px 22px;
+  margin: 10px auto 22px;         /* центрируем */
   padding: 18px;
   border-radius: 18px;
   border: none;
@@ -193,9 +193,8 @@ body{
   box-shadow:0 15px 30px rgba(37,99,235,.35);
   cursor:pointer;
 
-  width: calc(100% - 32px);
-  max-width: 400px;
-  align-self: center;
+  width: min(400px, calc(100% - 32px)); /* вместо full-width делаем “карточную” ширину */
+  display:block;
 
   transition: .3s;
 }
@@ -205,9 +204,9 @@ body{
 }
 .back-gradient-btn:active{ transform:scale(.97); }
 
-/* Кнопка вывода */
+/* ✅ Кнопка вывода (по центру) */
 .withdraw-button{
-  margin:30px 16px 20px;
+  margin:30px auto 12px;          /* центрируем */
   padding:20px;
   border-radius:18px;
   border:none;
@@ -219,9 +218,9 @@ body{
   transition:all .3s;
   cursor:pointer;
   opacity:.6;
-  width:calc(100% - 32px);
-  max-width:400px;
-  align-self:center;
+
+  width: min(400px, calc(100% - 32px)); /* центрированная ширина */
+  display:block;
 }
 .withdraw-button.active{opacity:1;}
 .withdraw-button:hover{
@@ -596,8 +595,6 @@ body{
   </div>
 
   <button class="pay" id="payButton" onclick="openPaymentPopup()" disabled>Пополнить</button>
-
-  <!-- ✅ НОВОЕ: кнопка назад на сайт под "Пополнить" -->
   <button class="back-gradient-btn" type="button" onclick="goToIndex()">Вернуться назад</button>
 </div>
 
@@ -647,8 +644,6 @@ body{
     </div>
 
     <button class="withdraw-button" id="withdrawButton" onclick="processWithdraw()" disabled>Вывести</button>
-
-    <!-- ✅ НОВОЕ: кнопка назад (вместо стрелки в хедере) -->
     <button class="back-gradient-btn" type="button" onclick="backToMain()">Назад</button>
   </div>
 </div>
@@ -779,8 +774,6 @@ function detectDevice(){
 function goToIndex(){
   closeAllPopups();
   window.location.href = 'index.html';
-  // Альтернатива:
-  // if (history.length > 1) history.back(); else window.location.href = 'index.html';
 }
 
 /* -------------------- Toast -------------------- */
@@ -894,7 +887,6 @@ function validateForm(){
       updatePayButton(true);
     }
   } else {
-    // ✅ Красим только если пользователь трогал поле/ставил быстрые суммы
     if (depositTouched){
       amountEl.classList.add('error');
       minHint.classList.add('error');
@@ -967,7 +959,6 @@ function selectPaymentMethod(method){
 }
 
 function openCheckPopup(){
-  // ✅ это только пополнение
   closePaymentPopup();
   closeAllPopups();
   $('depositCheckPopup').classList.add('show');
@@ -981,8 +972,8 @@ function openCheckPopup(){
 
 /* -------------------- Экран вывода -------------------- */
 function openWithdrawScreen(){
-  closeAllPopups();               // ✅ страховка
-  withdrawTouched = false;        // ✅ чтобы минимум не красный изначально
+  closeAllPopups();
+  withdrawTouched = false;
   isWithdrawProcessing = false;
 
   $('mainScreen').classList.add('hidden');
@@ -990,13 +981,11 @@ function openWithdrawScreen(){
 
   $('withdrawBalance').textContent = $('walletBalance').textContent;
 
-  // Сброс полей
   $('withdrawAmount').value = '';
   $('requisitesInput').value = '';
   $('fioInput').value = '';
   $('bankInput').value = '';
 
-  // Сброс ошибок/подсказок
   $('withdrawAmount').classList.remove('error');
   $('withdrawMinimumHint').classList.remove('error');
   $('withdrawFields').classList.remove('show');
@@ -1012,7 +1001,7 @@ function openWithdrawScreen(){
 }
 
 function backToMain(){
-  closeAllPopups(); // ✅ страховка
+  closeAllPopups();
   $('withdrawScreen').classList.add('hidden');
   $('mainScreen').classList.remove('hidden');
 }
@@ -1032,7 +1021,6 @@ function updateWithdrawButton(isActive){
   }
 }
 
-/* Валидация вывода */
 function validateWithdraw(){
   withdrawTouched = true;
 
@@ -1052,7 +1040,6 @@ function validateWithdraw(){
   const fioErr  = $('fioWithdrawError');
   const bankErr = $('bankWithdrawError');
 
-  // Если пусто — не красим
   if (!hasValue){
     amountEl.classList.remove('error');
     minHint.classList.remove('error');
@@ -1066,7 +1053,6 @@ function validateWithdraw(){
     return;
   }
 
-  // Минимум
   if (amount >= 1000){
     amountEl.classList.remove('error');
     minHint.classList.remove('error');
@@ -1084,7 +1070,6 @@ function validateWithdraw(){
     return;
   }
 
-  // Поля
   const isReq  = reqEl.value.trim().length > 0;
   const isFio  = fioEl.value.trim().length > 0;
   const isBank = bankEl.value.trim().length > 0;
@@ -1102,7 +1087,6 @@ function validateWithdraw(){
   updateWithdrawButton(allOk && !isWithdrawProcessing);
 }
 
-/* Обработка вывода */
 function processWithdraw(){
   const btn = $('withdrawButton');
   if (btn.disabled) return;
@@ -1121,7 +1105,6 @@ function processWithdraw(){
   isWithdrawProcessing = true;
   updateWithdrawButton(false);
 
-  // ✅ В выводе показываем ТОЛЬКО загрузку вывода
   closeAllPopups();
   $('withdrawProcessingPopup').classList.add('show');
 
@@ -1137,7 +1120,6 @@ function processWithdraw(){
   }, 5000);
 }
 
-/* -------------------- Инициализация -------------------- */
 document.addEventListener('DOMContentLoaded', () => {
   detectDevice();
   $('walletBalance').textContent = '0 VC';
@@ -1147,12 +1129,10 @@ document.addEventListener('DOMContentLoaded', () => {
   updatePayButton(false);
   updateWithdrawButton(false);
 
-  // Изначально минимум НЕ красный
   $('minimumHint').classList.remove('error');
   $('withdrawMinimumHint').classList.remove('error');
 });
 
-/* Запрет зума iOS/Android */
 document.addEventListener('touchstart', (event) => {
   if (event.touches.length > 1) event.preventDefault();
 }, { passive:false });
@@ -1166,7 +1146,6 @@ document.addEventListener('touchend', (event) => {
 
 document.addEventListener('gesturestart', (e) => e.preventDefault());
 
-// ✅ Когда пользователь впервые трогает сумму пополнения — touched
 $('amountInput')?.addEventListener('input', () => { depositTouched = true; });
 $('withdrawAmount')?.addEventListener('input', () => { withdrawTouched = true; });
 </script>
