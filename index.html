@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>VezusGame</title>
+  <title>Wallet</title>
 
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
 
@@ -211,7 +211,7 @@
     }
     .bal-amount:active{ transform: scale(.99); }
 
-    /* ✅ БАННЕРЫ — ВАРИАНТ B (3:1 + cover, одинаково на устройствах) */
+    /* ✅ БАННЕРЫ — ВАРИАНТ B (3:1 + cover) */
     .slider{ width:100%; max-width:520px; border-radius: var(--radius); }
 
     .slides{
@@ -273,7 +273,7 @@
       box-shadow: 0 0 12px rgba(42,171,238,.55);
     }
 
-    /* ✅ 3 кнопки (квадратные) */
+    /* ✅ 3 кнопки */
     .actions{
       width:100%;
       max-width:520px;
@@ -440,13 +440,85 @@
       .top-row{ gap: 14px; }
     }
 
-    @media (prefers-reduced-motion: reduce){
-      *{ transition:none !important; }
+    /* ✅ Оверлей логина */
+    .auth-overlay{
+      position:fixed;
+      inset:0;
+      z-index:200;
+      display:none;
+      align-items:center;
+      justify-content:center;
+      padding: 18px;
+      background: rgba(0,0,0,.68);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
     }
+    .auth-overlay.show{ display:flex; }
+
+    .auth-card{
+      width:min(520px, 100%);
+      border-radius: 22px;
+      background: rgba(12,18,34,.96);
+      border: 1px solid rgba(46, 180, 255, .22);
+      box-shadow: 0 34px 90px rgba(0,0,0,.62);
+      padding: 18px;
+    }
+
+    .auth-title{
+      font-weight: 900;
+      font-size: 16px;
+      margin: 0 0 10px 0;
+    }
+    .auth-sub{
+      margin: 0 0 14px 0;
+      color: rgba(234,241,255,.74);
+      font-size: 13px;
+      line-height: 1.35;
+    }
+
+    .google-btn{
+      width:100%;
+      height: 44px;
+      border-radius: 14px;
+      border: 1px solid rgba(46, 180, 255, .22);
+      cursor:pointer;
+      background: rgba(8, 12, 22, .72);
+      color: rgba(234,241,255,.98);
+      font-weight: 900;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:10px;
+      box-shadow: 0 12px 34px rgba(0,0,0,.55);
+    }
+    .google-btn:active{ transform: scale(.99); }
+
+    .auth-error{
+      margin-top: 12px;
+      font-size: 12px;
+      color: #ffb4b4;
+      display:none;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+    .auth-error.show{ display:block; }
   </style>
 </head>
 
 <body>
+  <!-- ✅ Окно входа -->
+  <div class="auth-overlay" id="authOverlay" aria-hidden="true">
+    <div class="auth-card">
+      <div class="auth-title">Вход</div>
+      <p class="auth-sub">Чтобы у каждого был свой баланс и профиль — нужно войти через Google.</p>
+      <button class="google-btn" id="googleLoginBtn">
+        <span>🔐</span>
+        <span>Войти через Google</span>
+      </button>
+      <div class="auth-error" id="authError"></div>
+    </div>
+  </div>
+
   <div class="app">
     <div class="content">
 
@@ -477,15 +549,9 @@
       <!-- ✅ Баннеры (3:1) -->
       <div class="slider" aria-label="Баннеры">
         <div class="slides" id="slides">
-          <div class="slide">
-            <img src="YOUR_BANNER_1200x400.png" alt="Banner 1">
-          </div>
-          <div class="slide">
-            <img src="YOUR_BANNER_1200x400.png" alt="Banner 2">
-          </div>
-          <div class="slide">
-            <img src="YOUR_BANNER_1200x400.png" alt="Banner 3">
-          </div>
+          <div class="slide"><img src="YOUR_BANNER_1200x400.png" alt="Banner 1"></div>
+          <div class="slide"><img src="YOUR_BANNER_1200x400.png" alt="Banner 2"></div>
+          <div class="slide"><img src="YOUR_BANNER_1200x400.png" alt="Banner 3"></div>
         </div>
 
         <div class="dots" id="dots" aria-label="Индикатор баннера">
@@ -544,13 +610,157 @@
           <div class="left"><div class="ico">🔗</div><div class="name">Реферальная ссылка</div></div>
           <div class="chev">›</div>
         </button>
+
+        <!-- ✅ Выйти -->
+        <button class="sheet-item" data-action="logout" id="logoutBtn">
+          <div class="left"><div class="ico">🚪</div><div class="name">Выйти</div></div>
+          <div class="chev">›</div>
+        </button>
       </div>
     </div>
   </div>
 
-  <script>
-    // Баланс (заглушка)
-    document.getElementById('balanceValue').textContent = '0 VC';
+  <!-- ✅ Supabase + логика -->
+  <script type="module">
+    import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+
+    // ✅ ТВОИ ДАННЫЕ SUPABASE
+    const SUPABASE_URL = "https://bidlyktnwnwvtfehnojw.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpZGx5a3Rud253dnRmZWhub2p3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA4NDg3NTQsImV4cCI6MjA4NjQyNDc1NH0.pYnmlTpkj4n3WbaMeAy6hlgO1470pg0Wm4nOV1w9WIY";
+
+    const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+      auth: {
+        persistSession: true,
+        autoRefreshToken: true,
+        detectSessionInUrl: true
+      }
+    });
+
+    // ---- UI refs
+    const authOverlay = document.getElementById("authOverlay");
+    const authError = document.getElementById("authError");
+    const googleLoginBtn = document.getElementById("googleLoginBtn");
+
+    const balanceValue = document.getElementById("balanceValue");
+    const profileBtn = document.getElementById("profileBtn");
+
+    function showAuth(errorText = "") {
+      authOverlay.classList.add("show");
+      authOverlay.setAttribute("aria-hidden", "false");
+      if (errorText) {
+        authError.textContent = errorText;
+        authError.classList.add("show");
+      } else {
+        authError.textContent = "";
+        authError.classList.remove("show");
+      }
+    }
+
+    function hideAuth() {
+      authOverlay.classList.remove("show");
+      authOverlay.setAttribute("aria-hidden", "true");
+      authError.textContent = "";
+      authError.classList.remove("show");
+    }
+
+    function setBalance(v) {
+      const num = Number(v);
+      balanceValue.textContent = (Number.isFinite(num) ? num : 0) + " VC";
+    }
+
+    async function ensureProfileAndLoad(user) {
+      // 1) upsert профиля
+      const full_name =
+        user.user_metadata?.full_name ||
+        user.user_metadata?.name ||
+        user.user_metadata?.display_name ||
+        "User";
+
+      const avatar_url =
+        user.user_metadata?.avatar_url ||
+        user.user_metadata?.picture ||
+        null;
+
+      const email = user.email || null;
+
+      // IMPORTANT: таблица profiles должна иметь хотя бы поля: id (uuid), balance (число)
+      // Остальные поля (email/full_name/avatar_url) можно тоже иметь — тогда они заполнятся.
+      const upsertPayload = {
+        id: user.id,
+        email,
+        full_name,
+        avatar_url
+      };
+
+      // Пытаемся upsert (если колонки email/full_name/avatar_url у тебя не созданы — можно их добавить в таблицу)
+      // Если хочешь оставить минимально — добавь эти колонки или просто удали их из payload.
+      const { error: upsertError } = await supabase
+        .from("profiles")
+        .upsert(upsertPayload, { onConflict: "id" });
+
+      if (upsertError) {
+        console.warn("profiles upsert error:", upsertError);
+        // не падаем — просто продолжим читать баланс
+      }
+
+      // 2) читаем баланс
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("*")
+        .eq("id", user.id)
+        .maybeSingle();
+
+      if (error) {
+        console.error("profiles select error:", error);
+        showAuth("Ошибка чтения профиля.\nПроверь RLS policies для таблицы profiles.\n\n" + error.message);
+        return;
+      }
+
+      const balance = data?.balance ?? 0;
+      setBalance(balance);
+
+      // (необязательно) можно здесь обновлять иконку профиля аватаркой, если хочешь
+      // console.log("profile:", data);
+    }
+
+    async function refreshAuthUI() {
+      const { data: { session } } = await supabase.auth.getSession();
+
+      if (!session?.user) {
+        setBalance(0);
+        showAuth();
+        return;
+      }
+
+      hideAuth();
+      await ensureProfileAndLoad(session.user);
+    }
+
+    // ✅ Вход Google
+    googleLoginBtn.addEventListener("click", async () => {
+      try {
+        authError.classList.remove("show");
+        authError.textContent = "";
+
+        const redirectTo = window.location.href; // важно: должен быть добавлен в Redirect URLs в Supabase
+
+        const { error } = await supabase.auth.signInWithOAuth({
+          provider: "google",
+          options: { redirectTo }
+        });
+
+        if (error) showAuth("Ошибка входа Google:\n" + error.message);
+      } catch (e) {
+        showAuth("Ошибка входа:\n" + (e?.message || String(e)));
+      }
+    });
+
+    // ✅ Слушаем изменения авторизации
+    supabase.auth.onAuthStateChange((_event, _session) => {
+      refreshAuthUI();
+    });
+
+    // -------- ТВОЯ СТАРАЯ ЛОГИКА (почти без изменений)
 
     // Переход в кошелек
     document.getElementById('balanceChip').addEventListener('click', () => {
@@ -558,7 +768,7 @@
     });
 
     // Профиль (пока заглушка)
-    document.getElementById('profileBtn').addEventListener('click', () => {
+    profileBtn.addEventListener('click', () => {
       alert('Профиль (позже сделаем переход)');
       // window.location.href = 'profile.html';
     });
@@ -622,9 +832,15 @@
     document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeSheet(); });
 
     document.querySelectorAll('.sheet-item').forEach(btn => {
-      btn.addEventListener('click', () => {
+      btn.addEventListener('click', async () => {
         const action = btn.getAttribute('data-action');
         closeSheet();
+
+        if (action === "logout") {
+          await supabase.auth.signOut();
+          return;
+        }
+
         alert('Открыть: ' + action);
       });
     });
@@ -638,7 +854,9 @@
     });
 
     document.getElementById('btnCustom').addEventListener('click', () => alert('Кастомки (позже сделаем переход)'));
+
+    // ✅ старт
+    refreshAuthUI();
   </script>
 </body>
 </html>
-                
