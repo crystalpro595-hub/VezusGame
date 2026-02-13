@@ -211,7 +211,7 @@
     }
     .bal-amount:active{ transform: scale(.99); }
 
-    /* ✅ БАННЕРЫ — ВАРИАНТ B (3:1 + cover, одинаково на устройствах) */
+    /* ✅ БАННЕРЫ — ВАРИАНТ B (3:1 + cover) */
     .slider{ width:100%; max-width:520px; border-radius: var(--radius); }
 
     .slides{
@@ -235,11 +235,7 @@
       box-shadow: 0 18px 55px rgba(0,0,0,.40);
     }
 
-    .slide::before{
-      content:"";
-      display:block;
-      padding-top: 33.3333%;
-    }
+    .slide::before{ content:""; display:block; padding-top: 33.3333%; }
 
     .slide img{
       position:absolute;
@@ -314,25 +310,6 @@
       position:absolute; inset:0;
       background: linear-gradient(180deg, rgba(0,0,0,.05), rgba(0,0,0,.48));
       pointer-events:none;
-    }
-
-    .action-btn::before,
-    .action-btn::after{
-      content:"";
-      position:absolute;
-      top:-18px; bottom:-18px;
-      width:18px;
-      filter: blur(10px);
-      opacity:.95;
-      pointer-events:none;
-    }
-    .action-btn::before{
-      left:-10px;
-      background: linear-gradient(180deg, rgba(42,171,238,.0), rgba(42,171,238,.95), rgba(59,130,246,.0));
-    }
-    .action-btn::after{
-      right:-10px;
-      background: linear-gradient(180deg, rgba(59,130,246,.0), rgba(42,171,238,.95), rgba(59,130,246,.0));
     }
 
     .action-btn .label{
@@ -432,6 +409,59 @@
     }
     .chev{ color: rgba(234,241,255,.65); font-weight:900; margin-left:10px; }
 
+    /* ✅ Экран входа */
+    .auth-overlay{
+      position:fixed;
+      inset:0;
+      z-index:200;
+      display:none;
+      align-items:center;
+      justify-content:center;
+      padding: 20px;
+      background: rgba(0,0,0,.70);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+    .auth-overlay.show{ display:flex; }
+
+    .auth-card{
+      width:min(520px, 100%);
+      border-radius: 24px;
+      padding: 18px;
+      background: rgba(12,18,34,.96);
+      border: 1px solid rgba(46, 180, 255, .18);
+      box-shadow: 0 34px 90px rgba(0,0,0,.62);
+    }
+    .auth-title{
+      font-weight: 900;
+      font-size: 16px;
+      margin: 0 0 8px 0;
+    }
+    .auth-sub{
+      margin: 0 0 14px 0;
+      color: rgba(234,241,255,.78);
+      font-size: 13px;
+      line-height: 1.35;
+    }
+    .auth-btn{
+      width:100%;
+      height: 46px;
+      border: none;
+      border-radius: 14px;
+      cursor:pointer;
+      font-weight: 900;
+      color: rgba(234,241,255,.96);
+      background: linear-gradient(180deg, rgba(42,171,238,.22), rgba(59,130,246,.14));
+      border: 1px solid rgba(42,171,238,.24);
+      box-shadow: 0 10px 18px rgba(0,0,0,.35), 0 0 16px rgba(42,171,238,.12);
+    }
+    .auth-btn:active{ transform: scale(.99); }
+    .auth-small{
+      margin-top: 10px;
+      font-size: 12px;
+      color: rgba(234,241,255,.6);
+    }
+
     @media (max-width: 360px){
       .balance-mini{ width: min(196px, 68%); height: 36px; }
       .bal-amount{ height: 25px; font-size: 12px; }
@@ -447,7 +477,18 @@
 </head>
 
 <body>
-  <div class="app">
+
+  <!-- ✅ Обязательный вход -->
+  <div class="auth-overlay" id="authOverlay" aria-label="Авторизация">
+    <div class="auth-card">
+      <h2 class="auth-title">Вход</h2>
+      <p class="auth-sub">Чтобы пользоваться приложением, нужно войти через Google.</p>
+      <button class="auth-btn" id="googleLoginBtn">Войти через Google</button>
+      <div class="auth-small" id="authStatus"></div>
+    </div>
+  </div>
+
+  <div class="app" id="appRoot" style="display:none;">
     <div class="content">
 
       <div class="top-row">
@@ -477,15 +518,9 @@
       <!-- ✅ Баннеры (3:1) -->
       <div class="slider" aria-label="Баннеры">
         <div class="slides" id="slides">
-          <div class="slide">
-            <img src="YOUR_BANNER_1200x400.png" alt="Banner 1">
-          </div>
-          <div class="slide">
-            <img src="YOUR_BANNER_1200x400.png" alt="Banner 2">
-          </div>
-          <div class="slide">
-            <img src="YOUR_BANNER_1200x400.png" alt="Banner 3">
-          </div>
+          <div class="slide"><img src="YOUR_BANNER_1200x400.png" alt="Banner 1"></div>
+          <div class="slide"><img src="YOUR_BANNER_1200x400.png" alt="Banner 2"></div>
+          <div class="slide"><img src="YOUR_BANNER_1200x400.png" alt="Banner 3"></div>
         </div>
 
         <div class="dots" id="dots" aria-label="Индикатор баннера">
@@ -544,23 +579,118 @@
           <div class="left"><div class="ico">🔗</div><div class="name">Реферальная ссылка</div></div>
           <div class="chev">›</div>
         </button>
+
+        <button class="sheet-item" id="logoutBtn" data-action="logout">
+          <div class="left"><div class="ico">🚪</div><div class="name">Выйти</div></div>
+          <div class="chev">›</div>
+        </button>
       </div>
     </div>
   </div>
 
+  <!-- ✅ Supabase JS (CDN) -->
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+
   <script>
-    // Баланс (заглушка)
-    document.getElementById('balanceValue').textContent = '0 VC';
+    // ✅ ВСТАВЬ СЮДА ДАННЫЕ ИЗ Supabase -> Settings -> API
+    const SUPABASE_URL = "https://bidlyktnwnwvtfehnojw.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpZGx5a3Rud253dnRmZWhub2p3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA4NDg3NTQsImV4cCI6MjA4NjQyNDc1NH0.pYnmlTpkj4n3WbaMeAy6hlgO1470pg0Wm4nOV1w9WIY";
+
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+      auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true }
+    });
+
+    const authOverlay = document.getElementById('authOverlay');
+    const authStatus = document.getElementById('authStatus');
+    const googleLoginBtn = document.getElementById('googleLoginBtn');
+    const appRoot = document.getElementById('appRoot');
+
+    function showAuth(msg=""){
+      authOverlay.classList.add('show');
+      appRoot.style.display = 'none';
+      authStatus.textContent = msg;
+    }
+
+    function showApp(){
+      authOverlay.classList.remove('show');
+      appRoot.style.display = '';
+      authStatus.textContent = "";
+    }
+
+    // ✅ Кнопка "Войти через Google"
+    googleLoginBtn.addEventListener('click', async () => {
+      try{
+        showAuth("Открываю Google...");
+        await supabase.auth.signInWithOAuth({
+          provider: 'google',
+          options: {
+            // возвращаемся на эту же страницу
+            redirectTo: window.location.href
+          }
+        });
+      }catch(e){
+        console.error(e);
+        showAuth("Ошибка входа. Открой консоль.");
+      }
+    });
+
+    // ✅ Загрузка баланса из БД
+    async function loadBalance(user){
+      const balanceEl = document.getElementById('balanceValue');
+      balanceEl.textContent = '0 VC';
+
+      try{
+        const { data, error } = await supabase
+          .from('wallets')
+          .select('balance')
+          .eq('user_id', user.id)
+          .single();
+
+        if (error) {
+          // если таблиц ещё нет / RLS / и т.д.
+          console.warn('Wallet load error:', error.message);
+          return;
+        }
+
+        balanceEl.textContent = `${data.balance} VC`;
+      }catch(err){
+        console.warn(err);
+      }
+    }
+
+    // ✅ Проверка сессии при открытии страницы
+    async function initAuth(){
+      const { data: { session } } = await supabase.auth.getSession();
+
+      if (!session?.user){
+        showAuth("");
+        return;
+      }
+
+      showApp();
+      await loadBalance(session.user);
+    }
+
+    // Если сессия изменилась (вход/выход)
+    supabase.auth.onAuthStateChange(async (_event, session) => {
+      if (!session?.user){
+        showAuth("");
+        return;
+      }
+      showApp();
+      await loadBalance(session.user);
+    });
+
+    // ====== ТВОЙ СТАРЫЙ JS (почти без изменений) ======
 
     // Переход в кошелек
     document.getElementById('balanceChip').addEventListener('click', () => {
       window.location.href = 'wallet.html';
     });
 
-    // Профиль (заглушка)
+    // Профиль (пока заглушка)
     document.getElementById('profileBtn').addEventListener('click', () => {
       alert('Профиль (позже сделаем переход)');
-      // window.location.href = 'profile.html';
     });
 
     // Баннеры: точки по scroll (учитываем gap)
@@ -622,8 +752,15 @@
     document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeSheet(); });
 
     document.querySelectorAll('.sheet-item').forEach(btn => {
-      btn.addEventListener('click', () => {
+      btn.addEventListener('click', async () => {
         const action = btn.getAttribute('data-action');
+
+        if (action === 'logout'){
+          closeSheet();
+          await supabase.auth.signOut();
+          return;
+        }
+
         closeSheet();
         alert('Открыть: ' + action);
       });
@@ -638,7 +775,9 @@
     });
 
     document.getElementById('btnCustom').addEventListener('click', () => alert('Кастомки (позже сделаем переход)'));
+
+    // ✅ старт
+    initAuth();
   </script>
 </body>
 </html>
-```0
