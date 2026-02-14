@@ -58,7 +58,7 @@
       align-items:center;
     }
 
-    /* ✅ Верхняя строка */
+    /* Верхняя строка */
     .top-row{
       width:100%;
       max-width:520px;
@@ -142,7 +142,7 @@
       box-shadow: 0 0 0 2px rgba(255,255,255,.12);
     }
 
-    /* ✅ Баланс */
+    /* Баланс */
     .balance-mini{
       width: min(210px, 70%);
       height: 38px;
@@ -220,14 +220,11 @@
     }
     .bal-amount:active{ transform: scale(.99); }
 
-    /* ✅ БАННЕРЫ — ВАРИАНТ B (3:1 + cover) */
+    /* Баннеры (3:1) */
     .slider{ width:100%; max-width:520px; border-radius: var(--radius); }
-
     .slides{
-      display:flex;
-      gap:12px;
-      overflow-x:auto;
-      scroll-snap-type:x mandatory;
+      display:flex; gap:12px;
+      overflow-x:auto; scroll-snap-type:x mandatory;
       -webkit-overflow-scrolling: touch;
       scrollbar-width:none;
       padding-bottom:4px;
@@ -243,27 +240,16 @@
       background:#000;
       box-shadow: 0 18px 55px rgba(0,0,0,.40);
     }
-
-    .slide::before{
-      content:"";
-      display:block;
-      padding-top: 33.3333%;
-    }
-
+    .slide::before{ content:""; display:block; padding-top: 33.3333%; }
     .slide img{
-      position:absolute;
-      inset:0;
-      width:100%;
-      height:100%;
-      object-fit: cover;
-      object-position: center;
+      position:absolute; inset:0;
+      width:100%; height:100%;
+      object-fit: cover; object-position: center;
       display:block;
     }
-
     .slide::after{
       content:"";
-      position:absolute;
-      inset:0;
+      position:absolute; inset:0;
       background: linear-gradient(180deg, rgba(0,0,0,.10), rgba(0,0,0,.38));
       pointer-events:none;
     }
@@ -282,7 +268,7 @@
       box-shadow: 0 0 12px rgba(42,171,238,.55);
     }
 
-    /* ✅ 3 кнопки (квадратные) */
+    /* Кнопки */
     .actions{
       width:100%;
       max-width:520px;
@@ -290,12 +276,10 @@
       grid-template-columns: repeat(3, 1fr);
       gap:10px;
     }
-
     .action-btn{
       position:relative;
       width:100%;
       aspect-ratio: 1 / 1;
-      height:auto;
       border:none;
       border-radius:18px;
       overflow:hidden;
@@ -324,7 +308,6 @@
       background: linear-gradient(180deg, rgba(0,0,0,.05), rgba(0,0,0,.48));
       pointer-events:none;
     }
-
     .action-btn::before,
     .action-btn::after{
       content:"";
@@ -356,13 +339,11 @@
       text-shadow: 0 10px 18px rgba(0,0,0,.55);
     }
 
-    /* ✅ Меню снизу */
+    /* Bottom sheet */
     .sheet-overlay{
-      position:fixed;
-      inset:0;
+      position:fixed; inset:0;
       background: rgba(0,0,0,.62);
-      opacity:0;
-      pointer-events:none;
+      opacity:0; pointer-events:none;
       transition: opacity .25s ease;
       z-index:80;
     }
@@ -395,9 +376,7 @@
       background: rgba(255,255,255,.04);
     }
     .sheet-handle span{
-      width:58px;
-      height:6px;
-      border-radius:999px;
+      width:58px; height:6px; border-radius:999px;
       background: rgba(234,241,255,.18);
     }
 
@@ -501,22 +480,13 @@
       pointer-events:none;
     }
 
-    .auth-inner{
-      position:relative;
-      padding: 18px;
-    }
+    .auth-inner{ position:relative; padding: 18px; }
 
-    .auth-top{
-      display:flex;
-      gap:14px;
-      align-items:center;
-    }
-
+    .auth-top{ display:flex; gap:14px; align-items:center; }
     .auth-logo{
       width:44px; height:44px;
       border-radius: 16px;
-      display:grid;
-      place-items:center;
+      display:grid; place-items:center;
       background: rgba(255,255,255,.06);
       border: 1px solid rgba(255,255,255,.08);
       box-shadow:
@@ -524,7 +494,6 @@
         0 0 18px rgba(42,171,238,.12);
       flex:0 0 auto;
     }
-
     .auth-logo svg{ width:22px; height:22px; opacity:.95; }
 
     .auth-title{
@@ -533,7 +502,6 @@
       letter-spacing: .2px;
       line-height: 1.15;
     }
-
     .auth-sub{
       margin-top: 4px;
       font-size: 12.5px;
@@ -554,35 +522,22 @@
       box-shadow: 0 18px 50px rgba(0,0,0,.40);
     }
 
-    .auth-bullets{
-      display:grid;
-      gap:10px;
-      margin-top: 8px;
-    }
-
+    .auth-bullets{ display:grid; gap:10px; margin-top: 8px; }
     .auth-bullet{
-      display:flex;
-      gap:10px;
-      align-items:flex-start;
+      display:flex; gap:10px; align-items:flex-start;
       color: rgba(234,241,255,.86);
       font-size: 12.5px;
       line-height: 1.3;
     }
-
     .chip-dot{
-      width:10px; height:10px;
-      margin-top: 3px;
+      width:10px; height:10px; margin-top: 3px;
       border-radius: 999px;
       background: rgba(42,171,238,.85);
       box-shadow: 0 0 12px rgba(42,171,238,.45);
       flex:0 0 auto;
     }
 
-    .auth-actions{
-      display:grid;
-      gap:10px;
-      margin-top: 14px;
-    }
+    .auth-actions{ display:grid; gap:10px; margin-top: 14px; }
 
     .gbtn{
       width:100%;
@@ -594,10 +549,7 @@
       color: rgba(234,241,255,.95);
       font-weight: 900;
       letter-spacing: .2px;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      gap:10px;
+      display:flex; align-items:center; justify-content:center; gap:10px;
       box-shadow:
         0 18px 40px rgba(0,0,0,.40),
         0 0 0 1px rgba(255,255,255,.04) inset,
@@ -658,7 +610,7 @@
 </head>
 
 <body>
-  <!-- AUTH OVERLAY -->
+  <!-- AUTH -->
   <div class="auth-overlay" id="authOverlay" hidden>
     <div class="auth-card" role="dialog" aria-modal="true" aria-label="Вход">
       <div class="auth-inner">
@@ -671,17 +623,17 @@
           </div>
           <div>
             <div class="auth-title">Войти в Vezus Game</div>
-            <div class="auth-sub">Вход нужен, чтобы сохранить <b>баланс</b>, <b>профиль</b> и покупки.</div>
+            <div class="auth-sub">Вход нужен, чтобы сохранить <b>баланс</b> и <b>профиль</b>.</div>
           </div>
         </div>
 
         <div class="auth-hero">
           <div style="font-weight:900; font-size:13px; letter-spacing:.2px;">
-            Что ты получаешь после входа:
+            После входа будет доступно:
           </div>
           <div class="auth-bullets">
-            <div class="auth-bullet"><span class="chip-dot"></span><span>Личный баланс VC и данные профиля</span></div>
-            <div class="auth-bullet"><span class="chip-dot"></span><span>Восстановление при смене устройства</span></div>
+            <div class="auth-bullet"><span class="chip-dot"></span><span>Личный баланс VC</span></div>
+            <div class="auth-bullet"><span class="chip-dot"></span><span>Профиль и аватар</span></div>
             <div class="auth-bullet"><span class="chip-dot"></span><span>Без паролей — только Google</span></div>
           </div>
         </div>
@@ -693,7 +645,7 @@
           </button>
 
           <div class="auth-mini">
-            Нажимая «Продолжить», ты соглашаешься на вход через Google.
+            Нажимая «Продолжить», ты входишь через Google.
           </div>
 
           <div class="auth-loading" id="authLoading">
@@ -735,18 +687,12 @@
         </div>
       </div>
 
-      <!-- Баннеры (3:1) -->
+      <!-- Баннеры -->
       <div class="slider" aria-label="Баннеры">
         <div class="slides" id="slides">
-          <div class="slide">
-            <img src="YOUR_BANNER_1200x400.png" alt="Banner 1">
-          </div>
-          <div class="slide">
-            <img src="YOUR_BANNER_1200x400.png" alt="Banner 2">
-          </div>
-          <div class="slide">
-            <img src="YOUR_BANNER_1200x400.png" alt="Banner 3">
-          </div>
+          <div class="slide"><img src="YOUR_BANNER_1200x400.png" alt="Banner 1"></div>
+          <div class="slide"><img src="YOUR_BANNER_1200x400.png" alt="Banner 2"></div>
+          <div class="slide"><img src="YOUR_BANNER_1200x400.png" alt="Banner 3"></div>
         </div>
 
         <div class="dots" id="dots" aria-label="Индикатор баннера">
@@ -780,7 +726,6 @@
   </div>
 
   <div class="sheet-overlay" id="sheetOverlay"></div>
-
   <div class="sheet" id="sheet">
     <div class="sheet-panel" role="dialog" aria-modal="true" aria-label="Меню">
       <div class="sheet-handle"><span></span></div>
@@ -817,13 +762,13 @@
   <script type="module">
     import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
 
-    // ✅ ТВОИ ДАННЫЕ SUPABASE (anon key — публичный, его можно в фронт)
+    // ✅ ТВОИ ДАННЫЕ
     const SUPABASE_URL = "https://bidlyktnwnwvtfehnojw.supabase.co";
     const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpZGx5a3Rud253dnRmZWhub2p3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA4NDg3NTQsImV4cCI6MjA4NjQyNDc1NH0.pYnmlTpkj4n3WbaMeAy6hlgO1470pg0Wm4nOV1w9WIY";
 
     const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    // UI
+    // UI refs
     const authOverlay = document.getElementById("authOverlay");
     const btnGoogle = document.getElementById("btnGoogle");
     const authStatus = document.getElementById("authStatus");
@@ -834,7 +779,7 @@
     const profileSvg = document.getElementById("profileSvg");
     const btnLogout = document.getElementById("btnLogout");
 
-    // Меню
+    // MENU refs
     const sheet = document.getElementById('sheet');
     const overlay = document.getElementById('sheetOverlay');
     const menuBtn = document.getElementById('menuBtn');
@@ -849,7 +794,6 @@
       sheet.classList.remove('show');
       document.body.style.overflow = '';
     }
-
     menuBtn.addEventListener('click', openSheet);
     overlay.addEventListener('click', closeSheet);
     document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeSheet(); });
@@ -862,7 +806,7 @@
       });
     });
 
-    // Баланс → wallet.html
+    // Баланс -> wallet.html
     document.getElementById('balanceChip').addEventListener('click', () => {
       window.location.href = 'wallet.html';
     });
@@ -872,10 +816,9 @@
     document.getElementById('btnShop').addEventListener('click', () => { window.location.href = 'ucshop.html'; });
     document.getElementById('btnCustom').addEventListener('click', () => alert('Кастомки (позже сделаем переход)'));
 
-    // Баннеры: dots по scroll (учитываем gap)
+    // Баннеры (dots)
     const slides = document.getElementById('slides');
     const dots = Array.from(document.getElementById('dots').querySelectorAll('.dot'));
-
     function getStep(){
       const first = slides.querySelector('.slide');
       if (!first) return slides.clientWidth || 1;
@@ -884,7 +827,6 @@
       return w + gap;
     }
     function clamp(n, min, max){ return Math.max(min, Math.min(max, n)); }
-
     function updateDotsByScroll(){
       const step = getStep();
       const idx = clamp(Math.round(slides.scrollLeft / step), 0, dots.length - 1);
@@ -906,9 +848,7 @@
     window.addEventListener('load', updateDotsByScroll);
     window.addEventListener('resize', updateDotsByScroll);
 
-    // =========================
-    // AUTH HELPERS
-    // =========================
+    // AUTH helpers
     function showAuth(msg = ""){
       authOverlay.hidden = false;
       authStatus.textContent = msg;
@@ -925,10 +865,8 @@
     }
 
     function setProfileIcon(avatarUrl){
-      // если есть аватар — ставим фото
       if (avatarUrl){
         profileSvg.style.display = "none";
-        // чистим старый img если есть
         const old = profileBtn.querySelector("img.profile-avatar");
         if (old) old.remove();
 
@@ -945,8 +883,7 @@
     }
 
     async function ensureProfileAndLoad(user){
-      // 1) upsert профиля
-      const displayName =
+      const fullName =
         user.user_metadata?.full_name ||
         user.user_metadata?.name ||
         (user.email ? user.email.split("@")[0] : "Player");
@@ -956,37 +893,36 @@
         user.user_metadata?.picture ||
         null;
 
-      // ВАЖНО: предполагаем, что ключ в таблице — user_id
-      // (у тебя раньше ошибка была "profiles.id does not exist", поэтому делаем user_id)
+      // ✅ ТВОЯ ТАБЛИЦА: profiles.id = auth.users.id
       const payload = {
-        user_id: user.id,
+        id: user.id,
         email: user.email ?? null,
-        display_name: displayName,
+        full_name: fullName,
         avatar_url: avatarUrl,
-        updated_at: new Date().toISOString()
+        updated_at: new Date().toISOString(),
       };
 
-      // upsert (не ломает баланс)
+      // upsert по PK (id)
       const up = await supabase
         .from("profiles")
-        .upsert(payload, { onConflict: "user_id" });
+        .upsert(payload, { onConflict: "id" });
 
       if (up.error) throw up.error;
 
-      // 2) читаем профиль (баланс)
+      // читаем баланс и профиль
       const { data: profile, error } = await supabase
         .from("profiles")
-        .select("vc_balance, display_name, avatar_url")
-        .eq("user_id", user.id)
+        .select("balance, full_name, avatar_url")
+        .eq("id", user.id)
         .maybeSingle();
 
       if (error) throw error;
 
-      const vc = (profile?.vc_balance ?? 0);
-      balanceValue.textContent = `${vc} VC`;
+      const bal = Number(profile?.balance ?? 0);
+      balanceValue.textContent = `${bal} VC`;
 
       setProfileIcon(profile?.avatar_url || avatarUrl);
-      profileBtn.title = profile?.display_name || displayName || "Профиль";
+      profileBtn.title = profile?.full_name || fullName || "Профиль";
     }
 
     async function bootstrap(){
@@ -994,30 +930,27 @@
       const session = data.session;
 
       if (!session?.user){
-        // не авторизован → показываем красивый вход
         showAuth("");
         balanceValue.textContent = "0 VC";
         setProfileIcon(null);
         return;
       }
 
-      // авторизован → прячем вход и грузим профиль
       hideAuth();
 
       try{
         await ensureProfileAndLoad(session.user);
       }catch(e){
         console.error(e);
-        // если профиль не читается — покажем вход и сообщение
         showAuth("Ошибка чтения профиля. Проверь RLS policies для таблицы profiles.");
       }
     }
 
-    // GOOGLE LOGIN
+    // Google login
     btnGoogle.addEventListener("click", async () => {
       try{
         setLoading(true, "Открываем Google…");
-        const redirectTo = `${location.origin}${location.pathname}`; // идеально для GitHub Pages
+        const redirectTo = `${location.origin}${location.pathname}`;
 
         const { error } = await supabase.auth.signInWithOAuth({
           provider: "google",
@@ -1031,7 +964,7 @@
       }
     });
 
-    // LOGOUT
+    // Logout
     btnLogout.addEventListener("click", async () => {
       closeSheet();
       await supabase.auth.signOut();
@@ -1040,14 +973,12 @@
       setProfileIcon(null);
     });
 
-    // PROFILE BUTTON (быстро — инфо + выход)
+    // Profile quick
     profileBtn.addEventListener("click", async () => {
       const { data } = await supabase.auth.getSession();
       const user = data.session?.user;
-      if (!user){
-        showAuth("");
-        return;
-      }
+      if (!user){ showAuth(""); return; }
+
       const name =
         user.user_metadata?.full_name ||
         user.user_metadata?.name ||
@@ -1062,12 +993,10 @@
       }
     });
 
-    // Обновление состояния при изменениях
-    supabase.auth.onAuthStateChange((_event, _session) => {
+    supabase.auth.onAuthStateChange(() => {
       bootstrap();
     });
 
-    // Старт
     bootstrap();
   </script>
 </body>
