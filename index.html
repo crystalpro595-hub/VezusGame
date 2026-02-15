@@ -58,7 +58,6 @@
       align-items:center;
     }
 
-    /* ✅ Верхняя строка */
     .top-row{
       width:100%;
       max-width:520px;
@@ -133,7 +132,6 @@
       stroke-linejoin: round;
     }
 
-    /* ✅ Баланс (как было) */
     .balance-mini{
       width: min(210px, 70%);
       height: 38px;
@@ -211,7 +209,6 @@
     }
     .bal-amount:active{ transform: scale(.99); }
 
-    /* ✅ БАННЕРЫ — ВАРИАНТ B (3:1 + cover) */
     .slider{ width:100%; max-width:520px; border-radius: var(--radius); }
 
     .slides{
@@ -234,14 +231,11 @@
       background:#000;
       box-shadow: 0 18px 55px rgba(0,0,0,.40);
     }
-
     .slide::before{ content:""; display:block; padding-top: 33.3333%; }
 
     .slide img{
-      position:absolute;
-      inset:0;
-      width:100%;
-      height:100%;
+      position:absolute; inset:0;
+      width:100%; height:100%;
       object-fit: cover;
       object-position: center;
       display:block;
@@ -249,8 +243,7 @@
 
     .slide::after{
       content:"";
-      position:absolute;
-      inset:0;
+      position:absolute; inset:0;
       background: linear-gradient(180deg, rgba(0,0,0,.10), rgba(0,0,0,.38));
       pointer-events:none;
     }
@@ -269,7 +262,6 @@
       box-shadow: 0 0 12px rgba(42,171,238,.55);
     }
 
-    /* ✅ 3 кнопки */
     .actions{
       width:100%;
       max-width:520px;
@@ -282,7 +274,6 @@
       position:relative;
       width:100%;
       aspect-ratio: 1 / 1;
-      height:auto;
       border:none;
       border-radius:18px;
       overflow:hidden;
@@ -324,24 +315,18 @@
       text-shadow: 0 10px 18px rgba(0,0,0,.55);
     }
 
-    /* ===========================
-       ✅ ЛЕВОЕ МЕНЮ (SIDEBAR)
-       =========================== */
+    /* ✅ ЛЕВОЕ МЕНЮ */
     .sidebar-overlay{
-      position: fixed;
-      inset: 0;
+      position: fixed; inset: 0;
       background: rgba(0,0,0,.62);
-      opacity: 0;
-      pointer-events: none;
+      opacity: 0; pointer-events: none;
       transition: opacity .25s ease;
       z-index: 120;
     }
     .sidebar-overlay.show{ opacity: 1; pointer-events: auto; }
 
     .sidebar{
-      position: fixed;
-      top: 0;
-      left: 0;
+      position: fixed; top: 0; left: 0;
       height: 100%;
       width: min(320px, 86vw);
       padding: calc(18px + var(--safe-top)) 14px calc(18px + var(--safe-bottom)) 14px;
@@ -361,30 +346,23 @@
     .sidebar.show{ transform: translateX(0); }
 
     .sidebar-top{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:10px;
+      display:flex; align-items:center; justify-content:space-between; gap:10px;
       padding: 0 2px 12px 2px;
       border-bottom: 1px solid rgba(255,255,255,.07);
       margin-bottom: 12px;
     }
     .sidebar-title{
-      font-weight: 900;
-      letter-spacing: .2px;
-      font-size: 14px;
+      font-weight: 900; letter-spacing: .2px; font-size: 14px;
       color: rgba(234,241,255,.92);
     }
     .sidebar-close{
-      width: 38px;
-      height: 38px;
+      width: 38px; height: 38px;
       border-radius: 12px;
       border: 1px solid rgba(255,255,255,.10);
       background: rgba(255,255,255,.06);
       color: rgba(234,241,255,.92);
       cursor:pointer;
-      display:grid;
-      place-items:center;
+      display:grid; place-items:center;
       transition: transform .15s ease, background .15s ease;
     }
     .sidebar-close:active{ transform: scale(.98); background: rgba(255,255,255,.09); }
@@ -392,14 +370,8 @@
     .side-grid{ display:grid; grid-template-columns: 1fr; gap: 10px; }
 
     .side-card{
-      border:none;
-      cursor:pointer;
-      padding: 0;
-      width:100%;
-      text-align:left;
-
-      border-radius: 16px;
-      overflow: hidden;
+      border:none; cursor:pointer; padding: 0; width:100%; text-align:left;
+      border-radius: 16px; overflow: hidden;
 
       background: rgba(255,255,255,.06);
       border: 1px solid rgba(46, 180, 255, .14);
@@ -416,53 +388,40 @@
     }
 
     .side-thumb{
-      height: 92px;
-      width: 100%;
+      height: 92px; width: 100%;
       position: relative;
       background: #0b102a;
     }
     .side-thumb::before{
       content:"";
-      position:absolute;
-      inset:0;
+      position:absolute; inset:0;
       background-image: var(--img);
       background-size: cover;
       background-position: center;
       background-repeat: no-repeat;
       transform: scale(1.02);
-      filter: saturate(1.02) contrast(1.02);
     }
     .side-thumb::after{
       content:"";
-      position:absolute;
-      inset:0;
+      position:absolute; inset:0;
       background: linear-gradient(180deg, rgba(0,0,0,.08), rgba(0,0,0,.55));
       pointer-events:none;
     }
 
     .side-meta{
-      padding: 12px 12px 12px 12px;
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap: 10px;
+      padding: 12px;
+      display:flex; align-items:center; justify-content:space-between; gap: 10px;
     }
     .side-name{
-      font-weight: 900;
-      font-size: 13px;
+      font-weight: 900; font-size: 13px;
       color: rgba(234,241,255,.95);
-      white-space: nowrap;
-      overflow:hidden;
-      text-overflow: ellipsis;
+      white-space: nowrap; overflow:hidden; text-overflow: ellipsis;
     }
-    .side-chev{ color: rgba(234,241,255,.65); font-weight: 900; flex: 0 0 auto; }
+    .side-chev{ color: rgba(234,241,255,.65); font-weight: 900; }
 
-    /* ===========================
-       ✅ AUTH (GOOGLE) — КРАСИВЫЙ ЭКРАН
-       =========================== */
+    /* ✅ AUTH */
     .auth-gate{
-      position: fixed;
-      inset: 0;
+      position: fixed; inset: 0;
       z-index: 999;
       display: none;
       align-items: center;
@@ -472,8 +431,7 @@
     .auth-gate.show{ display:flex; }
 
     .auth-bg{
-      position:absolute;
-      inset:0;
+      position:absolute; inset:0;
       background:
         radial-gradient(900px 600px at 25% 20%, rgba(42,171,238,.18), transparent 60%),
         radial-gradient(900px 600px at 80% 40%, rgba(59,130,246,.16), transparent 62%),
@@ -497,8 +455,7 @@
     }
     .auth-card::before{
       content:"";
-      position:absolute;
-      inset:-2px;
+      position:absolute; inset:-2px;
       background: conic-gradient(from 180deg, rgba(42,171,238,.55), rgba(59,130,246,.40), rgba(42,171,238,.55));
       filter: blur(16px);
       opacity: .35;
@@ -513,27 +470,20 @@
     }
 
     .auth-top{
-      display:flex;
-      align-items:center;
-      gap:12px;
+      display:flex; align-items:center; gap:12px;
       margin-bottom: 14px;
     }
     .auth-logo{
       width:44px; height:44px;
       border-radius: 14px;
-      display:grid;
-      place-items:center;
+      display:grid; place-items:center;
       background: rgba(42,171,238,.16);
       border: 1px solid rgba(46,180,255,.20);
       box-shadow: 0 0 18px rgba(42,171,238,.12);
-      flex:0 0 auto;
     }
-    .auth-logo svg{ width:22px; height:22px; opacity:.95; }
-
     .auth-title{
       font-weight: 900;
       font-size: 16px;
-      letter-spacing: .2px;
       margin:0;
       color: rgba(234,241,255,.98);
     }
@@ -564,13 +514,13 @@
       box-shadow:
         0 16px 34px rgba(0,0,0,.36),
         0 0 18px rgba(42,171,238,.14);
-      transition: transform .15s ease, filter .15s ease;
+      transition: transform .15s ease;
     }
     .auth-btn:active{ transform: scale(.99); }
     .auth-btn:disabled{ opacity:.6; cursor:not-allowed; }
 
     .google-ico{
-      width:18px; height:18px; flex:0 0 auto;
+      width:18px; height:18px;
       background: #fff;
       border-radius: 6px;
       display:grid;
@@ -579,14 +529,10 @@
     }
     .google-ico svg{ width:12px; height:12px; }
 
-    .auth-row{
-      display:flex;
-      gap:10px;
-      margin-top: 10px;
-    }
+    .auth-row{ display:flex; gap:10px; margin-top: 10px; }
     .auth-mini{
       flex:1;
-      padding: 10px 10px;
+      padding: 10px;
       border-radius: 14px;
       background: rgba(255,255,255,.05);
       border: 1px solid rgba(255,255,255,.06);
@@ -597,7 +543,7 @@
 
     .auth-error{
       margin-top: 10px;
-      padding: 10px 10px;
+      padding: 10px;
       border-radius: 14px;
       background: rgba(255, 70, 70, .10);
       border: 1px solid rgba(255, 70, 70, .20);
@@ -619,15 +565,11 @@
     .spinner.show{ display:inline-block; }
     @keyframes spin{ to{ transform: rotate(360deg); } }
 
-    /* ===========================
-       ✅ PROFILE MODAL (кнопка Профиль)
-       =========================== */
+    /* ✅ PROFILE MODAL */
     .modal-overlay{
-      position: fixed;
-      inset: 0;
+      position: fixed; inset: 0;
       background: rgba(0,0,0,.62);
-      opacity: 0;
-      pointer-events: none;
+      opacity: 0; pointer-events: none;
       transition: opacity .25s ease;
       z-index: 400;
     }
@@ -638,15 +580,13 @@
       left: 0; right: 0;
       top: 50%;
       transform: translateY(-50%) scale(.98);
-      opacity: 0;
-      pointer-events: none;
+      opacity: 0; pointer-events: none;
       transition: transform .25s ease, opacity .25s ease;
       z-index: 410;
       padding: 0 16px;
     }
     .profile-modal.show{
-      opacity: 1;
-      pointer-events: auto;
+      opacity: 1; pointer-events: auto;
       transform: translateY(-50%) scale(1);
     }
 
@@ -663,67 +603,42 @@
     }
 
     .profile-head{
-      padding: 14px 14px 12px 14px;
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:10px;
+      padding: 14px;
+      display:flex; align-items:center; justify-content:space-between; gap:10px;
       background: rgba(255,255,255,.04);
       border-bottom: 1px solid rgba(255,255,255,.06);
     }
-    .profile-head .t{
-      font-weight: 900;
-      font-size: 14px;
-      letter-spacing: .2px;
-    }
+    .profile-head .t{ font-weight: 900; font-size: 14px; }
+
     .profile-x{
-      width: 38px;
-      height: 38px;
+      width: 38px; height: 38px;
       border-radius: 12px;
       border: 1px solid rgba(255,255,255,.10);
       background: rgba(255,255,255,.06);
       color: rgba(234,241,255,.92);
       cursor:pointer;
-      display:grid;
-      place-items:center;
+      display:grid; place-items:center;
     }
     .profile-x:active{ transform: scale(.98); }
 
     .profile-body{
       padding: 14px;
-      display:flex;
-      gap:12px;
-      align-items:center;
+      display:flex; gap:12px; align-items:center;
     }
     .avatar{
-      width: 54px;
-      height: 54px;
+      width: 54px; height: 54px;
       border-radius: 18px;
       overflow:hidden;
       background: rgba(42,171,238,.12);
       border: 1px solid rgba(46, 180, 255, .18);
       box-shadow: 0 0 18px rgba(42,171,238,.10);
       flex: 0 0 auto;
-      display:grid;
-      place-items:center;
+      display:grid; place-items:center;
     }
-    .avatar img{
-      width:100%;
-      height:100%;
-      object-fit: cover;
-      display:block;
-    }
-    .avatar span{
-      font-weight: 900;
-      color: rgba(234,241,255,.92);
-      font-size: 14px;
-    }
-    .pname{
-      font-weight: 900;
-      font-size: 14px;
-      color: rgba(234,241,255,.98);
-      line-height: 1.2;
-    }
+    .avatar img{ width:100%; height:100%; object-fit: cover; display:block; }
+    .avatar span{ font-weight: 900; color: rgba(234,241,255,.92); font-size: 14px; }
+
+    .pname{ font-weight: 900; font-size: 14px; color: rgba(234,241,255,.98); }
     .pmail{
       margin-top: 4px;
       font-size: 12px;
@@ -733,16 +648,16 @@
       white-space: nowrap;
       max-width: 320px;
     }
+
     .profile-actions{
       padding: 0 14px 14px 14px;
-      display:flex;
-      gap:10px;
+      display:flex; gap:10px;
     }
     .btn-ghost{
       flex:1;
       border:none;
       cursor:pointer;
-      padding: 12px 12px;
+      padding: 12px;
       border-radius: 16px;
       background: rgba(255,255,255,.06);
       border: 1px solid rgba(255,255,255,.08);
@@ -756,7 +671,7 @@
       flex:1;
       border:none;
       cursor:pointer;
-      padding: 12px 12px;
+      padding: 12px;
       border-radius: 16px;
       background: rgba(255,70,70,.12);
       border: 1px solid rgba(255,70,70,.22);
@@ -772,7 +687,6 @@
       .menu-btn, .profile-btn{ width: 40px; height: 40px; border-radius: 13px; }
       .left-buttons{ transform: translateX(-8px); }
       .top-row{ gap: 14px; }
-      .side-thumb{ height: 86px; }
       .pmail{ max-width: 210px; }
     }
 
@@ -789,9 +703,7 @@
       <div class="top-row">
         <div class="left-buttons">
           <button class="menu-btn" id="menuBtn" aria-label="Открыть меню">
-            <div class="burger" aria-hidden="true">
-              <span></span><span></span><span></span>
-            </div>
+            <div class="burger" aria-hidden="true"><span></span><span></span><span></span></div>
           </button>
 
           <button class="profile-btn" id="profileBtn" aria-label="Профиль" title="Профиль">
@@ -810,54 +722,38 @@
         </div>
       </div>
 
-      <!-- ✅ Баннеры (3:1) -->
       <div class="slider" aria-label="Баннеры">
         <div class="slides" id="slides">
-          <div class="slide">
-            <img src="YOUR_BANNER_1200x400.png" alt="Banner 1">
-          </div>
-          <div class="slide">
-            <img src="YOUR_BANNER_1200x400.png" alt="Banner 2">
-          </div>
-          <div class="slide">
-            <img src="YOUR_BANNER_1200x400.png" alt="Banner 3">
-          </div>
+          <div class="slide"><img src="YOUR_BANNER_1200x400.png" alt="Banner 1"></div>
+          <div class="slide"><img src="YOUR_BANNER_1200x400.png" alt="Banner 2"></div>
+          <div class="slide"><img src="YOUR_BANNER_1200x400.png" alt="Banner 3"></div>
         </div>
 
         <div class="dots" id="dots" aria-label="Индикатор баннера">
-          <div class="dot active"></div>
-          <div class="dot"></div>
-          <div class="dot"></div>
+          <div class="dot active"></div><div class="dot"></div><div class="dot"></div>
         </div>
       </div>
 
       <div class="actions" aria-label="Разделы">
-        <button class="action-btn" id="btnGames"
-          style="--bg:url('https://i.postimg.cc/8khGybLS/d9e9d314-fd90-4cad-ad74-b2ed14a51f38.png');">
-          <div class="bg" aria-hidden="true"></div>
-          <div class="label">Игры</div>
+        <button class="action-btn" id="btnGames" style="--bg:url('https://i.postimg.cc/8khGybLS/d9e9d314-fd90-4cad-ad74-b2ed14a51f38.png');">
+          <div class="bg" aria-hidden="true"></div><div class="label">Игры</div>
         </button>
 
-        <button class="action-btn" id="btnShop"
-          style="--bg:url('https://i.postimg.cc/XvWZvSqj/file-0000000059bc72438dd485df46f69309-(1).png');">
-          <div class="bg" aria-hidden="true"></div>
-          <div class="label">UC Shop</div>
+        <button class="action-btn" id="btnShop" style="--bg:url('https://i.postimg.cc/XvWZvSqj/file-0000000059bc72438dd485df46f69309-(1).png');">
+          <div class="bg" aria-hidden="true"></div><div class="label">UC Shop</div>
         </button>
 
-        <button class="action-btn" id="btnCustom"
-          style="--bg:url('https://i.postimg.cc/TY9sZp02/46F82521-51BE-4FB1-B831-B19958E9872E.png');">
-          <div class="bg" aria-hidden="true"></div>
-          <div class="label">Кастомки</div>
+        <button class="action-btn" id="btnCustom" style="--bg:url('https://i.postimg.cc/TY9sZp02/46F82521-51BE-4FB1-B831-B19958E9872E.png');">
+          <div class="bg" aria-hidden="true"></div><div class="label">Кастомки</div>
         </button>
       </div>
 
     </div>
   </div>
 
-  <!-- ✅ Overlay для бокового меню -->
+  <!-- ✅ Sidebar -->
   <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
-  <!-- ✅ Левое меню -->
   <aside class="sidebar" id="sidebar" aria-label="Меню слева">
     <div class="sidebar-top">
       <div class="sidebar-title">Меню</div>
@@ -887,7 +783,7 @@
     </div>
   </aside>
 
-  <!-- ✅ AUTH GATE (GOOGLE LOGIN) -->
+  <!-- ✅ AUTH -->
   <div class="auth-gate show" id="authGate" aria-label="Вход">
     <div class="auth-bg" aria-hidden="true"></div>
 
@@ -953,16 +849,51 @@
     </div>
   </div>
 
+  <!-- ✅ IMPORTANT: берем supabase-js через jsDelivr (устойчивее на iOS) -->
   <script type="module">
-    import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+    import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
 
     /* ===========================
-       ✅ 1) ВСТАВЬ СЮДА ДАННЫЕ SUPABASE
+       ✅ ВСТАВЬ СЮДА СВОИ ДАННЫЕ
        =========================== */
     const SUPABASE_URL = "https://bidlyktnwnwvtfehnojw.supabase.co";
     const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpZGx5a3Rud253dnRmZWhub2p3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA4NDg3NTQsImV4cCI6MjA4NjQyNDc1NH0.pYnmlTpkj4n3WbaMeAy6hlgO1470pg0Wm4nOV1w9WIY";
 
-    const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    /* ✅ Safe storage (чтобы сессия НЕ пропадала на iOS) */
+    function createSafeStorage(){
+      const mem = new Map();
+
+      function ok(storage){
+        try{
+          const k="__sb_test__";
+          storage.setItem(k, "1");
+          storage.removeItem(k);
+          return true;
+        }catch{ return false; }
+      }
+
+      const hasLS = (() => { try{ return ok(window.localStorage); } catch{ return false; } })();
+      const hasSS = (() => { try{ return ok(window.sessionStorage); } catch{ return false; } })();
+      const store = hasLS ? window.localStorage : (hasSS ? window.sessionStorage : null);
+
+      return {
+        getItem: (key) => store ? store.getItem(key) : (mem.get(key) ?? null),
+        setItem: (key, value) => { store ? store.setItem(key, value) : mem.set(key, value); },
+        removeItem: (key) => { store ? store.removeItem(key) : mem.delete(key); }
+      };
+    }
+
+    const safeStorage = createSafeStorage();
+
+    const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+      auth: {
+        persistSession: true,
+        autoRefreshToken: true,
+        detectSessionInUrl: true,
+        flowType: "pkce",
+        storage: safeStorage
+      }
+    });
 
     /* ===========================
        ✅ UI refs
@@ -986,9 +917,6 @@
     const logoutBtn = document.getElementById('logoutBtn');
     const goWallet = document.getElementById('goWallet');
 
-    /* ===========================
-       ✅ Helpers
-       =========================== */
     function showAuthError(msg){
       authError.textContent = msg;
       authError.classList.add('show');
@@ -1032,9 +960,25 @@
       }
     }
 
+    function showApp(){ authGate.classList.remove('show'); }
+    function showAuth(){ authGate.classList.add('show'); }
+
+    /* ✅ маленький retry именно для iOS “aborted” */
+    async function withRetry(fn, tries=2){
+      for(let i=0;i<tries;i++){
+        try{ return await fn(); }
+        catch(e){
+          const msg = String(e?.message || e || '');
+          const isAbort = /aborted|AbortError|operation was aborted/i.test(msg);
+          if (i === tries-1 || !isAbort) throw e;
+          await new Promise(r => setTimeout(r, 300));
+        }
+      }
+    }
+
     async function ensureProfile(session){
-      // создаём/обновляем профиль в таблице profiles
       const user = session.user;
+
       const fullName =
         user.user_metadata?.full_name ||
         user.user_metadata?.name ||
@@ -1053,10 +997,8 @@
         updated_at: new Date().toISOString()
       };
 
-      // upsert
       await supabase.from('profiles').upsert(payload, { onConflict: 'id' });
 
-      // read
       const { data: profile, error } = await supabase
         .from('profiles')
         .select('id, balance, full_name, avatar_url, email')
@@ -1067,23 +1009,37 @@
       return profile;
     }
 
-    function showApp(){
-      authGate.classList.remove('show');
-    }
-    function showAuth(){
-      authGate.classList.add('show');
+    async function refreshUIBySession(session){
+      if (!session){
+        balanceValue.textContent = '—';
+        pName.textContent = '—';
+        pEmail.textContent = '—';
+        setAvatar(null, 'VG');
+        showAuth();
+        return;
+      }
+
+      const profile = await withRetry(() => ensureProfile(session), 2);
+
+      balanceValue.textContent = `${profile?.balance ?? 0} VC`;
+
+      const name = profile?.full_name || 'Пользователь';
+      const email = profile?.email || session.user.email || '—';
+
+      pName.textContent = name;
+      pEmail.textContent = email;
+      setAvatar(profile?.avatar_url || null, name || email);
+
+      showApp();
     }
 
-    /* ===========================
-       ✅ Auth flow
-       =========================== */
     async function signInGoogle(){
       clearAuthError();
       setAuthLoading(true);
 
       try{
-        // IMPORTANT: этот URL должен быть добавлен в Supabase → Authentication → URL Configuration → Redirect URLs
-        const redirectTo = window.location.origin + window.location.pathname;
+        // redirectTo должен быть добавлен в Supabase → Authentication → URL Configuration → Redirect URLs
+        const redirectTo = window.location.href;
 
         const { error } = await supabase.auth.signInWithOAuth({
           provider: 'google',
@@ -1097,72 +1053,25 @@
       }
     }
 
-    async function refreshUIBySession(session){
-      if (!session){
-        balanceValue.textContent = '—';
-        pName.textContent = '—';
-        pEmail.textContent = '—';
-        setAvatar(null, 'VG');
-        showAuth();
-        return;
-      }
-
-      try{
-        const profile = await ensureProfile(session);
-
-        // баланс
-        balanceValue.textContent = `${profile?.balance ?? 0} VC`;
-
-        // профиль
-        const name = profile?.full_name || 'Пользователь';
-        const email = profile?.email || session.user.email || '—';
-        pName.textContent = name;
-        pEmail.textContent = email;
-        setAvatar(profile?.avatar_url || null, name || email);
-
-        showApp();
-      }catch(e){
-        // если RLS/таблица/политики — покажем понятное сообщение
-        showAuthError(
-          'Не могу прочитать/создать профиль.\n' +
-          'Проверь таблицу profiles и RLS policies.\n\n' +
-          'Текст: ' + (e?.message || e)
-        );
-        // остаёмся на экране логина, чтобы ты увидел ошибку
-        showAuth();
-      }finally{
-        setAuthLoading(false);
-      }
-    }
-
-    /* ===========================
-       ✅ Init
-       =========================== */
     googleBtn.addEventListener('click', signInGoogle);
 
-    // Переход в кошелек
     document.getElementById('balanceChip').addEventListener('click', () => {
       window.location.href = 'wallet.html';
     });
 
-    // Переход на UC Shop
     document.getElementById('btnShop').addEventListener('click', () => {
       window.location.href = 'ucshop.html';
     });
 
-    // заглушки
     document.getElementById('btnGames').addEventListener('click', () => alert('Игры (позже сделаем переход)'));
     document.getElementById('btnCustom').addEventListener('click', () => alert('Кастомки (позже сделаем переход)'));
 
-    // профиль
     profileBtn.addEventListener('click', async () => {
       const { data: { session } } = await supabase.auth.getSession();
-      if (!session){
-        showAuth(); // если не залогинен — показываем вход
-        return;
-      }
+      if (!session){ showAuth(); return; }
       openProfile();
     });
+
     profileOverlay.addEventListener('click', closeProfile);
     profileClose.addEventListener('click', closeProfile);
     goWallet.addEventListener('click', () => window.location.href = 'wallet.html');
@@ -1177,7 +1086,7 @@
       }
     });
 
-    // боковое меню
+    // Sidebar
     const sidebar = document.getElementById('sidebar');
     const sidebarOverlay = document.getElementById('sidebarOverlay');
     const menuBtn = document.getElementById('menuBtn');
@@ -1215,7 +1124,7 @@
       });
     });
 
-    // баннеры: точки по scroll (учитываем gap)
+    // Banner dots
     const slides = document.getElementById('slides');
     const dots = Array.from(document.getElementById('dots').querySelectorAll('.dot'));
 
@@ -1251,20 +1160,28 @@
     window.addEventListener('load', updateDotsByScroll);
     window.addEventListener('resize', updateDotsByScroll);
 
-    // ✅ старт: проверяем сессию
+    // Init
     (async () => {
       try{
-        const { data: { session } } = await supabase.auth.getSession();
+        const res = await withRetry(() => supabase.auth.getSession(), 2);
+        const session = res?.data?.session ?? null;
         await refreshUIBySession(session);
       }catch(e){
-        showAuthError('Ошибка инициализации: ' + (e?.message || e));
+        showAuthError('Ошибка инициализации: ' + (e?.message || e) + '\n\nЕсли ты в приватном режиме Safari — сессия может не сохраняться.');
         showAuth();
+        setAuthLoading(false);
       }
     })();
 
-    // ✅ слушаем изменения auth (вход/выход)
     supabase.auth.onAuthStateChange(async (_event, session) => {
-      await refreshUIBySession(session);
+      try{
+        await refreshUIBySession(session);
+      }catch(e){
+        showAuthError('Ошибка: ' + (e?.message || e));
+        showAuth();
+      }finally{
+        setAuthLoading(false);
+      }
     });
   </script>
 </body>
