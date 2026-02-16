@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>VezusGame</title>
+  <title>Wallet</title>
 
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
 
@@ -58,6 +58,7 @@
       align-items:center;
     }
 
+    /* ✅ Верхняя строка */
     .top-row{
       width:100%;
       max-width:520px;
@@ -132,6 +133,7 @@
       stroke-linejoin: round;
     }
 
+    /* ✅ Баланс (как было) */
     .balance-mini{
       width: min(210px, 70%);
       height: 38px;
@@ -209,6 +211,7 @@
     }
     .bal-amount:active{ transform: scale(.99); }
 
+    /* ✅ БАННЕРЫ — ВАРИАНТ B (3:1 + cover) */
     .slider{ width:100%; max-width:520px; border-radius: var(--radius); }
 
     .slides{
@@ -231,19 +234,24 @@
       background:#000;
       box-shadow: 0 18px 55px rgba(0,0,0,.40);
     }
-    .slide::before{ content:""; display:block; padding-top: 33.3333%; }
-
+    .slide::before{
+      content:"";
+      display:block;
+      padding-top: 33.3333%;
+    }
     .slide img{
-      position:absolute; inset:0;
-      width:100%; height:100%;
+      position:absolute;
+      inset:0;
+      width:100%;
+      height:100%;
       object-fit: cover;
       object-position: center;
       display:block;
     }
-
     .slide::after{
       content:"";
-      position:absolute; inset:0;
+      position:absolute;
+      inset:0;
       background: linear-gradient(180deg, rgba(0,0,0,.10), rgba(0,0,0,.38));
       pointer-events:none;
     }
@@ -262,6 +270,7 @@
       box-shadow: 0 0 12px rgba(42,171,238,.55);
     }
 
+    /* ✅ 3 кнопки (квадратные) */
     .actions{
       width:100%;
       max-width:520px;
@@ -274,6 +283,7 @@
       position:relative;
       width:100%;
       aspect-ratio: 1 / 1;
+      height:auto;
       border:none;
       border-radius:18px;
       overflow:hidden;
@@ -303,6 +313,25 @@
       pointer-events:none;
     }
 
+    .action-btn::before,
+    .action-btn::after{
+      content:"";
+      position:absolute;
+      top:-18px; bottom:-18px;
+      width:18px;
+      filter: blur(10px);
+      opacity:.95;
+      pointer-events:none;
+    }
+    .action-btn::before{
+      left:-10px;
+      background: linear-gradient(180deg, rgba(42,171,238,.0), rgba(42,171,238,.95), rgba(59,130,246,.0));
+    }
+    .action-btn::after{
+      right:-10px;
+      background: linear-gradient(180deg, rgba(59,130,246,.0), rgba(42,171,238,.95), rgba(59,130,246,.0));
+    }
+
     .action-btn .label{
       position:absolute; left:0; right:0; bottom:0;
       padding:12px 10px;
@@ -315,371 +344,198 @@
       text-shadow: 0 10px 18px rgba(0,0,0,.55);
     }
 
-    /* ✅ ЛЕВОЕ МЕНЮ */
-    .sidebar-overlay{
-      position: fixed; inset: 0;
+    /* ✅ Меню снизу */
+    .sheet-overlay{
+      position:fixed;
+      inset:0;
       background: rgba(0,0,0,.62);
-      opacity: 0; pointer-events: none;
+      opacity:0;
+      pointer-events:none;
       transition: opacity .25s ease;
-      z-index: 120;
+      z-index:80;
     }
-    .sidebar-overlay.show{ opacity: 1; pointer-events: auto; }
+    .sheet-overlay.show{ opacity:1; pointer-events:auto; }
 
-    .sidebar{
-      position: fixed; top: 0; left: 0;
-      height: 100%;
-      width: min(320px, 86vw);
-      padding: calc(18px + var(--safe-top)) 14px calc(18px + var(--safe-bottom)) 14px;
-
-      background: rgba(10, 16, 30, .88);
-      border-right: 1px solid rgba(46, 180, 255, .18);
-      box-shadow: 20px 0 70px rgba(0,0,0,.65);
-
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-
-      transform: translateX(-105%);
+    .sheet{
+      position:fixed;
+      left:0; right:0; bottom:0;
+      transform: translateY(110%);
       transition: transform .30s cubic-bezier(.2,.9,.2,1);
-      z-index: 130;
-      overflow: auto;
+      z-index:90;
+      padding: 0 14px calc(28px + var(--safe-bottom)) 14px;
     }
-    .sidebar.show{ transform: translateX(0); }
+    .sheet.show{ transform: translateY(-12px); }
 
-    .sidebar-top{
-      display:flex; align-items:center; justify-content:space-between; gap:10px;
-      padding: 0 2px 12px 2px;
-      border-bottom: 1px solid rgba(255,255,255,.07);
-      margin-bottom: 12px;
-    }
-    .sidebar-title{
-      font-weight: 900; letter-spacing: .2px; font-size: 14px;
-      color: rgba(234,241,255,.92);
-    }
-    .sidebar-close{
-      width: 38px; height: 38px;
-      border-radius: 12px;
-      border: 1px solid rgba(255,255,255,.10);
-      background: rgba(255,255,255,.06);
-      color: rgba(234,241,255,.92);
-      cursor:pointer;
-      display:grid; place-items:center;
-      transition: transform .15s ease, background .15s ease;
-    }
-    .sidebar-close:active{ transform: scale(.98); background: rgba(255,255,255,.09); }
-
-    .side-grid{ display:grid; grid-template-columns: 1fr; gap: 10px; }
-
-    .side-card{
-      border:none; cursor:pointer; padding: 0; width:100%; text-align:left;
-      border-radius: 16px; overflow: hidden;
-
-      background: rgba(255,255,255,.06);
-      border: 1px solid rgba(46, 180, 255, .14);
-      box-shadow:
-        0 12px 28px rgba(0,0,0,.30),
-        0 0 0 1px rgba(255,255,255,.04) inset;
-
-      transition: transform .15s ease, background .15s ease, border-color .15s ease;
-    }
-    .side-card:active{
-      transform: scale(.99);
-      background: rgba(255,255,255,.08);
-      border-color: rgba(46, 180, 255, .20);
-    }
-
-    .side-thumb{
-      height: 92px; width: 100%;
-      position: relative;
-      background: #0b102a;
-    }
-    .side-thumb::before{
-      content:"";
-      position:absolute; inset:0;
-      background-image: var(--img);
-      background-size: cover;
-      background-position: center;
-      background-repeat: no-repeat;
-      transform: scale(1.02);
-    }
-    .side-thumb::after{
-      content:"";
-      position:absolute; inset:0;
-      background: linear-gradient(180deg, rgba(0,0,0,.08), rgba(0,0,0,.55));
-      pointer-events:none;
-    }
-
-    .side-meta{
-      padding: 12px;
-      display:flex; align-items:center; justify-content:space-between; gap: 10px;
-    }
-    .side-name{
-      font-weight: 900; font-size: 13px;
-      color: rgba(234,241,255,.95);
-      white-space: nowrap; overflow:hidden; text-overflow: ellipsis;
-    }
-    .side-chev{ color: rgba(234,241,255,.65); font-weight: 900; }
-
-    /* ✅ AUTH */
-    .auth-gate{
-      position: fixed; inset: 0;
-      z-index: 999;
-      display: none;
-      align-items: center;
-      justify-content: center;
-      padding: 18px;
-    }
-    .auth-gate.show{ display:flex; }
-
-    .auth-bg{
-      position:absolute; inset:0;
-      background:
-        radial-gradient(900px 600px at 25% 20%, rgba(42,171,238,.18), transparent 60%),
-        radial-gradient(900px 600px at 80% 40%, rgba(59,130,246,.16), transparent 62%),
-        linear-gradient(180deg, rgba(0,0,0,.40), rgba(0,0,0,.72));
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-    }
-
-    .auth-card{
-      position: relative;
-      width: min(520px, 100%);
-      border-radius: 26px;
-      padding: 18px;
+    .sheet-panel{
+      margin:0 auto;
+      width:min(520px, calc(100% - 10px));
+      border-radius:28px;
       overflow:hidden;
-      background: rgba(10, 16, 30, .78);
-      border: 1px solid rgba(46, 180, 255, .20);
-      box-shadow:
-        0 30px 90px rgba(0,0,0,.65),
-        0 0 0 1px rgba(255,255,255,.05) inset,
-        0 0 30px rgba(42,171,238,.12);
-    }
-    .auth-card::before{
-      content:"";
-      position:absolute; inset:-2px;
-      background: conic-gradient(from 180deg, rgba(42,171,238,.55), rgba(59,130,246,.40), rgba(42,171,238,.55));
-      filter: blur(16px);
-      opacity: .35;
-      pointer-events:none;
-    }
-    .auth-inner{
-      position:relative;
-      border-radius: 22px;
-      padding: 18px 16px 16px 16px;
-      background: rgba(5, 8, 16, .55);
-      border: 1px solid rgba(255,255,255,.06);
+      background: rgba(12,18,34,.96);
+      box-shadow: 0 34px 90px rgba(0,0,0,.62);
     }
 
-    .auth-top{
-      display:flex; align-items:center; gap:12px;
-      margin-bottom: 14px;
+    .sheet-handle{
+      height:26px;
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      background: rgba(255,255,255,.04);
     }
-    .auth-logo{
-      width:44px; height:44px;
-      border-radius: 14px;
-      display:grid; place-items:center;
-      background: rgba(42,171,238,.16);
-      border: 1px solid rgba(46,180,255,.20);
-      box-shadow: 0 0 18px rgba(42,171,238,.12);
+    .sheet-handle span{
+      width:58px;
+      height:6px;
+      border-radius:999px;
+      background: rgba(234,241,255,.18);
     }
-    .auth-title{
+
+    .sheet-list{
+      display:flex;
+      flex-direction:column;
+      padding: 12px 12px 14px 12px;
+      gap: 10px;
+    }
+
+    .sheet-item{
+      border:none;
+      background: rgba(255,255,255,.06);
+      color:#eaf1ff;
+      text-align:left;
+      padding: 15px 14px;
       font-weight: 900;
-      font-size: 16px;
-      margin:0;
-      color: rgba(234,241,255,.98);
-    }
-    .auth-sub{
-      margin: 2px 0 0 0;
-      font-size: 12px;
-      color: rgba(234,241,255,.70);
-      line-height: 1.35;
-    }
-
-    .auth-btn{
-      width: 100%;
-      border: none;
-      cursor: pointer;
-      padding: 13px 14px;
-      border-radius: 16px;
+      cursor:pointer;
       display:flex;
       align-items:center;
-      justify-content:center;
-      gap:10px;
-
-      color: rgba(234,241,255,.98);
-      font-weight: 900;
-      font-size: 13px;
-
-      background: linear-gradient(180deg, rgba(42,171,238,.26), rgba(59,130,246,.16));
-      border: 1px solid rgba(42,171,238,.26);
-      box-shadow:
-        0 16px 34px rgba(0,0,0,.36),
-        0 0 18px rgba(42,171,238,.14);
-      transition: transform .15s ease;
+      justify-content:space-between;
+      border-radius:16px;
+      box-shadow: 0 10px 26px rgba(0,0,0,.22);
     }
-    .auth-btn:active{ transform: scale(.99); }
-    .auth-btn:disabled{ opacity:.6; cursor:not-allowed; }
+    .sheet-item:active{ background: rgba(255,255,255,.09); }
 
-    .google-ico{
-      width:18px; height:18px;
-      background: #fff;
-      border-radius: 6px;
-      display:grid;
-      place-items:center;
-      box-shadow: 0 10px 22px rgba(0,0,0,.25);
+    .sheet-item .left{ display:flex; align-items:center; gap:10px; min-width:0; }
+    .ico{
+      width:36px; height:36px; border-radius:12px;
+      display:grid; place-items:center;
+      font-size:16px;
+      background: rgba(42,171,238,.12);
+      box-shadow: 0 0 16px rgba(42,171,238,.10);
+      flex:0 0 auto;
     }
-    .google-ico svg{ width:12px; height:12px; }
-
-    .auth-row{ display:flex; gap:10px; margin-top: 10px; }
-    .auth-mini{
-      flex:1;
-      padding: 10px;
-      border-radius: 14px;
-      background: rgba(255,255,255,.05);
-      border: 1px solid rgba(255,255,255,.06);
-      color: rgba(234,241,255,.74);
-      font-size: 11px;
-      line-height: 1.25;
+    .sheet-item .name{
+      font-size:13px;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
     }
+    .chev{ color: rgba(234,241,255,.65); font-weight:900; margin-left:10px; }
 
-    .auth-error{
-      margin-top: 10px;
-      padding: 10px;
-      border-radius: 14px;
-      background: rgba(255, 70, 70, .10);
-      border: 1px solid rgba(255, 70, 70, .20);
-      color: rgba(255, 200, 200, .95);
-      font-size: 12px;
-      display:none;
-      white-space: pre-wrap;
-    }
-    .auth-error.show{ display:block; }
-
-    .spinner{
-      width:16px; height:16px;
-      border-radius: 999px;
-      border: 2px solid rgba(234,241,255,.28);
-      border-top-color: rgba(234,241,255,.92);
-      animation: spin .8s linear infinite;
-      display:none;
-    }
-    .spinner.show{ display:inline-block; }
-    @keyframes spin{ to{ transform: rotate(360deg); } }
-
-    /* ✅ PROFILE MODAL */
+    /* ====== PROFILE MODAL ====== */
     .modal-overlay{
-      position: fixed; inset: 0;
+      position:fixed;
+      inset:0;
       background: rgba(0,0,0,.62);
-      opacity: 0; pointer-events: none;
+      opacity:0;
+      pointer-events:none;
       transition: opacity .25s ease;
-      z-index: 400;
+      z-index:95;
     }
-    .modal-overlay.show{ opacity: 1; pointer-events: auto; }
+    .modal-overlay.show{ opacity:1; pointer-events:auto; }
 
     .profile-modal{
-      position: fixed;
-      left: 0; right: 0;
-      top: 50%;
-      transform: translateY(-50%) scale(.98);
-      opacity: 0; pointer-events: none;
-      transition: transform .25s ease, opacity .25s ease;
-      z-index: 410;
-      padding: 0 16px;
+      position:fixed;
+      left:0; right:0; bottom:0;
+      transform: translateY(110%);
+      transition: transform .30s cubic-bezier(.2,.9,.2,1);
+      z-index:100;
+      padding: 0 14px calc(28px + var(--safe-bottom)) 14px;
     }
-    .profile-modal.show{
-      opacity: 1; pointer-events: auto;
-      transform: translateY(-50%) scale(1);
-    }
+    .profile-modal.show{ transform: translateY(-12px); }
 
-    .profile-card{
-      margin: 0 auto;
-      width: min(520px, 100%);
-      border-radius: 26px;
+    .profile-panel{
+      margin:0 auto;
+      width:min(520px, calc(100% - 10px));
+      border-radius:28px;
       overflow:hidden;
-      background: rgba(10, 16, 30, .88);
-      border: 1px solid rgba(46, 180, 255, .18);
-      box-shadow: 0 34px 90px rgba(0,0,0,.68);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
+      background: rgba(12,18,34,.96);
+      box-shadow: 0 34px 90px rgba(0,0,0,.62);
+      border: 1px solid rgba(255,255,255,.06);
     }
 
     .profile-head{
-      padding: 14px;
-      display:flex; align-items:center; justify-content:space-between; gap:10px;
+      padding: 16px 16px 14px 16px;
+      display:flex;
+      align-items:center;
+      gap:12px;
       background: rgba(255,255,255,.04);
-      border-bottom: 1px solid rgba(255,255,255,.06);
     }
-    .profile-head .t{ font-weight: 900; font-size: 14px; }
 
-    .profile-x{
-      width: 38px; height: 38px;
-      border-radius: 12px;
-      border: 1px solid rgba(255,255,255,.10);
-      background: rgba(255,255,255,.06);
+    .avatar{
+      width:52px;
+      height:52px;
+      border-radius:18px;
+      background: rgba(42,171,238,.14);
+      border: 1px solid rgba(46, 180, 255, .22);
+      box-shadow: 0 0 16px rgba(42,171,238,.12);
+      overflow:hidden;
+      flex:0 0 auto;
+      display:grid;
+      place-items:center;
+      font-weight:900;
       color: rgba(234,241,255,.92);
-      cursor:pointer;
-      display:grid; place-items:center;
     }
-    .profile-x:active{ transform: scale(.98); }
+    .avatar img{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      display:block;
+    }
+
+    .pmeta{ min-width:0; }
+    .pname{
+      font-weight:900;
+      font-size:14px;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+    .pemail{
+      font-size:12px;
+      color: rgba(234,241,255,.70);
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      margin-top:2px;
+    }
 
     .profile-body{
-      padding: 14px;
-      display:flex; gap:12px; align-items:center;
-    }
-    .avatar{
-      width: 54px; height: 54px;
-      border-radius: 18px;
-      overflow:hidden;
-      background: rgba(42,171,238,.12);
-      border: 1px solid rgba(46, 180, 255, .18);
-      box-shadow: 0 0 18px rgba(42,171,238,.10);
-      flex: 0 0 auto;
-      display:grid; place-items:center;
-    }
-    .avatar img{ width:100%; height:100%; object-fit: cover; display:block; }
-    .avatar span{ font-weight: 900; color: rgba(234,241,255,.92); font-size: 14px; }
-
-    .pname{ font-weight: 900; font-size: 14px; color: rgba(234,241,255,.98); }
-    .pmail{
-      margin-top: 4px;
-      font-size: 12px;
-      color: rgba(234,241,255,.70);
-      overflow:hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-      max-width: 320px;
+      padding: 14px 16px 16px 16px;
+      display:flex;
+      flex-direction:column;
+      gap:10px;
     }
 
-    .profile-actions{
-      padding: 0 14px 14px 14px;
-      display:flex; gap:10px;
-    }
-    .btn-ghost{
-      flex:1;
+    .pbtn{
+      width:100%;
       border:none;
+      border-radius:16px;
+      padding: 14px 14px;
       cursor:pointer;
-      padding: 12px;
-      border-radius: 16px;
+      font-weight:900;
+      color: rgba(234,241,255,.96);
       background: rgba(255,255,255,.06);
-      border: 1px solid rgba(255,255,255,.08);
-      color: rgba(234,241,255,.90);
-      font-weight: 900;
-      font-size: 13px;
+      box-shadow: 0 10px 26px rgba(0,0,0,.22);
+      text-align:left;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
     }
-    .btn-ghost:active{ transform: scale(.99); }
+    .pbtn:active{ background: rgba(255,255,255,.09); }
 
-    .btn-danger{
-      flex:1;
-      border:none;
-      cursor:pointer;
-      padding: 12px;
-      border-radius: 16px;
-      background: rgba(255,70,70,.12);
-      border: 1px solid rgba(255,70,70,.22);
-      color: rgba(255,220,220,.96);
-      font-weight: 900;
-      font-size: 13px;
+    .pbtn.primary{
+      background: linear-gradient(180deg, rgba(42,171,238,.22), rgba(59,130,246,.14));
+      border: 1px solid rgba(42,171,238,.24);
+      box-shadow: 0 12px 24px rgba(0,0,0,.35), 0 0 16px rgba(42,171,238,.12);
     }
-    .btn-danger:active{ transform: scale(.99); }
 
     @media (max-width: 360px){
       .balance-mini{ width: min(196px, 68%); height: 36px; }
@@ -687,7 +543,6 @@
       .menu-btn, .profile-btn{ width: 40px; height: 40px; border-radius: 13px; }
       .left-buttons{ transform: translateX(-8px); }
       .top-row{ gap: 14px; }
-      .pmail{ max-width: 210px; }
     }
 
     @media (prefers-reduced-motion: reduce){
@@ -703,7 +558,9 @@
       <div class="top-row">
         <div class="left-buttons">
           <button class="menu-btn" id="menuBtn" aria-label="Открыть меню">
-            <div class="burger" aria-hidden="true"><span></span><span></span><span></span></div>
+            <div class="burger" aria-hidden="true">
+              <span></span><span></span><span></span>
+            </div>
           </button>
 
           <button class="profile-btn" id="profileBtn" aria-label="Профиль" title="Профиль">
@@ -717,414 +574,130 @@
         <div class="balance-mini" aria-label="Баланс">
           <span class="bal-title">Баланс</span>
           <button class="bal-amount" id="balanceChip" aria-label="Открыть кошелёк">
-            <span id="balanceValue">—</span>
+            <span id="balanceValue">0 VC</span>
           </button>
         </div>
       </div>
 
+      <!-- ✅ Баннеры (3:1) -->
       <div class="slider" aria-label="Баннеры">
         <div class="slides" id="slides">
-          <div class="slide"><img src="YOUR_BANNER_1200x400.png" alt="Banner 1"></div>
-          <div class="slide"><img src="YOUR_BANNER_1200x400.png" alt="Banner 2"></div>
-          <div class="slide"><img src="YOUR_BANNER_1200x400.png" alt="Banner 3"></div>
+          <div class="slide">
+            <img src="YOUR_BANNER_1200x400.png" alt="Banner 1">
+          </div>
+          <div class="slide">
+            <img src="YOUR_BANNER_1200x400.png" alt="Banner 2">
+          </div>
+          <div class="slide">
+            <img src="YOUR_BANNER_1200x400.png" alt="Banner 3">
+          </div>
         </div>
 
         <div class="dots" id="dots" aria-label="Индикатор баннера">
-          <div class="dot active"></div><div class="dot"></div><div class="dot"></div>
+          <div class="dot active"></div>
+          <div class="dot"></div>
+          <div class="dot"></div>
         </div>
       </div>
 
       <div class="actions" aria-label="Разделы">
-        <button class="action-btn" id="btnGames" style="--bg:url('https://i.postimg.cc/8khGybLS/d9e9d314-fd90-4cad-ad74-b2ed14a51f38.png');">
-          <div class="bg" aria-hidden="true"></div><div class="label">Игры</div>
+        <button class="action-btn" id="btnGames"
+          style="--bg:url('https://i.postimg.cc/8khGybLS/d9e9d314-fd90-4cad-ad74-b2ed14a51f38.png');">
+          <div class="bg" aria-hidden="true"></div>
+          <div class="label">Игры</div>
         </button>
 
-        <button class="action-btn" id="btnShop" style="--bg:url('https://i.postimg.cc/XvWZvSqj/file-0000000059bc72438dd485df46f69309-(1).png');">
-          <div class="bg" aria-hidden="true"></div><div class="label">UC Shop</div>
+        <button class="action-btn" id="btnShop"
+          style="--bg:url('https://i.postimg.cc/XvWZvSqj/file-0000000059bc72438dd485df46f69309-(1).png');">
+          <div class="bg" aria-hidden="true"></div>
+          <div class="label">UC Shop</div>
         </button>
 
-        <button class="action-btn" id="btnCustom" style="--bg:url('https://i.postimg.cc/TY9sZp02/46F82521-51BE-4FB1-B831-B19958E9872E.png');">
-          <div class="bg" aria-hidden="true"></div><div class="label">Кастомки</div>
+        <button class="action-btn" id="btnCustom"
+          style="--bg:url('https://i.postimg.cc/TY9sZp02/46F82521-51BE-4FB1-B831-B19958E9872E.png');">
+          <div class="bg" aria-hidden="true"></div>
+          <div class="label">Кастомки</div>
         </button>
       </div>
 
     </div>
   </div>
 
-  <!-- ✅ Sidebar -->
-  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <!-- ✅ МЕНЮ (bottom sheet) -->
+  <div class="sheet-overlay" id="sheetOverlay"></div>
 
-  <aside class="sidebar" id="sidebar" aria-label="Меню слева">
-    <div class="sidebar-top">
-      <div class="sidebar-title">Меню</div>
-      <button class="sidebar-close" id="sidebarClose" aria-label="Закрыть меню">✕</button>
-    </div>
+  <div class="sheet" id="sheet">
+    <div class="sheet-panel" role="dialog" aria-modal="true" aria-label="Меню">
+      <div class="sheet-handle"><span></span></div>
 
-    <div class="side-grid">
-      <button class="side-card" data-link="wallet.html">
-        <div class="side-thumb" style="--img:url('https://i.postimg.cc/8khGybLS/d9e9d314-fd90-4cad-ad74-b2ed14a51f38.png');"></div>
-        <div class="side-meta"><div class="side-name">Кошелёк</div><div class="side-chev">›</div></div>
-      </button>
-
-      <button class="side-card" data-link="ucshop.html">
-        <div class="side-thumb" style="--img:url('https://i.postimg.cc/XvWZvSqj/file-0000000059bc72438dd485df46f69309-(1).png');"></div>
-        <div class="side-meta"><div class="side-name">UC Shop</div><div class="side-chev">›</div></div>
-      </button>
-
-      <button class="side-card" data-link="#custom">
-        <div class="side-thumb" style="--img:url('https://i.postimg.cc/TY9sZp02/46F82521-51BE-4FB1-B831-B19958E9872E.png');"></div>
-        <div class="side-meta"><div class="side-name">Кастомки</div><div class="side-chev">›</div></div>
-      </button>
-
-      <button class="side-card" data-link="#support">
-        <div class="side-thumb" style="--img:url('https://images.unsplash.com/photo-1525186402429-b4ff38bedbec?auto=format&fit=crop&w=1200&q=60');"></div>
-        <div class="side-meta"><div class="side-name">Поддержка</div><div class="side-chev">›</div></div>
-      </button>
-    </div>
-  </aside>
-
-  <!-- ✅ AUTH -->
-  <div class="auth-gate show" id="authGate" aria-label="Вход">
-    <div class="auth-bg" aria-hidden="true"></div>
-
-    <div class="auth-card">
-      <div class="auth-inner">
-        <div class="auth-top">
-          <div class="auth-logo" aria-hidden="true">
-            <svg viewBox="0 0 24 24" fill="none">
-              <path d="M12 2l8.5 4.9v10.2L12 22l-8.5-4.9V6.9L12 2Z" stroke="rgba(234,241,255,.92)" stroke-width="2"/>
-              <path d="M7.2 12.3 10.6 16l6.2-8" stroke="rgba(42,171,238,.95)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-          </div>
-          <div>
-            <p class="auth-title">Вход в VezusGame</p>
-            <p class="auth-sub">Чтобы у каждого был свой профиль и баланс, войди через Google.</p>
-          </div>
-        </div>
-
-        <button class="auth-btn" id="googleBtn">
-          <span class="google-ico" aria-hidden="true">
-            <svg viewBox="0 0 24 24">
-              <path fill="#EA4335" d="M12 10.2v3.9h5.4c-.2 1.3-1.6 3.9-5.4 3.9-3.2 0-5.8-2.7-5.8-6s2.6-6 5.8-6c1.8 0 3 .8 3.7 1.5l2.5-2.4C16.7 3.4 14.6 2.4 12 2.4 6.9 2.4 2.8 6.5 2.8 12S6.9 21.6 12 21.6c5.7 0 9.4-4 9.4-9.6 0-.6-.1-1-.2-1.8H12Z"/>
-            </svg>
-          </span>
-          <span id="googleBtnText">Продолжить с Google</span>
-          <span class="spinner" id="authSpinner" aria-hidden="true"></span>
+      <div class="sheet-list">
+        <button class="sheet-item" data-action="vouchers">
+          <div class="left"><div class="ico">🎟️</div><div class="name">Ваучеры</div></div>
+          <div class="chev">›</div>
         </button>
 
-        <div class="auth-row">
-          <div class="auth-mini">✅ Профиль создаётся автоматически</div>
-          <div class="auth-mini">🔒 Доступ к данным только у тебя</div>
-        </div>
+        <button class="sheet-item" data-action="history">
+          <div class="left"><div class="ico">🕘</div><div class="name">История</div></div>
+          <div class="chev">›</div>
+        </button>
 
-        <div class="auth-error" id="authError"></div>
+        <button class="sheet-item" data-action="support">
+          <div class="left"><div class="ico">💬</div><div class="name">Поддержка</div></div>
+          <div class="chev">›</div>
+        </button>
+
+        <button class="sheet-item" data-action="ref">
+          <div class="left"><div class="ico">🔗</div><div class="name">Реферальная ссылка</div></div>
+          <div class="chev">›</div>
+        </button>
       </div>
     </div>
   </div>
 
-  <!-- ✅ PROFILE MODAL -->
+  <!-- ✅ ПРОФИЛЬ (модалка снизу) -->
   <div class="modal-overlay" id="profileOverlay"></div>
 
-  <div class="profile-modal" id="profileModal" aria-label="Профиль">
-    <div class="profile-card">
+  <div class="profile-modal" id="profileModal">
+    <div class="profile-panel" role="dialog" aria-modal="true" aria-label="Профиль">
+      <div class="sheet-handle"><span></span></div>
+
       <div class="profile-head">
-        <div class="t">Профиль</div>
-        <button class="profile-x" id="profileClose" aria-label="Закрыть">✕</button>
+        <div class="avatar" id="avatarBox" aria-label="Аватар">
+          <span id="avatarFallback">VG</span>
+          <!-- если захочешь: вставь img через JS или руками -->
+          <!-- <img src="https://..." alt="avatar"> -->
+        </div>
+
+        <div class="pmeta">
+          <div class="pname" id="profileName">Гость</div>
+          <div class="pemail" id="profileEmail">guest@example.com</div>
+        </div>
       </div>
 
       <div class="profile-body">
-        <div class="avatar" id="avatarBox">
-          <span id="avatarFallback">VG</span>
-        </div>
-        <div style="min-width:0">
-          <div class="pname" id="pName">—</div>
-          <div class="pmail" id="pEmail">—</div>
-        </div>
-      </div>
+        <button class="pbtn primary" id="goWalletBtn">
+          <span>Открыть кошелёк</span>
+          <span>›</span>
+        </button>
 
-      <div class="profile-actions">
-        <button class="btn-ghost" id="goWallet">Кошелёк</button>
-        <button class="btn-danger" id="logoutBtn">Выйти</button>
+        <button class="pbtn" id="closeProfileBtn">
+          <span>Закрыть</span>
+          <span>×</span>
+        </button>
       </div>
     </div>
   </div>
 
-  <!-- ✅ IMPORTANT: берем supabase-js через jsDelivr (устойчивее на iOS) -->
-  <script type="module">
-    import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
+  <script>
+    // ===== Баланс (пока заглушка) =====
+    document.getElementById('balanceValue').textContent = '0 VC';
 
-    /* ===========================
-       ✅ ВСТАВЬ СЮДА СВОИ ДАННЫЕ
-       =========================== */
-    const SUPABASE_URL = "https://bidlyktnwnwvtfehnojw.supabase.co";
-    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpZGx5a3Rud253dnRmZWhub2p3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA4NDg3NTQsImV4cCI6MjA4NjQyNDc1NH0.pYnmlTpkj4n3WbaMeAy6hlgO1470pg0Wm4nOV1w9WIY";
-
-    /* ✅ Safe storage (чтобы сессия НЕ пропадала на iOS) */
-    function createSafeStorage(){
-      const mem = new Map();
-
-      function ok(storage){
-        try{
-          const k="__sb_test__";
-          storage.setItem(k, "1");
-          storage.removeItem(k);
-          return true;
-        }catch{ return false; }
-      }
-
-      const hasLS = (() => { try{ return ok(window.localStorage); } catch{ return false; } })();
-      const hasSS = (() => { try{ return ok(window.sessionStorage); } catch{ return false; } })();
-      const store = hasLS ? window.localStorage : (hasSS ? window.sessionStorage : null);
-
-      return {
-        getItem: (key) => store ? store.getItem(key) : (mem.get(key) ?? null),
-        setItem: (key, value) => { store ? store.setItem(key, value) : mem.set(key, value); },
-        removeItem: (key) => { store ? store.removeItem(key) : mem.delete(key); }
-      };
-    }
-
-    const safeStorage = createSafeStorage();
-
-    const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-      auth: {
-        persistSession: true,
-        autoRefreshToken: true,
-        detectSessionInUrl: true,
-        flowType: "pkce",
-        storage: safeStorage
-      }
-    });
-
-    /* ===========================
-       ✅ UI refs
-       =========================== */
-    const balanceValue = document.getElementById('balanceValue');
-    const authGate = document.getElementById('authGate');
-    const googleBtn = document.getElementById('googleBtn');
-    const googleBtnText = document.getElementById('googleBtnText');
-    const authSpinner = document.getElementById('authSpinner');
-    const authError = document.getElementById('authError');
-
-    const profileBtn = document.getElementById('profileBtn');
-    const profileOverlay = document.getElementById('profileOverlay');
-    const profileModal = document.getElementById('profileModal');
-    const profileClose = document.getElementById('profileClose');
-
-    const pName = document.getElementById('pName');
-    const pEmail = document.getElementById('pEmail');
-    const avatarBox = document.getElementById('avatarBox');
-    const avatarFallback = document.getElementById('avatarFallback');
-    const logoutBtn = document.getElementById('logoutBtn');
-    const goWallet = document.getElementById('goWallet');
-
-    function showAuthError(msg){
-      authError.textContent = msg;
-      authError.classList.add('show');
-    }
-    function clearAuthError(){
-      authError.textContent = '';
-      authError.classList.remove('show');
-    }
-    function setAuthLoading(isLoading){
-      googleBtn.disabled = isLoading;
-      authSpinner.classList.toggle('show', isLoading);
-      googleBtnText.textContent = isLoading ? 'Открываю Google…' : 'Продолжить с Google';
-    }
-
-    function openProfile(){
-      profileOverlay.classList.add('show');
-      profileModal.classList.add('show');
-      document.body.style.overflow = 'hidden';
-    }
-    function closeProfile(){
-      profileOverlay.classList.remove('show');
-      profileModal.classList.remove('show');
-      document.body.style.overflow = '';
-    }
-
-    function setAvatar(url, nameOrEmail){
-      avatarBox.innerHTML = '';
-      if (url){
-        const img = document.createElement('img');
-        img.src = url;
-        img.alt = "Avatar";
-        img.onerror = () => {
-          avatarBox.innerHTML = '';
-          avatarFallback.textContent = (nameOrEmail || 'VG').slice(0,2).toUpperCase();
-          avatarBox.appendChild(avatarFallback);
-        };
-        avatarBox.appendChild(img);
-      } else {
-        avatarFallback.textContent = (nameOrEmail || 'VG').slice(0,2).toUpperCase();
-        avatarBox.appendChild(avatarFallback);
-      }
-    }
-
-    function showApp(){ authGate.classList.remove('show'); }
-    function showAuth(){ authGate.classList.add('show'); }
-
-    /* ✅ маленький retry именно для iOS “aborted” */
-    async function withRetry(fn, tries=2){
-      for(let i=0;i<tries;i++){
-        try{ return await fn(); }
-        catch(e){
-          const msg = String(e?.message || e || '');
-          const isAbort = /aborted|AbortError|operation was aborted/i.test(msg);
-          if (i === tries-1 || !isAbort) throw e;
-          await new Promise(r => setTimeout(r, 300));
-        }
-      }
-    }
-
-    async function ensureProfile(session){
-      const user = session.user;
-
-      const fullName =
-        user.user_metadata?.full_name ||
-        user.user_metadata?.name ||
-        null;
-
-      const avatarUrl =
-        user.user_metadata?.avatar_url ||
-        user.user_metadata?.picture ||
-        null;
-
-      const payload = {
-        id: user.id,
-        email: user.email ?? null,
-        full_name: fullName,
-        avatar_url: avatarUrl,
-        updated_at: new Date().toISOString()
-      };
-
-      await supabase.from('profiles').upsert(payload, { onConflict: 'id' });
-
-      const { data: profile, error } = await supabase
-        .from('profiles')
-        .select('id, balance, full_name, avatar_url, email')
-        .eq('id', user.id)
-        .single();
-
-      if (error) throw error;
-      return profile;
-    }
-
-    async function refreshUIBySession(session){
-      if (!session){
-        balanceValue.textContent = '—';
-        pName.textContent = '—';
-        pEmail.textContent = '—';
-        setAvatar(null, 'VG');
-        showAuth();
-        return;
-      }
-
-      const profile = await withRetry(() => ensureProfile(session), 2);
-
-      balanceValue.textContent = `${profile?.balance ?? 0} VC`;
-
-      const name = profile?.full_name || 'Пользователь';
-      const email = profile?.email || session.user.email || '—';
-
-      pName.textContent = name;
-      pEmail.textContent = email;
-      setAvatar(profile?.avatar_url || null, name || email);
-
-      showApp();
-    }
-
-    async function signInGoogle(){
-      clearAuthError();
-      setAuthLoading(true);
-
-      try{
-        // redirectTo должен быть добавлен в Supabase → Authentication → URL Configuration → Redirect URLs
-        const redirectTo = window.location.href;
-
-        const { error } = await supabase.auth.signInWithOAuth({
-          provider: 'google',
-          options: { redirectTo }
-        });
-
-        if (error) throw error;
-      }catch(e){
-        showAuthError('Ошибка входа: ' + (e?.message || e));
-        setAuthLoading(false);
-      }
-    }
-
-    googleBtn.addEventListener('click', signInGoogle);
-
+    // Переход в кошелек по клику на сумму
     document.getElementById('balanceChip').addEventListener('click', () => {
       window.location.href = 'wallet.html';
     });
 
-    document.getElementById('btnShop').addEventListener('click', () => {
-      window.location.href = 'ucshop.html';
-    });
-
-    document.getElementById('btnGames').addEventListener('click', () => alert('Игры (позже сделаем переход)'));
-    document.getElementById('btnCustom').addEventListener('click', () => alert('Кастомки (позже сделаем переход)'));
-
-    profileBtn.addEventListener('click', async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session){ showAuth(); return; }
-      openProfile();
-    });
-
-    profileOverlay.addEventListener('click', closeProfile);
-    profileClose.addEventListener('click', closeProfile);
-    goWallet.addEventListener('click', () => window.location.href = 'wallet.html');
-
-    logoutBtn.addEventListener('click', async () => {
-      try{
-        await supabase.auth.signOut();
-        closeProfile();
-        await refreshUIBySession(null);
-      }catch(e){
-        alert('Ошибка выхода: ' + (e?.message || e));
-      }
-    });
-
-    // Sidebar
-    const sidebar = document.getElementById('sidebar');
-    const sidebarOverlay = document.getElementById('sidebarOverlay');
-    const menuBtn = document.getElementById('menuBtn');
-    const sidebarClose = document.getElementById('sidebarClose');
-
-    function openSidebar(){
-      sidebar.classList.add('show');
-      sidebarOverlay.classList.add('show');
-      document.body.style.overflow = 'hidden';
-    }
-    function closeSidebar(){
-      sidebar.classList.remove('show');
-      sidebarOverlay.classList.remove('show');
-      document.body.style.overflow = '';
-    }
-
-    menuBtn.addEventListener('click', openSidebar);
-    sidebarClose.addEventListener('click', closeSidebar);
-    sidebarOverlay.addEventListener('click', closeSidebar);
-
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape'){
-        closeSidebar();
-        closeProfile();
-      }
-    });
-
-    document.querySelectorAll('.side-card').forEach(card => {
-      card.addEventListener('click', () => {
-        const link = card.getAttribute('data-link');
-        closeSidebar();
-        if (!link) return;
-        if (link.startsWith('#')) { alert('Открыть: ' + link); return; }
-        window.location.href = link;
-      });
-    });
-
-    // Banner dots
+    // ===== Баннеры: точки по scroll (учитываем gap) =====
     const slides = document.getElementById('slides');
     const dots = Array.from(document.getElementById('dots').querySelectorAll('.dot'));
 
@@ -1135,7 +708,9 @@
       const gap = parseFloat(getComputedStyle(slides).gap || '0') || 0;
       return w + gap;
     }
+
     function clamp(n, min, max){ return Math.max(min, Math.min(max, n)); }
+
     function updateDotsByScroll(){
       const step = getStep();
       const idx = clamp(Math.round(slides.scrollLeft / step), 0, dots.length - 1);
@@ -1160,29 +735,68 @@
     window.addEventListener('load', updateDotsByScroll);
     window.addEventListener('resize', updateDotsByScroll);
 
-    // Init
-    (async () => {
-      try{
-        const res = await withRetry(() => supabase.auth.getSession(), 2);
-        const session = res?.data?.session ?? null;
-        await refreshUIBySession(session);
-      }catch(e){
-        showAuthError('Ошибка инициализации: ' + (e?.message || e) + '\n\nЕсли ты в приватном режиме Safari — сессия может не сохраняться.');
-        showAuth();
-        setAuthLoading(false);
-      }
-    })();
+    // ===== Меню (bottom sheet) =====
+    const sheet = document.getElementById('sheet');
+    const overlay = document.getElementById('sheetOverlay');
+    const menuBtn = document.getElementById('menuBtn');
 
-    supabase.auth.onAuthStateChange(async (_event, session) => {
-      try{
-        await refreshUIBySession(session);
-      }catch(e){
-        showAuthError('Ошибка: ' + (e?.message || e));
-        showAuth();
-      }finally{
-        setAuthLoading(false);
-      }
+    function openSheet(){
+      overlay.classList.add('show');
+      sheet.classList.add('show');
+      document.body.style.overflow = 'hidden';
+    }
+    function closeSheet(){
+      overlay.classList.remove('show');
+      sheet.classList.remove('show');
+      document.body.style.overflow = '';
+    }
+
+    menuBtn.addEventListener('click', openSheet);
+    overlay.addEventListener('click', closeSheet);
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeSheet(); });
+
+    document.querySelectorAll('.sheet-item').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const action = btn.getAttribute('data-action');
+        closeSheet();
+        alert('Открыть: ' + action);
+      });
     });
+
+    // ===== Профиль (модалка) =====
+    const profileBtn = document.getElementById('profileBtn');
+    const profileOverlay = document.getElementById('profileOverlay');
+    const profileModal = document.getElementById('profileModal');
+
+    function openProfile(){
+      profileOverlay.classList.add('show');
+      profileModal.classList.add('show');
+      document.body.style.overflow = 'hidden';
+    }
+    function closeProfile(){
+      profileOverlay.classList.remove('show');
+      profileModal.classList.remove('show');
+      document.body.style.overflow = '';
+    }
+
+    profileBtn.addEventListener('click', openProfile);
+    profileOverlay.addEventListener('click', closeProfile);
+    document.getElementById('closeProfileBtn').addEventListener('click', closeProfile);
+
+    // Открыть кошелёк из профиля
+    document.getElementById('goWalletBtn').addEventListener('click', () => {
+      window.location.href = 'wallet.html';
+    });
+
+    // ===== 3 кнопки =====
+    document.getElementById('btnGames').addEventListener('click', () => alert('Игры (позже сделаем переход)'));
+
+    // Переход на ucshop.html
+    document.getElementById('btnShop').addEventListener('click', () => {
+      window.location.href = 'ucshop.html';
+    });
+
+    document.getElementById('btnCustom').addEventListener('click', () => alert('Кастомки (позже сделаем переход)'));
   </script>
 </body>
 </html>
