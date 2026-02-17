@@ -61,7 +61,7 @@
       align-items:center;
     }
 
-    /* ===== Top row: Назад + баланс (по центру группой) ===== */
+    /* ===== Top row: Назад + баланс ===== */
     .top-row{
       width:100%;
       max-width:520px;
@@ -100,7 +100,7 @@
       transform: translateX(-1px);
     }
 
-    /* ===== Баланс (как было) ===== */
+    /* ===== Баланс ===== */
     .balance-mini{
       width: min(210px, 70%);
       height: 38px;
@@ -222,11 +222,10 @@
       box-shadow: 0 18px 55px rgba(0,0,0,.40);
       border: 1px solid rgba(255,255,255,.06);
     }
-    /* фикс 3:1 как вариант B */
     .slide::before{
       content:"";
       display:block;
-      padding-top: 33.3333%; /* 3:1 */
+      padding-top: 33.3333%;
     }
     .slide img{
       position:absolute;
@@ -329,7 +328,6 @@
       align-items:center;
     }
 
-    /* ✅ Иконка пака: только картинка (без цифр) */
     .uc-badge{
       width:56px;
       height:56px;
@@ -367,7 +365,6 @@
       text-overflow:ellipsis;
     }
 
-    /* ✅ Цена рядом с кнопкой Купить */
     .actions-row{
       display:flex;
       gap:10px;
@@ -408,7 +405,7 @@
     }
     .buy-btn:active{ transform: scale(.98); }
 
-    /* ===== Popup ===== */
+    /* ===== Popup (универсальный) ===== */
     .popup-overlay{
       position:fixed;
       inset:0;
@@ -471,16 +468,120 @@
     }
     .popup-line b{ opacity:1; }
 
-    .pay-now{
-      margin-top:4px;
+    /* PUBG ID input */
+    .field{
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+      margin-top: 2px;
+    }
+    .field label{
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing:.12px;
+      opacity:.92;
+    }
+    .input{
+      height: 44px;
+      border-radius: 16px;
+      border: 1px solid rgba(46, 180, 255, .16);
+      background: rgba(255,255,255,.06);
+      color: rgba(234,241,255,.96);
+      padding: 0 14px;
+      outline: none;
+      font-weight: 800;
+      letter-spacing:.2px;
+      box-shadow: 0 18px 40px rgba(0,0,0,.25);
+    }
+    .input::placeholder{ color: rgba(234,241,255,.45); font-weight: 800; }
+
+    .hint{
+      font-size: 12px;
+      opacity: .72;
+      line-height: 1.2;
+      margin-top: -2px;
+    }
+
+    .error{
+      display:none;
+      font-size: 12px;
+      color: #ffb4b4;
+      font-weight: 900;
+      opacity: .95;
+    }
+    .error.show{ display:block; }
+
+    .btn-row{
+      display:flex;
+      gap:10px;
+      margin-top: 4px;
+    }
+
+    .btn{
       height: 44px;
       border:none;
       border-radius: 16px;
       cursor:pointer;
       font-weight: 900;
+      letter-spacing:.15px;
+      flex: 1;
+      transition: transform .15s ease;
+      white-space:nowrap;
+    }
+    .btn:active{ transform: scale(.99); }
+
+    .btn-primary{
       color:#fff;
       background: linear-gradient(135deg, #3b82f6, #2563eb);
       box-shadow: 0 18px 34px rgba(37,99,235,.28);
+    }
+    .btn-ghost{
+      color: rgba(234,241,255,.92);
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(46, 180, 255, .16);
+      box-shadow: 0 18px 34px rgba(0,0,0,.20);
+    }
+
+    /* Toast */
+    .toast{
+      position: fixed;
+      left: 50%;
+      bottom: calc(18px + var(--safe-bottom));
+      transform: translateX(-50%) translateY(14px);
+      background: rgba(12,18,34,.92);
+      border: 1px solid rgba(46, 180, 255, .18);
+      box-shadow: 0 22px 60px rgba(0,0,0,.55);
+      color: rgba(234,241,255,.95);
+      border-radius: 18px;
+      padding: 12px 14px;
+      width: min(520px, calc(100% - 32px));
+      opacity: 0;
+      pointer-events:none;
+      transition: opacity .22s ease, transform .22s ease;
+      z-index: 300;
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 10px;
+      font-weight: 900;
+      font-size: 13px;
+    }
+    .toast.show{
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+    .toast .ok{
+      border:none;
+      cursor:pointer;
+      border-radius: 14px;
+      height: 34px;
+      padding: 0 12px;
+      background: rgba(255,255,255,.08);
+      border: 1px solid rgba(46, 180, 255, .16);
+      color: rgba(234,241,255,.95);
+      font-weight: 900;
     }
 
     @media (max-width: 360px){
@@ -500,7 +601,7 @@
   <div class="app">
     <div class="content">
 
-      <!-- Top row: Назад + баланс -->
+      <!-- Top row -->
       <div class="top-row">
         <button class="back-btn-square" id="backBtn" aria-label="Назад" title="Назад">
           <span class="back-icon">←</span>
@@ -518,7 +619,7 @@
         <h1 class="page-title">UC Shop</h1>
       </div>
 
-      <!-- ✅ 2 Баннера + индикатор -->
+      <!-- Slider -->
       <div class="slider" aria-label="Баннеры">
         <div class="slides" id="slides">
           <div class="slide">
@@ -540,31 +641,70 @@
         <div class="section-head">
           <p class="h">Пакеты UC</p>
         </div>
-
         <div class="grid" id="productGrid"></div>
       </div>
 
     </div>
   </div>
 
-  <!-- Buy popup -->
-  <div class="popup-overlay" id="buyPopup">
-    <div class="popup">
+  <!-- STEP 1: Buy popup (данные + PUBG ID) -->
+  <div class="popup-overlay" id="buyPopup" aria-hidden="true">
+    <div class="popup" role="dialog" aria-modal="true" aria-label="Покупка UC">
       <div class="popup-head">
         <p class="t">Покупка UC</p>
-        <button class="close-x" id="closePopup">×</button>
+        <button class="close-x" id="closePopup1" aria-label="Закрыть">×</button>
       </div>
       <div class="popup-body">
         <div class="popup-line"><span>Пакет:</span> <b id="pName">—</b></div>
         <div class="popup-line"><span>Цена:</span> <b id="pTotal">—</b></div>
-        <button class="pay-now" id="payNow">Продолжить</button>
+
+        <div class="field">
+          <label for="pubgIdInput">Игровой ID PUBG</label>
+          <input class="input" id="pubgIdInput" inputmode="numeric" autocomplete="off" placeholder="Например: 5123456789">
+          <div class="hint">Только цифры. Проверь ID в профиле PUBG.</div>
+          <div class="error" id="pubgErr">Введите корректный PUBG ID (6–16 цифр).</div>
+        </div>
+
+        <div class="btn-row">
+          <button class="btn btn-ghost" id="cancel1">Отмена</button>
+          <button class="btn btn-primary" id="buyStep1">Купить</button>
+        </div>
       </div>
     </div>
   </div>
 
+  <!-- STEP 2: Confirm popup (верно ли ID) -->
+  <div class="popup-overlay" id="confirmPopup" aria-hidden="true">
+    <div class="popup" role="dialog" aria-modal="true" aria-label="Подтверждение ID">
+      <div class="popup-head">
+        <p class="t">Проверь ID</p>
+        <button class="close-x" id="closePopup2" aria-label="Закрыть">×</button>
+      </div>
+      <div class="popup-body">
+        <div class="popup-line"><span>Пакет:</span> <b id="cName">—</b></div>
+        <div class="popup-line"><span>Цена:</span> <b id="cTotal">—</b></div>
+        <div class="popup-line"><span>PUBG ID:</span> <b id="cPubg">—</b></div>
+
+        <div class="hint" style="opacity:.85">
+          Верно ли указан игровой ID? Если ошибёшься — UC придут на другой аккаунт.
+        </div>
+
+        <div class="btn-row">
+          <button class="btn btn-ghost" id="backToEdit">Назад</button>
+          <button class="btn btn-primary" id="confirmBuy">Да, верно</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast" aria-live="polite">
+    <span id="toastText">—</span>
+    <button class="ok" id="toastOk">Ок</button>
+  </div>
+
   <script>
     // ====== Данные пакетов ======
-    // ✅ Вставляй свои картинки в img. Цифры поверх убраны полностью.
     const PRODUCTS = [
       { id:'uc_60',   name:'60 UC',   price: 80,   img: 'https://i.postimg.cc/L6tCqkN3/Picsart-26-02-15-18-22-50-916.png'   },
       { id:'uc_325',  name:'325 UC',  price: 420,  img: 'https://i.postimg.cc/bwmZ2c1q/Picsart-26-02-17-17-05-40-600.png'  },
@@ -574,26 +714,55 @@
       { id:'uc_8100', name:'8100 UC', price: 8100, img: 'https://i.postimg.cc/3Jq3m8Wb/Picsart-26-02-17-17-48-00-356.png' },
     ];
 
-    // Баланс (заглушка)
-    document.getElementById('balanceValue').textContent = '0 VC';
+    // ===== Utils =====
+    const $ = (id) => document.getElementById(id);
+    const clamp = (n, min, max) => Math.max(min, Math.min(max, n));
 
-    // ✅ Переход по капсуле баланса на wallet.html
-    document.getElementById('balanceChip').addEventListener('click', () => {
-      window.location.href = 'wallet.html';
-    });
+    function formatRub(n){
+      return new Intl.NumberFormat('ru-RU').format(n) + ' ₽';
+    }
 
-    // ✅ Назад (history.back, иначе index.html)
-    document.getElementById('backBtn').addEventListener('click', () => {
+    function setBodyLock(locked){
+      document.body.style.overflow = locked ? 'hidden' : '';
+    }
+
+    function openOverlay(el){
+      el.classList.add('show');
+      el.setAttribute('aria-hidden', 'false');
+      setBodyLock(true);
+    }
+    function closeOverlay(el){
+      el.classList.remove('show');
+      el.setAttribute('aria-hidden', 'true');
+      setBodyLock(false);
+    }
+
+    // Toast
+    const toast = $('toast');
+    const toastText = $('toastText');
+    const toastOk = $('toastOk');
+    let toastTimer = null;
+
+    function showToast(msg){
+      toastText.textContent = msg;
+      toast.classList.add('show');
+      if (toastTimer) clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => toast.classList.remove('show'), 3800);
+    }
+    toastOk.addEventListener('click', () => toast.classList.remove('show'));
+
+    // ===== Баланс (заглушка) =====
+    $('balanceValue').textContent = '0 VC';
+    $('balanceChip').addEventListener('click', () => window.location.href = 'wallet.html');
+
+    // Назад
+    $('backBtn').addEventListener('click', () => {
       if (history.length > 1) history.back();
       else window.location.href = 'index.html';
     });
 
     // ====== Рендер товаров ======
-    const grid = document.getElementById('productGrid');
-
-    function formatRub(n){
-      return new Intl.NumberFormat('ru-RU').format(n) + ' ₽';
-    }
+    const grid = $('productGrid');
 
     function createCard(p){
       const card = document.createElement('div');
@@ -604,62 +773,161 @@
           <div class="uc-badge">
             <img src="${p.img}" alt="${p.name}">
           </div>
-
           <div class="card-info">
             <p class="card-title">${p.name}</p>
           </div>
         </div>
-
         <div class="actions-row">
           <div class="price-inline"><span class="label">Цена</span>${formatRub(p.price)}</div>
           <button type="button" class="buy-btn">Купить</button>
         </div>
       `;
 
-      const buy = card.querySelector('.buy-btn');
-      buy.addEventListener('click', () => openBuyPopup(p));
-
+      card.querySelector('.buy-btn').addEventListener('click', () => openBuyStep1(p));
       return card;
     }
 
     PRODUCTS.forEach(p => grid.appendChild(createCard(p)));
 
-    // ====== Popup ======
-    const popup = document.getElementById('buyPopup');
-    const closePopupBtn = document.getElementById('closePopup');
-    const payNowBtn = document.getElementById('payNow');
+    // ====== Покупка: STEP 1 ======
+    const buyPopup = $('buyPopup');
+    const confirmPopup = $('confirmPopup');
 
-    let current = null;
+    const pubgInput = $('pubgIdInput');
+    const pubgErr = $('pubgErr');
 
-    function openBuyPopup(product){
-      current = { product };
-      document.getElementById('pName').textContent = product.name;
-      document.getElementById('pTotal').textContent = formatRub(product.price);
-      popup.classList.add('show');
-      document.body.style.overflow = 'hidden';
+    const STORAGE_KEY = 'pubg_id_last';
+    pubgInput.value = localStorage.getItem(STORAGE_KEY) || '';
+
+    let current = null; // { product, pubgId }
+
+    function sanitizeDigits(str){
+      return (str || '').replace(/\D+/g, '');
     }
 
-    function closeBuyPopup(){
-      popup.classList.remove('show');
-      document.body.style.overflow = '';
+    function isValidPubgId(id){
+      // ✅ можно поменять правила:
+      // сейчас: 6–16 цифр
+      return /^\d{6,16}$/.test(id);
+    }
+
+    // оставляем только цифры прямо во время ввода
+    pubgInput.addEventListener('input', () => {
+      const digits = sanitizeDigits(pubgInput.value);
+      if (pubgInput.value !== digits) pubgInput.value = digits;
+      pubgErr.classList.remove('show');
+    });
+
+    function openBuyStep1(product){
+      current = { product, pubgId: '' };
+      $('pName').textContent = product.name;
+      $('pTotal').textContent = formatRub(product.price);
+
+      pubgErr.classList.remove('show');
+
+      // если уже вводили раньше — подставим
+      pubgInput.value = sanitizeDigits(pubgInput.value);
+      openOverlay(buyPopup);
+
+      // фокус удобнее на телефоне
+      setTimeout(() => pubgInput.focus({ preventScroll:true }), 80);
+    }
+
+    function closeStep1(){
+      closeOverlay(buyPopup);
       current = null;
     }
 
-    closePopupBtn.addEventListener('click', closeBuyPopup);
-    popup.addEventListener('click', (e) => { if (e.target === popup) closeBuyPopup(); });
-    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeBuyPopup(); });
+    $('closePopup1').addEventListener('click', closeStep1);
+    $('cancel1').addEventListener('click', closeStep1);
+    buyPopup.addEventListener('click', (e) => { if (e.target === buyPopup) closeStep1(); });
 
-    payNowBtn.addEventListener('click', () => {
+    // ====== Покупка: STEP 2 (подтверждение) ======
+    function openConfirmStep(){
       if (!current) return;
-      alert(`Оформляем покупку: ${current.product.name} (цена ${formatRub(current.product.price)})`);
-      closeBuyPopup();
+
+      $('cName').textContent  = current.product.name;
+      $('cTotal').textContent = formatRub(current.product.price);
+      $('cPubg').textContent  = current.pubgId;
+
+      openOverlay(confirmPopup);
+    }
+
+    function closeStep2(){
+      closeOverlay(confirmPopup);
+    }
+
+    $('closePopup2').addEventListener('click', () => {
+      closeStep2();
+      // если закрыли подтверждение — вернём на шаг 1, чтобы не терять форму
+      openOverlay(buyPopup);
+      setTimeout(() => pubgInput.focus({ preventScroll:true }), 80);
     });
 
-    // ====== Баннеры: точки как на главной ======
-    const slides = document.getElementById('slides');
-    const dots = Array.from(document.getElementById('dots').querySelectorAll('.dot'));
+    confirmPopup.addEventListener('click', (e) => {
+      if (e.target === confirmPopup){
+        closeStep2();
+        openOverlay(buyPopup);
+        setTimeout(() => pubgInput.focus({ preventScroll:true }), 80);
+      }
+    });
 
-    function clamp(n, min, max){ return Math.max(min, Math.min(max, n)); }
+    $('backToEdit').addEventListener('click', () => {
+      closeStep2();
+      openOverlay(buyPopup);
+      setTimeout(() => pubgInput.focus({ preventScroll:true }), 80);
+    });
+
+    // кнопка "Купить" на шаге 1
+    $('buyStep1').addEventListener('click', () => {
+      if (!current) return;
+
+      const id = sanitizeDigits(pubgInput.value);
+      if (!isValidPubgId(id)){
+        pubgErr.classList.add('show');
+        pubgInput.focus({ preventScroll:true });
+        return;
+      }
+
+      localStorage.setItem(STORAGE_KEY, id);
+      current.pubgId = id;
+
+      // переходим на подтверждение
+      closeOverlay(buyPopup);
+      openConfirmStep();
+    });
+
+    // финальное подтверждение
+    $('confirmBuy').addEventListener('click', () => {
+      if (!current) return;
+
+      // ✅ тут позже будет реальная оплата/заявка
+      showToast(`Заявка создана: ${current.product.name} • PUBG ID ${current.pubgId}`);
+
+      closeStep2();
+      current = null;
+      setBodyLock(false);
+    });
+
+    // ESC — закрывает самый верхний попап
+    document.addEventListener('keydown', (e) => {
+      if (e.key !== 'Escape') return;
+
+      if (confirmPopup.classList.contains('show')){
+        closeStep2();
+        openOverlay(buyPopup);
+        setTimeout(() => pubgInput.focus({ preventScroll:true }), 80);
+        return;
+      }
+      if (buyPopup.classList.contains('show')){
+        closeStep1();
+        return;
+      }
+    });
+
+    // ====== Баннеры: точки ======
+    const slides = $('slides');
+    const dots = Array.from($('dots').querySelectorAll('.dot'));
 
     function updateDotsByScroll(){
       const w = slides.clientWidth || 1;
@@ -674,7 +942,7 @@
         updateDotsByScroll();
         rafId = null;
       });
-    });
+    }, { passive:true });
 
     dots.forEach((dot, i) => {
       dot.addEventListener('click', () => {
