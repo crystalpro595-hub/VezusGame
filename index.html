@@ -86,9 +86,9 @@
       width: 42px;
       height: 42px;
       border-radius: 14px;
-      border: 1px solid rgba(46, 180, 255, .22);
+      border: 1px solid var(--glassBorder);
       cursor:pointer;
-      background: rgba(8, 12, 22, .72);
+      background: var(--glass);
       box-shadow:
         0 12px 34px rgba(0,0,0,.55),
         0 0 22px rgba(42,171,238,.14);
@@ -123,7 +123,7 @@
 
     /* ✅ Баланс */
     .balance-mini{
-      width: min(260px, 78%);
+      width: min(210px, 70%);
       height: 38px;
       border-radius: 999px;
       display:flex;
@@ -134,10 +134,10 @@
       position:relative;
       overflow:hidden;
 
-      background: rgba(8, 12, 22, .72);
-      border: 1px solid rgba(46, 180, 255, .22);
+      background: var(--glass);
+      border: 1px solid var(--glassBorder);
       box-shadow:
-        0 14px 40px rgba(0,0,0,.55),
+        var(--shadow),
         0 0 0 1px rgba(255,255,255,.04) inset,
         0 0 24px rgba(42,171,238,.16);
       backdrop-filter: blur(12px);
@@ -200,25 +200,6 @@
       white-space:nowrap;
     }
     .bal-amount:active{ transform: scale(.99); }
-
-    /* мини-кнопка выхода на главной */
-    .mini-logout{
-      display:none;
-      height: 26px;
-      padding: 0 10px;
-      border-radius: 999px;
-      border: 1px solid rgba(46, 180, 255, .18);
-      background: rgba(255,255,255,.06);
-      color: rgba(234,241,255,.95);
-      font-weight: 900;
-      font-size: 12px;
-      cursor:pointer;
-      position:relative;
-      z-index:1;
-      white-space:nowrap;
-    }
-    .mini-logout.show{ display:inline-flex; align-items:center; justify-content:center; }
-    .mini-logout:active{ transform: scale(.99); }
 
     /* ✅ Баннеры — 3:1 cover */
     .slider{ width:100%; max-width:520px; border-radius: var(--radius); }
@@ -585,7 +566,7 @@
     }
 
     /* =========================================
-       ✅ AUTH OVERLAY (в твоём стиле)
+       ✅ AUTH OVERLAY (ПЕРЕДЕЛАННЫЙ ДИЗАЙН ПОД ТВОЙ СТИЛЬ)
     ========================================== */
     .auth-overlay{
       position:fixed;
@@ -595,84 +576,102 @@
       align-items:center;
       justify-content:center;
       padding: 18px;
-      background: rgba(0,0,0,.72);
+      background:
+        radial-gradient(900px 600px at 30% 10%, rgba(42,171,238,.18), transparent 60%),
+        radial-gradient(900px 600px at 70% 90%, rgba(59,130,246,.16), transparent 60%),
+        linear-gradient(180deg, rgba(0,0,0,.72), rgba(0,0,0,.82));
       opacity:0;
       pointer-events:none;
       transition: opacity .18s ease;
     }
-    .auth-overlay.show{ opacity:1; pointer-events:auto; }
+    .auth-overlay.show{
+      opacity:1;
+      pointer-events:auto;
+    }
 
     .auth-card{
-      width: min(520px, 100%);
+      width: min(460px, 100%);
       border-radius: 24px;
       overflow:hidden;
-      background: rgba(12,18,34,.92);
+      background: rgba(8, 12, 22, .86);
       border: 1px solid rgba(46, 180, 255, .18);
-      box-shadow: 0 34px 90px rgba(0,0,0,.62);
+      box-shadow:
+        0 34px 90px rgba(0,0,0,.62),
+        0 0 0 1px rgba(255,255,255,.04) inset,
+        0 0 28px rgba(42,171,238,.14);
       backdrop-filter: blur(14px);
       -webkit-backdrop-filter: blur(14px);
-      position:relative;
       transform: translateY(10px) scale(.98);
       transition: transform .18s ease;
     }
     .auth-overlay.show .auth-card{ transform: translateY(0) scale(1); }
 
-    .auth-head{
+    .auth-top{
       padding: 16px 16px 12px 16px;
       display:flex;
       align-items:center;
       justify-content:space-between;
-      gap: 10px;
-      background: rgba(255,255,255,.03);
+      gap:12px;
       border-bottom: 1px solid rgba(255,255,255,.06);
+      background: rgba(255,255,255,.04);
     }
-    .auth-title{
-      font-weight: 900;
-      letter-spacing:.25px;
-      font-size: 14px;
-      color: rgba(234,241,255,.95);
-      margin:0;
+
+    .brand{
+      display:flex; align-items:center; gap:10px;
+      min-width:0;
     }
-    .auth-x{
-      width:38px; height:38px;
-      border-radius: 14px;
-      border: 1px solid rgba(46, 180, 255, .16);
-      background: rgba(8, 12, 22, .55);
-      color: rgba(234,241,255,.92);
-      cursor:pointer;
-      display:grid;
-      place-items:center;
-      box-shadow: 0 12px 28px rgba(0,0,0,.45);
-      font-weight:900;
+    .brand-badge{
+      width:42px; height:42px; border-radius:16px;
+      background: linear-gradient(135deg, rgba(42,171,238,.95), rgba(59,130,246,.90));
+      box-shadow: 0 18px 34px rgba(37,99,235,.22);
+      display:grid; place-items:center;
+      color:#fff; font-weight:900;
+      flex: 0 0 auto;
     }
-    .auth-x:active{ transform: scale(.98); }
+    .brand-title{
+      display:flex; flex-direction:column; gap:2px;
+      min-width:0;
+    }
+    .brand-title b{
+      color: rgba(234,241,255,.96);
+      font-size:14px;
+      letter-spacing:.2px;
+      white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+    }
+    .brand-title span{
+      color: rgba(234,241,255,.62);
+      font-size:12px;
+      white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+    }
 
     .auth-body{
       padding: 14px 16px 16px 16px;
       display:flex;
       flex-direction:column;
       gap: 12px;
+      color: rgba(234,241,255,.95);
     }
+
     .auth-h{
       margin:0;
-      font-size: 18px;
+      font-size: 16px;
       font-weight: 900;
       letter-spacing:.2px;
-      color: rgba(234,241,255,.98);
+      color: rgba(234,241,255,.95);
     }
     .auth-p{
       margin:0;
       font-size: 13px;
       line-height: 1.35;
-      color: rgba(234,241,255,.82);
+      color: rgba(234,241,255,.72);
     }
 
     .google-btn{
       height: 50px;
       width: 100%;
       border-radius: 16px;
-      border: 1px solid rgba(46, 180, 255, .18);
-      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(46, 180, 255, .22);
+      background: linear-gradient(180deg, rgba(42,171,238,.18), rgba(59,130,246,.10));
       cursor:pointer;
       display:flex;
       align-items:center;
@@ -680,20 +679,56 @@
       gap: 10px;
       font-weight: 900;
       letter-spacing:.2px;
-      color: rgba(234,241,255,.98);
-      box-shadow: 0 18px 34px rgba(37,99,235,.18);
-      transition: transform .12s ease, box-shadow .12s ease;
+      color: rgba(234,241,255,.96);
+      box-shadow: 0 16px 34px rgba(0,0,0,.38), 0 0 18px rgba(42,171,238,.12);
+      transition: transform .12s ease;
     }
     .google-btn:active{ transform: scale(.99); }
 
     .g-ico{ width: 22px; height: 22px; display:block; }
+
+    .auth-row{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 10px;
+      margin-top: 2px;
+    }
+
+    .auth-mini{
+      font-size: 12px;
+      color: rgba(234,241,255,.60);
+    }
+
+    .auth-link{
+      border:none;
+      background: rgba(255,255,255,.06);
+      color: rgba(234,241,255,.92);
+      font-weight: 900;
+      cursor:pointer;
+      padding: 8px 10px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,.08);
+    }
+    .auth-link:active{ transform: scale(.99); }
+
+    .auth-error{
+      display:none;
+      font-size: 12px;
+      color: #fecaca;
+      background: rgba(185,28,28,.16);
+      border: 1px solid rgba(185,28,28,.28);
+      padding: 10px 12px;
+      border-radius: 14px;
+    }
+    .auth-error.show{ display:block; }
 
     .auth-loading{
       display:none;
       align-items:center;
       gap: 10px;
       font-size: 13px;
-      color: rgba(234,241,255,.84);
+      color: rgba(234,241,255,.70);
     }
     .auth-loading.show{ display:flex; }
 
@@ -706,44 +741,8 @@
     }
     @keyframes spin{ to{ transform: rotate(360deg); } }
 
-    .auth-error{
-      display:none;
-      font-size: 12px;
-      color: #fecaca;
-      background: rgba(239,68,68,.12);
-      border: 1px solid rgba(239,68,68,.20);
-      padding: 10px 12px;
-      border-radius: 14px;
-    }
-    .auth-error.show{ display:block; }
-
-    .auth-row{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap: 10px;
-      margin-top: 2px;
-    }
-    .auth-mini{
-      font-size: 12px;
-      color: rgba(234,241,255,.70);
-      white-space:nowrap;
-      overflow:hidden;
-      text-overflow:ellipsis;
-    }
-    .auth-link{
-      border:none;
-      background: transparent;
-      color: rgba(42,171,238,.95);
-      font-weight: 900;
-      cursor:pointer;
-      padding: 8px 10px;
-      border-radius: 12px;
-    }
-    .auth-link:active{ transform: scale(.99); }
-
     @media (max-width: 360px){
-      .balance-mini{ width: min(280px, 86%); height: 36px; }
+      .balance-mini{ width: min(196px, 68%); height: 36px; }
       .bal-amount{ height: 25px; font-size: 12px; }
       .menu-btn, .profile-btn{ width: 40px; height: 40px; border-radius: 13px; }
       .left-buttons{ transform: translateX(-8px); }
@@ -768,13 +767,21 @@
   <!-- ✅ AUTH OVERLAY -->
   <div class="auth-overlay" id="authOverlay" aria-hidden="true">
     <div class="auth-card" role="dialog" aria-modal="true" aria-label="Вход">
-      <div class="auth-head">
-        <p class="auth-title">Вход в аккаунт</p>
-        <button class="auth-x" id="authClose" aria-label="Закрыть">✕</button>
+      <div class="auth-top">
+        <div class="brand">
+          <div class="brand-badge">V</div>
+          <div class="brand-title">
+            <b>VezusGame</b>
+            <span>Вход в аккаунт</span>
+          </div>
+        </div>
+        <!-- Выйти убран с главной, но в overlay можно оставить/не использовать -->
+        <button class="auth-link" id="authLogout" title="Выйти" style="display:none;">Выйти</button>
       </div>
+
       <div class="auth-body">
         <p class="auth-h">Продолжить</p>
-        <p class="auth-p">Вход без пароля — через Google. После входа ты вернёшься на главную.</p>
+        <p class="auth-p">Вход без пароля — через Google. Мы покажем выбор аккаунта каждый раз.</p>
 
         <button class="google-btn" id="googleLogin" type="button">
           <!-- Google icon -->
@@ -802,8 +809,8 @@
     </div>
   </div>
 
-  <!-- ✅ ГЛАВНАЯ -->
-  <div class="app">
+  <!-- ✅ ТВОЯ ГЛАВНАЯ -->
+  <div class="app" id="appRoot">
     <div class="content">
 
       <div class="top-row">
@@ -827,22 +834,16 @@
           <button class="bal-amount" id="balanceChip" aria-label="Открыть кошелёк">
             <span id="balanceValue">0 VC</span>
           </button>
-          <button class="mini-logout" id="miniLogout" title="Выйти">Выйти</button>
+          <!-- ❌ КНОПКА ВЫЙТИ РЯДОМ С БАЛАНСОМ УБРАНА -->
         </div>
       </div>
 
       <!-- ✅ Баннеры (3:1) -->
       <div class="slider" aria-label="Баннеры">
         <div class="slides" id="slides">
-          <div class="slide">
-            <img src="YOUR_BANNER_1200x400.png" alt="Banner 1">
-          </div>
-          <div class="slide">
-            <img src="YOUR_BANNER_1200x400.png" alt="Banner 2">
-          </div>
-          <div class="slide">
-            <img src="YOUR_BANNER_1200x400.png" alt="Banner 3">
-          </div>
+          <div class="slide"><img src="YOUR_BANNER_1200x400.png" alt="Banner 1"></div>
+          <div class="slide"><img src="YOUR_BANNER_1200x400.png" alt="Banner 2"></div>
+          <div class="slide"><img src="YOUR_BANNER_1200x400.png" alt="Banner 3"></div>
         </div>
 
         <div class="dots" id="dots" aria-label="Индикатор баннера">
@@ -938,46 +939,46 @@
     const SUPABASE_URL = "https://bidlyktnwnwvtfehnojw.supabase.co";
     const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpZGx5a3Rud253dnRmZWhub2p3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA4NDg3NTQsImV4cCI6MjA4NjQyNDc1NH0.pYnmlTpkj4n3WbaMeAy6hlgO1470pg0Wm4nOV1w9WIY";
 
-    // redirectTo: вернуться на текущую страницу (index.html)
+    // redirect обратно на эту же страницу
     const REDIRECT_TO = `${location.origin}${location.pathname}`;
 
     /**********************
-     * 2) Auth UI helpers
+     * 2) UI helpers
      **********************/
-    const authOverlay   = document.getElementById('authOverlay');
-    const authMini      = document.getElementById('authMini');
-    const authError     = document.getElementById('authError');
-    const authLoading   = document.getElementById('authLoading');
-    const googleLogin   = document.getElementById('googleLogin');
-    const authRefresh   = document.getElementById('authRefresh');
-    const authClose     = document.getElementById('authClose');
-    const miniLogoutBtn = document.getElementById('miniLogout');
+    const authOverlay = document.getElementById('authOverlay');
+    const authMini = document.getElementById('authMini');
+    const authError = document.getElementById('authError');
+    const authLoading = document.getElementById('authLoading');
+    const googleLoginBtn = document.getElementById('googleLogin');
+    const authRefreshBtn = document.getElementById('authRefresh');
+    const authLogoutBtn = document.getElementById('authLogout');
 
-    function openAuth(msg = "Нужен вход"){
+    function showAuth(msg = "Нужен вход"){
       authMini.textContent = msg;
       authError.classList.remove('show');
       authLoading.classList.remove('show');
       authOverlay.classList.add('show');
-      authOverlay.setAttribute('aria-hidden','false');
+      authOverlay.setAttribute('aria-hidden', 'false');
       document.body.style.overflow = 'hidden';
     }
 
-    function closeAuth(){
+    function hideAuth(){
       authOverlay.classList.remove('show');
-      authOverlay.setAttribute('aria-hidden','true');
+      authOverlay.setAttribute('aria-hidden', 'true');
       authError.classList.remove('show');
       authLoading.classList.remove('show');
       document.body.style.overflow = '';
     }
 
-    function setAuthError(text){
+    function setError(text){
       authError.textContent = text;
       authError.classList.add('show');
       authLoading.classList.remove('show');
     }
 
     function setLoggedInUI(isIn){
-      miniLogoutBtn.classList.toggle('show', !!isIn);
+      // кнопка выхода внутри overlay оставляем скрытой (по умолчанию)
+      authLogoutBtn.style.display = isIn ? 'inline-block' : 'none';
     }
 
     /**********************
@@ -991,33 +992,38 @@
         auth: {
           persistSession: true,
           autoRefreshToken: true,
-          detectSessionInUrl: true
+          detectSessionInUrl: true,
         },
       });
       return supabase;
     }
 
+    /**********************
+     * 4) Auth logic
+     **********************/
     async function refreshSessionUI(){
       try{
-        openAuth("Проверяем сессию…");
+        authMini.textContent = "Проверяем сессию…";
+        showAuth("Проверяем сессию…");
+
         const { data: { session }, error } = await supabase.auth.getSession();
         if (error) throw error;
 
         if (session?.user){
           setLoggedInUI(true);
-          closeAuth();
+          hideAuth();
         } else {
           setLoggedInUI(false);
-          openAuth("Войди через Google");
+          showAuth("Войди через Google");
         }
-      } catch(e){
+      } catch (e){
         setLoggedInUI(false);
-        openAuth("Ошибка проверки");
-        setAuthError(e?.message || "Ошибка");
+        showAuth("Ошибка проверки");
+        setError(e?.message || "Ошибка");
       }
     }
 
-    googleLogin.addEventListener('click', async () => {
+    googleLoginBtn.addEventListener('click', async () => {
       try{
         authError.classList.remove('show');
         authLoading.classList.add('show');
@@ -1025,38 +1031,36 @@
 
         const { error } = await supabase.auth.signInWithOAuth({
           provider: "google",
-          options: { redirectTo: REDIRECT_TO },
+          options: {
+            redirectTo: REDIRECT_TO,
+            // ✅ чтобы можно было выбрать любой аккаунт Google
+            queryParams: { prompt: "select_account" }
+          },
         });
         if (error) throw error;
-      } catch(e){
-        setAuthError(e?.message || "Не удалось открыть вход Google");
+      } catch (e){
+        setError(e?.message || "Не удалось открыть вход Google");
       }
     });
 
+    // выход тут оставлен (если захочешь вызвать из profile.html)
     async function logout(){
       try{
         await supabase.auth.signOut();
         setLoggedInUI(false);
-        openAuth("Ты вышел. Войди снова через Google");
-      } catch(e){
-        openAuth("Ошибка выхода");
-        setAuthError(e?.message || "Ошибка");
+        showAuth("Ты вышел. Войди снова через Google");
+        location.reload();
+      } catch (e){
+        showAuth("Ошибка выхода");
+        setError(e?.message || "Ошибка");
       }
     }
+    authLogoutBtn.addEventListener('click', logout);
 
-    miniLogoutBtn.addEventListener('click', logout);
-
-    authRefresh.addEventListener('click', () => refreshSessionUI());
-
-    // закрывать auth-окно нельзя если не вошёл (чтобы не обходили вход)
-    authClose.addEventListener('click', async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session?.user) closeAuth();
-      else openAuth("Нужен вход через Google");
-    });
+    authRefreshBtn.addEventListener('click', () => refreshSessionUI());
 
     /**********************
-     * 4) Твой UI (как было)
+     * 5) Your existing UI logic
      **********************/
     const clamp = (n, min, max) => Math.max(min, Math.min(max, n));
 
@@ -1069,7 +1073,7 @@
       window.location.href = 'wallet.html';
     });
 
-    // Профиль -> profile.html
+    // ✅ Профиль → profile.html (у тебя он уже есть)
     document.getElementById('profileBtn').addEventListener('click', () => {
       window.location.href = 'profile.html';
     });
@@ -1243,21 +1247,19 @@
     });
 
     /**********************
-     * 5) Boot
+     * 6) Boot
      **********************/
     (async () => {
-      // Сначала показываем auth, пока проверяем
-      openAuth("Проверяем сессию…");
+      showAuth("Проверяем сессию…");
 
       await initSupabase();
       await refreshSessionUI();
 
-      // Авто-обновление UI при изменении авторизации
       supabase.auth.onAuthStateChange((_event, session) => {
         const loggedIn = !!session?.user;
         setLoggedInUI(loggedIn);
-        if (loggedIn) closeAuth();
-        else openAuth("Войди через Google");
+        if (loggedIn) hideAuth();
+        else showAuth("Войди через Google");
       });
     })();
   </script>
