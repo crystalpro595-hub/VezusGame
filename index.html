@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>VezusGame</title>
+  <title>Wallet</title>
 
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
 
@@ -448,7 +448,7 @@
     .menu-close:active{ transform: scale(.98); }
 
     /* =========================================
-       ✅ SUPPORT POPUP (кнопка "Перейти в Telegram")
+       ✅ SUPPORT POPUP
     ========================================== */
     .support-overlay{
       position:fixed;
@@ -562,7 +562,7 @@
     }
 
     /* =========================================
-       ✅ AUTH OVERLAY (в твоём стиле)
+       ✅ ВХОД (БЕЛЫЙ, но под твой стиль)
     ========================================== */
     .auth-overlay{
       position:fixed;
@@ -573,97 +573,113 @@
       justify-content:center;
       padding: 18px;
       background:
-        radial-gradient(900px 600px at 30% 10%, rgba(42,171,238,.18), transparent 62%),
-        radial-gradient(900px 600px at 70% 90%, rgba(59,130,246,.18), transparent 62%),
-        linear-gradient(180deg, rgba(2,6,23,.82), rgba(0,0,0,.86));
+        radial-gradient(900px 600px at 20% 10%, rgba(59,130,246,.18), transparent 60%),
+        radial-gradient(900px 600px at 85% 90%, rgba(42,171,238,.22), transparent 60%),
+        linear-gradient(180deg, #ffffff, #eef2ff);
       opacity:0;
       pointer-events:none;
       transition: opacity .18s ease;
     }
-    .auth-overlay.show{ opacity:1; pointer-events:auto; }
+    .auth-overlay.show{
+      opacity:1;
+      pointer-events:auto;
+    }
 
     .auth-card{
-      width: min(460px, 100%);
+      width: min(480px, 100%);
       border-radius: 26px;
       overflow:hidden;
-      background: rgba(8, 12, 22, .78);
-      border: 1px solid rgba(46, 180, 255, .18);
+      background: rgba(255,255,255,.92);
+      border: 1px solid rgba(15,23,42,.10);
       box-shadow:
-        0 34px 90px rgba(0,0,0,.62),
-        0 0 0 1px rgba(255,255,255,.04) inset,
-        0 0 28px rgba(42,171,238,.12);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      transform: translateY(10px) scale(.98);
+        0 34px 90px rgba(2,6,23,.16),
+        0 0 0 1px rgba(255,255,255,.65) inset;
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      transform: translateY(12px) scale(.985);
       transition: transform .18s ease;
+      position:relative;
     }
-    .auth-overlay.show .auth-card{ transform: translateY(0) scale(1); }
+    .auth-overlay.show .auth-card{
+      transform: translateY(0) scale(1);
+    }
 
     .auth-top{
-      padding: 16px 16px 12px 16px;
+      padding: 18px 18px 14px 18px;
       display:flex;
       align-items:center;
       justify-content:space-between;
       gap:12px;
-      border-bottom: 1px solid rgba(255,255,255,.06);
-      background: rgba(255,255,255,.03);
+      border-bottom: 1px solid rgba(15,23,42,.06);
+      background: rgba(255,255,255,.65);
     }
 
     .brand{
-      display:flex; align-items:center; gap:10px;
+      display:flex; align-items:center; gap:12px;
       min-width:0;
     }
     .brand-badge{
-      width:42px; height:42px; border-radius:16px;
+      width:44px; height:44px; border-radius:16px;
       background: linear-gradient(135deg, #3b82f6, #2AABEE);
-      box-shadow: 0 18px 34px rgba(37,99,235,.20);
+      box-shadow: 0 18px 34px rgba(37,99,235,.18);
       display:grid; place-items:center;
       color:#fff; font-weight:900;
       flex: 0 0 auto;
+      position:relative;
+      overflow:hidden;
+    }
+    .brand-badge::after{
+      content:"";
+      position:absolute;
+      inset:-40px -40px auto auto;
+      width:120px; height:120px;
+      background: radial-gradient(circle at 30% 30%, rgba(255,255,255,.38), transparent 62%);
+      transform: rotate(10deg);
     }
     .brand-title{
       display:flex; flex-direction:column; gap:2px;
       min-width:0;
     }
     .brand-title b{
-      color: rgba(234,241,255,.98);
+      color:#0f172a;
       font-size:14px;
       letter-spacing:.2px;
       white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
     }
     .brand-title span{
-      color: rgba(234,241,255,.70);
+      color: rgba(15,23,42,.62);
       font-size:12px;
       white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
     }
 
     .auth-body{
-      padding: 14px 16px 16px 16px;
+      padding: 16px 18px 18px 18px;
       display:flex;
       flex-direction:column;
       gap: 12px;
+      color:#0f172a;
     }
 
     .auth-h{
       margin:0;
-      font-size: 16px;
+      font-size: 18px;
       font-weight: 900;
       letter-spacing:.2px;
-      color: rgba(234,241,255,.98);
+      color:#0f172a;
     }
     .auth-p{
       margin:0;
       font-size: 13px;
       line-height: 1.35;
-      color: rgba(234,241,255,.78);
+      color: rgba(15,23,42,.72);
     }
 
     .google-btn{
-      height: 50px;
+      height: 52px;
       width: 100%;
-      border-radius: 16px;
-      border: 1px solid rgba(255,255,255,.10);
-      background: rgba(255,255,255,.92);
+      border-radius: 18px;
+      border: 1px solid rgba(15,23,42,.10);
+      background: #ffffff;
       cursor:pointer;
       display:flex;
       align-items:center;
@@ -672,12 +688,23 @@
       font-weight: 900;
       letter-spacing:.2px;
       color:#0f172a;
-      box-shadow:
-        0 18px 40px rgba(0,0,0,.40),
-        0 0 18px rgba(42,171,238,.10);
-      transition: transform .12s ease;
+      box-shadow: 0 18px 40px rgba(2,6,23,.10);
+      transition: transform .12s ease, box-shadow .12s ease;
+      position:relative;
+      overflow:hidden;
     }
-    .google-btn:active{ transform: scale(.99); }
+    .google-btn::after{
+      content:"";
+      position:absolute;
+      inset:0;
+      background: linear-gradient(90deg, rgba(59,130,246,.10), rgba(42,171,238,.08));
+      opacity:.0;
+      transition: opacity .18s ease;
+      pointer-events:none;
+    }
+    .google-btn:active{ transform: scale(.992); }
+    .google-btn:active::after{ opacity:.75; }
+
     .g-ico{ width: 22px; height: 22px; display:block; }
 
     .auth-row{
@@ -690,29 +717,29 @@
 
     .auth-mini{
       font-size: 12px;
-      color: rgba(234,241,255,.70);
+      color: rgba(15,23,42,.62);
     }
 
     .auth-link{
       border:none;
-      background: rgba(255,255,255,.06);
-      color: rgba(234,241,255,.92);
+      background: transparent;
+      color: #2563eb;
       font-weight: 900;
       cursor:pointer;
       padding: 8px 10px;
       border-radius: 12px;
-      border: 1px solid rgba(255,255,255,.08);
     }
     .auth-link:active{ transform: scale(.99); }
 
     .auth-error{
       display:none;
       font-size: 12px;
-      color: #fecaca;
-      background: rgba(185,28,28,.18);
-      border: 1px solid rgba(185,28,28,.35);
+      color: #b91c1c;
+      background: rgba(185,28,28,.08);
+      border: 1px solid rgba(185,28,28,.18);
       padding: 10px 12px;
       border-radius: 14px;
+      white-space:pre-wrap;
     }
     .auth-error.show{ display:block; }
 
@@ -721,18 +748,29 @@
       align-items:center;
       gap: 10px;
       font-size: 13px;
-      color: rgba(234,241,255,.78);
+      color: rgba(15,23,42,.72);
     }
     .auth-loading.show{ display:flex; }
 
     .spinner{
       width:16px; height:16px;
       border-radius:999px;
-      border: 2px solid rgba(234,241,255,.18);
-      border-top-color: rgba(42,171,238,.95);
+      border: 2px solid rgba(15,23,42,.15);
+      border-top-color: rgba(37,99,235,.95);
       animation: spin .9s linear infinite;
     }
     @keyframes spin{ to{ transform: rotate(360deg); } }
+
+    .hint{
+      margin-top:2px;
+      font-size:12px;
+      color: rgba(15,23,42,.58);
+      line-height:1.35;
+      padding: 10px 12px;
+      border-radius: 14px;
+      background: rgba(37,99,235,.06);
+      border: 1px solid rgba(37,99,235,.12);
+    }
 
     @media (max-width: 360px){
       .balance-mini{ width: min(196px, 68%); height: 36px; }
@@ -758,7 +796,7 @@
 
 <body>
 
-  <!-- ✅ AUTH OVERLAY -->
+  <!-- ✅ БЕЛЫЙ ЭКРАН ВХОДА -->
   <div class="auth-overlay" id="authOverlay" aria-hidden="true">
     <div class="auth-card" role="dialog" aria-modal="true" aria-label="Вход">
       <div class="auth-top">
@@ -769,13 +807,13 @@
             <span>Вход в аккаунт</span>
           </div>
         </div>
+        <button class="auth-link" id="authReload" type="button">Обновить</button>
       </div>
 
       <div class="auth-body">
         <p class="auth-h">Продолжить</p>
         <p class="auth-p">
-          Вход без пароля — через Google.<br>
-          Чтобы зайти с другого аккаунта — появится выбор аккаунта.
+          Вход без пароля — через Google. После входа ты вернёшься на эту страницу автоматически.
         </p>
 
         <button class="google-btn" id="googleLogin" type="button">
@@ -797,14 +835,20 @@
 
         <div class="auth-row">
           <span class="auth-mini" id="authMini">Проверяем сессию…</span>
-          <button class="auth-link" id="authRefresh" type="button">Обновить</button>
+          <button class="auth-link" id="authCheck" type="button">Проверить</button>
+        </div>
+
+        <div class="hint">
+          Если тебя “впускает” только одним аккаунтом — мы принудительно показываем выбор аккаунта.
+          Если после выбора тебя возвращает обратно на вход — значит в настройках OAuth/Redirect есть ошибка,
+          и она появится красным блоком выше.
         </div>
       </div>
     </div>
   </div>
 
   <!-- ✅ ТВОЯ ГЛАВНАЯ -->
-  <div class="app">
+  <div class="app" id="appRoot">
     <div class="content">
 
       <div class="top-row">
@@ -828,21 +872,16 @@
           <button class="bal-amount" id="balanceChip" aria-label="Открыть кошелёк">
             <span id="balanceValue">0 VC</span>
           </button>
+          <!-- ❌ Кнопки выхода возле баланса НЕТ (по твоей просьбе) -->
         </div>
       </div>
 
       <!-- ✅ Баннеры (3:1) -->
       <div class="slider" aria-label="Баннеры">
         <div class="slides" id="slides">
-          <div class="slide">
-            <img src="YOUR_BANNER_1200x400.png" alt="Banner 1">
-          </div>
-          <div class="slide">
-            <img src="YOUR_BANNER_1200x400.png" alt="Banner 2">
-          </div>
-          <div class="slide">
-            <img src="YOUR_BANNER_1200x400.png" alt="Banner 3">
-          </div>
+          <div class="slide"><img src="YOUR_BANNER_1200x400.png" alt="Banner 1"></div>
+          <div class="slide"><img src="YOUR_BANNER_1200x400.png" alt="Banner 2"></div>
+          <div class="slide"><img src="YOUR_BANNER_1200x400.png" alt="Banner 3"></div>
         </div>
 
         <div class="dots" id="dots" aria-label="Индикатор баннера">
@@ -903,7 +942,6 @@
         <span class="tile-bg" aria-hidden="true"></span>
         <span class="tile-title">История</span>
       </button>
-
     </div>
   </div>
 
@@ -938,25 +976,19 @@
     const SUPABASE_URL = "https://bidlyktnwnwvtfehnojw.supabase.co";
     const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpZGx5a3Rud253dnRmZWhub2p3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA4NDg3NTQsImV4cCI6MjA4NjQyNDc1NH0.pYnmlTpkj4n3WbaMeAy6hlgO1470pg0Wm4nOV1w9WIY";
 
-    function computeRedirectTo(){
-      const u = new URL(location.href);
-      u.hash = "";
-      u.search = "";
-      // GitHub Pages часто открывают как /VezusGame/ (без index.html)
-      if (u.pathname.endsWith("/")) u.pathname += "index.html";
-      return u.toString();
-    }
-    const REDIRECT_TO = computeRedirectTo();
+    // ✅ redirect строго на текущую страницу (важно для GitHub Pages)
+    const REDIRECT_TO = window.location.href.split("#")[0];
 
     /**********************
-     * 2) UI helpers (auth)
+     * 2) UI helpers
      **********************/
-    const authOverlay = document.getElementById("authOverlay");
-    const authMini = document.getElementById("authMini");
-    const authError = document.getElementById("authError");
-    const authLoading = document.getElementById("authLoading");
-    const googleLoginBtn = document.getElementById("googleLogin");
-    const authRefreshBtn = document.getElementById("authRefresh");
+    const authOverlay  = document.getElementById("authOverlay");
+    const authMini     = document.getElementById("authMini");
+    const authError    = document.getElementById("authError");
+    const authLoading  = document.getElementById("authLoading");
+    const googleBtn    = document.getElementById("googleLogin");
+    const authCheckBtn = document.getElementById("authCheck");
+    const authReloadBtn= document.getElementById("authReload");
 
     function showAuth(msg = "Нужен вход"){
       authMini.textContent = msg;
@@ -979,84 +1011,85 @@
       authLoading.classList.remove("show");
     }
 
-    function readOAuthErrorFromUrl(){
-      const p = new URLSearchParams(location.search);
-      const err = p.get("error_description") || p.get("error");
-      if (err){
-        showAuth("Ошибка входа");
-        setError(decodeURIComponent(err));
-        // очищаем URL, чтобы ошибка не висела при обновлении
-        history.replaceState({}, document.title, location.pathname);
-        return true;
-      }
-      return false;
+    function readReturnErrorFromUrl(){
+      const fromSearch = new URLSearchParams(window.location.search);
+      const fromHash   = new URLSearchParams((window.location.hash || "").replace(/^#/, ""));
+      const err = fromSearch.get("error_description")
+            || fromSearch.get("error")
+            || fromHash.get("error_description")
+            || fromHash.get("error");
+      if (err) setError(decodeURIComponent(err.replace(/\+/g, " ")));
     }
 
     /**********************
      * 3) Supabase init
      **********************/
-    const { createClient } = await import("https://esm.sh/@supabase/supabase-js@2");
-    const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-      auth: {
-        persistSession: true,
-        autoRefreshToken: true,
-        detectSessionInUrl: true
-      },
-    });
+    let supabase = null;
+
+    async function initSupabase(){
+      const { createClient } = await import("https://esm.sh/@supabase/supabase-js@2");
+      supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+        auth: {
+          persistSession: true,
+          autoRefreshToken: true,
+          detectSessionInUrl: true,
+        },
+      });
+      return supabase;
+    }
 
     /**********************
      * 4) Auth logic
      **********************/
     async function refreshSessionUI(){
       try{
+        readReturnErrorFromUrl();
         authMini.textContent = "Проверяем сессию…";
-        showAuth("Проверяем сессию…");
 
-        // важно: getSession триггерит обработку code= в URL (если вернулись с Google)
         const { data: { session }, error } = await supabase.auth.getSession();
         if (error) throw error;
 
         if (session?.user){
+          // очистим URL от возможных code/error
+          window.history.replaceState({}, "", window.location.pathname);
           hideAuth();
         } else {
           showAuth("Войди через Google");
         }
       } catch (e){
-        showAuth("Ошибка проверки");
+        showAuth("Ошибка входа");
         setError(e?.message || "Ошибка");
       }
     }
 
-    googleLoginBtn.addEventListener("click", async () => {
+    async function signInGoogle(){
       try{
         authError.classList.remove("show");
         authLoading.classList.add("show");
         authMini.textContent = "Открываю Google…";
 
+        // 🔥 главное: prompt=select_account (даёт выбрать любой Google-аккаунт)
         const { error } = await supabase.auth.signInWithOAuth({
           provider: "google",
           options: {
             redirectTo: REDIRECT_TO,
-            // ✅ это заставляет показывать выбор аккаунта Google
-            queryParams: { prompt: "select_account" }
-          }
+            queryParams: {
+              prompt: "select_account"
+            }
+          },
         });
         if (error) throw error;
       } catch (e){
         setError(e?.message || "Не удалось открыть вход Google");
       }
-    });
+    }
 
-    authRefreshBtn.addEventListener("click", () => refreshSessionUI());
-
-    // реагируем на изменения авторизации
-    supabase.auth.onAuthStateChange((_event, session) => {
-      if (session?.user) hideAuth();
-      else showAuth("Войди через Google");
-    });
+    googleBtn.addEventListener("click", signInGoogle);
+    authCheckBtn.addEventListener("click", () => refreshSessionUI());
+    authReloadBtn.addEventListener("click", () => window.location.reload());
 
     /**********************
-     * 5) ТВОЯ ЛОГИКА СТРАНИЦЫ (как было)
+     * 5) Твоя логика страницы
      **********************/
     const clamp = (n, min, max) => Math.max(min, Math.min(max, n));
 
@@ -1069,12 +1102,12 @@
       window.location.href = "wallet.html";
     });
 
-    // Профиль -> profile.html (там у тебя кнопка выхода)
+    // Профиль → твой profile.html
     document.getElementById("profileBtn").addEventListener("click", () => {
       window.location.href = "profile.html";
     });
 
-    // Кнопки (заглушки)
+    // Кнопки
     document.getElementById("btnGames").addEventListener("click", () => alert("Игры (позже сделаем переход)"));
     document.getElementById("btnShop").addEventListener("click", () => { window.location.href = "ucshop.html"; });
     document.getElementById("btnCustom").addEventListener("click", () => alert("Кастомки (позже сделаем переход)"));
@@ -1167,22 +1200,19 @@
 
     function openMenu(){
       menuOverlay.classList.add("show");
-      menuOverlay.setAttribute("aria-hidden", "false");
+      menuOverlay.setAttribute("aria-hidden","false");
       document.body.style.overflow = "hidden";
     }
 
     function closeMenu(){
       menuOverlay.classList.remove("show");
-      menuOverlay.setAttribute("aria-hidden", "true");
+      menuOverlay.setAttribute("aria-hidden","true");
       document.body.style.overflow = "";
     }
 
     menuBtn.addEventListener("click", openMenu);
     menuClose.addEventListener("click", closeMenu);
-
-    menuOverlay.addEventListener("click", (e) => {
-      if (e.target === menuOverlay) closeMenu();
-    });
+    menuOverlay.addEventListener("click", (e) => { if (e.target === menuOverlay) closeMenu(); });
 
     // ✅ Поддержка popup + открытие Telegram
     const supportOverlay = document.getElementById("supportOverlay");
@@ -1191,21 +1221,18 @@
 
     function openSupport(){
       supportOverlay.classList.add("show");
-      supportOverlay.setAttribute("aria-hidden", "false");
+      supportOverlay.setAttribute("aria-hidden","false");
       document.body.style.overflow = "hidden";
     }
 
     function closeSupport(){
       supportOverlay.classList.remove("show");
-      supportOverlay.setAttribute("aria-hidden", "true");
+      supportOverlay.setAttribute("aria-hidden","true");
       document.body.style.overflow = "";
     }
 
     supportClose.addEventListener("click", closeSupport);
-
-    supportOverlay.addEventListener("click", (e) => {
-      if (e.target === supportOverlay) closeSupport();
-    });
+    supportOverlay.addEventListener("click", (e) => { if (e.target === supportOverlay) closeSupport(); });
 
     function openTelegramLinkSafe(url){
       if (window.Telegram && window.Telegram.WebApp && typeof window.Telegram.WebApp.openTelegramLink === "function") {
@@ -1215,9 +1242,7 @@
       window.open(url, "_blank", "noopener");
     }
 
-    goTelegram.addEventListener("click", () => {
-      openTelegramLinkSafe("https://t.me/vezusmanager");
-    });
+    goTelegram.addEventListener("click", () => openTelegramLinkSafe("https://t.me/vezusmanager"));
 
     document.addEventListener("keydown", (e) => {
       if (e.key === "Escape") {
@@ -1230,11 +1255,7 @@
     document.querySelectorAll(".menu-tile").forEach(btn => {
       btn.addEventListener("click", () => {
         const action = btn.getAttribute("data-action");
-        if (action === "support") {
-          closeMenu();
-          openSupport();
-          return;
-        }
+        if (action === "support") { closeMenu(); openSupport(); return; }
         closeMenu();
         alert("Открыть: " + action);
       });
@@ -1243,9 +1264,17 @@
     /**********************
      * 6) Boot
      **********************/
-    showAuth("Проверяем сессию…");
-    readOAuthErrorFromUrl();
-    await refreshSessionUI();
+    (async () => {
+      showAuth("Проверяем сессию…");
+      await initSupabase();
+      await refreshSessionUI();
+
+      // авто-обновление UI при смене сессии
+      supabase.auth.onAuthStateChange((_event, session) => {
+        if (session?.user) hideAuth();
+        else showAuth("Войди через Google");
+      });
+    })();
   </script>
 </body>
 </html>
