@@ -16,10 +16,6 @@
 
       --neon:#2AABEE;
       --neon2:#3b82f6;
-
-      --glass: rgba(8, 12, 22, .72);
-      --glassBorder: rgba(46, 180, 255, .22);
-      --shadow: 0 14px 40px rgba(0,0,0,.55);
     }
 
     *{ box-sizing:border-box; font-family:'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
@@ -86,9 +82,9 @@
       width: 42px;
       height: 42px;
       border-radius: 14px;
-      border: 1px solid var(--glassBorder);
+      border: 1px solid rgba(46, 180, 255, .22);
       cursor:pointer;
-      background: var(--glass);
+      background: rgba(8, 12, 22, .72);
       box-shadow:
         0 12px 34px rgba(0,0,0,.55),
         0 0 22px rgba(42,171,238,.14);
@@ -134,10 +130,10 @@
       position:relative;
       overflow:hidden;
 
-      background: var(--glass);
-      border: 1px solid var(--glassBorder);
+      background: rgba(8, 12, 22, .72);
+      border: 1px solid rgba(46, 180, 255, .22);
       box-shadow:
-        var(--shadow),
+        0 14px 40px rgba(0,0,0,.55),
         0 0 0 1px rgba(255,255,255,.04) inset,
         0 0 24px rgba(42,171,238,.16);
       backdrop-filter: blur(12px);
@@ -452,7 +448,7 @@
     .menu-close:active{ transform: scale(.98); }
 
     /* =========================================
-       ✅ SUPPORT POPUP
+       ✅ SUPPORT POPUP (кнопка "Перейти в Telegram")
     ========================================== */
     .support-overlay{
       position:fixed;
@@ -566,7 +562,7 @@
     }
 
     /* =========================================
-       ✅ AUTH OVERLAY (ПЕРЕДЕЛАННЫЙ ДИЗАЙН ПОД ТВОЙ СТИЛЬ)
+       ✅ AUTH OVERLAY (в твоём стиле)
     ========================================== */
     .auth-overlay{
       position:fixed;
@@ -577,30 +573,27 @@
       justify-content:center;
       padding: 18px;
       background:
-        radial-gradient(900px 600px at 30% 10%, rgba(42,171,238,.18), transparent 60%),
-        radial-gradient(900px 600px at 70% 90%, rgba(59,130,246,.16), transparent 60%),
-        linear-gradient(180deg, rgba(0,0,0,.72), rgba(0,0,0,.82));
+        radial-gradient(900px 600px at 30% 10%, rgba(42,171,238,.18), transparent 62%),
+        radial-gradient(900px 600px at 70% 90%, rgba(59,130,246,.18), transparent 62%),
+        linear-gradient(180deg, rgba(2,6,23,.82), rgba(0,0,0,.86));
       opacity:0;
       pointer-events:none;
       transition: opacity .18s ease;
     }
-    .auth-overlay.show{
-      opacity:1;
-      pointer-events:auto;
-    }
+    .auth-overlay.show{ opacity:1; pointer-events:auto; }
 
     .auth-card{
       width: min(460px, 100%);
-      border-radius: 24px;
+      border-radius: 26px;
       overflow:hidden;
-      background: rgba(8, 12, 22, .86);
+      background: rgba(8, 12, 22, .78);
       border: 1px solid rgba(46, 180, 255, .18);
       box-shadow:
         0 34px 90px rgba(0,0,0,.62),
         0 0 0 1px rgba(255,255,255,.04) inset,
-        0 0 28px rgba(42,171,238,.14);
-      backdrop-filter: blur(14px);
-      -webkit-backdrop-filter: blur(14px);
+        0 0 28px rgba(42,171,238,.12);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
       transform: translateY(10px) scale(.98);
       transition: transform .18s ease;
     }
@@ -613,7 +606,7 @@
       justify-content:space-between;
       gap:12px;
       border-bottom: 1px solid rgba(255,255,255,.06);
-      background: rgba(255,255,255,.04);
+      background: rgba(255,255,255,.03);
     }
 
     .brand{
@@ -622,8 +615,8 @@
     }
     .brand-badge{
       width:42px; height:42px; border-radius:16px;
-      background: linear-gradient(135deg, rgba(42,171,238,.95), rgba(59,130,246,.90));
-      box-shadow: 0 18px 34px rgba(37,99,235,.22);
+      background: linear-gradient(135deg, #3b82f6, #2AABEE);
+      box-shadow: 0 18px 34px rgba(37,99,235,.20);
       display:grid; place-items:center;
       color:#fff; font-weight:900;
       flex: 0 0 auto;
@@ -633,13 +626,13 @@
       min-width:0;
     }
     .brand-title b{
-      color: rgba(234,241,255,.96);
+      color: rgba(234,241,255,.98);
       font-size:14px;
       letter-spacing:.2px;
       white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
     }
     .brand-title span{
-      color: rgba(234,241,255,.62);
+      color: rgba(234,241,255,.70);
       font-size:12px;
       white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
     }
@@ -649,7 +642,6 @@
       display:flex;
       flex-direction:column;
       gap: 12px;
-      color: rgba(234,241,255,.95);
     }
 
     .auth-h{
@@ -657,21 +649,21 @@
       font-size: 16px;
       font-weight: 900;
       letter-spacing:.2px;
-      color: rgba(234,241,255,.95);
+      color: rgba(234,241,255,.98);
     }
     .auth-p{
       margin:0;
       font-size: 13px;
       line-height: 1.35;
-      color: rgba(234,241,255,.72);
+      color: rgba(234,241,255,.78);
     }
 
     .google-btn{
       height: 50px;
       width: 100%;
       border-radius: 16px;
-      border: 1px solid rgba(46, 180, 255, .22);
-      background: linear-gradient(180deg, rgba(42,171,238,.18), rgba(59,130,246,.10));
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.92);
       cursor:pointer;
       display:flex;
       align-items:center;
@@ -679,12 +671,13 @@
       gap: 10px;
       font-weight: 900;
       letter-spacing:.2px;
-      color: rgba(234,241,255,.96);
-      box-shadow: 0 16px 34px rgba(0,0,0,.38), 0 0 18px rgba(42,171,238,.12);
+      color:#0f172a;
+      box-shadow:
+        0 18px 40px rgba(0,0,0,.40),
+        0 0 18px rgba(42,171,238,.10);
       transition: transform .12s ease;
     }
     .google-btn:active{ transform: scale(.99); }
-
     .g-ico{ width: 22px; height: 22px; display:block; }
 
     .auth-row{
@@ -697,7 +690,7 @@
 
     .auth-mini{
       font-size: 12px;
-      color: rgba(234,241,255,.60);
+      color: rgba(234,241,255,.70);
     }
 
     .auth-link{
@@ -716,8 +709,8 @@
       display:none;
       font-size: 12px;
       color: #fecaca;
-      background: rgba(185,28,28,.16);
-      border: 1px solid rgba(185,28,28,.28);
+      background: rgba(185,28,28,.18);
+      border: 1px solid rgba(185,28,28,.35);
       padding: 10px 12px;
       border-radius: 14px;
     }
@@ -728,7 +721,7 @@
       align-items:center;
       gap: 10px;
       font-size: 13px;
-      color: rgba(234,241,255,.70);
+      color: rgba(234,241,255,.78);
     }
     .auth-loading.show{ display:flex; }
 
@@ -764,6 +757,7 @@
 </head>
 
 <body>
+
   <!-- ✅ AUTH OVERLAY -->
   <div class="auth-overlay" id="authOverlay" aria-hidden="true">
     <div class="auth-card" role="dialog" aria-modal="true" aria-label="Вход">
@@ -775,16 +769,16 @@
             <span>Вход в аккаунт</span>
           </div>
         </div>
-        <!-- Выйти убран с главной, но в overlay можно оставить/не использовать -->
-        <button class="auth-link" id="authLogout" title="Выйти" style="display:none;">Выйти</button>
       </div>
 
       <div class="auth-body">
         <p class="auth-h">Продолжить</p>
-        <p class="auth-p">Вход без пароля — через Google. Мы покажем выбор аккаунта каждый раз.</p>
+        <p class="auth-p">
+          Вход без пароля — через Google.<br>
+          Чтобы зайти с другого аккаунта — появится выбор аккаунта.
+        </p>
 
         <button class="google-btn" id="googleLogin" type="button">
-          <!-- Google icon -->
           <svg class="g-ico" viewBox="0 0 48 48" aria-hidden="true">
             <path fill="#FFC107" d="M43.611 20.083H42V20H24v8h11.303C33.651 32.657 29.199 36 24 36c-6.627 0-12-5.373-12-12s5.373-12 12-12c3.059 0 5.842 1.154 7.957 3.043l5.657-5.657C34.965 6.053 29.727 4 24 4 12.954 4 4 12.954 4 24s8.954 20 20 20 20-8.954 20-20c0-1.341-.138-2.65-.389-3.917z"/>
             <path fill="#FF3D00" d="M6.306 14.691l6.571 4.819C14.655 16.108 19.009 12 24 12c3.059 0 5.842 1.154 7.957 3.043l5.657-5.657C34.965 6.053 29.727 4 24 4 16.318 4 9.656 8.337 6.306 14.691z"/>
@@ -810,7 +804,7 @@
   </div>
 
   <!-- ✅ ТВОЯ ГЛАВНАЯ -->
-  <div class="app" id="appRoot">
+  <div class="app">
     <div class="content">
 
       <div class="top-row">
@@ -834,16 +828,21 @@
           <button class="bal-amount" id="balanceChip" aria-label="Открыть кошелёк">
             <span id="balanceValue">0 VC</span>
           </button>
-          <!-- ❌ КНОПКА ВЫЙТИ РЯДОМ С БАЛАНСОМ УБРАНА -->
         </div>
       </div>
 
       <!-- ✅ Баннеры (3:1) -->
       <div class="slider" aria-label="Баннеры">
         <div class="slides" id="slides">
-          <div class="slide"><img src="YOUR_BANNER_1200x400.png" alt="Banner 1"></div>
-          <div class="slide"><img src="YOUR_BANNER_1200x400.png" alt="Banner 2"></div>
-          <div class="slide"><img src="YOUR_BANNER_1200x400.png" alt="Banner 3"></div>
+          <div class="slide">
+            <img src="YOUR_BANNER_1200x400.png" alt="Banner 1">
+          </div>
+          <div class="slide">
+            <img src="YOUR_BANNER_1200x400.png" alt="Banner 2">
+          </div>
+          <div class="slide">
+            <img src="YOUR_BANNER_1200x400.png" alt="Banner 3">
+          </div>
         </div>
 
         <div class="dots" id="dots" aria-label="Индикатор баннера">
@@ -939,64 +938,71 @@
     const SUPABASE_URL = "https://bidlyktnwnwvtfehnojw.supabase.co";
     const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpZGx5a3Rud253dnRmZWhub2p3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA4NDg3NTQsImV4cCI6MjA4NjQyNDc1NH0.pYnmlTpkj4n3WbaMeAy6hlgO1470pg0Wm4nOV1w9WIY";
 
-    // redirect обратно на эту же страницу
-    const REDIRECT_TO = `${location.origin}${location.pathname}`;
+    function computeRedirectTo(){
+      const u = new URL(location.href);
+      u.hash = "";
+      u.search = "";
+      // GitHub Pages часто открывают как /VezusGame/ (без index.html)
+      if (u.pathname.endsWith("/")) u.pathname += "index.html";
+      return u.toString();
+    }
+    const REDIRECT_TO = computeRedirectTo();
 
     /**********************
-     * 2) UI helpers
+     * 2) UI helpers (auth)
      **********************/
-    const authOverlay = document.getElementById('authOverlay');
-    const authMini = document.getElementById('authMini');
-    const authError = document.getElementById('authError');
-    const authLoading = document.getElementById('authLoading');
-    const googleLoginBtn = document.getElementById('googleLogin');
-    const authRefreshBtn = document.getElementById('authRefresh');
-    const authLogoutBtn = document.getElementById('authLogout');
+    const authOverlay = document.getElementById("authOverlay");
+    const authMini = document.getElementById("authMini");
+    const authError = document.getElementById("authError");
+    const authLoading = document.getElementById("authLoading");
+    const googleLoginBtn = document.getElementById("googleLogin");
+    const authRefreshBtn = document.getElementById("authRefresh");
 
     function showAuth(msg = "Нужен вход"){
       authMini.textContent = msg;
-      authError.classList.remove('show');
-      authLoading.classList.remove('show');
-      authOverlay.classList.add('show');
-      authOverlay.setAttribute('aria-hidden', 'false');
-      document.body.style.overflow = 'hidden';
+      authError.classList.remove("show");
+      authLoading.classList.remove("show");
+      authOverlay.classList.add("show");
+      authOverlay.setAttribute("aria-hidden","false");
     }
 
     function hideAuth(){
-      authOverlay.classList.remove('show');
-      authOverlay.setAttribute('aria-hidden', 'true');
-      authError.classList.remove('show');
-      authLoading.classList.remove('show');
-      document.body.style.overflow = '';
+      authOverlay.classList.remove("show");
+      authOverlay.setAttribute("aria-hidden","true");
+      authError.classList.remove("show");
+      authLoading.classList.remove("show");
     }
 
     function setError(text){
       authError.textContent = text;
-      authError.classList.add('show');
-      authLoading.classList.remove('show');
+      authError.classList.add("show");
+      authLoading.classList.remove("show");
     }
 
-    function setLoggedInUI(isIn){
-      // кнопка выхода внутри overlay оставляем скрытой (по умолчанию)
-      authLogoutBtn.style.display = isIn ? 'inline-block' : 'none';
+    function readOAuthErrorFromUrl(){
+      const p = new URLSearchParams(location.search);
+      const err = p.get("error_description") || p.get("error");
+      if (err){
+        showAuth("Ошибка входа");
+        setError(decodeURIComponent(err));
+        // очищаем URL, чтобы ошибка не висела при обновлении
+        history.replaceState({}, document.title, location.pathname);
+        return true;
+      }
+      return false;
     }
 
     /**********************
      * 3) Supabase init
      **********************/
-    let supabase = null;
-
-    async function initSupabase(){
-      const { createClient } = await import("https://esm.sh/@supabase/supabase-js@2");
-      supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-        auth: {
-          persistSession: true,
-          autoRefreshToken: true,
-          detectSessionInUrl: true,
-        },
-      });
-      return supabase;
-    }
+    const { createClient } = await import("https://esm.sh/@supabase/supabase-js@2");
+    const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+      auth: {
+        persistSession: true,
+        autoRefreshToken: true,
+        detectSessionInUrl: true
+      },
+    });
 
     /**********************
      * 4) Auth logic
@@ -1006,36 +1012,34 @@
         authMini.textContent = "Проверяем сессию…";
         showAuth("Проверяем сессию…");
 
+        // важно: getSession триггерит обработку code= в URL (если вернулись с Google)
         const { data: { session }, error } = await supabase.auth.getSession();
         if (error) throw error;
 
         if (session?.user){
-          setLoggedInUI(true);
           hideAuth();
         } else {
-          setLoggedInUI(false);
           showAuth("Войди через Google");
         }
       } catch (e){
-        setLoggedInUI(false);
         showAuth("Ошибка проверки");
         setError(e?.message || "Ошибка");
       }
     }
 
-    googleLoginBtn.addEventListener('click', async () => {
+    googleLoginBtn.addEventListener("click", async () => {
       try{
-        authError.classList.remove('show');
-        authLoading.classList.add('show');
+        authError.classList.remove("show");
+        authLoading.classList.add("show");
         authMini.textContent = "Открываю Google…";
 
         const { error } = await supabase.auth.signInWithOAuth({
           provider: "google",
           options: {
             redirectTo: REDIRECT_TO,
-            // ✅ чтобы можно было выбрать любой аккаунт Google
+            // ✅ это заставляет показывать выбор аккаунта Google
             queryParams: { prompt: "select_account" }
-          },
+          }
         });
         if (error) throw error;
       } catch (e){
@@ -1043,56 +1047,48 @@
       }
     });
 
-    // выход тут оставлен (если захочешь вызвать из profile.html)
-    async function logout(){
-      try{
-        await supabase.auth.signOut();
-        setLoggedInUI(false);
-        showAuth("Ты вышел. Войди снова через Google");
-        location.reload();
-      } catch (e){
-        showAuth("Ошибка выхода");
-        setError(e?.message || "Ошибка");
-      }
-    }
-    authLogoutBtn.addEventListener('click', logout);
+    authRefreshBtn.addEventListener("click", () => refreshSessionUI());
 
-    authRefreshBtn.addEventListener('click', () => refreshSessionUI());
+    // реагируем на изменения авторизации
+    supabase.auth.onAuthStateChange((_event, session) => {
+      if (session?.user) hideAuth();
+      else showAuth("Войди через Google");
+    });
 
     /**********************
-     * 5) Your existing UI logic
+     * 5) ТВОЯ ЛОГИКА СТРАНИЦЫ (как было)
      **********************/
     const clamp = (n, min, max) => Math.max(min, Math.min(max, n));
 
     // Баланс (заглушка)
-    const balanceValueEl = document.getElementById('balanceValue');
-    const balanceChipEl  = document.getElementById('balanceChip');
-    balanceValueEl.textContent = '0 VC';
+    const balanceValueEl = document.getElementById("balanceValue");
+    const balanceChipEl  = document.getElementById("balanceChip");
+    balanceValueEl.textContent = "0 VC";
 
-    balanceChipEl.addEventListener('click', () => {
-      window.location.href = 'wallet.html';
+    balanceChipEl.addEventListener("click", () => {
+      window.location.href = "wallet.html";
     });
 
-    // ✅ Профиль → profile.html (у тебя он уже есть)
-    document.getElementById('profileBtn').addEventListener('click', () => {
-      window.location.href = 'profile.html';
+    // Профиль -> profile.html (там у тебя кнопка выхода)
+    document.getElementById("profileBtn").addEventListener("click", () => {
+      window.location.href = "profile.html";
     });
 
-    // Кнопки
-    document.getElementById('btnGames').addEventListener('click', () => alert('Игры (позже сделаем переход)'));
-    document.getElementById('btnShop').addEventListener('click', () => { window.location.href = 'ucshop.html'; });
-    document.getElementById('btnCustom').addEventListener('click', () => alert('Кастомки (позже сделаем переход)'));
+    // Кнопки (заглушки)
+    document.getElementById("btnGames").addEventListener("click", () => alert("Игры (позже сделаем переход)"));
+    document.getElementById("btnShop").addEventListener("click", () => { window.location.href = "ucshop.html"; });
+    document.getElementById("btnCustom").addEventListener("click", () => alert("Кастомки (позже сделаем переход)"));
 
     // Баннеры: точки + автоплей
-    const slides = document.getElementById('slides');
-    const dotsWrap = document.getElementById('dots');
-    const dots = Array.from(dotsWrap.querySelectorAll('.dot'));
+    const slides = document.getElementById("slides");
+    const dotsWrap = document.getElementById("dots");
+    const dots = Array.from(dotsWrap.querySelectorAll(".dot"));
 
     function getStep(){
-      const first = slides.querySelector('.slide');
+      const first = slides.querySelector(".slide");
       if (!first) return slides.clientWidth || 1;
       const w = first.getBoundingClientRect().width || 1;
-      const gap = parseFloat(getComputedStyle(slides).gap || '0') || 0;
+      const gap = parseFloat(getComputedStyle(slides).gap || "0") || 0;
       return w + gap;
     }
 
@@ -1103,11 +1099,11 @@
 
     function updateDotsByScroll(){
       const idx = getCurrentIndex();
-      dots.forEach((d,i)=>d.classList.toggle('active', i === idx));
+      dots.forEach((d,i)=>d.classList.toggle("active", i === idx));
     }
 
     let rafId = null;
-    slides.addEventListener('scroll', () => {
+    slides.addEventListener("scroll", () => {
       if (rafId) return;
       rafId = requestAnimationFrame(() => {
         updateDotsByScroll();
@@ -1116,12 +1112,12 @@
     }, { passive:true });
 
     dots.forEach((dot, i) => {
-      dot.addEventListener('click', () => {
-        slides.scrollTo({ left: i * getStep(), behavior: 'smooth' });
+      dot.addEventListener("click", () => {
+        slides.scrollTo({ left: i * getStep(), behavior: "smooth" });
       });
     });
 
-    window.addEventListener('resize', updateDotsByScroll);
+    window.addEventListener("resize", updateDotsByScroll);
 
     const AUTOPLAY_DELAY = 5000;
     const RESUME_DELAY   = 3500;
@@ -1135,12 +1131,12 @@
 
     function startAutoplay(){
       if (dots.length <= 1) return;
-      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
       stopAutoplay();
       autoplayInterval = setInterval(() => {
         const next = (getCurrentIndex() + 1) % dots.length;
-        slides.scrollTo({ left: next * getStep(), behavior: 'smooth' });
+        slides.scrollTo({ left: next * getStep(), behavior: "smooth" });
       }, AUTOPLAY_DELAY);
     }
 
@@ -1150,118 +1146,106 @@
       resumeTimeout = setTimeout(startAutoplay, RESUME_DELAY);
     }
 
-    ['pointerdown','touchstart','mousedown','wheel'].forEach(evt => {
+    ["pointerdown","touchstart","mousedown","wheel"].forEach(evt => {
       slides.addEventListener(evt, pauseAndResume, { passive:true });
     });
 
-    document.addEventListener('visibilitychange', () => {
+    document.addEventListener("visibilitychange", () => {
       if (document.hidden) stopAutoplay();
       else startAutoplay();
     });
 
-    window.addEventListener('load', () => {
+    window.addEventListener("load", () => {
       updateDotsByScroll();
       startAutoplay();
     });
 
     // ✅ Меню
-    const menuBtn = document.getElementById('menuBtn');
-    const menuOverlay = document.getElementById('menuOverlay');
-    const menuClose = document.getElementById('menuClose');
+    const menuBtn = document.getElementById("menuBtn");
+    const menuOverlay = document.getElementById("menuOverlay");
+    const menuClose = document.getElementById("menuClose");
 
     function openMenu(){
-      menuOverlay.classList.add('show');
-      menuOverlay.setAttribute('aria-hidden', 'false');
-      document.body.style.overflow = 'hidden';
+      menuOverlay.classList.add("show");
+      menuOverlay.setAttribute("aria-hidden", "false");
+      document.body.style.overflow = "hidden";
     }
 
     function closeMenu(){
-      menuOverlay.classList.remove('show');
-      menuOverlay.setAttribute('aria-hidden', 'true');
-      document.body.style.overflow = '';
+      menuOverlay.classList.remove("show");
+      menuOverlay.setAttribute("aria-hidden", "true");
+      document.body.style.overflow = "";
     }
 
-    menuBtn.addEventListener('click', openMenu);
-    menuClose.addEventListener('click', closeMenu);
+    menuBtn.addEventListener("click", openMenu);
+    menuClose.addEventListener("click", closeMenu);
 
-    menuOverlay.addEventListener('click', (e) => {
+    menuOverlay.addEventListener("click", (e) => {
       if (e.target === menuOverlay) closeMenu();
     });
 
     // ✅ Поддержка popup + открытие Telegram
-    const supportOverlay = document.getElementById('supportOverlay');
-    const supportClose = document.getElementById('supportClose');
-    const goTelegram = document.getElementById('goTelegram');
+    const supportOverlay = document.getElementById("supportOverlay");
+    const supportClose = document.getElementById("supportClose");
+    const goTelegram = document.getElementById("goTelegram");
 
     function openSupport(){
-      supportOverlay.classList.add('show');
-      supportOverlay.setAttribute('aria-hidden', 'false');
-      document.body.style.overflow = 'hidden';
+      supportOverlay.classList.add("show");
+      supportOverlay.setAttribute("aria-hidden", "false");
+      document.body.style.overflow = "hidden";
     }
 
     function closeSupport(){
-      supportOverlay.classList.remove('show');
-      supportOverlay.setAttribute('aria-hidden', 'true');
-      document.body.style.overflow = '';
+      supportOverlay.classList.remove("show");
+      supportOverlay.setAttribute("aria-hidden", "true");
+      document.body.style.overflow = "";
     }
 
-    supportClose.addEventListener('click', closeSupport);
+    supportClose.addEventListener("click", closeSupport);
 
-    supportOverlay.addEventListener('click', (e) => {
+    supportOverlay.addEventListener("click", (e) => {
       if (e.target === supportOverlay) closeSupport();
     });
 
     function openTelegramLinkSafe(url){
-      if (window.Telegram && window.Telegram.WebApp && typeof window.Telegram.WebApp.openTelegramLink === 'function') {
+      if (window.Telegram && window.Telegram.WebApp && typeof window.Telegram.WebApp.openTelegramLink === "function") {
         window.Telegram.WebApp.openTelegramLink(url);
         return;
       }
-      window.open(url, '_blank', 'noopener');
+      window.open(url, "_blank", "noopener");
     }
 
-    goTelegram.addEventListener('click', () => {
-      openTelegramLinkSafe('https://t.me/vezusmanager');
+    goTelegram.addEventListener("click", () => {
+      openTelegramLinkSafe("https://t.me/vezusmanager");
     });
 
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape') {
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") {
         closeSupport();
         closeMenu();
       }
     });
 
     // ✅ Клики по плиткам меню
-    document.querySelectorAll('.menu-tile').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const action = btn.getAttribute('data-action');
-
-        if (action === 'support') {
+    document.querySelectorAll(".menu-tile").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const action = btn.getAttribute("data-action");
+        if (action === "support") {
           closeMenu();
           openSupport();
           return;
         }
-
         closeMenu();
-        alert('Открыть: ' + action);
+        alert("Открыть: " + action);
       });
     });
 
     /**********************
      * 6) Boot
      **********************/
-    (async () => {
-      showAuth("Проверяем сессию…");
-
-      await initSupabase();
-      await refreshSessionUI();
-
-      supabase.auth.onAuthStateChange((_event, session) => {
-        const loggedIn = !!session?.user;
-        setLoggedInUI(loggedIn);
-        if (loggedIn) hideAuth();
-        else showAuth("Войди через Google");
-      });
-    })();
+    showAuth("Проверяем сессию…");
+    readOAuthErrorFromUrl();
+    await refreshSessionUI();
   </script>
 </body>
 </html>
