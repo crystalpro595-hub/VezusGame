@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Wallet</title>
+  <title>VezusGame</title>
 
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
 
@@ -66,7 +66,7 @@
       max-width:520px;
       display:flex;
       align-items:center;
-      justify-content:center;
+      justify-content:space-between;
       gap:16px;
     }
 
@@ -74,7 +74,6 @@
       display:flex;
       align-items:center;
       gap:10px;
-      transform: translateX(-10px);
       flex: 0 0 auto;
     }
 
@@ -117,9 +116,16 @@
       stroke-linejoin: round;
     }
 
-    /* ✅ Баланс */
-    .balance-mini{
+    /* ✅ Баланс / Войти (одно место) */
+    .auth-slot{
+      flex: 0 0 auto;
       width: min(210px, 70%);
+    }
+
+    .hidden{ display:none !important; }
+
+    .balance-mini{
+      width: 100%;
       height: 38px;
       border-radius: 999px;
       display:flex;
@@ -138,7 +144,6 @@
         0 0 24px rgba(42,171,238,.16);
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
-      flex: 0 1 auto;
     }
 
     .balance-mini::before{
@@ -194,8 +199,41 @@
       font-weight: 900;
       font-size: 13px;
       white-space:nowrap;
+      transition: transform .12s ease;
     }
     .bal-amount:active{ transform: scale(.99); }
+
+    /* ✅ Кнопка Войти (на месте баланса) */
+    .login-mini{
+      width: 100%;
+      height: 38px;
+      border-radius: 999px;
+      border: 1px solid rgba(46, 180, 255, .22);
+      background: rgba(8, 12, 22, .72);
+      box-shadow:
+        0 14px 40px rgba(0,0,0,.55),
+        0 0 0 1px rgba(255,255,255,.04) inset,
+        0 0 24px rgba(42,171,238,.16);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      cursor:pointer;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:10px;
+      color: rgba(234,241,255,.98);
+      font-weight: 900;
+      letter-spacing:.2px;
+      transition: transform .12s ease;
+      position:relative;
+      overflow:hidden;
+    }
+    .login-mini:active{ transform: scale(.99); }
+
+    .gmark{
+      width:18px; height:18px; display:block;
+      filter: drop-shadow(0 10px 18px rgba(0,0,0,.35));
+    }
 
     /* ✅ Баннеры — 3:1 cover */
     .slider{ width:100%; max-width:520px; border-radius: var(--radius); }
@@ -561,12 +599,147 @@
       filter: drop-shadow(0 8px 14px rgba(0,0,0,.25));
     }
 
+    /* =========================================
+       ✅ AUTH MODAL (по твоему стилю)
+    ========================================== */
+    .auth-overlay{
+      position:fixed;
+      inset:0;
+      z-index:900;
+      background: rgba(0,0,0,.72);
+      opacity:0;
+      pointer-events:none;
+      transition: opacity .18s ease;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:18px;
+    }
+    .auth-overlay.show{ opacity:1; pointer-events:auto; }
+
+    .auth-card{
+      width:min(460px, 100%);
+      border-radius:24px;
+      overflow:hidden;
+      background: rgba(8, 12, 22, .78);
+      border: 1px solid rgba(46, 180, 255, .18);
+      box-shadow:
+        0 34px 90px rgba(0,0,0,.62),
+        0 0 26px rgba(42,171,238,.14);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      transform: translateY(10px) scale(.98);
+      transition: transform .18s ease;
+      position:relative;
+    }
+    .auth-overlay.show .auth-card{ transform: translateY(0) scale(1); }
+
+    .auth-top{
+      padding: 14px 14px 10px 14px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      background: rgba(255,255,255,.03);
+      border-bottom: 1px solid rgba(255,255,255,.06);
+    }
+    .auth-title{
+      font-weight:900;
+      letter-spacing:.25px;
+      font-size:14px;
+      color: rgba(234,241,255,.95);
+    }
+    .auth-x{
+      width: 38px;
+      height: 38px;
+      border-radius: 14px;
+      border: 1px solid rgba(46, 180, 255, .16);
+      background: rgba(8, 12, 22, .55);
+      color: rgba(234,241,255,.92);
+      cursor:pointer;
+      display:grid;
+      place-items:center;
+      box-shadow: 0 12px 28px rgba(0,0,0,.45);
+    }
+    .auth-x:active{ transform: scale(.98); }
+
+    .auth-body{
+      padding: 14px 14px 16px 14px;
+      display:flex;
+      flex-direction:column;
+      gap: 12px;
+    }
+    .auth-h{
+      margin:0;
+      font-size: 18px;
+      font-weight: 900;
+      letter-spacing:.2px;
+      color: rgba(234,241,255,.98);
+    }
+    .auth-p{
+      margin:0;
+      font-size: 13px;
+      line-height: 1.35;
+      color: rgba(234,241,255,.80);
+    }
+
+    .google-btn{
+      height: 50px;
+      width: 100%;
+      border-radius: 16px;
+      border: 1px solid rgba(46, 180, 255, .22);
+      background: linear-gradient(180deg, rgba(42,171,238,.22), rgba(59,130,246,.14));
+      cursor:pointer;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap: 10px;
+      font-weight: 900;
+      letter-spacing:.2px;
+      color: rgba(234,241,255,.98);
+      box-shadow: 0 18px 40px rgba(0,0,0,.45);
+      transition: transform .12s ease;
+    }
+    .google-btn:active{ transform: scale(.99); }
+
+    .auth-note{
+      font-size:12px;
+      color: rgba(234,241,255,.70);
+    }
+
+    /* =========================================
+       ✅ TOAST уведомление
+    ========================================== */
+    .toast{
+      position:fixed;
+      left:50%;
+      transform:translateX(-50%);
+      bottom: calc(16px + var(--safe-bottom));
+      z-index:1200;
+      padding: 12px 14px;
+      border-radius: 16px;
+      background: rgba(8, 12, 22, .82);
+      border: 1px solid rgba(46, 180, 255, .18);
+      box-shadow: 0 18px 50px rgba(0,0,0,.55);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      color: rgba(234,241,255,.96);
+      font-weight: 800;
+      font-size: 13px;
+      letter-spacing:.2px;
+      opacity:0;
+      pointer-events:none;
+      transition: opacity .18s ease, transform .18s ease;
+    }
+    .toast.show{
+      opacity:1;
+      transform: translateX(-50%) translateY(-2px);
+    }
+
     @media (max-width: 360px){
-      .balance-mini{ width: min(196px, 68%); height: 36px; }
+      .balance-mini, .login-mini{ height: 36px; }
       .bal-amount{ height: 25px; font-size: 12px; }
       .menu-btn, .profile-btn{ width: 40px; height: 40px; border-radius: 13px; }
-      .left-buttons{ transform: translateX(-8px); }
-      .top-row{ gap: 14px; }
       .menu-tile{ min-height: 112px; border-radius: 20px; }
       .menu-panel{ gap: 12px; }
       .menu-close{ top:-50px; width:40px; height:40px; border-radius:13px; }
@@ -577,14 +750,41 @@
     @media (prefers-reduced-motion: reduce){
       *{ transition:none !important; }
       .menu-overlay.show .menu-tile{ animation:none !important; opacity:1 !important; transform:none !important; }
-      .support-overlay.show .support-card{ transform:none !important; }
     }
   </style>
 </head>
 
 <body>
-  <!-- ✅ ТВОЯ ГЛАВНАЯ -->
-  <div class="app" id="appRoot">
+  <!-- ✅ TOAST -->
+  <div class="toast" id="toast" aria-live="polite"></div>
+
+  <!-- ✅ AUTH MODAL -->
+  <div class="auth-overlay" id="authOverlay" aria-hidden="true">
+    <div class="auth-card" role="dialog" aria-modal="true" aria-label="Вход">
+      <div class="auth-top">
+        <div class="auth-title">Вход в аккаунт</div>
+        <button class="auth-x" id="authClose" aria-label="Закрыть">✕</button>
+      </div>
+      <div class="auth-body">
+        <p class="auth-h">Продолжить</p>
+        <p class="auth-p">Войди через Google. После входа кнопка “Войти” исчезнет и появится баланс.</p>
+
+        <button class="google-btn" id="googleLogin" type="button">
+          <svg class="gmark" viewBox="0 0 48 48" aria-hidden="true">
+            <path fill="#FFC107" d="M43.611 20.083H42V20H24v8h11.303C33.651 32.657 29.199 36 24 36c-6.627 0-12-5.373-12-12s5.373-12 12-12c3.059 0 5.842 1.154 7.957 3.043l5.657-5.657C34.965 6.053 29.727 4 24 4 12.954 4 4 12.954 4 24s8.954 20 20 20 20-8.954 20-20c0-1.341-.138-2.65-.389-3.917z"/>
+            <path fill="#FF3D00" d="M6.306 14.691l6.571 4.819C14.655 16.108 19.009 12 24 12c3.059 0 5.842 1.154 7.957 3.043l5.657-5.657C34.965 6.053 29.727 4 24 4 16.318 4 9.656 8.337 6.306 14.691z"/>
+            <path fill="#4CAF50" d="M24 44c5.096 0 9.834-1.946 13.391-5.112l-6.187-5.238C29.212 35.091 26.715 36 24 36c-5.176 0-9.607-3.314-11.257-7.946l-6.522 5.025C9.505 39.556 16.227 44 24 44z"/>
+            <path fill="#1976D2" d="M43.611 20.083H42V20H24v8h11.303a12.07 12.07 0 0 1-4.099 5.65l.002-.002 6.187 5.238C36.977 39.236 44 34 44 24c0-1.341-.138-2.65-.389-3.917z"/>
+          </svg>
+          Войти через Google
+        </button>
+
+        <div class="auth-note" id="authNote"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="app">
     <div class="content">
 
       <div class="top-row">
@@ -603,20 +803,40 @@
           </button>
         </div>
 
-        <div class="balance-mini" aria-label="Баланс">
-          <span class="bal-title">Баланс</span>
-          <button class="bal-amount" id="balanceChip" aria-label="Открыть кошелёк">
-            <span id="balanceValue">0 VC</span>
+        <div class="auth-slot">
+          <!-- ✅ Войти (показывается до входа) -->
+          <button class="login-mini" id="loginMini" type="button" aria-label="Войти">
+            <svg class="gmark" viewBox="0 0 48 48" aria-hidden="true">
+              <path fill="#FFC107" d="M43.611 20.083H42V20H24v8h11.303C33.651 32.657 29.199 36 24 36c-6.627 0-12-5.373-12-12s5.373-12 12-12c3.059 0 5.842 1.154 7.957 3.043l5.657-5.657C34.965 6.053 29.727 4 24 4 12.954 4 4 12.954 4 24s8.954 20 20 20 20-8.954 20-20c0-1.341-.138-2.65-.389-3.917z"/>
+              <path fill="#FF3D00" d="M6.306 14.691l6.571 4.819C14.655 16.108 19.009 12 24 12c3.059 0 5.842 1.154 7.957 3.043l5.657-5.657C34.965 6.053 29.727 4 24 4 16.318 4 9.656 8.337 6.306 14.691z"/>
+              <path fill="#4CAF50" d="M24 44c5.096 0 9.834-1.946 13.391-5.112l-6.187-5.238C29.212 35.091 26.715 36 24 36c-5.176 0-9.607-3.314-11.257-7.946l-6.522 5.025C9.505 39.556 16.227 44 24 44z"/>
+              <path fill="#1976D2" d="M43.611 20.083H42V20H24v8h11.303a12.07 12.07 0 0 1-4.099 5.65l.002-.002 6.187 5.238C36.977 39.236 44 34 44 24c0-1.341-.138-2.65-.389-3.917z"/>
+            </svg>
+            Войти
           </button>
+
+          <!-- ✅ Баланс (показывается после входа) -->
+          <div class="balance-mini hidden" id="balanceMini" aria-label="Баланс">
+            <span class="bal-title">Баланс</span>
+            <button class="bal-amount" id="balanceChip" aria-label="Открыть кошелёк">
+              <span id="balanceValue">0 VC</span>
+            </button>
+          </div>
         </div>
       </div>
 
       <!-- ✅ Баннеры (3:1) -->
       <div class="slider" aria-label="Баннеры">
         <div class="slides" id="slides">
-          <div class="slide"><img src="YOUR_BANNER_1200x400.png" alt="Banner 1"></div>
-          <div class="slide"><img src="YOUR_BANNER_1200x400.png" alt="Banner 2"></div>
-          <div class="slide"><img src="YOUR_BANNER_1200x400.png" alt="Banner 3"></div>
+          <div class="slide">
+            <img src="YOUR_BANNER_1200x400.png" alt="Banner 1">
+          </div>
+          <div class="slide">
+            <img src="YOUR_BANNER_1200x400.png" alt="Banner 2">
+          </div>
+          <div class="slide">
+            <img src="YOUR_BANNER_1200x400.png" alt="Banner 3">
+          </div>
         </div>
 
         <div class="dots" id="dots" aria-label="Индикатор баннера">
@@ -661,7 +881,7 @@
       </button>
 
       <button class="menu-tile from-right" data-action="vouchers"
-        style="--img:url('https://i.postimg.cc/FRCspg3R/file-00000000ef88720aa82ee07de2475c09.png')">
+        style="--img:url('https://i.postimg.cc/xCt8Fgry/file-000000009a147243b409376278ab22bd.png')">
         <span class="tile-bg" aria-hidden="true"></span>
         <span class="tile-title">Ваучеры</span>
       </button>
@@ -705,30 +925,161 @@
     </div>
   </div>
 
-  <!-- ✅ JS -->
-  <script>
-    const clamp = (n, min, max) => Math.max(min, Math.min(max, n));
+  <script type="module">
+    /**********************
+     * Supabase config
+     **********************/
+    const SUPABASE_URL = "https://bidlyktnwnwvtfehnojw.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpZGx5a3Rud253dnRmZWhub2p3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA4NDg3NTQsImV4cCI6MjA4NjQyNDc1NH0.pYnmlTpkj4n3WbaMeAy6hlgO1470pg0Wm4nOV1w9WIY";
+    const REDIRECT_TO = `${location.origin}${location.pathname}`;
 
-    // Баланс (заглушка)
+    /**********************
+     * Elements
+     **********************/
+    const toast = document.getElementById('toast');
+
+    const loginMini = document.getElementById('loginMini');
+    const balanceMini = document.getElementById('balanceMini');
     const balanceValueEl = document.getElementById('balanceValue');
     const balanceChipEl  = document.getElementById('balanceChip');
-    balanceValueEl.textContent = '0 VC';
 
-    balanceChipEl.addEventListener('click', () => {
-      window.location.href = 'wallet.html';
+    const authOverlay = document.getElementById('authOverlay');
+    const authClose = document.getElementById('authClose');
+    const googleLoginBtn = document.getElementById('googleLogin');
+    const authNote = document.getElementById('authNote');
+
+    const menuBtn = document.getElementById('menuBtn');
+    const profileBtn = document.getElementById('profileBtn');
+
+    /**********************
+     * Toast
+     **********************/
+    let toastTimer = null;
+    function showToast(msg){
+      toast.textContent = msg;
+      toast.classList.add('show');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(()=> toast.classList.remove('show'), 2200);
+    }
+
+    function needLogin(){
+      showToast("Нужно войти в аккаунт");
+    }
+
+    /**********************
+     * Auth modal
+     **********************/
+    function openAuth(){
+      authNote.textContent = "";
+      authOverlay.classList.add('show');
+      authOverlay.setAttribute('aria-hidden','false');
+      document.body.style.overflow = 'hidden';
+    }
+    function closeAuth(){
+      authOverlay.classList.remove('show');
+      authOverlay.setAttribute('aria-hidden','true');
+      document.body.style.overflow = '';
+    }
+    authClose.addEventListener('click', closeAuth);
+    authOverlay.addEventListener('click', (e)=>{ if(e.target === authOverlay) closeAuth(); });
+
+    /**********************
+     * Supabase init
+     **********************/
+    const { createClient } = await import("https://esm.sh/@supabase/supabase-js@2");
+    const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+      auth: {
+        persistSession: true,
+        autoRefreshToken: true,
+        detectSessionInUrl: true
+      }
     });
 
-    // Профиль
-    document.getElementById('profileBtn').addEventListener('click', () => {
+    let isLoggedIn = false;
+
+    function setAuthUI(logged){
+      isLoggedIn = !!logged;
+
+      // показываем "Войти" до входа
+      loginMini.classList.toggle('hidden', isLoggedIn);
+
+      // показываем баланс после входа
+      balanceMini.classList.toggle('hidden', !isLoggedIn);
+    }
+
+    async function syncSession(){
+      const { data: { session } } = await supabase.auth.getSession();
+      setAuthUI(!!session?.user);
+      return session?.user || null;
+    }
+
+    /**********************
+     * Google login
+     **********************/
+    async function loginWithGoogle(){
+      try{
+        authNote.textContent = "Открываю Google…";
+        await supabase.auth.signInWithOAuth({
+          provider: "google",
+          options: {
+            redirectTo: REDIRECT_TO,
+            // важно: дает выбор аккаунта (чтобы можно было зайти с другого)
+            queryParams: {
+              prompt: "select_account"
+            }
+          }
+        });
+      } catch (e){
+        authNote.textContent = e?.message ? ("Ошибка: " + e.message) : "Ошибка входа";
+      }
+    }
+
+    loginMini.addEventListener('click', () => openAuth());
+    googleLoginBtn.addEventListener('click', () => loginWithGoogle());
+
+    /**********************
+     * Guard for buttons (до входа)
+     **********************/
+    function guard(handler){
+      return (e) => {
+        if(!isLoggedIn){
+          e.preventDefault();
+          e.stopPropagation();
+          needLogin();
+          return;
+        }
+        handler?.(e);
+      };
+    }
+
+    // верхние кнопки
+    menuBtn.addEventListener('click', guard(openMenu));
+    profileBtn.addEventListener('click', guard(() => {
+      // если у тебя есть profile.html — ведём туда
       window.location.href = 'profile.html';
-    });
+    }));
 
-    // Кнопки
-    document.getElementById('btnGames').addEventListener('click', () => alert('Игры (позже сделаем переход)'));
-    document.getElementById('btnShop').addEventListener('click', () => { window.location.href = 'ucshop.html'; });
-    document.getElementById('btnCustom').addEventListener('click', () => alert('Кастомки (позже сделаем переход)'));
+    // баланс -> кошелёк только после входа
+    balanceValueEl.textContent = '0 VC';
+    balanceChipEl.addEventListener('click', guard(() => {
+      window.location.href = 'wallet.html';
+    }));
 
-    // Баннеры: точки + автоплей
+    /**********************
+     * Buttons
+     **********************/
+    const btnGames = document.getElementById('btnGames');
+    const btnShop  = document.getElementById('btnShop');
+    const btnCustom= document.getElementById('btnCustom');
+
+    btnGames.addEventListener('click', guard(() => alert('Игры (позже сделаем переход)')));
+    btnShop.addEventListener('click',  guard(() => { window.location.href = 'ucshop.html'; }));
+    btnCustom.addEventListener('click',guard(() => alert('Кастомки (позже сделаем переход)')));
+
+    /**********************
+     * Slider logic + guard dots
+     **********************/
+    const clamp = (n, min, max) => Math.max(min, Math.min(max, n));
     const slides = document.getElementById('slides');
     const dotsWrap = document.getElementById('dots');
     const dots = Array.from(dotsWrap.querySelectorAll('.dot'));
@@ -761,11 +1112,12 @@
     }, { passive:true });
 
     dots.forEach((dot, i) => {
-      dot.addEventListener('click', () => {
+      dot.addEventListener('click', guard(() => {
         slides.scrollTo({ left: i * getStep(), behavior: 'smooth' });
-      });
+      }));
     });
 
+    window.addEventListener('load', updateDotsByScroll);
     window.addEventListener('resize', updateDotsByScroll);
 
     const AUTOPLAY_DELAY = 5000;
@@ -804,13 +1156,11 @@
       else startAutoplay();
     });
 
-    window.addEventListener('load', () => {
-      updateDotsByScroll();
-      startAutoplay();
-    });
+    window.addEventListener('load', startAutoplay);
 
-    // ✅ Меню
-    const menuBtn = document.getElementById('menuBtn');
+    /**********************
+     * Menu
+     **********************/
     const menuOverlay = document.getElementById('menuOverlay');
     const menuClose = document.getElementById('menuClose');
 
@@ -826,14 +1176,23 @@
       document.body.style.overflow = '';
     }
 
-    menuBtn.addEventListener('click', openMenu);
     menuClose.addEventListener('click', closeMenu);
 
     menuOverlay.addEventListener('click', (e) => {
       if (e.target === menuOverlay) closeMenu();
     });
 
-    // ✅ Поддержка popup + открытие Telegram
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        closeSupport();
+        closeMenu();
+        closeAuth();
+      }
+    });
+
+    /**********************
+     * Support popup
+     **********************/
     const supportOverlay = document.getElementById('supportOverlay');
     const supportClose = document.getElementById('supportClose');
     const goTelegram = document.getElementById('goTelegram');
@@ -864,20 +1223,13 @@
       window.open(url, '_blank', 'noopener');
     }
 
-    goTelegram.addEventListener('click', () => {
+    goTelegram.addEventListener('click', guard(() => {
       openTelegramLinkSafe('https://t.me/vezusmanager');
-    });
+    }));
 
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape') {
-        closeSupport();
-        closeMenu();
-      }
-    });
-
-    // ✅ Клики по плиткам меню
+    // tiles
     document.querySelectorAll('.menu-tile').forEach(btn => {
-      btn.addEventListener('click', () => {
+      btn.addEventListener('click', guard(() => {
         const action = btn.getAttribute('data-action');
 
         if (action === 'support') {
@@ -888,8 +1240,20 @@
 
         closeMenu();
         alert('Открыть: ' + action);
-      });
+      }));
     });
+
+    /**********************
+     * Boot
+     **********************/
+    await syncSession();
+
+    // закрываем модалку если вернулся с OAuth и уже залогинен
+    supabase.auth.onAuthStateChange(async (_event, session) => {
+      setAuthUI(!!session?.user);
+      if(session?.user) closeAuth();
+    });
+
   </script>
 </body>
 </html>
