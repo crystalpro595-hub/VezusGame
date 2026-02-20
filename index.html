@@ -119,7 +119,7 @@
       stroke-linejoin: round;
     }
 
-    /* ✅ Telegram login button */
+    /* ✅ Telegram кнопка (Войти + лого) */
     .tg-login{
       height: 42px;
       border-radius: 999px;
@@ -153,7 +153,7 @@
       filter: drop-shadow(0 10px 16px rgba(0,0,0,.22));
     }
 
-    /* ✅ when logged in */
+    /* ✅ После входа: превращается в баланс */
     .tg-login.logged{
       background: rgba(8, 12, 22, .72);
       border: 1px solid rgba(46, 180, 255, .22);
@@ -167,6 +167,7 @@
 
     /* ✅ Баннеры */
     .slider{ width:100%; max-width:520px; border-radius: var(--radius); }
+
     .slides{
       display:flex;
       gap:12px;
@@ -275,7 +276,7 @@
       text-shadow: 0 10px 18px rgba(0,0,0,.55);
     }
 
-    /* ✅ Menu Overlay */
+    /* ✅ Меню */
     .menu-overlay{
       position:fixed;
       inset:0;
@@ -289,10 +290,7 @@
       justify-content:center;
       padding: 18px;
     }
-    .menu-overlay.show{
-      opacity:1;
-      pointer-events:auto;
-    }
+    .menu-overlay.show{ opacity:1; pointer-events:auto; }
 
     .menu-panel{
       width: min(560px, 100%);
@@ -386,10 +384,7 @@
       justify-content:center;
       padding: 18px;
     }
-    .support-overlay.show{
-      opacity:1;
-      pointer-events:auto;
-    }
+    .support-overlay.show{ opacity:1; pointer-events:auto; }
 
     .support-card{
       width: min(440px, 100%);
@@ -419,14 +414,12 @@
       background: rgba(255,255,255,.03);
       border-bottom: 1px solid rgba(255,255,255,.06);
     }
-
     .support-title{
       font-weight: 900;
       letter-spacing:.25px;
       font-size: 14px;
       color: rgba(234,241,255,.95);
     }
-
     .support-x{
       width: 38px;
       height: 38px;
@@ -447,7 +440,6 @@
       flex-direction:column;
       gap: 12px;
     }
-
     .support-text{
       margin:0;
       font-size: 13px;
@@ -491,10 +483,7 @@
       justify-content:center;
       padding: 18px;
     }
-    .auth-overlay.show{
-      opacity:1;
-      pointer-events:auto;
-    }
+    .auth-overlay.show{ opacity:1; pointer-events:auto; }
 
     .auth-card{
       width: min(460px, 100%);
@@ -523,7 +512,6 @@
       background: rgba(255,255,255,.03);
       border-bottom: 1px solid rgba(255,255,255,.06);
     }
-
     .auth-title{
       font-weight: 900;
       letter-spacing:.2px;
@@ -566,7 +554,6 @@
       align-items:center;
       text-align:center;
     }
-
     .auth-text{
       margin:0;
       font-size: 13px;
@@ -633,7 +620,7 @@
           </button>
         </div>
 
-        <!-- ✅ Кнопка входа (Войти + Telegram logo) -->
+        <!-- ✅ Войти + лого Telegram -->
         <button class="tg-login" id="loginBtn" aria-label="Войти">
           <svg class="ico" viewBox="0 0 240 240" aria-hidden="true">
             <path fill="#fff" d="M120 0C53.7 0 0 53.7 0 120s53.7 120 120 120 120-53.7 120-120S186.3 0 120 0zm58.7 82.3l-19.7 92.8c-1.5 6.6-5.4 8.2-10.9 5.1l-30.2-22.3-14.6 14c-1.6 1.6-3 3-6.1 3l2.2-31.6 57.5-52c2.5-2.2-.5-3.4-3.9-1.2l-71 44.7-30.6-9.6c-6.6-2.1-6.7-6.6 1.4-9.7l119.6-46.1c5.5-2 10.3 1.3 8.8 9.9z"/>
@@ -762,8 +749,8 @@
   <div class="toast" id="toast"></div>
 
   <script>
-    // ✅ Твои данные (уже подставлены)
-    const BOT_USERNAME   = 'vezusgamebot'; // без @
+    // ✅ Твои данные
+    const BOT_USERNAME = 'vezusgamebot'; // без @
     const SB_FUNCTION_URL = 'https://lazrfierfbhwlduqlvws.supabase.co/functions/v1/telegram-auth';
 
     const toastEl = document.getElementById('toast');
@@ -772,18 +759,12 @@
       toastEl.textContent = msg;
       toastEl.classList.add('show');
       clearTimeout(toastTimer);
-      toastTimer = setTimeout(()=>toastEl.classList.remove('show'), 2600);
+      toastTimer = setTimeout(()=>toastEl.classList.remove('show'), 3000);
     }
 
-    // Telegram env
     const inTelegram = !!(window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initData);
-    try{
-      if (window.Telegram && window.Telegram.WebApp){
-        window.Telegram.WebApp.ready();
-      }
-    }catch(_){}
+    try { window.Telegram?.WebApp?.ready?.(); } catch (_) {}
 
-    // auth state
     let auth = { ok:false, user:null, wallet:null, progress:null };
     try{
       const saved = JSON.parse(localStorage.getItem('tg_auth') || 'null');
@@ -805,7 +786,7 @@
     }
     renderAuthUI();
 
-    // Auth popup (browser widget)
+    // Browser widget popup
     const authOverlay = document.getElementById('authOverlay');
     const authClose = document.getElementById('authClose');
     const tgWidgetWrap = document.getElementById('tgWidget');
@@ -878,15 +859,15 @@
           body: JSON.stringify({ initData })
         });
 
-        const { data } = await parseFetchResponse(r);
-        if (!r.ok) throw new Error(data.error || 'Auth failed');
+        const { data, raw } = await parseFetchResponse(r);
+        if (!r.ok) throw new Error(data.error || raw || ('HTTP ' + r.status));
 
         auth = { ok:true, user:data.user||null, wallet:data.wallet||null, progress:data.progress||null };
         localStorage.setItem('tg_auth', JSON.stringify(auth));
         renderAuthUI();
         toast('Вход выполнен ✅');
       }catch(e){
-        toast('Ошибка входа: ' + (e?.message || e));
+        toast('Ошибка входа: ' + (e?.message || String(e)));
       }
     }
 
@@ -898,8 +879,8 @@
           body: JSON.stringify({ user })
         });
 
-        const { data } = await parseFetchResponse(r);
-        if (!r.ok) throw new Error(data.error || 'Auth failed');
+        const { data, raw } = await parseFetchResponse(r);
+        if (!r.ok) throw new Error(data.error || raw || ('HTTP ' + r.status));
 
         auth = { ok:true, user:data.user||null, wallet:data.wallet||null, progress:data.progress||null };
         localStorage.setItem('tg_auth', JSON.stringify(auth));
@@ -907,11 +888,11 @@
         renderAuthUI();
         toast('Вход выполнен ✅');
       }catch(e){
-        toast('Ошибка входа: ' + (e?.message || e));
+        toast('Ошибка входа: ' + (e?.message || String(e)));
       }
     }
 
-    // login button behaviour
+    // Кнопка входа/баланса
     loginBtn.addEventListener('click', () => {
       if (auth.ok){
         window.location.href = 'wallet.html';
@@ -921,17 +902,16 @@
       else openAuth();
     });
 
-    // long press/right click -> logout (удобно для тестов)
+    // Удобно для теста: долгий тап/контекст -> logout
     loginBtn.addEventListener('contextmenu', (e) => {
       e.preventDefault();
       if (auth.ok) logout();
     });
 
-    // Locked buttons
+    // Кнопки (закрыты до входа)
     document.getElementById('profileBtn').addEventListener('click',
       requireLogin(() => window.location.href = 'profile.html')
     );
-
     document.getElementById('btnGames').addEventListener('click',
       requireLogin(() => alert('Игры (позже сделаем переход)'))
     );
@@ -942,7 +922,7 @@
       requireLogin(() => alert('Кастомки (позже сделаем переход)'))
     );
 
-    // Banners dots
+    // Баннеры: точки
     const clamp = (n, min, max) => Math.max(min, Math.min(max, n));
     const slides = document.getElementById('slides');
     const dotsWrap = document.getElementById('dots');
@@ -955,17 +935,14 @@
       const gap = parseFloat(getComputedStyle(slides).gap || '0') || 0;
       return w + gap;
     }
-
     function getCurrentIndex(){
       const step = getStep();
       return clamp(Math.round(slides.scrollLeft / step), 0, dots.length - 1);
     }
-
     function updateDotsByScroll(){
       const idx = getCurrentIndex();
       dots.forEach((d,i)=>d.classList.toggle('active', i === idx));
     }
-
     let rafId = null;
     slides.addEventListener('scroll', () => {
       if (rafId) return;
@@ -984,7 +961,7 @@
     window.addEventListener('resize', updateDotsByScroll);
     window.addEventListener('load', updateDotsByScroll);
 
-    // Menu open/close
+    // ✅ Меню
     const menuBtn = document.getElementById('menuBtn');
     const menuOverlay = document.getElementById('menuOverlay');
     const menuClose = document.getElementById('menuClose');
@@ -1002,9 +979,11 @@
 
     menuBtn.addEventListener('click', openMenu);
     menuClose.addEventListener('click', closeMenu);
-    menuOverlay.addEventListener('click', (e) => { if (e.target === menuOverlay) closeMenu(); });
+    menuOverlay.addEventListener('click', (e) => {
+      if (e.target === menuOverlay) closeMenu();
+    });
 
-    // Support popup + open Telegram
+    // ✅ Поддержка popup + открытие Telegram
     const supportOverlay = document.getElementById('supportOverlay');
     const supportClose = document.getElementById('supportClose');
     const goTelegram = document.getElementById('goTelegram');
@@ -1021,7 +1000,9 @@
     }
 
     supportClose.addEventListener('click', closeSupport);
-    supportOverlay.addEventListener('click', (e) => { if (e.target === supportOverlay) closeSupport(); });
+    supportOverlay.addEventListener('click', (e) => {
+      if (e.target === supportOverlay) closeSupport();
+    });
 
     function openTelegramLinkSafe(url){
       if (window.Telegram && window.Telegram.WebApp && typeof window.Telegram.WebApp.openTelegramLink === 'function') {
@@ -1032,7 +1013,7 @@
     }
     goTelegram.addEventListener('click', () => openTelegramLinkSafe('https://t.me/vezusmanager'));
 
-    // Menu tiles (support available without login)
+    // Клики по плиткам меню (support без входа; остальное — только после входа)
     document.querySelectorAll('.menu-tile').forEach(btn => {
       btn.addEventListener('click', () => {
         const action = btn.getAttribute('data-action');
@@ -1054,7 +1035,9 @@
 
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') {
-        closeSupport(); closeMenu(); closeAuth();
+        closeSupport();
+        closeMenu();
+        closeAuth();
       }
     });
   </script>
