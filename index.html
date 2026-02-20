@@ -60,6 +60,7 @@
       align-items:center;
     }
 
+    /* Верхняя строка */
     .top-row{
       width:100%;
       max-width:520px;
@@ -115,7 +116,7 @@
       stroke-linejoin: round;
     }
 
-    /* Telegram button (Войти + logo) */
+    /* Telegram button */
     .tg-login{
       height: 42px;
       border-radius: 999px;
@@ -134,7 +135,7 @@
       font-weight: 900;
       font-size: 14px;
       letter-spacing: .2px;
-      transition: transform .12s ease, filter .12s ease;
+      transition: transform .12s ease;
       white-space:nowrap;
       user-select:none;
     }
@@ -157,6 +158,7 @@
     }
     .tg-login.logged .ico{ display:none; }
 
+    /* Баннеры */
     .slider{ width:100%; max-width:520px; border-radius: var(--radius); }
     .slides{
       display:flex;
@@ -168,7 +170,6 @@
       padding-bottom:4px;
     }
     .slides::-webkit-scrollbar{ display:none; }
-
     .slide{
       scroll-snap-align:start;
       flex:0 0 100%;
@@ -188,7 +189,6 @@
       background: linear-gradient(180deg, rgba(0,0,0,.10), rgba(0,0,0,.38));
       pointer-events:none;
     }
-
     .dots{ display:flex; justify-content:center; gap:8px; margin-top:10px; }
     .dot{
       width:8px; height:8px; border-radius:999px;
@@ -203,6 +203,7 @@
       box-shadow: 0 0 12px rgba(42,171,238,.55);
     }
 
+    /* 3 кнопки */
     .actions{
       width:100%;
       max-width:520px;
@@ -233,7 +234,6 @@
       background-position: center;
       background-repeat:no-repeat;
       transform: scale(1.03);
-      filter: saturate(1.03) contrast(1.02);
     }
     .action-btn .bg::after{
       content:""; position:absolute; inset:0;
@@ -250,6 +250,97 @@
       color: rgba(234,241,255,.95);
       background: linear-gradient(180deg, rgba(0,0,0,.00), rgba(0,0,0,.60));
       text-shadow: 0 10px 18px rgba(0,0,0,.55);
+    }
+
+    /* MENU overlay */
+    .menu-overlay{
+      position:fixed;
+      inset:0;
+      background: rgba(0,0,0,.72);
+      opacity:0;
+      pointer-events:none;
+      transition: opacity .25s ease;
+      z-index:200;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding: 18px;
+    }
+    .menu-overlay.show{ opacity:1; pointer-events:auto; }
+
+    .menu-panel{
+      width: min(560px, 100%);
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      position:relative;
+    }
+
+    .menu-close{
+      position:absolute;
+      top:-56px;
+      right:0;
+      width: 42px;
+      height: 42px;
+      border-radius: 14px;
+      border: 1px solid rgba(46, 180, 255, .18);
+      background: rgba(8, 12, 22, .55);
+      color: rgba(234,241,255,.92);
+      cursor:pointer;
+      display:grid;
+      place-items:center;
+      box-shadow: 0 14px 30px rgba(0,0,0,.45);
+    }
+    .menu-close:active{ transform: scale(.98); }
+
+    .menu-tile{
+      border:none;
+      cursor:pointer;
+      border-radius: 22px;
+      overflow:hidden;
+      padding: 0;
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(46, 180, 255, .16);
+      box-shadow:
+        0 22px 55px rgba(0,0,0,.48),
+        0 0 0 1px rgba(255,255,255,.04) inset;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      min-height: 120px;
+      position:relative;
+    }
+    .menu-tile:active{ transform: scale(.99); }
+
+    .menu-tile .tile-bg{
+      position:absolute;
+      inset:0;
+      background-image: var(--img);
+      background-size: cover;
+      background-position: center;
+      background-repeat:no-repeat;
+      transform: scale(1.02);
+    }
+    .menu-tile .tile-bg::after{
+      content:"";
+      position:absolute;
+      inset:0;
+      background:
+        radial-gradient(600px 220px at 30% 10%, rgba(42,171,238,.22), transparent 60%),
+        linear-gradient(180deg, rgba(0,0,0,.20), rgba(0,0,0,.55));
+    }
+    .menu-tile .tile-title{
+      position:absolute;
+      inset:0;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      text-align:center;
+      padding: 14px;
+      font-weight: 900;
+      font-size: 15px;
+      letter-spacing:.35px;
+      color: rgba(234,241,255,.98);
+      text-shadow: 0 14px 28px rgba(0,0,0,.70);
     }
 
     /* Auth popup (widget) */
@@ -275,12 +366,7 @@
       box-shadow: 0 34px 90px rgba(0,0,0,.62);
       backdrop-filter: blur(14px);
       -webkit-backdrop-filter: blur(14px);
-      transform: translateY(12px) scale(.98);
-      opacity:.95;
-      transition: transform .22s ease, opacity .22s ease;
     }
-    .auth-overlay.show .auth-card{ transform: translateY(0) scale(1); opacity:1; }
-
     .auth-head{
       padding: 16px 16px 10px 16px;
       display:flex;
@@ -312,7 +398,6 @@
       cursor:pointer; display:grid; place-items:center;
       box-shadow: 0 12px 28px rgba(0,0,0,.45);
     }
-    .auth-x:active{ transform: scale(.98); }
     .auth-body{
       padding: 14px 16px 18px 16px;
       display:flex; flex-direction:column; gap: 12px;
@@ -353,10 +438,6 @@
       text-align:center;
     }
     .toast.show{ opacity: 1; transform: translateX(-50%) translateY(-6px); }
-
-    @media (max-width: 360px){
-      .tg-login{ height: 40px; font-size: 13px; padding:0 12px 0 10px; }
-    }
   </style>
 </head>
 
@@ -425,7 +506,40 @@
     </div>
   </div>
 
-  <!-- Auth popup -->
+  <!-- MENU -->
+  <div class="menu-overlay" id="menuOverlay" aria-hidden="true">
+    <div class="menu-panel" role="dialog" aria-modal="true" aria-label="Меню">
+      <button class="menu-close" id="menuClose" aria-label="Закрыть меню">✕</button>
+
+      <button class="menu-tile" data-action="support"
+        style="--img:url('https://i.postimg.cc/3NGRJh4G/file-000000006f747246895391c411a6b70f.png')">
+        <span class="tile-bg" aria-hidden="true"></span>
+        <span class="tile-title">Поддержка</span>
+      </button>
+
+      <button class="menu-tile" data-action="history"
+        style="--img:url('https://i.postimg.cc/DwwTxFv8/file-00000000fee07243ab2744a3e771bb84-(1).png')">
+        <span class="tile-bg" aria-hidden="true"></span>
+        <span class="tile-title">История</span>
+      </button>
+
+      <button class="menu-tile" data-action="ref"
+        style="--img:url('https://i.postimg.cc/GtwVSbmY/file-000000005e94722f9294319ad4c8eb41-(1).png')">
+        <span class="tile-bg" aria-hidden="true"></span>
+        <span class="tile-title">Реферальная ссылка</span>
+      </button>
+
+      <!-- ✅ ВЫЙТИ -->
+      <button class="menu-tile" data-action="logout"
+        style="--img:url('https://i.postimg.cc/0QdZgF8s/file-logout-bg.png')">
+        <span class="tile-bg" aria-hidden="true"></span>
+        <span class="tile-title">Выйти</span>
+      </button>
+
+    </div>
+  </div>
+
+  <!-- AUTH POPUP (widget) -->
   <div class="auth-overlay" id="authOverlay" aria-hidden="true">
     <div class="auth-card" role="dialog" aria-modal="true" aria-label="Вход через Telegram">
       <div class="auth-head">
@@ -453,13 +567,13 @@
 
   <script>
     // ====== CONFIG ======
-    const BOT_USERNAME = 'vezusgamebot'; // без @
+    const BOT_USERNAME = 'vezusgamebot';
     const SB_FUNCTION_URL = 'https://lazrfierfbhwlduqlvws.supabase.co/functions/v1/telegram-auth';
 
     // ✅ ВСТАВЬ СЮДА anon public key из Supabase (Settings → API)
     const SB_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxhenJmaWVyZmJod2xkdXFsdndzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE1NzY2ODIsImV4cCI6MjA4NzE1MjY4Mn0.tJtwFrNPrNyGNedGP1h0bNgr98FnyoliR-13mOqlBJI';
 
-    // ====== UI helpers ======
+    // ====== Helpers ======
     const toastEl = document.getElementById('toast');
     let toastTimer = null;
     function toast(msg){
@@ -472,6 +586,22 @@
     const inTelegram = !!(window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initData);
     try { window.Telegram?.WebApp?.ready?.(); } catch (_) {}
 
+    function supaHeaders(){
+      return {
+        'Content-Type':'application/json',
+        'apikey': SB_ANON_KEY,
+        'Authorization': 'Bearer ' + SB_ANON_KEY
+      };
+    }
+
+    async function parseFetchResponse(r){
+      const raw = await r.text();
+      let data = {};
+      try { data = JSON.parse(raw); } catch { data = { raw }; }
+      return { data, raw };
+    }
+
+    // ====== Auth state ======
     let auth = { ok:false, user:null, wallet:null, progress:null };
     try{
       const saved = JSON.parse(localStorage.getItem('tg_auth') || 'null');
@@ -493,6 +623,13 @@
     }
     renderAuthUI();
 
+    function logout(){
+      auth = { ok:false, user:null, wallet:null, progress:null };
+      localStorage.removeItem('tg_auth');
+      renderAuthUI();
+      toast('Вы вышли');
+    }
+
     function requireLogin(action){
       return () => {
         if (!auth.ok){
@@ -503,21 +640,7 @@
       };
     }
 
-    async function parseFetchResponse(r){
-      const raw = await r.text();
-      let data = {};
-      try { data = JSON.parse(raw); } catch { data = { raw }; }
-      return { data, raw };
-    }
-
-    function supaHeaders(){
-      return {
-        'Content-Type':'application/json',
-        'apikey': SB_ANON_KEY,
-        'Authorization': 'Bearer ' + SB_ANON_KEY
-      };
-    }
-
+    // ====== Login flows ======
     async function loginFromWebApp(){
       try{
         const initData = window.Telegram.WebApp.initData;
@@ -560,13 +683,6 @@
       }
     }
 
-    function logout(){
-      auth = { ok:false, user:null, wallet:null, progress:null };
-      localStorage.removeItem('tg_auth');
-      renderAuthUI();
-      toast('Вы вышли');
-    }
-
     // ====== Login button ======
     loginBtn.addEventListener('click', () => {
       if (auth.ok){
@@ -574,17 +690,11 @@
         return;
       }
       if (SB_ANON_KEY.includes('PASTE_YOUR_')){
-        toast('Вставь SB_ANON_KEY в index.html (Supabase → Settings → API)');
+        toast('Вставь SB_ANON_KEY (Supabase → Settings → API)');
         return;
       }
       if (inTelegram) loginFromWebApp();
       else openAuth();
-    });
-
-    // (для тестов) долгий тап/контекст — logout
-    loginBtn.addEventListener('contextmenu', (e) => {
-      e.preventDefault();
-      if (auth.ok) logout();
     });
 
     // ====== Lock other buttons ======
@@ -601,7 +711,7 @@
       requireLogin(() => alert('Кастомки (позже сделаем переход)'))
     );
 
-    // ====== Browser Widget popup ======
+    // ====== Widget popup ======
     const authOverlay = document.getElementById('authOverlay');
     const authClose = document.getElementById('authClose');
     const tgWidgetWrap = document.getElementById('tgWidget');
@@ -640,6 +750,52 @@
     authClose.addEventListener('click', closeAuth);
     authOverlay.addEventListener('click', (e)=>{ if(e.target===authOverlay) closeAuth(); });
 
+    // ====== MENU logic (FIX) ======
+    const menuBtn = document.getElementById('menuBtn');
+    const menuOverlay = document.getElementById('menuOverlay');
+    const menuClose = document.getElementById('menuClose');
+
+    function openMenu(){
+      menuOverlay.classList.add('show');
+      menuOverlay.setAttribute('aria-hidden','false');
+      document.body.style.overflow = 'hidden';
+    }
+    function closeMenu(){
+      menuOverlay.classList.remove('show');
+      menuOverlay.setAttribute('aria-hidden','true');
+      document.body.style.overflow = '';
+    }
+
+    menuBtn.addEventListener('click', openMenu);
+    menuClose.addEventListener('click', closeMenu);
+    menuOverlay.addEventListener('click', (e)=>{ if (e.target === menuOverlay) closeMenu(); });
+
+    // Tiles actions
+    document.querySelectorAll('.menu-tile').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const action = btn.getAttribute('data-action');
+        closeMenu();
+
+        if (action === 'logout'){
+          if (!auth.ok) { toast('Ты не в аккаунте'); return; }
+          logout();
+          return;
+        }
+
+        if (action === 'support'){
+          toast('Поддержка: @vezusmanager');
+          return;
+        }
+
+        if (!auth.ok){
+          toast('Сначала войди в аккаунт');
+          return;
+        }
+
+        toast('Открыть: ' + action);
+      });
+    });
+
     // ====== Banners dots ======
     const clamp = (n, min, max) => Math.max(min, Math.min(max, n));
     const slides = document.getElementById('slides');
@@ -675,6 +831,11 @@
 
     window.addEventListener('resize', updateDotsByScroll);
     window.addEventListener('load', updateDotsByScroll);
+
+    // ESC closes
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') { closeMenu(); closeAuth(); }
+    });
   </script>
 </body>
 </html>
