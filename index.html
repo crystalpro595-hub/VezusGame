@@ -3,9 +3,12 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Wallet</title>
+  <title>VezusGame</title>
 
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
+
+  <!-- Telegram WebApp SDK (для входа внутри Telegram) -->
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
   <style>
     :root{
@@ -14,7 +17,8 @@
       --safe-top: env(safe-area-inset-top, 0px);
       --radius:18px;
 
-      --neon:#2AABEE;
+      --tg:#2AABEE;     /* Telegram */
+      --tg2:#1e96d3;    /* Telegram darker */
       --neon2:#3b82f6;
     }
 
@@ -117,10 +121,10 @@
       stroke-linejoin: round;
     }
 
-    /* ✅ Баланс */
+    /* ✅ Баланс / Вход */
     .balance-mini{
-      width: min(210px, 70%);
-      height: 38px;
+      width: min(240px, 76%);
+      height: 40px;
       border-radius: 999px;
       display:flex;
       align-items:center;
@@ -141,27 +145,6 @@
       flex: 0 1 auto;
     }
 
-    .balance-mini::before{
-      content:"";
-      position:absolute;
-      inset:auto -40px 0 -40px;
-      height: 2px;
-      background: linear-gradient(90deg, transparent, rgba(42,171,238,.95), rgba(59,130,246,.95), transparent);
-      opacity:.70;
-      pointer-events:none;
-    }
-
-    .balance-mini::after{
-      content:"";
-      position:absolute;
-      inset:-120px -160px auto auto;
-      width:300px;
-      height:300px;
-      background: radial-gradient(circle at 30% 30%, rgba(42,171,238,.16), transparent 62%);
-      pointer-events:none;
-      transform: rotate(10deg);
-    }
-
     .bal-title{
       position:relative;
       z-index:1;
@@ -175,15 +158,16 @@
     .bal-amount{
       position:relative;
       z-index:1;
-      height: 26px;
+      height: 28px;
       border:none;
       border-radius: 999px;
       cursor:pointer;
-      padding: 0 10px;
+      padding: 0 12px;
 
       display:flex;
       align-items:center;
       justify-content:center;
+      gap: 8px;
 
       background: linear-gradient(180deg, rgba(42,171,238,.22), rgba(59,130,246,.14));
       border: 1px solid rgba(42,171,238,.24);
@@ -194,12 +178,35 @@
       font-weight: 900;
       font-size: 13px;
       white-space:nowrap;
+      transition: transform .12s ease, filter .12s ease;
     }
     .bal-amount:active{ transform: scale(.99); }
 
-    /* ✅ Баннеры — 3:1 cover */
-    .slider{ width:100%; max-width:520px; border-radius: var(--radius); }
+    /* ✅ Telegram стиль для кнопки логина */
+    .bal-amount.login{
+      background: linear-gradient(180deg, rgba(42,171,238,.98), rgba(30,150,211,.98));
+      border: 1px solid rgba(255,255,255,.18);
+      box-shadow:
+        0 16px 36px rgba(0,0,0,.45),
+        0 0 24px rgba(42,171,238,.35);
+      filter: saturate(1.05);
+    }
 
+    .btn-ico{
+      width:18px;
+      height:18px;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      filter: drop-shadow(0 10px 16px rgba(0,0,0,.20));
+    }
+    .btn-ico svg{ width:18px; height:18px; display:block; }
+
+    /* когда вошли — иконку прячем */
+    .bal-amount.wallet .btn-ico{ display:none; }
+
+    /* ✅ Баннеры */
+    .slider{ width:100%; max-width:520px; border-radius: var(--radius); }
     .slides{
       display:flex;
       gap:12px;
@@ -297,25 +304,6 @@
       pointer-events:none;
     }
 
-    .action-btn::before,
-    .action-btn::after{
-      content:"";
-      position:absolute;
-      top:-18px; bottom:-18px;
-      width:18px;
-      filter: blur(10px);
-      opacity:.95;
-      pointer-events:none;
-    }
-    .action-btn::before{
-      left:-10px;
-      background: linear-gradient(180deg, rgba(42,171,238,.0), rgba(42,171,238,.95), rgba(59,130,246,.0));
-    }
-    .action-btn::after{
-      right:-10px;
-      background: linear-gradient(180deg, rgba(59,130,246,.0), rgba(42,171,238,.95), rgba(59,130,246,.0));
-    }
-
     .action-btn .label{
       position:absolute; left:0; right:0; bottom:0;
       padding:12px 10px;
@@ -373,8 +361,6 @@
       transition: transform .15s ease, background .15s ease;
       min-height: 120px;
       position:relative;
-      opacity:0;
-      transform: translate3d(0,0,0) scale(.96);
     }
     .menu-tile:active{ transform: scale(.99); }
 
@@ -410,23 +396,6 @@
       letter-spacing:.35px;
       color: rgba(234,241,255,.98);
       text-shadow: 0 14px 28px rgba(0,0,0,.70);
-    }
-
-    .menu-overlay.show .menu-tile{
-      animation: popIn .48s cubic-bezier(.2,.9,.2,1) forwards;
-    }
-    .menu-tile.from-left{  transform: translateX(-44px) scale(.96); }
-    .menu-tile.from-right{ transform: translateX( 44px) scale(.96); }
-    .menu-tile.from-top{   transform: translateY(-44px) scale(.96); }
-    .menu-tile.from-bot{   transform: translateY( 44px) scale(.96); }
-
-    .menu-overlay.show .menu-tile:nth-child(1){ animation-delay: .02s; }
-    .menu-overlay.show .menu-tile:nth-child(2){ animation-delay: .07s; }
-    .menu-overlay.show .menu-tile:nth-child(3){ animation-delay: .12s; }
-    .menu-overlay.show .menu-tile:nth-child(4){ animation-delay: .17s; }
-
-    @keyframes popIn{
-      to{ opacity:1; transform: translate3d(0,0,0) scale(1); }
     }
 
     .menu-close{
@@ -554,16 +523,145 @@
     }
     .tg-btn:active{ transform: scale(.99); }
 
-    .tg-ico{
-      width: 22px;
-      height: 22px;
-      display:block;
-      filter: drop-shadow(0 8px 14px rgba(0,0,0,.25));
+    /* =========================================
+       ✅ AUTH POPUP (Browser Telegram Login Widget)
+    ========================================== */
+    .auth-overlay{
+      position:fixed;
+      inset:0;
+      background: rgba(0,0,0,.72);
+      opacity:0;
+      pointer-events:none;
+      transition: opacity .22s ease;
+      z-index:280;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding: 18px;
+    }
+    .auth-overlay.show{
+      opacity:1;
+      pointer-events:auto;
+    }
+
+    .auth-card{
+      width: min(460px, 100%);
+      border-radius: 24px;
+      overflow:hidden;
+      background: rgba(12,18,34,.92);
+      border: 1px solid rgba(46, 180, 255, .18);
+      box-shadow: 0 34px 90px rgba(0,0,0,.62);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      transform: translateY(12px) scale(.98);
+      opacity:.95;
+      transition: transform .22s ease, opacity .22s ease;
+    }
+    .auth-overlay.show .auth-card{
+      transform: translateY(0) scale(1);
+      opacity:1;
+    }
+
+    .auth-head{
+      padding: 16px 16px 10px 16px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 10px;
+      background: rgba(255,255,255,.03);
+      border-bottom: 1px solid rgba(255,255,255,.06);
+    }
+
+    .auth-head-left{
+      display:flex;
+      align-items:center;
+      gap:10px;
+    }
+
+    .tg-badge{
+      width:34px;height:34px;
+      border-radius: 12px;
+      display:grid;
+      place-items:center;
+      background: linear-gradient(180deg, rgba(42,171,238,.95), rgba(30,150,211,.95));
+      box-shadow: 0 18px 40px rgba(0,0,0,.35);
+      border: 1px solid rgba(255,255,255,.16);
+    }
+    .tg-badge svg{ width:18px;height:18px; display:block; }
+
+    .auth-title{
+      font-weight: 900;
+      letter-spacing:.2px;
+      font-size: 14px;
+      color: rgba(234,241,255,.95);
+    }
+
+    .auth-x{
+      width: 38px;
+      height: 38px;
+      border-radius: 14px;
+      border: 1px solid rgba(46, 180, 255, .16);
+      background: rgba(8, 12, 22, .55);
+      color: rgba(234,241,255,.92);
+      cursor:pointer;
+      display:grid;
+      place-items:center;
+      box-shadow: 0 12px 28px rgba(0,0,0,.45);
+    }
+    .auth-x:active{ transform: scale(.98); }
+
+    .auth-body{
+      padding: 14px 16px 18px 16px;
+      display:flex;
+      flex-direction:column;
+      gap: 12px;
+      align-items:center;
+    }
+
+    .auth-text{
+      margin:0;
+      font-size: 13px;
+      line-height: 1.35;
+      color: rgba(234,241,255,.84);
+      text-align:center;
+    }
+
+    #tgWidget{
+      width:100%;
+      display:flex;
+      justify-content:center;
+      padding-top: 4px;
+      min-height: 56px;
+    }
+
+    /* ✅ Toast */
+    .toast{
+      position:fixed;
+      left:50%;
+      bottom: calc(18px + var(--safe-bottom));
+      transform: translateX(-50%);
+      background: rgba(8, 12, 22, .92);
+      border: 1px solid rgba(46, 180, 255, .22);
+      box-shadow: 0 14px 40px rgba(0,0,0,.55);
+      padding: 10px 12px;
+      border-radius: 14px;
+      font-weight: 900;
+      font-size: 13px;
+      opacity: 0;
+      pointer-events:none;
+      transition: opacity .2s ease, transform .2s ease;
+      z-index: 9999;
+      max-width: min(520px, calc(100% - 24px));
+      text-align:center;
+    }
+    .toast.show{
+      opacity: 1;
+      transform: translateX(-50%) translateY(-6px);
     }
 
     @media (max-width: 360px){
-      .balance-mini{ width: min(196px, 68%); height: 36px; }
-      .bal-amount{ height: 25px; font-size: 12px; }
+      .balance-mini{ width: min(220px, 74%); height: 38px; }
+      .bal-amount{ height: 27px; font-size: 12px; }
       .menu-btn, .profile-btn{ width: 40px; height: 40px; border-radius: 13px; }
       .left-buttons{ transform: translateX(-8px); }
       .top-row{ gap: 14px; }
@@ -576,14 +674,11 @@
 
     @media (prefers-reduced-motion: reduce){
       *{ transition:none !important; }
-      .menu-overlay.show .menu-tile{ animation:none !important; opacity:1 !important; transform:none !important; }
-      .support-overlay.show .support-card{ transform:none !important; }
     }
   </style>
 </head>
 
 <body>
-  <!-- ✅ ТВОЯ ГЛАВНАЯ -->
   <div class="app" id="appRoot">
     <div class="content">
 
@@ -603,15 +698,22 @@
           </button>
         </div>
 
-        <div class="balance-mini" aria-label="Баланс">
-          <span class="bal-title">Баланс</span>
-          <button class="bal-amount" id="balanceChip" aria-label="Открыть кошелёк">
-            <span id="balanceValue">0 VC</span>
+        <div class="balance-mini" aria-label="Аккаунт/Баланс">
+          <span class="bal-title" id="balTitle">Аккаунт</span>
+
+          <button class="bal-amount login" id="balanceChip" aria-label="Войти/Кошелёк">
+            <span class="btn-ico" aria-hidden="true">
+              <!-- Telegram icon -->
+              <svg viewBox="0 0 240 240" xmlns="http://www.w3.org/2000/svg">
+                <path fill="#fff" d="M120 0C53.7 0 0 53.7 0 120s53.7 120 120 120 120-53.7 120-120S186.3 0 120 0zm58.7 82.3l-19.7 92.8c-1.5 6.6-5.4 8.2-10.9 5.1l-30.2-22.3-14.6 14c-1.6 1.6-3 3-6.1 3l2.2-31.6 57.5-52c2.5-2.2-.5-3.4-3.9-1.2l-71 44.7-30.6-9.6c-6.6-2.1-6.7-6.6 1.4-9.7l119.6-46.1c5.5-2 10.3 1.3 8.8 9.9z"/>
+              </svg>
+            </span>
+            <span id="balanceValue">Войти через Telegram</span>
           </button>
         </div>
       </div>
 
-      <!-- ✅ Баннеры (3:1) -->
+      <!-- ✅ Баннеры -->
       <div class="slider" aria-label="Баннеры">
         <div class="slides" id="slides">
           <div class="slide"><img src="YOUR_BANNER_1200x400.png" alt="Banner 1"></div>
@@ -654,25 +756,25 @@
     <div class="menu-panel" role="dialog" aria-modal="true" aria-label="Меню">
       <button class="menu-close" id="menuClose" aria-label="Закрыть меню">✕</button>
 
-      <button class="menu-tile from-left" data-action="support"
+      <button class="menu-tile" data-action="support"
         style="--img:url('https://i.postimg.cc/3NGRJh4G/file-000000006f747246895391c411a6b70f.png')">
         <span class="tile-bg" aria-hidden="true"></span>
         <span class="tile-title">Поддержка</span>
       </button>
 
-      <button class="menu-tile from-right" data-action="vouchers"
+      <button class="menu-tile" data-action="vouchers"
         style="--img:url('https://i.postimg.cc/xCt8Fgry/file-000000009a147243b409376278ab22bd.png')">
         <span class="tile-bg" aria-hidden="true"></span>
         <span class="tile-title">Ваучеры</span>
       </button>
 
-      <button class="menu-tile from-top" data-action="ref"
+      <button class="menu-tile" data-action="ref"
         style="--img:url('https://i.postimg.cc/GtwVSbmY/file-000000005e94722f9294319ad4c8eb41-(1).png')">
         <span class="tile-bg" aria-hidden="true"></span>
         <span class="tile-title">Реферальная ссылка</span>
       </button>
 
-      <button class="menu-tile from-bot" data-action="history"
+      <button class="menu-tile" data-action="history"
         style="--img:url('https://i.postimg.cc/DwwTxFv8/file-00000000fee07243ab2744a3e771bb84-(1).png')">
         <span class="tile-bg" aria-hidden="true"></span>
         <span class="tile-title">История</span>
@@ -696,39 +798,250 @@
         </p>
 
         <button class="tg-btn" id="goTelegram" aria-label="Перейти в Telegram">
-          <svg class="tg-ico" viewBox="0 0 240 240" aria-hidden="true">
-            <path fill="#fff" d="M120 0C53.7 0 0 53.7 0 120s53.7 120 120 120 120-53.7 120-120S186.3 0 120 0zm58.7 82.3l-19.7 92.8c-1.5 6.6-5.4 8.2-10.9 5.1l-30.2-22.3-14.6 14c-1.6 1.6-3 3-6.1 3l2.2-31.6 57.5-52c2.5-2.2-.5-3.4-3.9-1.2l-71 44.7-30.6-9.6c-6.6-2.1-6.7-6.6 1.4-9.7l119.6-46.1c5.5-2 10.3 1.3 8.8 9.9z"/>
-          </svg>
           Перейти в Telegram
         </button>
       </div>
     </div>
   </div>
 
-  <!-- ✅ JS -->
+  <!-- ✅ AUTH POPUP (Browser Telegram Login Widget) -->
+  <div class="auth-overlay" id="authOverlay" aria-hidden="true">
+    <div class="auth-card" role="dialog" aria-modal="true" aria-label="Вход через Telegram">
+      <div class="auth-head">
+        <div class="auth-head-left">
+          <div class="tg-badge" aria-hidden="true">
+            <svg viewBox="0 0 240 240" xmlns="http://www.w3.org/2000/svg">
+              <path fill="#fff" d="M120 0C53.7 0 0 53.7 0 120s53.7 120 120 120 120-53.7 120-120S186.3 0 120 0zm58.7 82.3l-19.7 92.8c-1.5 6.6-5.4 8.2-10.9 5.1l-30.2-22.3-14.6 14c-1.6 1.6-3 3-6.1 3l2.2-31.6 57.5-52c2.5-2.2-.5-3.4-3.9-1.2l-71 44.7-30.6-9.6c-6.6-2.1-6.7-6.6 1.4-9.7l119.6-46.1c5.5-2 10.3 1.3 8.8 9.9z"/>
+            </svg>
+          </div>
+          <div class="auth-title">Вход через Telegram</div>
+        </div>
+
+        <button class="auth-x" id="authClose" aria-label="Закрыть">✕</button>
+      </div>
+
+      <div class="auth-body">
+        <p class="auth-text">
+          Нажми кнопку ниже и подтверди вход в Telegram.
+        </p>
+        <div id="tgWidget"></div>
+        <p class="auth-text" style="opacity:.8;">
+          Если кнопка не появляется — проверь /setdomain в BotFather (домен: <b>crystalpro595-hub.github.io</b>)
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ✅ Toast -->
+  <div class="toast" id="toast"></div>
+
   <script>
+    // =============================
+    // 1) ОБЯЗАТЕЛЬНО ЗАМЕНИ ЭТИ 2 СТРОКИ:
+    // =============================
+    const BOT_USERNAME = 'vezusgamebot';
+    const SB_FUNCTION_URL = 'https://lazrfierfbhwlduqlvws.supabase.co/functions/v1/telegram-auth';
+
+    // =============================
+    // UI helpers
+    // =============================
     const clamp = (n, min, max) => Math.max(min, Math.min(max, n));
 
-    // Баланс (заглушка)
+    const toastEl = document.getElementById('toast');
+    let toastTimer = null;
+    function toast(msg){
+      toastEl.textContent = msg;
+      toastEl.classList.add('show');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(()=>toastEl.classList.remove('show'), 2200);
+    }
+
+    // Telegram WebApp env
+    const inTelegram = !!(window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initData);
+    try{
+      if (window.Telegram && window.Telegram.WebApp){
+        window.Telegram.WebApp.ready();
+      }
+    }catch(_){}
+
+    // =============================
+    // AUTH state
+    // =============================
+    let auth = { ok:false, user:null, wallet:null, progress:null };
+
+    try{
+      const saved = JSON.parse(localStorage.getItem('tg_auth') || 'null');
+      if (saved?.ok && saved?.user?.id) auth = saved;
+    }catch(_){}
+
     const balanceValueEl = document.getElementById('balanceValue');
     const balanceChipEl  = document.getElementById('balanceChip');
-    balanceValueEl.textContent = '0 VC';
+    const balTitleEl     = document.getElementById('balTitle');
 
+    function renderAuthUI(){
+      if (!auth.ok){
+        balTitleEl.textContent = 'Аккаунт';
+        balanceValueEl.textContent = 'Войти через Telegram';
+        balanceChipEl.classList.add('login');
+        balanceChipEl.classList.remove('wallet');
+      } else {
+        balTitleEl.textContent = 'Баланс';
+        const bal = (auth.wallet && typeof auth.wallet.balance_vc !== 'undefined') ? auth.wallet.balance_vc : 0;
+        balanceValueEl.textContent = `${bal} VC`;
+        balanceChipEl.classList.remove('login');
+        balanceChipEl.classList.add('wallet');
+      }
+    }
+    renderAuthUI();
+
+    // =============================
+    // AUTH modal (browser widget)
+    // =============================
+    const authOverlay = document.getElementById('authOverlay');
+    const authClose = document.getElementById('authClose');
+    const tgWidgetWrap = document.getElementById('tgWidget');
+    let widgetLoaded = false;
+
+    function openAuth(){
+      authOverlay.classList.add('show');
+      authOverlay.setAttribute('aria-hidden','false');
+      document.body.style.overflow = 'hidden';
+
+      if (!widgetLoaded){
+        widgetLoaded = true;
+        tgWidgetWrap.innerHTML = '';
+
+        window.onTelegramAuth = function(user){
+          loginFromWidget(user);
+        };
+
+        const s = document.createElement('script');
+        s.async = true;
+        s.src = 'https://telegram.org/js/telegram-widget.js?22';
+        s.setAttribute('data-telegram-login', BOT_USERNAME);
+        s.setAttribute('data-size', 'large');
+        s.setAttribute('data-radius', '14');
+        s.setAttribute('data-onauth', 'onTelegramAuth(user)');
+        s.setAttribute('data-request-access', 'write');
+        tgWidgetWrap.appendChild(s);
+      }
+    }
+
+    function closeAuth(){
+      authOverlay.classList.remove('show');
+      authOverlay.setAttribute('aria-hidden','true');
+      document.body.style.overflow = '';
+    }
+
+    authClose.addEventListener('click', closeAuth);
+    authOverlay.addEventListener('click', (e)=>{ if(e.target===authOverlay) closeAuth(); });
+
+    // =============================
+    // Login logic
+    // =============================
+    async function loginFromWebApp(){
+      try{
+        const initData = window.Telegram.WebApp.initData;
+        const r = await fetch(SB_FUNCTION_URL, {
+          method:'POST',
+          headers:{ 'Content-Type':'application/json' },
+          body: JSON.stringify({ initData })
+        });
+        const data = await r.json().catch(()=> ({}));
+        if (!r.ok) throw new Error(data.error || 'Auth failed');
+
+        auth = {
+          ok: true,
+          user: data.user || null,
+          wallet: data.wallet || null,
+          progress: data.progress || null
+        };
+
+        localStorage.setItem('tg_auth', JSON.stringify(auth));
+        renderAuthUI();
+        toast('Вход выполнен ✅');
+      }catch(e){
+        toast('Ошибка входа: ' + (e?.message || e));
+      }
+    }
+
+    async function loginFromWidget(user){
+      try{
+        const r = await fetch(SB_FUNCTION_URL, {
+          method:'POST',
+          headers:{ 'Content-Type':'application/json' },
+          body: JSON.stringify({ user })
+        });
+        const data = await r.json().catch(()=> ({}));
+        if (!r.ok) throw new Error(data.error || 'Auth failed');
+
+        auth = {
+          ok: true,
+          user: data.user || null,
+          wallet: data.wallet || null,
+          progress: data.progress || null
+        };
+
+        localStorage.setItem('tg_auth', JSON.stringify(auth));
+        closeAuth();
+        renderAuthUI();
+        toast('Вход выполнен ✅');
+      }catch(e){
+        toast('Ошибка входа: ' + (e?.message || e));
+      }
+    }
+
+    function logout(){
+      auth = { ok:false, user:null, wallet:null, progress:null };
+      localStorage.removeItem('tg_auth');
+      renderAuthUI();
+      toast('Вы вышли');
+    }
+
+    function requireLogin(action){
+      return () => {
+        if (!auth.ok){
+          toast('Сначала войди в аккаунт');
+          return;
+        }
+        action();
+      };
+    }
+
+    // Кнопка входа / кошелька
     balanceChipEl.addEventListener('click', () => {
-      window.location.href = 'wallet.html';
+      if (auth.ok){
+        window.location.href = 'wallet.html';
+        return;
+      }
+      if (inTelegram) loginFromWebApp();
+      else openAuth();
     });
 
-    // Профиль
-    document.getElementById('profileBtn').addEventListener('click', () => {
-      window.location.href = 'profile.html';
+    // (необязательно) долгий тап/контекст меню = выход
+    balanceChipEl.addEventListener('contextmenu', (e) => {
+      e.preventDefault();
+      if (auth.ok) logout();
     });
 
-    // Кнопки
-    document.getElementById('btnGames').addEventListener('click', () => alert('Игры (позже сделаем переход)'));
-    document.getElementById('btnShop').addEventListener('click', () => { window.location.href = 'ucshop.html'; });
-    document.getElementById('btnCustom').addEventListener('click', () => alert('Кастомки (позже сделаем переход)'));
+    // Профиль и разделы (закрыты до входа)
+    document.getElementById('profileBtn').addEventListener('click',
+      requireLogin(() => window.location.href = 'profile.html')
+    );
 
-    // Баннеры: точки + автоплей
+    document.getElementById('btnGames').addEventListener('click',
+      requireLogin(() => alert('Игры (позже сделаем переход)'))
+    );
+    document.getElementById('btnShop').addEventListener('click',
+      requireLogin(() => window.location.href = 'ucshop.html')
+    );
+    document.getElementById('btnCustom').addEventListener('click',
+      requireLogin(() => alert('Кастомки (позже сделаем переход)'))
+    );
+
+    // =============================
+    // Banners
+    // =============================
     const slides = document.getElementById('slides');
     const dotsWrap = document.getElementById('dots');
     const dots = Array.from(dotsWrap.querySelectorAll('.dot'));
@@ -767,49 +1080,11 @@
     });
 
     window.addEventListener('resize', updateDotsByScroll);
+    window.addEventListener('load', updateDotsByScroll);
 
-    const AUTOPLAY_DELAY = 5000;
-    const RESUME_DELAY   = 3500;
-    let autoplayInterval = null;
-    let resumeTimeout = null;
-
-    function stopAutoplay(){
-      if (autoplayInterval) clearInterval(autoplayInterval);
-      autoplayInterval = null;
-    }
-
-    function startAutoplay(){
-      if (dots.length <= 1) return;
-      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-
-      stopAutoplay();
-      autoplayInterval = setInterval(() => {
-        const next = (getCurrentIndex() + 1) % dots.length;
-        slides.scrollTo({ left: next * getStep(), behavior: 'smooth' });
-      }, AUTOPLAY_DELAY);
-    }
-
-    function pauseAndResume(){
-      stopAutoplay();
-      if (resumeTimeout) clearTimeout(resumeTimeout);
-      resumeTimeout = setTimeout(startAutoplay, RESUME_DELAY);
-    }
-
-    ['pointerdown','touchstart','mousedown','wheel'].forEach(evt => {
-      slides.addEventListener(evt, pauseAndResume, { passive:true });
-    });
-
-    document.addEventListener('visibilitychange', () => {
-      if (document.hidden) stopAutoplay();
-      else startAutoplay();
-    });
-
-    window.addEventListener('load', () => {
-      updateDotsByScroll();
-      startAutoplay();
-    });
-
-    // ✅ Меню
+    // =============================
+    // Menu
+    // =============================
     const menuBtn = document.getElementById('menuBtn');
     const menuOverlay = document.getElementById('menuOverlay');
     const menuClose = document.getElementById('menuClose');
@@ -828,12 +1103,9 @@
 
     menuBtn.addEventListener('click', openMenu);
     menuClose.addEventListener('click', closeMenu);
+    menuOverlay.addEventListener('click', (e) => { if (e.target === menuOverlay) closeMenu(); });
 
-    menuOverlay.addEventListener('click', (e) => {
-      if (e.target === menuOverlay) closeMenu();
-    });
-
-    // ✅ Поддержка popup + открытие Telegram
+    // Support popup
     const supportOverlay = document.getElementById('supportOverlay');
     const supportClose = document.getElementById('supportClose');
     const goTelegram = document.getElementById('goTelegram');
@@ -851,10 +1123,7 @@
     }
 
     supportClose.addEventListener('click', closeSupport);
-
-    supportOverlay.addEventListener('click', (e) => {
-      if (e.target === supportOverlay) closeSupport();
-    });
+    supportOverlay.addEventListener('click', (e) => { if (e.target === supportOverlay) closeSupport(); });
 
     function openTelegramLinkSafe(url){
       if (window.Telegram && window.Telegram.WebApp && typeof window.Telegram.WebApp.openTelegramLink === 'function') {
@@ -864,22 +1133,14 @@
       window.open(url, '_blank', 'noopener');
     }
 
-    goTelegram.addEventListener('click', () => {
-      openTelegramLinkSafe('https://t.me/vezusmanager');
-    });
+    goTelegram.addEventListener('click', () => openTelegramLinkSafe('https://t.me/vezusmanager'));
 
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape') {
-        closeSupport();
-        closeMenu();
-      }
-    });
-
-    // ✅ Клики по плиткам меню
+    // Menu tiles
     document.querySelectorAll('.menu-tile').forEach(btn => {
       btn.addEventListener('click', () => {
         const action = btn.getAttribute('data-action');
 
+        // "Поддержка" можно без входа
         if (action === 'support') {
           closeMenu();
           openSupport();
@@ -887,8 +1148,21 @@
         }
 
         closeMenu();
-        alert('Открыть: ' + action);
+        if (!auth.ok){
+          toast('Сначала войди в аккаунт');
+          return;
+        }
+
+        toast('Открыть: ' + action);
       });
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        closeSupport();
+        closeMenu();
+        closeAuth();
+      }
     });
   </script>
 </body>
