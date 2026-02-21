@@ -120,7 +120,7 @@
       stroke-linejoin: round;
     }
 
-    /* ✅ Баланс/Кнопка "Войти" */
+    /* ✅ Баланс / Кнопка входа */
     .balance-mini{
       width: min(210px, 70%);
       height: 38px;
@@ -187,7 +187,6 @@
       display:flex;
       align-items:center;
       justify-content:center;
-      gap: 8px;
 
       background: linear-gradient(180deg, rgba(42,171,238,.22), rgba(59,130,246,.14));
       border: 1px solid rgba(42,171,238,.24);
@@ -198,11 +197,25 @@
       font-weight: 900;
       font-size: 13px;
       white-space:nowrap;
+      transition: transform .15s ease, opacity .15s ease;
     }
     .bal-amount:active{ transform: scale(.99); }
+    .bal-amount:disabled{ opacity:.75; cursor: default; }
 
-    /* стиль Telegram-кнопки */
+    /* ✅ Логин-режим: аккуратно (иконка сверху, текст снизу) */
+    .balance-mini.logged-out{
+      padding: 6px;
+      justify-content:center;
+    }
+    .balance-mini.logged-out .bal-title{ display:none; }
+
     .bal-amount.login{
+      width: 100%;
+      height: 32px;
+      padding: 0;
+      gap: 2px;
+      flex-direction: column;
+
       background: linear-gradient(180deg, rgba(42,171,238,.98), rgba(30,150,211,.98));
       border: 1px solid rgba(255,255,255,.16);
       box-shadow:
@@ -210,17 +223,20 @@
         0 0 24px rgba(42,171,238,.25);
       color:#fff;
     }
-
     .tg-ico-mini{
-      width:18px;
-      height:18px;
+      width:16px; height:16px;
       display:block;
       filter: drop-shadow(0 8px 14px rgba(0,0,0,.22));
+    }
+    .login-text{
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: .2px;
+      line-height: 1;
     }
 
     /* ✅ Баннеры — 3:1 cover */
     .slider{ width:100%; max-width:520px; border-radius: var(--radius); }
-
     .slides{
       display:flex;
       gap:12px;
@@ -349,9 +365,7 @@
       text-shadow: 0 10px 18px rgba(0,0,0,.55);
     }
 
-    /* =========================================
-       ✅ МЕНЮ
-    ========================================== */
+    /* ✅ МЕНЮ */
     .menu-overlay{
       position:fixed;
       inset:0;
@@ -365,10 +379,7 @@
       justify-content:center;
       padding: 18px;
     }
-    .menu-overlay.show{
-      opacity:1;
-      pointer-events:auto;
-    }
+    .menu-overlay.show{ opacity:1; pointer-events:auto; }
 
     .menu-panel{
       width: min(560px, 100%);
@@ -446,9 +457,7 @@
     .menu-overlay.show .menu-tile:nth-child(3){ animation-delay: .12s; }
     .menu-overlay.show .menu-tile:nth-child(4){ animation-delay: .17s; }
 
-    @keyframes popIn{
-      to{ opacity:1; transform: translate3d(0,0,0) scale(1); }
-    }
+    @keyframes popIn{ to{ opacity:1; transform: translate3d(0,0,0) scale(1); } }
 
     .menu-close{
       position:absolute;
@@ -468,9 +477,7 @@
     }
     .menu-close:active{ transform: scale(.98); }
 
-    /* =========================================
-       ✅ SUPPORT POPUP
-    ========================================== */
+    /* ✅ SUPPORT POPUP */
     .support-overlay{
       position:fixed;
       inset:0;
@@ -484,10 +491,7 @@
       justify-content:center;
       padding: 18px;
     }
-    .support-overlay.show{
-      opacity:1;
-      pointer-events:auto;
-    }
+    .support-overlay.show{ opacity:1; pointer-events:auto; }
 
     .support-card{
       width: min(440px, 100%);
@@ -503,10 +507,7 @@
       opacity:.95;
       transition: transform .22s ease, opacity .22s ease;
     }
-    .support-overlay.show .support-card{
-      transform: translateY(0) scale(1);
-      opacity: 1;
-    }
+    .support-overlay.show .support-card{ transform: translateY(0) scale(1); opacity: 1; }
 
     .support-head{
       padding: 16px 16px 10px 16px;
@@ -517,17 +518,10 @@
       background: rgba(255,255,255,.03);
       border-bottom: 1px solid rgba(255,255,255,.06);
     }
-
-    .support-title{
-      font-weight: 900;
-      letter-spacing:.25px;
-      font-size: 14px;
-      color: rgba(234,241,255,.95);
-    }
+    .support-title{ font-weight: 900; letter-spacing:.25px; font-size: 14px; color: rgba(234,241,255,.95); }
 
     .support-x{
-      width: 38px;
-      height: 38px;
+      width: 38px; height: 38px;
       border-radius: 14px;
       border: 1px solid rgba(46, 180, 255, .16);
       background: rgba(8, 12, 22, .55);
@@ -582,9 +576,7 @@
       filter: drop-shadow(0 8px 14px rgba(0,0,0,.25));
     }
 
-    /* =========================================
-       ✅ AUTH POPUP (Widget)
-    ========================================== */
+    /* ✅ AUTH POPUP (Widget) */
     .auth-overlay{
       position:fixed;
       inset:0;
@@ -598,10 +590,7 @@
       justify-content:center;
       padding: 18px;
     }
-    .auth-overlay.show{
-      opacity:1;
-      pointer-events:auto;
-    }
+    .auth-overlay.show{ opacity:1; pointer-events:auto; }
 
     .auth-card{
       width: min(460px, 100%);
@@ -623,17 +612,10 @@
       background: rgba(255,255,255,.03);
       border-bottom: 1px solid rgba(255,255,255,.06);
     }
-
-    .auth-title{
-      font-weight: 900;
-      letter-spacing:.2px;
-      font-size: 14px;
-      color: rgba(234,241,255,.95);
-    }
+    .auth-title{ font-weight: 900; letter-spacing:.2px; font-size: 14px; color: rgba(234,241,255,.95); }
 
     .auth-x{
-      width: 38px;
-      height: 38px;
+      width: 38px; height: 38px;
       border-radius: 14px;
       border: 1px solid rgba(46, 180, 255, .16);
       background: rgba(8, 12, 22, .55);
@@ -688,6 +670,7 @@
     @media (max-width: 360px){
       .balance-mini{ width: min(196px, 68%); height: 36px; }
       .bal-amount{ height: 25px; font-size: 12px; }
+      .bal-amount.login{ height: 30px; }
       .menu-btn, .profile-btn{ width: 40px; height: 40px; border-radius: 13px; }
       .left-buttons{ transform: translateX(-8px); }
       .top-row{ gap: 14px; }
@@ -720,7 +703,7 @@
           </button>
         </div>
 
-        <div class="balance-mini" aria-label="Баланс">
+        <div class="balance-mini" id="balanceBox" aria-label="Баланс">
           <span class="bal-title" id="balTitle">Баланс</span>
           <button class="bal-amount" id="balanceChip" aria-label="Баланс/Войти">
             <span id="balanceValue">0 VC</span>
@@ -843,9 +826,7 @@
     // =========================
     const BOT_USERNAME = 'vezusgamebot';
     const SB_FUNCTION_URL = 'https://lazrfierfbhwlduqlvws.supabase.co/functions/v1/telegram-auth';
-
-    // ✅ твой anon key (публичный)
-    const SB_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxhenJmaWVyZmJod2xkdXFsdndzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE1NzY2ODIsImV4cCI6MjA4NzE1MjY4Mn0.tJtwFrNPrNyGNedGP1h0bNgr98FnyoliR-13mOqlBJI';
+    const SB_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxhenJmaWVyZmJod2xkdXFsdndzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE1NzY2ODIsImV4cCI6MjA4NzE1MjY4Mn0.tJtwFrNPrNyGNedGP1h0bNgr98FnyoliR-13mOqlBJI'; // вставь свой anon key
 
     // =========================
     // Helpers
@@ -878,24 +859,32 @@
     // Auth state (без localStorage)
     // =========================
     let auth = { ok:false, wallet:null, user:null };
+    let loginBusy = false;
 
-    const balTitleEl = document.getElementById('balTitle');
+    const balanceBoxEl   = document.getElementById('balanceBox');
+    const balTitleEl     = document.getElementById('balTitle');
     const balanceChipEl  = document.getElementById('balanceChip');
     const balanceValueEl = document.getElementById('balanceValue');
 
+    function setBusy(on){
+      loginBusy = on;
+      balanceChipEl.disabled = on;
+    }
+
     function setUILoggedOut(){
-      // никаких "аккаунт" / "вход в аккаунт"
-      balTitleEl.textContent = '';
+      balanceBoxEl.classList.add('logged-out');
+      balTitleEl.textContent = ''; // без лишних надписей
       balanceChipEl.classList.add('login');
       balanceValueEl.innerHTML = `
         <svg class="tg-ico-mini" viewBox="0 0 240 240" aria-hidden="true">
           <path fill="#fff" d="M120 0C53.7 0 0 53.7 0 120s53.7 120 120 120 120-53.7 120-120S186.3 0 120 0zm58.7 82.3l-19.7 92.8c-1.5 6.6-5.4 8.2-10.9 5.1l-30.2-22.3-14.6 14c-1.6 1.6-3 3-6.1 3l2.2-31.6 57.5-52c2.5-2.2-.5-3.4-3.9-1.2l-71 44.7-30.6-9.6c-6.6-2.1-6.7-6.6 1.4-9.7l119.6-46.1c5.5-2 10.3 1.3 8.8 9.9z"/>
         </svg>
-        <span>Войти</span>
+        <span class="login-text">Войти</span>
       `;
     }
 
     function setUILoggedIn(){
+      balanceBoxEl.classList.remove('logged-out');
       balTitleEl.textContent = 'Баланс';
       balanceChipEl.classList.remove('login');
       const bal = auth.wallet?.balance_vc ?? 0;
@@ -938,6 +927,8 @@
     }
 
     async function loginFromWebApp(){
+      if (loginBusy) return;
+      setBusy(true);
       try{
         const initData = window.Telegram.WebApp.initData;
         const r = await fetch(SB_FUNCTION_URL, {
@@ -949,15 +940,19 @@
         const { data, raw } = await parseFetchResponse(r);
         if (!r.ok) throw new Error(data.error || raw || ('HTTP ' + r.status));
 
-        auth = { ok:true, user:data.user||null, wallet:data.wallet||null };
-        renderAuthUI();
+        // ✅ после логина всегда синхронизируем состояние с сервера (убирает "глюки" UI)
+        await refreshSession();
         toast('Готово');
-      }catch(e){
+      }catch(_){
         toast('Ошибка');
+      }finally{
+        setBusy(false);
       }
     }
 
     async function loginFromWidget(user){
+      if (loginBusy) return;
+      setBusy(true);
       try{
         const r = await fetch(SB_FUNCTION_URL, {
           method:'POST',
@@ -968,22 +963,20 @@
         const { data, raw } = await parseFetchResponse(r);
         if (!r.ok) throw new Error(data.error || raw || ('HTTP ' + r.status));
 
-        auth = { ok:true, user:data.user||null, wallet:data.wallet||null };
         closeAuth();
-        renderAuthUI();
+        await refreshSession();
         toast('Готово');
       }catch(_){
         toast('Ошибка');
+      }finally{
+        setBusy(false);
       }
     }
 
     // =========================
     // Guards
     // =========================
-    function needLogin(){
-      toast('Нужно войти');
-    }
-
+    function needLogin(){ toast('Нужно войти'); }
     function requireLogin(action){
       return () => {
         if (!auth.ok) return needLogin();
@@ -995,6 +988,8 @@
     // Clicks
     // =========================
     balanceChipEl.addEventListener('click', () => {
+      if (loginBusy) return;
+
       if (!auth.ok){
         if (inTelegram) loginFromWebApp();
         else openAuth();
@@ -1018,7 +1013,7 @@
     );
 
     // =========================
-    // Banner dots + autoplay (как было)
+    // Banner dots + autoplay
     // =========================
     const clamp = (n, min, max) => Math.max(min, Math.min(max, n));
     const slides = document.getElementById('slides');
@@ -1083,11 +1078,14 @@
     });
     document.addEventListener('visibilitychange', () => {
       if (document.hidden) stopAutoplay();
-      else startAutoplay();
+      else {
+        startAutoplay();
+        refreshSession(); // ✅ при возврате в таб — синхронизация
+      }
     });
 
     // =========================
-    // Menu (как было)
+    // Menu
     // =========================
     const menuBtn = document.getElementById('menuBtn');
     const menuOverlay = document.getElementById('menuOverlay');
@@ -1109,7 +1107,7 @@
     menuOverlay.addEventListener('click', (e) => { if (e.target === menuOverlay) closeMenu(); });
 
     // =========================
-    // Support popup + Telegram open (как было)
+    // Support popup + Telegram open
     // =========================
     const supportOverlay = document.getElementById('supportOverlay');
     const supportClose = document.getElementById('supportClose');
@@ -1192,10 +1190,8 @@
           return;
         }
 
-        // Остальное — только если вошёл
         closeMenu();
         if (!auth.ok) return needLogin();
-
         alert('Открыть: ' + action);
       });
     });
@@ -1214,8 +1210,12 @@
     window.addEventListener('load', async () => {
       updateDotsByScroll();
       startAutoplay();
-      await refreshSession(); // проверка cookie-сессии в БД
+      renderAuthUI();     // сразу красивый вид
+      await refreshSession(); // ✅ проверка cookie-сессии
     });
+
+    // ✅ Когда возвращаешься на страницу (iOS часто держит в памяти)
+    window.addEventListener('pageshow', () => refreshSession());
   </script>
 </body>
 </html>
