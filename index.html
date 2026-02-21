@@ -6,7 +6,6 @@
   <title>VezusGame</title>
 
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
-  <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
   <style>
     :root{
@@ -14,11 +13,7 @@
       --safe-bottom: env(safe-area-inset-bottom, 0px);
       --safe-top: env(safe-area-inset-top, 0px);
       --radius:18px;
-
-      --neon:#2AABEE;
-      --neon2:#3b82f6;
       --tg:#2AABEE;
-      --tg2:#1e96d3;
     }
 
     *{ box-sizing:border-box; font-family:'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
@@ -102,25 +97,19 @@
     .menu-btn:active, .profile-btn:active{ transform: scale(.98); }
 
     .burger{ width:18px; height:14px; display:grid; gap:3px; }
-    .burger span{
-      height:2px;
-      border-radius:999px;
-      background: rgba(234,241,255,.92);
-      display:block;
-    }
+    .burger span{ height:2px; border-radius:999px; background: rgba(234,241,255,.92); display:block; }
 
     .profile-svg{
-      width:20px;
-      height:20px;
+      width:20px; height:20px;
       display:block;
       stroke: rgba(234,241,255,.92);
-      fill: none;
-      stroke-width: 2;
-      stroke-linecap: round;
-      stroke-linejoin: round;
+      fill:none;
+      stroke-width:2;
+      stroke-linecap:round;
+      stroke-linejoin:round;
     }
 
-    /* ✅ Баланс / Кнопка входа (на том же месте) */
+    /* ✅ Баланс / Войти */
     .balance-mini{
       width: min(210px, 70%);
       height: 38px;
@@ -143,7 +132,6 @@
       -webkit-backdrop-filter: blur(12px);
       flex: 0 1 auto;
     }
-
     .balance-mini::before{
       content:"";
       position:absolute;
@@ -153,7 +141,6 @@
       opacity:.70;
       pointer-events:none;
     }
-
     .balance-mini::after{
       content:"";
       position:absolute;
@@ -202,18 +189,15 @@
     .bal-amount:active{ transform: scale(.99); }
     .bal-amount:disabled{ opacity:.75; cursor: default; }
 
-    /* ✅ Войти: ровно в ряд (иконка + текст) */
+    /* ✅ Logged out layout */
     .balance-mini.logged-out{ justify-content:center; padding: 6px; }
     .balance-mini.logged-out .bal-title{ display:none; }
 
+    /* ✅ Telegram button style */
     .bal-amount.login{
       width: 100%;
       height: 32px;
       padding: 0 12px;
-      gap: 8px;
-      flex-direction: row;   /* ← В РЯД */
-      justify-content:center;
-
       background: linear-gradient(180deg, rgba(42,171,238,.98), rgba(30,150,211,.98));
       border: 1px solid rgba(255,255,255,.16);
       box-shadow:
@@ -222,24 +206,31 @@
       color:#fff;
     }
 
+    /* ✅ ЖЁСТКИЙ фикс: иконка + "Войти" всегда В РЯД */
+    #balanceValue{
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:8px;
+      white-space:nowrap;
+      line-height:1;
+    }
     .tg-ico-mini{
-      width:16px;
-      height:16px;
+      width:18px;
+      height:18px;
       display:block;
+      flex:0 0 auto;
       filter: drop-shadow(0 8px 14px rgba(0,0,0,.22));
-      flex: 0 0 auto;
     }
-
     .login-text{
-      font-size: 12px;
-      font-weight: 900;
-      letter-spacing: .2px;
-      line-height: 1;
+      font-size:13px;
+      font-weight:900;
+      letter-spacing:.2px;
+      line-height:1;
     }
 
-    /* ✅ Баннеры — 3:1 cover */
+    /* ✅ Баннеры */
     .slider{ width:100%; max-width:520px; border-radius: var(--radius); }
-
     .slides{
       display:flex;
       gap:12px;
@@ -261,21 +252,16 @@
       box-shadow: 0 18px 55px rgba(0,0,0,.40);
     }
     .slide::before{ content:""; display:block; padding-top: 33.3333%; }
-
     .slide img{
-      position:absolute;
-      inset:0;
-      width:100%;
-      height:100%;
+      position:absolute; inset:0;
+      width:100%; height:100%;
       object-fit: cover;
-      object-position: center;
+      object-position:center;
       display:block;
     }
-
     .slide::after{
       content:"";
-      position:absolute;
-      inset:0;
+      position:absolute; inset:0;
       background: linear-gradient(180deg, rgba(0,0,0,.10), rgba(0,0,0,.38));
       pointer-events:none;
     }
@@ -302,12 +288,10 @@
       grid-template-columns: repeat(3, 1fr);
       gap:10px;
     }
-
     .action-btn{
       position:relative;
       width:100%;
       aspect-ratio: 1 / 1;
-      height:auto;
       border:none;
       border-radius:18px;
       overflow:hidden;
@@ -336,7 +320,6 @@
       background: linear-gradient(180deg, rgba(0,0,0,.05), rgba(0,0,0,.48));
       pointer-events:none;
     }
-
     .action-btn::before,
     .action-btn::after{
       content:"";
@@ -355,7 +338,6 @@
       right:-10px;
       background: linear-gradient(180deg, rgba(59,130,246,.0), rgba(42,171,238,.95), rgba(59,130,246,.0));
     }
-
     .action-btn .label{
       position:absolute; left:0; right:0; bottom:0;
       padding:12px 10px;
@@ -391,7 +373,6 @@
       gap: 14px;
       position:relative;
     }
-
     .menu-tile{
       border:none;
       cursor:pointer;
@@ -422,7 +403,6 @@
       background-repeat:no-repeat;
       transform: scale(1.02);
     }
-
     .menu-tile .tile-bg::after{
       content:"";
       position:absolute;
@@ -431,7 +411,6 @@
         radial-gradient(600px 220px at 30% 10%, rgba(42,171,238,.22), transparent 60%),
         linear-gradient(180deg, rgba(0,0,0,.20), rgba(0,0,0,.55));
     }
-
     .menu-tile .tile-title{
       position:absolute;
       inset:0;
@@ -447,19 +426,15 @@
       text-shadow: 0 14px 28px rgba(0,0,0,.70);
     }
 
-    .menu-overlay.show .menu-tile{
-      animation: popIn .48s cubic-bezier(.2,.9,.2,1) forwards;
-    }
+    .menu-overlay.show .menu-tile{ animation: popIn .48s cubic-bezier(.2,.9,.2,1) forwards; }
     .menu-tile.from-left{  transform: translateX(-44px) scale(.96); }
     .menu-tile.from-right{ transform: translateX( 44px) scale(.96); }
     .menu-tile.from-top{   transform: translateY(-44px) scale(.96); }
     .menu-tile.from-bot{   transform: translateY( 44px) scale(.96); }
-
     .menu-overlay.show .menu-tile:nth-child(1){ animation-delay: .02s; }
     .menu-overlay.show .menu-tile:nth-child(2){ animation-delay: .07s; }
     .menu-overlay.show .menu-tile:nth-child(3){ animation-delay: .12s; }
     .menu-overlay.show .menu-tile:nth-child(4){ animation-delay: .17s; }
-
     @keyframes popIn{ to{ opacity:1; transform: translate3d(0,0,0) scale(1); } }
 
     .menu-close{
@@ -495,7 +470,6 @@
       padding: 18px;
     }
     .support-overlay.show{ opacity:1; pointer-events:auto; }
-
     .support-card{
       width: min(440px, 100%);
       border-radius: 24px;
@@ -510,11 +484,7 @@
       opacity:.95;
       transition: transform .22s ease, opacity .22s ease;
     }
-    .support-overlay.show .support-card{
-      transform: translateY(0) scale(1);
-      opacity: 1;
-    }
-
+    .support-overlay.show .support-card{ transform: translateY(0) scale(1); opacity:1; }
     .support-head{
       padding: 16px 16px 10px 16px;
       display:flex;
@@ -524,14 +494,12 @@
       background: rgba(255,255,255,.03);
       border-bottom: 1px solid rgba(255,255,255,.06);
     }
-
     .support-title{
       font-weight: 900;
       letter-spacing:.25px;
       font-size: 14px;
       color: rgba(234,241,255,.95);
     }
-
     .support-x{
       width: 38px;
       height: 38px;
@@ -545,21 +513,18 @@
       box-shadow: 0 12px 28px rgba(0,0,0,.45);
     }
     .support-x:active{ transform: scale(.98); }
-
     .support-body{
       padding: 14px 16px 16px 16px;
       display:flex;
       flex-direction:column;
       gap: 12px;
     }
-
     .support-text{
       margin:0;
       font-size: 13px;
       line-height: 1.35;
       color: rgba(234,241,255,.84);
     }
-
     .tg-btn{
       border:none;
       cursor:pointer;
@@ -570,18 +535,16 @@
       align-items:center;
       justify-content:center;
       gap: 10px;
-
       background: linear-gradient(180deg, rgba(42,171,238,.95), rgba(33,150,243,.90));
       box-shadow:
         0 18px 40px rgba(0,0,0,.45),
         0 0 24px rgba(42,171,238,.25);
-      color: #fff;
+      color:#fff;
       font-weight: 900;
       letter-spacing: .2px;
       font-size: 14px;
     }
     .tg-btn:active{ transform: scale(.99); }
-
     .tg-ico{
       width: 22px;
       height: 22px;
@@ -589,7 +552,7 @@
       filter: drop-shadow(0 8px 14px rgba(0,0,0,.25));
     }
 
-    /* ✅ AUTH POPUP (Safari/Яндекс) */
+    /* ✅ AUTH POPUP (Widget) */
     .auth-overlay{
       position:fixed;
       inset:0;
@@ -604,7 +567,6 @@
       padding: 18px;
     }
     .auth-overlay.show{ opacity:1; pointer-events:auto; }
-
     .auth-card{
       width: min(460px, 100%);
       border-radius: 24px;
@@ -615,7 +577,6 @@
       backdrop-filter: blur(14px);
       -webkit-backdrop-filter: blur(14px);
     }
-
     .auth-head{
       padding: 16px 16px 10px 16px;
       display:flex;
@@ -631,7 +592,6 @@
       font-size: 14px;
       color: rgba(234,241,255,.95);
     }
-
     .auth-x{
       width: 38px;
       height: 38px;
@@ -645,7 +605,6 @@
       box-shadow: 0 12px 28px rgba(0,0,0,.45);
     }
     .auth-x:active{ transform: scale(.98); }
-
     .auth-body{
       padding: 14px 16px 18px 16px;
       display:flex;
@@ -654,7 +613,6 @@
       align-items:center;
       text-align:center;
     }
-
     #tgWidget{
       width:100%;
       display:flex;
@@ -709,7 +667,6 @@
 </head>
 
 <body>
-  <!-- ✅ Главная -->
   <div class="app" id="appRoot">
     <div class="content">
 
@@ -729,7 +686,6 @@
           </button>
         </div>
 
-        <!-- ✅ Тут вместо баланса будет "Войти" пока не авторизован -->
         <div class="balance-mini" id="balanceBox" aria-label="Баланс / Вход">
           <span class="bal-title" id="balTitle">Баланс</span>
           <button class="bal-amount" id="balanceChip" aria-label="Баланс/Войти">
@@ -738,7 +694,6 @@
         </div>
       </div>
 
-      <!-- ✅ Баннеры (3:1) -->
       <div class="slider" aria-label="Баннеры">
         <div class="slides" id="slides">
           <div class="slide"><img src="YOUR_BANNER_1200x400.png" alt="Banner 1"></div>
@@ -776,7 +731,7 @@
     </div>
   </div>
 
-  <!-- ✅ Меню -->
+  <!-- ✅ МЕНЮ -->
   <div class="menu-overlay" id="menuOverlay" aria-hidden="true">
     <div class="menu-panel" role="dialog" aria-modal="true" aria-label="Меню">
       <button class="menu-close" id="menuClose" aria-label="Закрыть меню">✕</button>
@@ -804,11 +759,10 @@
         <span class="tile-bg" aria-hidden="true"></span>
         <span class="tile-title">История</span>
       </button>
-
     </div>
   </div>
 
-  <!-- ✅ Popup Поддержки -->
+  <!-- ✅ POPUP ПОДДЕРЖКИ -->
   <div class="support-overlay" id="supportOverlay" aria-hidden="true">
     <div class="support-card" role="dialog" aria-modal="true" aria-label="Поддержка">
       <div class="support-head">
@@ -832,7 +786,7 @@
     </div>
   </div>
 
-  <!-- ✅ AUTH Popup (Safari/Яндекс: Telegram Login Widget) -->
+  <!-- ✅ AUTH POPUP (Login Widget) -->
   <div class="auth-overlay" id="authOverlay" aria-hidden="true">
     <div class="auth-card" role="dialog" aria-modal="true" aria-label="Telegram">
       <div class="auth-head">
@@ -849,7 +803,7 @@
 
   <script>
     // =========================
-    // CONFIG (твои данные)
+    // CONFIG
     // =========================
     const BOT_USERNAME = 'vezusgamebot';
     const SB_FUNCTION_URL = 'https://lazrfierfbhwlduqlvws.supabase.co/functions/v1/telegram-auth';
@@ -878,6 +832,7 @@
       };
     }
 
+    // (не localStorage) — сохраняется между страницами в этой же вкладке
     function getToken(){ return sessionStorage.getItem('vg_session') || ''; }
     function saveToken(t){ if (t) sessionStorage.setItem('vg_session', t); }
     function clearToken(){ sessionStorage.removeItem('vg_session'); }
@@ -890,7 +845,7 @@
     }
 
     // =========================
-    // UI references
+    // UI refs
     // =========================
     const balanceBoxEl   = document.getElementById('balanceBox');
     const balTitleEl     = document.getElementById('balTitle');
@@ -907,8 +862,10 @@
 
     function setUILoggedOut(){
       balanceBoxEl.classList.add('logged-out');
-      balTitleEl.textContent = ''; // без лишних слов
+      balTitleEl.textContent = '';
       balanceChipEl.classList.add('login');
+
+      // ✅ иконка + текст рядом
       balanceValueEl.innerHTML = `
         <svg class="tg-ico-mini" viewBox="0 0 240 240" aria-hidden="true">
           <path fill="#fff" d="M120 0C53.7 0 0 53.7 0 120s53.7 120 120 120 120-53.7 120-120S186.3 0 120 0zm58.7 82.3l-19.7 92.8c-1.5 6.6-5.4 8.2-10.9 5.1l-30.2-22.3-14.6 14c-1.6 1.6-3 3-6.1 3l2.2-31.6 57.5-52c2.5-2.2-.5-3.4-3.9-1.2l-71 44.7-30.6-9.6c-6.6-2.1-6.7-6.6 1.4-9.7l119.6-46.1c5.5-2 10.3 1.3 8.8 9.9z"/>
@@ -930,13 +887,7 @@
     }
 
     // =========================
-    // Telegram env
-    // =========================
-    const inTelegram = !!(window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initData);
-    try { window.Telegram?.WebApp?.ready?.(); } catch {}
-
-    // =========================
-    // Session API (cookie + Safari-safe header)
+    // Session check (тихий вход)
     // =========================
     async function refreshSession(){
       const token = getToken();
@@ -959,37 +910,12 @@
         auth = { ok:false, user:null, wallet:null };
       }
       renderAuthUI();
+      return auth.ok;
     }
 
-    async function loginByInitData(){
-      if (loginBusy) return;
-      setBusy(true);
-      try{
-        const initData = window.Telegram.WebApp.initData;
-        const r = await fetch(SB_FUNCTION_URL, {
-          method:'POST',
-          headers: supaHeaders(),
-          credentials:'include',
-          body: JSON.stringify({ initData })
-        });
-
-        const { data, raw } = await parseResp(r);
-        if (!r.ok) throw new Error(data.error || raw || ('HTTP ' + r.status));
-
-        if (data.session_token) saveToken(data.session_token);
-
-        // ✅ сразу обновляем UI (не ждём второго запроса)
-        auth = { ok:true, user:data.user||null, wallet:data.wallet||null };
-        renderAuthUI();
-
-        toast('Готово');
-      }catch(_){
-        toast('Ошибка');
-      }finally{
-        setBusy(false);
-      }
-    }
-
+    // =========================
+    // Login Widget
+    // =========================
     async function loginByWidget(user){
       if (loginBusy) return;
       setBusy(true);
@@ -1008,25 +934,31 @@
 
         auth = { ok:true, user:data.user||null, wallet:data.wallet||null };
         renderAuthUI();
-
         closeAuth();
         toast('Готово');
       }catch(_){
-        toast('Ошибка');
+        toast('Ошибка входа');
       }finally{
         setBusy(false);
       }
     }
 
     // =========================
-    // AUTH popup (widget)
+    // Auth popup
     // =========================
     const authOverlay = document.getElementById('authOverlay');
     const authClose = document.getElementById('authClose');
     const tgWidgetWrap = document.getElementById('tgWidget');
     let widgetLoaded = false;
 
-    function openAuth(){
+    async function openAuth(){
+      // ✅ если уже вошёл — НЕ открываем Telegram/номер
+      const ok = await refreshSession();
+      if (ok){
+        toast('Вы уже вошли');
+        return;
+      }
+
       authOverlay.classList.add('show');
       authOverlay.setAttribute('aria-hidden', 'false');
       document.body.style.overflow = 'hidden';
@@ -1067,35 +999,39 @@
     // =========================
     function needLogin(){ toast('Нужно войти'); }
     function requireLogin(action){
-      return () => auth.ok ? action() : needLogin();
+      return async () => {
+        const ok = await refreshSession();
+        if (!ok) return needLogin();
+        action();
+      };
     }
 
     // =========================
-    // Click handlers
+    // Top balance/login button
     // =========================
-    balanceChipEl.addEventListener('click', () => {
+    balanceChipEl.addEventListener('click', async () => {
       if (loginBusy) return;
 
-      if (!auth.ok){
-        if (inTelegram) loginByInitData();
-        else openAuth();
+      const ok = await refreshSession();
+      if (ok){
+        window.location.href = 'wallet.html';
         return;
       }
-      window.location.href = 'wallet.html';
+      await openAuth();
     });
 
+    // Профиль
     document.getElementById('profileBtn').addEventListener('click',
       requireLogin(() => window.location.href = 'profile.html')
     );
 
+    // Кнопки
     document.getElementById('btnGames').addEventListener('click',
       requireLogin(() => alert('Игры (позже сделаем переход)'))
     );
-
     document.getElementById('btnShop').addEventListener('click',
-      requireLogin(() => { window.location.href = 'ucshop.html'; })
+      requireLogin(() => window.location.href = 'ucshop.html')
     );
-
     document.getElementById('btnCustom').addEventListener('click',
       requireLogin(() => alert('Кастомки (позже сделаем переход)'))
     );
@@ -1114,12 +1050,10 @@
       const gap = parseFloat(getComputedStyle(slides).gap || '0') || 0;
       return w + gap;
     }
-
     function getCurrentIndex(){
       const step = getStep();
       return clamp(Math.round(slides.scrollLeft / step), 0, dots.length - 1);
     }
-
     function updateDotsByScroll(){
       const idx = getCurrentIndex();
       dots.forEach((d,i)=>d.classList.toggle('active', i === idx));
@@ -1151,7 +1085,6 @@
       if (autoplayInterval) clearInterval(autoplayInterval);
       autoplayInterval = null;
     }
-
     function startAutoplay(){
       if (dots.length <= 1) return;
       if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
@@ -1162,13 +1095,11 @@
         slides.scrollTo({ left: next * getStep(), behavior: 'smooth' });
       }, AUTOPLAY_DELAY);
     }
-
     function pauseAndResume(){
       stopAutoplay();
       if (resumeTimeout) clearTimeout(resumeTimeout);
       resumeTimeout = setTimeout(startAutoplay, RESUME_DELAY);
     }
-
     ['pointerdown','touchstart','mousedown','wheel'].forEach(evt => {
       slides.addEventListener(evt, pauseAndResume, { passive:true });
     });
@@ -1178,13 +1109,8 @@
       else startAutoplay();
     });
 
-    window.addEventListener('load', () => {
-      updateDotsByScroll();
-      startAutoplay();
-    });
-
     // =========================
-    // Меню
+    // ✅ Меню
     // =========================
     const menuBtn = document.getElementById('menuBtn');
     const menuOverlay = document.getElementById('menuOverlay');
@@ -1195,23 +1121,18 @@
       menuOverlay.setAttribute('aria-hidden', 'false');
       document.body.style.overflow = 'hidden';
     }
-
     function closeMenu(){
       menuOverlay.classList.remove('show');
       menuOverlay.setAttribute('aria-hidden', 'true');
       document.body.style.overflow = '';
     }
-
     menuBtn.addEventListener('click', openMenu);
     menuClose.addEventListener('click', closeMenu);
-
     menuOverlay.addEventListener('click', (e) => {
       if (e.target === menuOverlay) closeMenu();
     });
 
-    // =========================
-    // Поддержка
-    // =========================
+    // ✅ Поддержка popup + открытие Telegram
     const supportOverlay = document.getElementById('supportOverlay');
     const supportClose = document.getElementById('supportClose');
     const goTelegram = document.getElementById('goTelegram');
@@ -1221,29 +1142,36 @@
       supportOverlay.setAttribute('aria-hidden', 'false');
       document.body.style.overflow = 'hidden';
     }
-
     function closeSupport(){
       supportOverlay.classList.remove('show');
       supportOverlay.setAttribute('aria-hidden', 'true');
       document.body.style.overflow = '';
     }
-
     supportClose.addEventListener('click', closeSupport);
-
     supportOverlay.addEventListener('click', (e) => {
       if (e.target === supportOverlay) closeSupport();
     });
-
-    function openTelegramLinkSafe(url){
-      if (window.Telegram && window.Telegram.WebApp && typeof window.Telegram.WebApp.openTelegramLink === 'function') {
-        window.Telegram.WebApp.openTelegramLink(url);
-        return;
-      }
-      window.open(url, '_blank', 'noopener');
-    }
-
     goTelegram.addEventListener('click', () => {
-      openTelegramLinkSafe('https://t.me/vezusmanager');
+      window.open('https://t.me/vezusmanager', '_blank', 'noopener');
+    });
+
+    // ✅ Клики по плиткам меню
+    document.querySelectorAll('.menu-tile').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const action = btn.getAttribute('data-action');
+
+        if (action === 'support') {
+          closeMenu();
+          openSupport();
+          return;
+        }
+
+        closeMenu();
+        const ok = await refreshSession();
+        if (!ok) return needLogin();
+
+        alert('Открыть: ' + action);
+      });
     });
 
     document.addEventListener('keydown', (e) => {
@@ -1255,33 +1183,18 @@
     });
 
     // =========================
-    // Клики по плиткам меню
-    // =========================
-    document.querySelectorAll('.menu-tile').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const action = btn.getAttribute('data-action');
-
-        if (action === 'support') {
-          closeMenu();
-          openSupport();
-          return;
-        }
-
-        closeMenu();
-        if (!auth.ok) return needLogin();
-        alert('Открыть: ' + action);
-      });
-    });
-
-    // =========================
-    // START: показываем кнопку и проверяем сессию
+    // START
     // =========================
     window.addEventListener('load', async () => {
       renderAuthUI();
       await refreshSession();
+      updateDotsByScroll();
+      startAutoplay();
     });
 
+    // если вернулся на страницу из другой вкладки/страницы
     window.addEventListener('pageshow', () => refreshSession());
+    window.addEventListener('focus', () => refreshSession());
   </script>
 </body>
 </html>
