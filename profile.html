@@ -14,14 +14,13 @@
       --muted: rgba(234,241,255,.78);
       --safe-bottom: env(safe-area-inset-bottom, 0px);
       --safe-top: env(safe-area-inset-top, 0px);
-      --radius:18px;
 
       --neon:#2AABEE;
-      --neon2:#3b82f6;
-      --danger:#ef4444;
-      --danger2:#dc2626;
       --card: rgba(8, 12, 22, .72);
       --stroke: rgba(46, 180, 255, .22);
+
+      --danger:#ef4444;
+      --danger2:#dc2626;
     }
 
     *{ box-sizing:border-box; font-family:'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
@@ -98,7 +97,7 @@
       color: rgba(234,241,255,.96);
     }
 
-    /* Cards */
+    /* Card */
     .card{
       position:relative;
       border-radius: 22px;
@@ -126,7 +125,7 @@
       padding: 16px;
       display:flex;
       flex-direction:column;
-      gap: 12px;
+      gap: 14px;
     }
 
     /* Profile header */
@@ -187,80 +186,13 @@
     .sub{
       font-size: 12px;
       color: var(--muted);
-      font-weight: 700;
+      font-weight: 800;
       white-space:nowrap;
       overflow:hidden;
       text-overflow:ellipsis;
     }
 
-    /* Stats */
-    .stats{
-      display:grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-    }
-
-    .stat{
-      border-radius: 18px;
-      background: rgba(255,255,255,.05);
-      border: 1px solid rgba(255,255,255,.06);
-      box-shadow: 0 12px 28px rgba(0,0,0,.28);
-      padding: 12px 12px;
-      display:flex;
-      flex-direction:column;
-      gap: 6px;
-    }
-
-    .stat .label{
-      font-size: 11px;
-      font-weight: 900;
-      letter-spacing:.2px;
-      color: rgba(234,241,255,.76);
-    }
-
-    .stat .value{
-      font-size: 16px;
-      font-weight: 900;
-      color: rgba(234,241,255,.98);
-    }
-
-    /* Progress bar */
-    .progress-wrap{
-      border-radius: 18px;
-      background: rgba(255,255,255,.05);
-      border: 1px solid rgba(255,255,255,.06);
-      padding: 12px;
-      display:flex;
-      flex-direction:column;
-      gap: 10px;
-    }
-    .progress-top{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap: 10px;
-      font-weight: 900;
-      font-size: 12px;
-      color: rgba(234,241,255,.88);
-    }
-    .bar{
-      width:100%;
-      height: 10px;
-      border-radius: 999px;
-      background: rgba(255,255,255,.08);
-      overflow:hidden;
-      border: 1px solid rgba(255,255,255,.06);
-    }
-    .bar > div{
-      height:100%;
-      width: 0%;
-      border-radius: 999px;
-      background: linear-gradient(90deg, rgba(42,171,238,.95), rgba(59,130,246,.95));
-      box-shadow: 0 0 18px rgba(42,171,238,.25);
-      transition: width .25s ease;
-    }
-
-    /* Buttons */
+    /* Button */
     .btn{
       border:none;
       cursor:pointer;
@@ -281,32 +213,11 @@
     .btn:active{ transform: scale(.99); }
     .btn:disabled{ opacity:.65; cursor: default; }
 
-    .btn.tg{
-      background: linear-gradient(180deg, rgba(42,171,238,.95), rgba(33,150,243,.90));
-      box-shadow:
-        0 18px 40px rgba(0,0,0,.45),
-        0 0 24px rgba(42,171,238,.22);
-    }
-
     .btn.danger{
       background: linear-gradient(180deg, rgba(239,68,68,.95), rgba(220,38,38,.92));
       box-shadow:
         0 18px 40px rgba(0,0,0,.45),
         0 0 24px rgba(239,68,68,.18);
-    }
-
-    .tg-ico{
-      width: 20px;
-      height: 20px;
-      display:block;
-      filter: drop-shadow(0 8px 14px rgba(0,0,0,.22));
-    }
-
-    .hint{
-      margin:0;
-      font-size: 12px;
-      line-height: 1.35;
-      color: rgba(234,241,255,.78);
     }
 
     /* Toast */
@@ -354,7 +265,6 @@
         <button class="icon-btn" id="homeBtn" aria-label="Главная">⌂</button>
       </div>
 
-      <!-- Профиль -->
       <div class="card">
         <div class="card-inner">
           <div class="profile">
@@ -367,47 +277,11 @@
 
             <div class="profile-meta">
               <div class="name" id="nameText">Загрузка…</div>
-              <div class="sub" id="subText"> </div>
+              <div class="sub" id="subText"></div>
             </div>
           </div>
 
-          <div class="stats">
-            <div class="stat">
-              <div class="label">Баланс</div>
-              <div class="value" id="balanceText">—</div>
-            </div>
-            <div class="stat">
-              <div class="label">Уровень</div>
-              <div class="value" id="levelText">—</div>
-            </div>
-          </div>
-
-          <div class="progress-wrap">
-            <div class="progress-top">
-              <span>Прогресс</span>
-              <span id="xpText">—</span>
-            </div>
-            <div class="bar" aria-label="Прогресс XP">
-              <div id="xpBar"></div>
-            </div>
-            <p class="hint" id="progressHint"> </p>
-          </div>
-
-          <button class="btn tg" id="openTgBtn" type="button">
-            <svg class="tg-ico" viewBox="0 0 240 240" aria-hidden="true">
-              <path fill="#fff" d="M120 0C53.7 0 0 53.7 0 120s53.7 120 120 120 120-53.7 120-120S186.3 0 120 0zm58.7 82.3l-19.7 92.8c-1.5 6.6-5.4 8.2-10.9 5.1l-30.2-22.3-14.6 14c-1.6 1.6-3 3-6.1 3l2.2-31.6 57.5-52c2.5-2.2-.5-3.4-3.9-1.2l-71 44.7-30.6-9.6c-6.6-2.1-6.7-6.6 1.4-9.7l119.6-46.1c5.5-2 10.3 1.3 8.8 9.9z"/>
-            </svg>
-            Открыть Telegram
-          </button>
-
-          <button class="btn danger" id="logoutBtn" type="button">
-            Выйти
-          </button>
-
-          <p class="hint">
-            Если после выхода Safari всё равно открывает тот же Telegram-аккаунт — это нормально:
-            войди другим аккаунтом через приватную вкладку (Incognito) или выйди из Telegram Web в браузере.
-          </p>
+          <button class="btn danger" id="logoutBtn" type="button">Выйти</button>
         </div>
       </div>
 
@@ -417,15 +291,11 @@
   <div class="toast" id="toast"></div>
 
   <script>
-    // =========================
-    // CONFIG (твои данные)
-    // =========================
+    // CONFIG
     const SB_FUNCTION_URL = 'https://lazrfierfbhwlduqlvws.supabase.co/functions/v1/telegram-auth';
     const SB_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxhenJmaWVyZmJod2xkdXFsdndzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE1NzY2ODIsImV4cCI6MjA4NzE1MjY4Mn0.tJtwFrNPrNyGNedGP1h0bNgr98FnyoliR-13mOqlBJI';
 
-    // =========================
     // Helpers
-    // =========================
     const toastEl = document.getElementById('toast');
     let toastTimer = null;
     function toast(msg){
@@ -454,42 +324,20 @@
       return { data, raw };
     }
 
-    // =========================
     // UI refs
-    // =========================
     const avatarBox = document.getElementById('avatarBox');
     const nameText = document.getElementById('nameText');
     const subText = document.getElementById('subText');
-    const balanceText = document.getElementById('balanceText');
-    const levelText = document.getElementById('levelText');
-    const xpText = document.getElementById('xpText');
-    const xpBar = document.getElementById('xpBar');
-    const progressHint = document.getElementById('progressHint');
-
     const logoutBtn = document.getElementById('logoutBtn');
-    const openTgBtn = document.getElementById('openTgBtn');
 
-    // =========================
-    // Навигация
-    // =========================
+    // Navigation
     document.getElementById('backBtn').addEventListener('click', () => history.back());
     document.getElementById('homeBtn').addEventListener('click', () => location.href = 'index.html');
 
-    function openTelegramLinkSafe(url){
-      if (window.Telegram && window.Telegram.WebApp && typeof window.Telegram.WebApp.openTelegramLink === 'function') {
-        window.Telegram.WebApp.openTelegramLink(url);
-        return;
-      }
-      window.open(url, '_blank', 'noopener');
-    }
-
-    // =========================
-    // Сессия (cookie + x-vg-session)
-    // =========================
+    // Session
     async function getSession(){
       const token = getToken();
       const extra = token ? { 'x-vg-session': token } : {};
-
       const r = await fetch(SB_FUNCTION_URL, {
         method:'GET',
         headers: supaHeaders(extra),
@@ -500,14 +348,8 @@
       return data;
     }
 
-    function safeName(p){
-      const parts = [p?.first_name, p?.last_name].filter(Boolean);
-      const n = parts.join(' ').trim();
-      return n || (p?.username ? '@' + p.username : 'Пользователь');
-    }
-
     function setAvatar(url){
-      if (!url) return; // оставим fallback
+      if (!url) return;
       avatarBox.innerHTML = '';
       const img = document.createElement('img');
       img.src = url;
@@ -516,40 +358,29 @@
       avatarBox.appendChild(img);
     }
 
-    function calcXpPercent(level, xp){
-      // Простая формула для красивого UI:
-      // нужно XP = level * 100
-      const need = Math.max(100, Number(level || 1) * 100);
-      const cur = Math.max(0, Number(xp || 0));
-      const pct = Math.max(0, Math.min(100, Math.round((cur / need) * 100)));
-      return { pct, need, cur };
+    function safeName(profile){
+      const parts = [profile?.first_name, profile?.last_name].filter(Boolean);
+      const n = parts.join(' ').trim();
+      return n || (profile?.username ? ('@' + profile.username) : 'Пользователь');
     }
 
     function fillUI(session){
       const profile = session.profile || null;
-      const wallet = session.wallet || null;
-      const progress = session.progress || null;
+      const tgId = profile?.telegram_id ?? session.user?.id ?? '—';
+      const username = profile?.username ? ('@' + profile.username) : '';
 
       nameText.textContent = safeName(profile);
-      subText.textContent = profile?.username ? ('@' + profile.username) : ('Telegram ID: ' + (profile?.telegram_id ?? session.user?.id ?? '—'));
+
+      // ✅ Ник возле айди
+      // Пример: "ID: 123456789 • @username"
+      subText.textContent = username
+        ? `ID: ${tgId} • ${username}`
+        : `ID: ${tgId}`;
 
       setAvatar(profile?.photo_url || null);
-
-      balanceText.textContent = ((wallet?.balance_vc ?? 0) + ' VC');
-      levelText.textContent = String(progress?.level ?? 1);
-
-      const { pct, need, cur } = calcXpPercent(progress?.level ?? 1, progress?.xp ?? 0);
-      xpText.textContent = `${cur} / ${need} XP`;
-      xpBar.style.width = pct + '%';
-
-      progressHint.textContent = pct >= 100
-        ? 'Можно апнуть уровень (сделаем позже кнопку).'
-        : 'Зарабатывай XP в играх — уровень растёт.';
     }
 
-    // =========================
-    // Logout (удаляем сессию на сервере + чистим токен)
-    // =========================
+    // Logout
     async function logout(){
       const token = getToken();
       const extra = token ? { 'x-vg-session': token } : {};
@@ -576,14 +407,7 @@
 
     logoutBtn.addEventListener('click', logout);
 
-    openTgBtn.addEventListener('click', () => {
-      // Можно поменять на ссылку на бота/чат/поддержку
-      openTelegramLinkSafe('https://t.me/vezusgamebot');
-    });
-
-    // =========================
-    // START
-    // =========================
+    // Start
     window.addEventListener('load', async () => {
       try{
         const s = await getSession();
@@ -598,11 +422,8 @@
     });
 
     window.addEventListener('pageshow', () => {
-      // на iOS Safari полезно перепроверять при возврате
-      // но без лишнего шума: просто перезагружаем если сессия пропала
-      getSession().then(s => {
-        if (!s.ok) location.href = 'index.html';
-      }).catch(()=> location.href = 'index.html');
+      getSession().then(s => { if (!s.ok) location.href = 'index.html'; })
+        .catch(()=> location.href = 'index.html');
     });
   </script>
 </body>
