@@ -6,21 +6,13 @@
   <title>Профиль</title>
 
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
-  <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
   <style>
     :root{
       --text:#eaf1ff;
-      --muted: rgba(234,241,255,.78);
       --safe-bottom: env(safe-area-inset-bottom, 0px);
       --safe-top: env(safe-area-inset-top, 0px);
-
-      --neon:#2AABEE;
-      --card: rgba(8, 12, 22, .72);
-      --stroke: rgba(46, 180, 255, .22);
-
-      --danger:#ef4444;
-      --danger2:#dc2626;
+      --tg:#2AABEE;
     }
 
     *{ box-sizing:border-box; font-family:'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
@@ -52,175 +44,93 @@
       z-index:1;
     }
 
-    .content{
+    .wrap{
+      max-width:520px;
+      margin: 0 auto;
       display:flex;
       flex-direction:column;
-      gap: 14px;
-      max-width: 520px;
-      margin: 0 auto;
-      align-items:stretch;
+      gap:14px;
     }
 
-    /* Top bar */
-    .top-row{
+    .top{
       display:flex;
       align-items:center;
       justify-content:space-between;
       gap:12px;
+      margin-top: 8px;
     }
 
-    .icon-btn{
-      width: 44px;
-      height: 44px;
-      border-radius: 14px;
+    .back-btn{
+      height:42px;
+      padding:0 14px;
+      border-radius:14px;
       border: 1px solid rgba(46, 180, 255, .22);
-      cursor:pointer;
       background: rgba(8, 12, 22, .72);
-      box-shadow:
-        0 12px 34px rgba(0,0,0,.55),
-        0 0 22px rgba(42,171,238,.14);
-      display:grid;
-      place-items:center;
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      transition: transform .15s ease;
-      padding:0;
+      color: rgba(234,241,255,.92);
+      cursor:pointer;
+      font-weight:900;
+      box-shadow: 0 12px 34px rgba(0,0,0,.55);
     }
-    .icon-btn:active{ transform: scale(.98); }
+    .back-btn:active{ transform: scale(.99); }
+
+    .card{
+      border-radius: 22px;
+      overflow:hidden;
+      padding: 16px;
+      background: rgba(12,18,34,.86);
+      border: 1px solid rgba(46, 180, 255, .18);
+      box-shadow: 0 34px 90px rgba(0,0,0,.45);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+    }
 
     .title{
-      flex:1 1 auto;
-      text-align:center;
       font-weight: 900;
-      letter-spacing:.2px;
       font-size: 16px;
-      color: rgba(234,241,255,.96);
-    }
-
-    /* Card */
-    .card{
-      position:relative;
-      border-radius: 22px;
-      background: var(--card);
-      border: 1px solid var(--stroke);
-      box-shadow:
-        0 18px 55px rgba(0,0,0,.40),
-        0 0 0 1px rgba(255,255,255,.04) inset,
-        0 0 24px rgba(42,171,238,.14);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      overflow:hidden;
-    }
-    .card::before{
-      content:"";
-      position:absolute;
-      inset:auto -40px 0 -40px;
-      height: 2px;
-      background: linear-gradient(90deg, transparent, rgba(42,171,238,.95), rgba(59,130,246,.95), transparent);
-      opacity:.65;
-      pointer-events:none;
-    }
-
-    .card-inner{
-      padding: 16px;
-      display:flex;
-      flex-direction:column;
-      gap: 14px;
-    }
-
-    /* Profile header */
-    .profile{
-      display:flex;
-      align-items:center;
-      gap: 12px;
-    }
-
-    .avatar{
-      width: 64px;
-      height: 64px;
-      border-radius: 18px;
-      overflow:hidden;
-      border: 1px solid rgba(255,255,255,.08);
-      background: rgba(255,255,255,.06);
-      box-shadow: 0 14px 34px rgba(0,0,0,.35);
-      display:grid;
-      place-items:center;
-      flex:0 0 auto;
-    }
-
-    .avatar img{
-      width:100%;
-      height:100%;
-      object-fit: cover;
-      display:block;
-    }
-
-    .avatar .fallback{
-      width: 28px;
-      height: 28px;
-      stroke: rgba(234,241,255,.88);
-      fill: none;
-      stroke-width: 2;
-      stroke-linecap: round;
-      stroke-linejoin: round;
-      opacity: .9;
-    }
-
-    .profile-meta{
-      display:flex;
-      flex-direction:column;
-      gap: 3px;
-      min-width: 0;
-    }
-
-    .name{
-      font-weight: 900;
-      font-size: 15px;
       letter-spacing:.2px;
-      color: rgba(234,241,255,.98);
-      white-space:nowrap;
-      overflow:hidden;
-      text-overflow:ellipsis;
+      margin:0 0 10px 0;
     }
 
-    .sub{
-      font-size: 12px;
-      color: var(--muted);
-      font-weight: 800;
-      white-space:nowrap;
-      overflow:hidden;
-      text-overflow:ellipsis;
-    }
-
-    /* Button */
-    .btn{
-      border:none;
-      cursor:pointer;
-      width: 100%;
-      height: 50px;
-      border-radius: 16px;
+    .row{
       display:flex;
       align-items:center;
-      justify-content:center;
-      gap: 10px;
+      justify-content:space-between;
+      gap:12px;
+      padding: 10px 0;
+      border-bottom: 1px solid rgba(255,255,255,.06);
+    }
+    .row:last-child{ border-bottom:none; }
+
+    .k{
+      font-size: 12px;
       font-weight: 900;
-      letter-spacing: .2px;
+      letter-spacing:.25px;
+      color: rgba(234,241,255,.75);
+    }
+    .v{
+      font-size: 13px;
+      font-weight: 900;
+      color: rgba(234,241,255,.95);
+      text-align:right;
+      word-break: break-word;
+    }
+
+    .logout{
+      width:100%;
+      height:52px;
+      border:none;
+      border-radius: 18px;
+      cursor:pointer;
+      font-weight: 900;
+      letter-spacing:.2px;
       font-size: 14px;
-      color: #fff;
-      box-shadow: 0 18px 40px rgba(0,0,0,.45);
-      transition: transform .12s ease, opacity .12s ease;
+      color:#fff;
+      background: linear-gradient(180deg, rgba(239,68,68,.98), rgba(220,38,38,.98));
+      box-shadow: 0 18px 44px rgba(0,0,0,.45);
     }
-    .btn:active{ transform: scale(.99); }
-    .btn:disabled{ opacity:.65; cursor: default; }
+    .logout:active{ transform: scale(.99); }
+    .logout:disabled{ opacity:.75; cursor: default; }
 
-    .btn.danger{
-      background: linear-gradient(180deg, rgba(239,68,68,.95), rgba(220,38,38,.92));
-      box-shadow:
-        0 18px 40px rgba(0,0,0,.45),
-        0 0 24px rgba(239,68,68,.18);
-    }
-
-    /* Toast */
     .toast{
       position:fixed;
       left:50%;
@@ -242,62 +152,52 @@
       white-space: pre-wrap;
     }
     .toast.show{ opacity: 1; transform: translateX(-50%) translateY(-6px); }
-
-    @media (max-width: 360px){
-      .icon-btn{ width: 42px; height: 42px; border-radius: 13px; }
-      .avatar{ width: 60px; height: 60px; border-radius: 16px; }
-      .btn{ height: 48px; border-radius: 15px; }
-    }
-
-    @media (prefers-reduced-motion: reduce){
-      *{ transition:none !important; }
-    }
   </style>
 </head>
 
 <body>
   <div class="app">
-    <div class="content">
+    <div class="wrap">
 
-      <div class="top-row">
-        <button class="icon-btn" id="backBtn" aria-label="Назад">←</button>
-        <div class="title">Профиль</div>
-        <button class="icon-btn" id="homeBtn" aria-label="Главная">⌂</button>
+      <div class="top">
+        <button class="back-btn" id="backBtn">Назад</button>
       </div>
 
       <div class="card">
-        <div class="card-inner">
-          <div class="profile">
-            <div class="avatar" id="avatarBox" aria-label="Аватар">
-              <svg class="fallback" viewBox="0 0 24 24" aria-hidden="true">
-                <path d="M20 21a8 8 0 0 0-16 0"></path>
-                <circle cx="12" cy="8" r="4"></circle>
-              </svg>
-            </div>
+        <p class="title">Профиль</p>
 
-            <div class="profile-meta">
-              <div class="name" id="nameText">Загрузка…</div>
-              <div class="sub" id="subText"></div>
-            </div>
-          </div>
+        <div class="row">
+          <div class="k">ID</div>
+          <div class="v" id="tgId">—</div>
+        </div>
 
-          <button class="btn danger" id="logoutBtn" type="button">Выйти</button>
+        <div class="row">
+          <div class="k">Ник</div>
+          <div class="v" id="tgNick">—</div>
         </div>
       </div>
 
+      <button class="logout" id="logoutBtn">Выйти</button>
     </div>
   </div>
 
   <div class="toast" id="toast"></div>
 
   <script>
+    // =========================
     // CONFIG
+    // =========================
     const SB_FUNCTION_URL = 'https://lazrfierfbhwlduqlvws.supabase.co/functions/v1/telegram-auth';
     const SB_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxhenJmaWVyZmJod2xkdXFsdndzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE1NzY2ODIsImV4cCI6MjA4NzE1MjY4Mn0.tJtwFrNPrNyGNedGP1h0bNgr98FnyoliR-13mOqlBJI';
 
-    // Helpers
+    const tgIdEl = document.getElementById('tgId');
+    const tgNickEl = document.getElementById('tgNick');
+    const logoutBtn = document.getElementById('logoutBtn');
+    const backBtn = document.getElementById('backBtn');
+
     const toastEl = document.getElementById('toast');
     let toastTimer = null;
+
     function toast(msg){
       toastEl.textContent = msg;
       toastEl.classList.add('show');
@@ -324,107 +224,71 @@
       return { data, raw };
     }
 
-    // UI refs
-    const avatarBox = document.getElementById('avatarBox');
-    const nameText = document.getElementById('nameText');
-    const subText = document.getElementById('subText');
-    const logoutBtn = document.getElementById('logoutBtn');
-
-    // Navigation
-    document.getElementById('backBtn').addEventListener('click', () => history.back());
-    document.getElementById('homeBtn').addEventListener('click', () => location.href = 'index.html');
-
-    // Session
     async function getSession(){
       const token = getToken();
       const extra = token ? { 'x-vg-session': token } : {};
+
       const r = await fetch(SB_FUNCTION_URL, {
         method:'GET',
         headers: supaHeaders(extra),
         credentials:'include'
       });
+
       const { data, raw } = await parseResp(r);
-      if (!r.ok) throw new Error(data.error || raw || ('HTTP ' + r.status));
+      if (!r.ok) return { ok:false, error: data.error || raw || ('HTTP '+r.status) };
       return data;
     }
 
-    function setAvatar(url){
-      if (!url) return;
-      avatarBox.innerHTML = '';
-      const img = document.createElement('img');
-      img.src = url;
-      img.alt = 'Avatar';
-      img.loading = 'lazy';
-      avatarBox.appendChild(img);
+    function normNick(user){
+      const u = user || {};
+      const username = u.username || u.tg_username || u.telegram_username || '';
+      if (username) return '@' + String(username).replace('@','');
+      const name = [u.first_name, u.last_name].filter(Boolean).join(' ').trim();
+      return name || '—';
     }
 
-    function safeName(profile){
-      const parts = [profile?.first_name, profile?.last_name].filter(Boolean);
-      const n = parts.join(' ').trim();
-      return n || (profile?.username ? ('@' + profile.username) : 'Пользователь');
+    async function loadProfile(){
+      const s = await getSession();
+      if (!s.ok){
+        // если не вошёл — назад на главную
+        window.location.href = 'index.html';
+        return;
+      }
+
+      const user = s.user || {};
+      const id = user.telegram_id || user.tg_id || user.id || '—';
+
+      tgIdEl.textContent = String(id);
+      tgNickEl.textContent = normNick(user);
     }
 
-    function fillUI(session){
-      const profile = session.profile || null;
-      const tgId = profile?.telegram_id ?? session.user?.id ?? '—';
-      const username = profile?.username ? ('@' + profile.username) : '';
-
-      nameText.textContent = safeName(profile);
-
-      // ✅ Ник возле айди
-      // Пример: "ID: 123456789 • @username"
-      subText.textContent = username
-        ? `ID: ${tgId} • ${username}`
-        : `ID: ${tgId}`;
-
-      setAvatar(profile?.photo_url || null);
-    }
-
-    // Logout
     async function logout(){
-      const token = getToken();
-      const extra = token ? { 'x-vg-session': token } : {};
       logoutBtn.disabled = true;
-
       try{
-        const r = await fetch(SB_FUNCTION_URL, {
-          method:'POST',
-          headers: supaHeaders(extra),
-          credentials:'include',
-          body: JSON.stringify({ logout: true })
-        });
-        const { data, raw } = await parseResp(r);
-        if (!r.ok) throw new Error(data.error || raw || ('HTTP ' + r.status));
+        const token = getToken();
+        const extra = token ? { 'x-vg-session': token } : {};
 
-        clearToken();
-        toast('Вы вышли');
-        setTimeout(()=> location.href = 'index.html', 350);
+        // Пытаемся попросить сервер удалить сессию (если edge это поддерживает)
+        await fetch(SB_FUNCTION_URL, {
+          method:'DELETE',
+          headers: supaHeaders(extra),
+          credentials:'include'
+        });
       }catch(_){
-        toast('Ошибка выхода');
-        logoutBtn.disabled = false;
+        // игнор
+      }finally{
+        clearToken();
+        // чтобы точно не оставалось “входа”
+        toast('Вы вышли');
+        setTimeout(()=> window.location.href = 'index.html', 400);
       }
     }
 
+    backBtn.addEventListener('click', () => window.location.href = 'index.html');
     logoutBtn.addEventListener('click', logout);
 
-    // Start
-    window.addEventListener('load', async () => {
-      try{
-        const s = await getSession();
-        if (!s.ok){
-          location.href = 'index.html';
-          return;
-        }
-        fillUI(s);
-      }catch(_){
-        location.href = 'index.html';
-      }
-    });
-
-    window.addEventListener('pageshow', () => {
-      getSession().then(s => { if (!s.ok) location.href = 'index.html'; })
-        .catch(()=> location.href = 'index.html');
-    });
+    window.addEventListener('load', loadProfile);
+    window.addEventListener('pageshow', loadProfile);
   </script>
 </body>
 </html>
