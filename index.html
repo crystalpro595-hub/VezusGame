@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>VezusGame</title>
+  <title>Wallet</title>
 
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
 
@@ -13,7 +13,9 @@
       --safe-bottom: env(safe-area-inset-bottom, 0px);
       --safe-top: env(safe-area-inset-top, 0px);
       --radius:18px;
-      --tg:#2AABEE;
+
+      --neon:#2AABEE;
+      --neon2:#3b82f6;
     }
 
     *{ box-sizing:border-box; font-family:'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
@@ -97,19 +99,25 @@
     .menu-btn:active, .profile-btn:active{ transform: scale(.98); }
 
     .burger{ width:18px; height:14px; display:grid; gap:3px; }
-    .burger span{ height:2px; border-radius:999px; background: rgba(234,241,255,.92); display:block; }
-
-    .profile-svg{
-      width:20px; height:20px;
+    .burger span{
+      height:2px;
+      border-radius:999px;
+      background: rgba(234,241,255,.92);
       display:block;
-      stroke: rgba(234,241,255,.92);
-      fill:none;
-      stroke-width:2;
-      stroke-linecap:round;
-      stroke-linejoin:round;
     }
 
-    /* ✅ Баланс / Войти */
+    .profile-svg{
+      width:20px;
+      height:20px;
+      display:block;
+      stroke: rgba(234,241,255,.92);
+      fill: none;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    /* ✅ Баланс */
     .balance-mini{
       width: min(210px, 70%);
       height: 38px;
@@ -132,6 +140,7 @@
       -webkit-backdrop-filter: blur(12px);
       flex: 0 1 auto;
     }
+
     .balance-mini::before{
       content:"";
       position:absolute;
@@ -141,6 +150,7 @@
       opacity:.70;
       pointer-events:none;
     }
+
     .balance-mini::after{
       content:"";
       position:absolute;
@@ -184,53 +194,12 @@
       font-weight: 900;
       font-size: 13px;
       white-space:nowrap;
-      transition: transform .15s ease, opacity .15s ease;
     }
     .bal-amount:active{ transform: scale(.99); }
-    .bal-amount:disabled{ opacity:.75; cursor: default; }
 
-    /* ✅ Logged out layout */
-    .balance-mini.logged-out{ justify-content:center; padding: 6px; }
-    .balance-mini.logged-out .bal-title{ display:none; }
-
-    /* ✅ Telegram button style */
-    .bal-amount.login{
-      width: 100%;
-      height: 32px;
-      padding: 0 12px;
-      background: linear-gradient(180deg, rgba(42,171,238,.98), rgba(30,150,211,.98));
-      border: 1px solid rgba(255,255,255,.16);
-      box-shadow:
-        0 18px 40px rgba(0,0,0,.45),
-        0 0 24px rgba(42,171,238,.25);
-      color:#fff;
-    }
-
-    /* ✅ ЖЁСТКИЙ фикс: иконка + "Войти" всегда В РЯД */
-    #balanceValue{
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      gap:8px;
-      white-space:nowrap;
-      line-height:1;
-    }
-    .tg-ico-mini{
-      width:18px;
-      height:18px;
-      display:block;
-      flex:0 0 auto;
-      filter: drop-shadow(0 8px 14px rgba(0,0,0,.22));
-    }
-    .login-text{
-      font-size:13px;
-      font-weight:900;
-      letter-spacing:.2px;
-      line-height:1;
-    }
-
-    /* ✅ Баннеры */
+    /* ✅ Баннеры — 3:1 cover */
     .slider{ width:100%; max-width:520px; border-radius: var(--radius); }
+
     .slides{
       display:flex;
       gap:12px;
@@ -252,16 +221,21 @@
       box-shadow: 0 18px 55px rgba(0,0,0,.40);
     }
     .slide::before{ content:""; display:block; padding-top: 33.3333%; }
+
     .slide img{
-      position:absolute; inset:0;
-      width:100%; height:100%;
+      position:absolute;
+      inset:0;
+      width:100%;
+      height:100%;
       object-fit: cover;
-      object-position:center;
+      object-position: center;
       display:block;
     }
+
     .slide::after{
       content:"";
-      position:absolute; inset:0;
+      position:absolute;
+      inset:0;
       background: linear-gradient(180deg, rgba(0,0,0,.10), rgba(0,0,0,.38));
       pointer-events:none;
     }
@@ -288,10 +262,12 @@
       grid-template-columns: repeat(3, 1fr);
       gap:10px;
     }
+
     .action-btn{
       position:relative;
       width:100%;
       aspect-ratio: 1 / 1;
+      height:auto;
       border:none;
       border-radius:18px;
       overflow:hidden;
@@ -320,6 +296,7 @@
       background: linear-gradient(180deg, rgba(0,0,0,.05), rgba(0,0,0,.48));
       pointer-events:none;
     }
+
     .action-btn::before,
     .action-btn::after{
       content:"";
@@ -338,6 +315,7 @@
       right:-10px;
       background: linear-gradient(180deg, rgba(59,130,246,.0), rgba(42,171,238,.95), rgba(59,130,246,.0));
     }
+
     .action-btn .label{
       position:absolute; left:0; right:0; bottom:0;
       padding:12px 10px;
@@ -350,7 +328,9 @@
       text-shadow: 0 10px 18px rgba(0,0,0,.55);
     }
 
-    /* ✅ МЕНЮ */
+    /* =========================================
+       ✅ МЕНЮ
+    ========================================== */
     .menu-overlay{
       position:fixed;
       inset:0;
@@ -364,7 +344,10 @@
       justify-content:center;
       padding: 18px;
     }
-    .menu-overlay.show{ opacity:1; pointer-events:auto; }
+    .menu-overlay.show{
+      opacity:1;
+      pointer-events:auto;
+    }
 
     .menu-panel{
       width: min(560px, 100%);
@@ -373,6 +356,7 @@
       gap: 14px;
       position:relative;
     }
+
     .menu-tile{
       border:none;
       cursor:pointer;
@@ -403,6 +387,7 @@
       background-repeat:no-repeat;
       transform: scale(1.02);
     }
+
     .menu-tile .tile-bg::after{
       content:"";
       position:absolute;
@@ -411,6 +396,7 @@
         radial-gradient(600px 220px at 30% 10%, rgba(42,171,238,.22), transparent 60%),
         linear-gradient(180deg, rgba(0,0,0,.20), rgba(0,0,0,.55));
     }
+
     .menu-tile .tile-title{
       position:absolute;
       inset:0;
@@ -426,16 +412,22 @@
       text-shadow: 0 14px 28px rgba(0,0,0,.70);
     }
 
-    .menu-overlay.show .menu-tile{ animation: popIn .48s cubic-bezier(.2,.9,.2,1) forwards; }
+    .menu-overlay.show .menu-tile{
+      animation: popIn .48s cubic-bezier(.2,.9,.2,1) forwards;
+    }
     .menu-tile.from-left{  transform: translateX(-44px) scale(.96); }
     .menu-tile.from-right{ transform: translateX( 44px) scale(.96); }
     .menu-tile.from-top{   transform: translateY(-44px) scale(.96); }
     .menu-tile.from-bot{   transform: translateY( 44px) scale(.96); }
+
     .menu-overlay.show .menu-tile:nth-child(1){ animation-delay: .02s; }
     .menu-overlay.show .menu-tile:nth-child(2){ animation-delay: .07s; }
     .menu-overlay.show .menu-tile:nth-child(3){ animation-delay: .12s; }
     .menu-overlay.show .menu-tile:nth-child(4){ animation-delay: .17s; }
-    @keyframes popIn{ to{ opacity:1; transform: translate3d(0,0,0) scale(1); } }
+
+    @keyframes popIn{
+      to{ opacity:1; transform: translate3d(0,0,0) scale(1); }
+    }
 
     .menu-close{
       position:absolute;
@@ -455,7 +447,9 @@
     }
     .menu-close:active{ transform: scale(.98); }
 
-    /* ✅ SUPPORT POPUP */
+    /* =========================================
+       ✅ SUPPORT POPUP
+    ========================================== */
     .support-overlay{
       position:fixed;
       inset:0;
@@ -469,7 +463,11 @@
       justify-content:center;
       padding: 18px;
     }
-    .support-overlay.show{ opacity:1; pointer-events:auto; }
+    .support-overlay.show{
+      opacity:1;
+      pointer-events:auto;
+    }
+
     .support-card{
       width: min(440px, 100%);
       border-radius: 24px;
@@ -484,7 +482,11 @@
       opacity:.95;
       transition: transform .22s ease, opacity .22s ease;
     }
-    .support-overlay.show .support-card{ transform: translateY(0) scale(1); opacity:1; }
+    .support-overlay.show .support-card{
+      transform: translateY(0) scale(1);
+      opacity: 1;
+    }
+
     .support-head{
       padding: 16px 16px 10px 16px;
       display:flex;
@@ -494,12 +496,14 @@
       background: rgba(255,255,255,.03);
       border-bottom: 1px solid rgba(255,255,255,.06);
     }
+
     .support-title{
       font-weight: 900;
       letter-spacing:.25px;
       font-size: 14px;
       color: rgba(234,241,255,.95);
     }
+
     .support-x{
       width: 38px;
       height: 38px;
@@ -513,18 +517,21 @@
       box-shadow: 0 12px 28px rgba(0,0,0,.45);
     }
     .support-x:active{ transform: scale(.98); }
+
     .support-body{
       padding: 14px 16px 16px 16px;
       display:flex;
       flex-direction:column;
       gap: 12px;
     }
+
     .support-text{
       margin:0;
       font-size: 13px;
       line-height: 1.35;
       color: rgba(234,241,255,.84);
     }
+
     .tg-btn{
       border:none;
       cursor:pointer;
@@ -535,16 +542,18 @@
       align-items:center;
       justify-content:center;
       gap: 10px;
+
       background: linear-gradient(180deg, rgba(42,171,238,.95), rgba(33,150,243,.90));
       box-shadow:
         0 18px 40px rgba(0,0,0,.45),
         0 0 24px rgba(42,171,238,.25);
-      color:#fff;
+      color: #fff;
       font-weight: 900;
       letter-spacing: .2px;
       font-size: 14px;
     }
     .tg-btn:active{ transform: scale(.99); }
+
     .tg-ico{
       width: 22px;
       height: 22px;
@@ -552,102 +561,9 @@
       filter: drop-shadow(0 8px 14px rgba(0,0,0,.25));
     }
 
-    /* ✅ AUTH POPUP (Widget) */
-    .auth-overlay{
-      position:fixed;
-      inset:0;
-      background: rgba(0,0,0,.72);
-      opacity:0;
-      pointer-events:none;
-      transition: opacity .22s ease;
-      z-index:280;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      padding: 18px;
-    }
-    .auth-overlay.show{ opacity:1; pointer-events:auto; }
-    .auth-card{
-      width: min(460px, 100%);
-      border-radius: 24px;
-      overflow:hidden;
-      background: rgba(12,18,34,.92);
-      border: 1px solid rgba(46, 180, 255, .18);
-      box-shadow: 0 34px 90px rgba(0,0,0,.62);
-      backdrop-filter: blur(14px);
-      -webkit-backdrop-filter: blur(14px);
-    }
-    .auth-head{
-      padding: 16px 16px 10px 16px;
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap: 10px;
-      background: rgba(255,255,255,.03);
-      border-bottom: 1px solid rgba(255,255,255,.06);
-    }
-    .auth-title{
-      font-weight: 900;
-      letter-spacing:.2px;
-      font-size: 14px;
-      color: rgba(234,241,255,.95);
-    }
-    .auth-x{
-      width: 38px;
-      height: 38px;
-      border-radius: 14px;
-      border: 1px solid rgba(46, 180, 255, .16);
-      background: rgba(8, 12, 22, .55);
-      color: rgba(234,241,255,.92);
-      cursor:pointer;
-      display:grid;
-      place-items:center;
-      box-shadow: 0 12px 28px rgba(0,0,0,.45);
-    }
-    .auth-x:active{ transform: scale(.98); }
-    .auth-body{
-      padding: 14px 16px 18px 16px;
-      display:flex;
-      flex-direction:column;
-      gap: 12px;
-      align-items:center;
-      text-align:center;
-    }
-    #tgWidget{
-      width:100%;
-      display:flex;
-      justify-content:center;
-      padding-top: 4px;
-      min-height: 56px;
-    }
-
-    /* ✅ TOAST */
-    .toast{
-      position:fixed;
-      left:50%;
-      bottom: calc(18px + var(--safe-bottom));
-      transform: translateX(-50%);
-      background: rgba(8, 12, 22, .92);
-      border: 1px solid rgba(46, 180, 255, .22);
-      box-shadow: 0 14px 40px rgba(0,0,0,.55);
-      padding: 10px 12px;
-      border-radius: 14px;
-      font-weight: 900;
-      font-size: 13px;
-      opacity: 0;
-      pointer-events:none;
-      transition: opacity .2s ease, transform .2s ease;
-      z-index: 9999;
-      max-width: min(520px, calc(100% - 24px));
-      text-align:center;
-      white-space: pre-wrap;
-    }
-    .toast.show{ opacity: 1; transform: translateX(-50%) translateY(-6px); }
-
     @media (max-width: 360px){
       .balance-mini{ width: min(196px, 68%); height: 36px; }
       .bal-amount{ height: 25px; font-size: 12px; }
-      .bal-amount.login{ height: 30px; }
       .menu-btn, .profile-btn{ width: 40px; height: 40px; border-radius: 13px; }
       .left-buttons{ transform: translateX(-8px); }
       .top-row{ gap: 14px; }
@@ -667,6 +583,7 @@
 </head>
 
 <body>
+  <!-- ✅ ТВОЯ ГЛАВНАЯ -->
   <div class="app" id="appRoot">
     <div class="content">
 
@@ -686,14 +603,15 @@
           </button>
         </div>
 
-        <div class="balance-mini" id="balanceBox" aria-label="Баланс / Вход">
-          <span class="bal-title" id="balTitle">Баланс</span>
-          <button class="bal-amount" id="balanceChip" aria-label="Баланс/Войти">
+        <div class="balance-mini" aria-label="Баланс">
+          <span class="bal-title">Баланс</span>
+          <button class="bal-amount" id="balanceChip" aria-label="Открыть кошелёк">
             <span id="balanceValue">0 VC</span>
           </button>
         </div>
       </div>
 
+      <!-- ✅ Баннеры (3:1) -->
       <div class="slider" aria-label="Баннеры">
         <div class="slides" id="slides">
           <div class="slide"><img src="YOUR_BANNER_1200x400.png" alt="Banner 1"></div>
@@ -759,6 +677,7 @@
         <span class="tile-bg" aria-hidden="true"></span>
         <span class="tile-title">История</span>
       </button>
+
     </div>
   </div>
 
@@ -786,259 +705,36 @@
     </div>
   </div>
 
-  <!-- ✅ AUTH POPUP (Login Widget) -->
-  <div class="auth-overlay" id="authOverlay" aria-hidden="true">
-    <div class="auth-card" role="dialog" aria-modal="true" aria-label="Telegram">
-      <div class="auth-head">
-        <div class="auth-title">Telegram</div>
-        <button class="auth-x" id="authClose" aria-label="Закрыть">✕</button>
-      </div>
-      <div class="auth-body">
-        <div id="tgWidget"></div>
-      </div>
-    </div>
-  </div>
-
-  <div class="toast" id="toast"></div>
-
+  <!-- ✅ JS -->
   <script>
-    // =========================
-    // CONFIG
-    // =========================
-    const BOT_USERNAME = 'vezusgamebot';
-    const SB_FUNCTION_URL = 'https://lazrfierfbhwlduqlvws.supabase.co/functions/v1/telegram-auth';
-    const SB_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxhenJmaWVyZmJod2xkdXFsdndzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE1NzY2ODIsImV4cCI6MjA4NzE1MjY4Mn0.tJtwFrNPrNyGNedGP1h0bNgr98FnyoliR-13mOqlBJI';
-
-    // =========================
-    // Helpers
-    // =========================
     const clamp = (n, min, max) => Math.max(min, Math.min(max, n));
-    const toastEl = document.getElementById('toast');
-    let toastTimer = null;
 
-    function toast(msg){
-      toastEl.textContent = msg;
-      toastEl.classList.add('show');
-      clearTimeout(toastTimer);
-      toastTimer = setTimeout(()=>toastEl.classList.remove('show'), 2500);
-    }
-
-    function supaHeaders(extra = {}){
-      return {
-        'Content-Type':'application/json',
-        'apikey': SB_ANON_KEY,
-        'Authorization': 'Bearer ' + SB_ANON_KEY,
-        ...extra
-      };
-    }
-
-    // (не localStorage) — сохраняется между страницами в этой же вкладке
-    function getToken(){ return sessionStorage.getItem('vg_session') || ''; }
-    function saveToken(t){ if (t) sessionStorage.setItem('vg_session', t); }
-    function clearToken(){ sessionStorage.removeItem('vg_session'); }
-
-    async function parseResp(r){
-      const raw = await r.text();
-      let data = {};
-      try { data = JSON.parse(raw); } catch { data = { raw }; }
-      return { data, raw };
-    }
-
-    // =========================
-    // UI refs
-    // =========================
-    const balanceBoxEl   = document.getElementById('balanceBox');
-    const balTitleEl     = document.getElementById('balTitle');
-    const balanceChipEl  = document.getElementById('balanceChip');
+    // Баланс (заглушка)
     const balanceValueEl = document.getElementById('balanceValue');
+    const balanceChipEl  = document.getElementById('balanceChip');
+    balanceValueEl.textContent = '0 VC';
 
-    let auth = { ok:false, user:null, wallet:null };
-    let loginBusy = false;
-
-    function setBusy(on){
-      loginBusy = on;
-      balanceChipEl.disabled = on;
-    }
-
-    function setUILoggedOut(){
-      balanceBoxEl.classList.add('logged-out');
-      balTitleEl.textContent = '';
-      balanceChipEl.classList.add('login');
-
-      // ✅ иконка + текст рядом
-      balanceValueEl.innerHTML = `
-        <svg class="tg-ico-mini" viewBox="0 0 240 240" aria-hidden="true">
-          <path fill="#fff" d="M120 0C53.7 0 0 53.7 0 120s53.7 120 120 120 120-53.7 120-120S186.3 0 120 0zm58.7 82.3l-19.7 92.8c-1.5 6.6-5.4 8.2-10.9 5.1l-30.2-22.3-14.6 14c-1.6 1.6-3 3-6.1 3l2.2-31.6 57.5-52c2.5-2.2-.5-3.4-3.9-1.2l-71 44.7-30.6-9.6c-6.6-2.1-6.7-6.6 1.4-9.7l119.6-46.1c5.5-2 10.3 1.3 8.8 9.9z"/>
-        </svg>
-        <span class="login-text">Войти</span>
-      `;
-    }
-
-    function setUILoggedIn(){
-      balanceBoxEl.classList.remove('logged-out');
-      balTitleEl.textContent = 'Баланс';
-      balanceChipEl.classList.remove('login');
-      const bal = auth.wallet?.balance_vc ?? 0;
-      balanceValueEl.textContent = `${bal} VC`;
-    }
-
-    function renderAuthUI(){
-      auth.ok ? setUILoggedIn() : setUILoggedOut();
-    }
-
-    // =========================
-    // Session check (тихий вход)
-    // =========================
-    async function refreshSession(){
-      const token = getToken();
-      const extra = token ? { 'x-vg-session': token } : {};
-      try{
-        const r = await fetch(SB_FUNCTION_URL, {
-          method:'GET',
-          headers: supaHeaders(extra),
-          credentials:'include'
-        });
-        const { data, raw } = await parseResp(r);
-        if (!r.ok) throw new Error(data.error || raw || ('HTTP ' + r.status));
-
-        if (data.ok){
-          auth = { ok:true, user:data.user||null, wallet:data.wallet||null };
-        } else {
-          auth = { ok:false, user:null, wallet:null };
-        }
-      }catch(_){
-        auth = { ok:false, user:null, wallet:null };
-      }
-      renderAuthUI();
-      return auth.ok;
-    }
-
-    // =========================
-    // Login Widget
-    // =========================
-    async function loginByWidget(user){
-      if (loginBusy) return;
-      setBusy(true);
-      try{
-        const r = await fetch(SB_FUNCTION_URL, {
-          method:'POST',
-          headers: supaHeaders(),
-          credentials:'include',
-          body: JSON.stringify({ user })
-        });
-
-        const { data, raw } = await parseResp(r);
-        if (!r.ok) throw new Error(data.error || raw || ('HTTP ' + r.status));
-
-        if (data.session_token) saveToken(data.session_token);
-
-        auth = { ok:true, user:data.user||null, wallet:data.wallet||null };
-        renderAuthUI();
-        closeAuth();
-        toast('Готово');
-      }catch(_){
-        toast('Ошибка входа');
-      }finally{
-        setBusy(false);
-      }
-    }
-
-    // =========================
-    // Auth popup
-    // =========================
-    const authOverlay = document.getElementById('authOverlay');
-    const authClose = document.getElementById('authClose');
-    const tgWidgetWrap = document.getElementById('tgWidget');
-    let widgetLoaded = false;
-
-    async function openAuth(){
-      // ✅ если уже вошёл — НЕ открываем Telegram/номер
-      const ok = await refreshSession();
-      if (ok){
-        toast('Вы уже вошли');
-        return;
-      }
-
-      authOverlay.classList.add('show');
-      authOverlay.setAttribute('aria-hidden', 'false');
-      document.body.style.overflow = 'hidden';
-
-      if (!widgetLoaded){
-        widgetLoaded = true;
-        tgWidgetWrap.innerHTML = '';
-
-        window.onTelegramAuth = function(user){
-          loginByWidget(user);
-        };
-
-        const s = document.createElement('script');
-        s.async = true;
-        s.src = 'https://telegram.org/js/telegram-widget.js?22';
-        s.setAttribute('data-telegram-login', BOT_USERNAME);
-        s.setAttribute('data-size', 'large');
-        s.setAttribute('data-radius', '14');
-        s.setAttribute('data-onauth', 'onTelegramAuth(user)');
-        s.setAttribute('data-request-access', 'write');
-        tgWidgetWrap.appendChild(s);
-      }
-    }
-
-    function closeAuth(){
-      authOverlay.classList.remove('show');
-      authOverlay.setAttribute('aria-hidden', 'true');
-      document.body.style.overflow = '';
-    }
-
-    authClose.addEventListener('click', closeAuth);
-    authOverlay.addEventListener('click', (e) => {
-      if (e.target === authOverlay) closeAuth();
+    // ✅ ПЕРЕХОД НА wallet.html
+    balanceChipEl.addEventListener('click', () => {
+      window.location.href = 'wallet.html';
     });
 
-    // =========================
-    // Guards
-    // =========================
-    function needLogin(){ toast('Нужно войти'); }
-    function requireLogin(action){
-      return async () => {
-        const ok = await refreshSession();
-        if (!ok) return needLogin();
-        action();
-      };
-    }
-
-    // =========================
-    // Top balance/login button
-    // =========================
-    balanceChipEl.addEventListener('click', async () => {
-      if (loginBusy) return;
-
-      const ok = await refreshSession();
-      if (ok){
-        window.location.href = 'wallet.html';
-        return;
-      }
-      await openAuth();
+    // ✅ ПЕРЕХОД НА profile.html (если файла нет — поменяешь/уберёшь)
+    document.getElementById('profileBtn').addEventListener('click', () => {
+      window.location.href = 'profile.html';
     });
-
-    // Профиль
-    document.getElementById('profileBtn').addEventListener('click',
-      requireLogin(() => window.location.href = 'profile.html')
-    );
 
     // Кнопки
-    document.getElementById('btnGames').addEventListener('click',
-      requireLogin(() => alert('Игры (позже сделаем переход)'))
-    );
-    document.getElementById('btnShop').addEventListener('click',
-      requireLogin(() => window.location.href = 'ucshop.html')
-    );
-    document.getElementById('btnCustom').addEventListener('click',
-      requireLogin(() => alert('Кастомки (позже сделаем переход)'))
-    );
+    document.getElementById('btnGames').addEventListener('click', () => alert('Игры (позже сделаем переход)'));
 
-    // =========================
+    // ✅ ПЕРЕХОД НА ucshop.html
+    document.getElementById('btnShop').addEventListener('click', () => {
+      window.location.href = 'ucshop.html';
+    });
+
+    document.getElementById('btnCustom').addEventListener('click', () => alert('Кастомки (позже сделаем переход)'));
+
     // Баннеры: точки + автоплей
-    // =========================
     const slides = document.getElementById('slides');
     const dotsWrap = document.getElementById('dots');
     const dots = Array.from(dotsWrap.querySelectorAll('.dot'));
@@ -1050,10 +746,12 @@
       const gap = parseFloat(getComputedStyle(slides).gap || '0') || 0;
       return w + gap;
     }
+
     function getCurrentIndex(){
       const step = getStep();
       return clamp(Math.round(slides.scrollLeft / step), 0, dots.length - 1);
     }
+
     function updateDotsByScroll(){
       const idx = getCurrentIndex();
       dots.forEach((d,i)=>d.classList.toggle('active', i === idx));
@@ -1085,6 +783,7 @@
       if (autoplayInterval) clearInterval(autoplayInterval);
       autoplayInterval = null;
     }
+
     function startAutoplay(){
       if (dots.length <= 1) return;
       if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
@@ -1095,11 +794,13 @@
         slides.scrollTo({ left: next * getStep(), behavior: 'smooth' });
       }, AUTOPLAY_DELAY);
     }
+
     function pauseAndResume(){
       stopAutoplay();
       if (resumeTimeout) clearTimeout(resumeTimeout);
       resumeTimeout = setTimeout(startAutoplay, RESUME_DELAY);
     }
+
     ['pointerdown','touchstart','mousedown','wheel'].forEach(evt => {
       slides.addEventListener(evt, pauseAndResume, { passive:true });
     });
@@ -1109,9 +810,12 @@
       else startAutoplay();
     });
 
-    // =========================
+    window.addEventListener('load', () => {
+      updateDotsByScroll();
+      startAutoplay();
+    });
+
     // ✅ Меню
-    // =========================
     const menuBtn = document.getElementById('menuBtn');
     const menuOverlay = document.getElementById('menuOverlay');
     const menuClose = document.getElementById('menuClose');
@@ -1121,13 +825,16 @@
       menuOverlay.setAttribute('aria-hidden', 'false');
       document.body.style.overflow = 'hidden';
     }
+
     function closeMenu(){
       menuOverlay.classList.remove('show');
       menuOverlay.setAttribute('aria-hidden', 'true');
       document.body.style.overflow = '';
     }
+
     menuBtn.addEventListener('click', openMenu);
     menuClose.addEventListener('click', closeMenu);
+
     menuOverlay.addEventListener('click', (e) => {
       if (e.target === menuOverlay) closeMenu();
     });
@@ -1142,22 +849,41 @@
       supportOverlay.setAttribute('aria-hidden', 'false');
       document.body.style.overflow = 'hidden';
     }
+
     function closeSupport(){
       supportOverlay.classList.remove('show');
       supportOverlay.setAttribute('aria-hidden', 'true');
       document.body.style.overflow = '';
     }
+
     supportClose.addEventListener('click', closeSupport);
+
     supportOverlay.addEventListener('click', (e) => {
       if (e.target === supportOverlay) closeSupport();
     });
+
+    function openTelegramLinkSafe(url){
+      if (window.Telegram && window.Telegram.WebApp && typeof window.Telegram.WebApp.openTelegramLink === 'function') {
+        window.Telegram.WebApp.openTelegramLink(url);
+        return;
+      }
+      window.open(url, '_blank', 'noopener');
+    }
+
     goTelegram.addEventListener('click', () => {
-      window.open('https://t.me/vezusmanager', '_blank', 'noopener');
+      openTelegramLinkSafe('https://t.me/vezusmanager');
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        closeSupport();
+        closeMenu();
+      }
     });
 
     // ✅ Клики по плиткам меню
     document.querySelectorAll('.menu-tile').forEach(btn => {
-      btn.addEventListener('click', async () => {
+      btn.addEventListener('click', () => {
         const action = btn.getAttribute('data-action');
 
         if (action === 'support') {
@@ -1167,34 +893,9 @@
         }
 
         closeMenu();
-        const ok = await refreshSession();
-        if (!ok) return needLogin();
-
         alert('Открыть: ' + action);
       });
     });
-
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape') {
-        closeSupport();
-        closeMenu();
-        closeAuth();
-      }
-    });
-
-    // =========================
-    // START
-    // =========================
-    window.addEventListener('load', async () => {
-      renderAuthUI();
-      await refreshSession();
-      updateDotsByScroll();
-      startAutoplay();
-    });
-
-    // если вернулся на страницу из другой вкладки/страницы
-    window.addEventListener('pageshow', () => refreshSession());
-    window.addEventListener('focus', () => refreshSession());
   </script>
 </body>
 </html>
