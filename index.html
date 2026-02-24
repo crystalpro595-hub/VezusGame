@@ -197,6 +197,19 @@
     }
     .bal-amount:active{ transform: scale(.99); }
 
+    .bal-content{
+      display:flex;
+      align-items:center;
+      gap:8px;
+      line-height:1;
+    }
+    .tg-mini{
+      width:16px;
+      height:16px;
+      display:none; /* покажем только когда НЕ вошёл */
+      filter: drop-shadow(0 8px 14px rgba(0,0,0,.25));
+    }
+
     /* ✅ Баннеры — 3:1 cover */
     .slider{ width:100%; max-width:520px; border-radius: var(--radius); }
 
@@ -741,9 +754,14 @@
         </div>
 
         <div class="balance-mini" aria-label="Баланс">
-          <span class="bal-title" id="balTitle">Баланс</span>
-          <button class="bal-amount" id="balanceChip" aria-label="Открыть кошелёк">
-            <span id="balanceValue">0 VC</span>
+          <span class="bal-title" id="balTitle">Вход</span>
+          <button class="bal-amount" id="balanceChip" aria-label="Войти / Открыть кошелёк">
+            <span class="bal-content">
+              <svg class="tg-mini" id="tgMiniIcon" viewBox="0 0 240 240" aria-hidden="true">
+                <path fill="#fff" d="M120 0C53.7 0 0 53.7 0 120s53.7 120 120 120 120-53.7 120-120S186.3 0 120 0zm58.7 82.3l-19.7 92.8c-1.5 6.6-5.4 8.2-10.9 5.1l-30.2-22.3-14.6 14c-1.6 1.6-3 3-6.1 3l2.2-31.6 57.5-52c2.5-2.2-.5-3.4-3.9-1.2l-71 44.7-30.6-9.6c-6.6-2.1-6.7-6.6 1.4-9.7l119.6-46.1c5.5-2 10.3 1.3 8.8 9.9z"/>
+              </svg>
+              <span id="balanceValue">Войти</span>
+            </span>
           </button>
         </div>
       </div>
@@ -856,7 +874,6 @@
         </p>
 
         <div class="tg-widget-wrap" id="tgWidgetWrap">
-          <!-- Telegram Login Widget -->
           <script async src="https://telegram.org/js/telegram-widget.js?22"
             data-telegram-login="vezusgamebot"
             data-size="large"
@@ -878,7 +895,6 @@
   <!-- ✅ Supabase JS -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-  <!-- ✅ JS -->
   <script>
     const clamp = (n, min, max) => Math.max(min, Math.min(max, n));
 
@@ -890,11 +906,7 @@
     const TG_LINK_FUNCTION_URL = 'https://lazrfierfbhwlduqlvws.supabase.co/functions/v1/telegram-link';
 
     const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-      auth: {
-        persistSession: true,
-        autoRefreshToken: true,
-        detectSessionInUrl: false,
-      }
+      auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: false }
     });
 
     // =========================
@@ -903,9 +915,9 @@
     const balTitleEl = document.getElementById('balTitle');
     const balanceValueEl = document.getElementById('balanceValue');
     const balanceChipEl  = document.getElementById('balanceChip');
+    const tgMiniIconEl   = document.getElementById('tgMiniIcon');
 
     const toastEl = document.getElementById('toast');
-
     const authOverlay = document.getElementById('authOverlay');
     const authClose = document.getElementById('authClose');
     const authLoading = document.getElementById('authLoading');
@@ -913,7 +925,7 @@
     // =========================
     // ✅ State
     // =========================
-    let isTelegramAuthed = false; // “можно пользоваться”
+    let isTelegramAuthed = false;
     let profileCache = null;
 
     // =========================
@@ -934,7 +946,14 @@
     // =========================
     // ✅ Auth modal
     // =========================
-    function openAuth(){
+    async function openAuth(){
+      try{
+        await ensureSession(); // создаём сессию заранее (чтобы не было invalid_session)
+      }catch(e){
+        console.error(e);
+        showToast('Не удалось создать сессию Supabase', 2600);
+        return;
+      }
       authOverlay.classList.add('show');
       authOverlay.setAttribute('aria-hidden', 'false');
       document.body.style.overflow = 'hidden';
@@ -948,9 +967,7 @@
     }
 
     authClose.addEventListener('click', closeAuth);
-    authOverlay.addEventListener('click', (e) => {
-      if (e.target === authOverlay) closeAuth();
-    });
+    authOverlay.addEventListener('click', (e) => { if (e.target === authOverlay) closeAuth(); });
 
     // =========================
     // ✅ Helpers
@@ -958,7 +975,6 @@
     function formatBalance(v){
       const num = Number(v ?? 0);
       if (!Number.isFinite(num)) return '0 VC';
-      // если хочешь без копеек:
       const isInt = Math.abs(num - Math.round(num)) < 1e-9;
       return (isInt ? String(Math.round(num)) : num.toFixed(2)) + ' VC';
     }
@@ -967,7 +983,8 @@
       isTelegramAuthed = false;
       profileCache = null;
       balTitleEl.textContent = 'Вход';
-      balanceValueEl.textContent = 'Войти через Telegram';
+      balanceValueEl.textContent = 'Войти';
+      tgMiniIconEl.style.display = 'block';
     }
 
     function setLoggedInUI(profile){
@@ -975,13 +992,13 @@
       profileCache = profile;
       balTitleEl.textContent = 'Баланс';
       balanceValueEl.textContent = formatBalance(profile?.balance);
+      tgMiniIconEl.style.display = 'none';
     }
 
     async function ensureSession(){
       const { data: { session } } = await supabaseClient.auth.getSession();
       if (session) return session;
 
-      // Создаём анонимную сессию ТОЛЬКО когда нужно (например, при входе)
       const { data, error } = await supabaseClient.auth.signInAnonymously();
       if (error) throw error;
       return data.session;
@@ -994,7 +1011,6 @@
       const { data: { user } } = await supabaseClient.auth.getUser();
       if (!user) return null;
 
-      // читаем профайл
       const { data, error } = await supabaseClient
         .from('profiles')
         .select('id, telegram_id, balance, username, first_name, last_name')
@@ -1019,12 +1035,17 @@
     // =========================
     window.onTelegramAuth = async function(user){
       try{
+        if (!user || !user.hash) {
+          showToast('Telegram не передал hash. Проверь /setdomain', 3200);
+          return;
+        }
+
         authLoading.classList.add('show');
 
-        // 1) гарантируем сессию supabase (anon)
+        // 1) сессия supabase
         const session = await ensureSession();
 
-        // 2) шлём данные Telegram в Edge Function (она проверит подпись и запишет profile)
+        // 2) вызов edge function
         const res = await fetch(TG_LINK_FUNCTION_URL, {
           method: 'POST',
           headers: {
@@ -1035,32 +1056,39 @@
           body: JSON.stringify(user),
         });
 
-        const payload = await res.json().catch(() => ({}));
+        // ✅ Читаем текст (чтобы видеть точную ошибку даже если не JSON)
+        const raw = await res.text();
+        let payload = {};
+        try { payload = JSON.parse(raw); } catch { payload = { raw }; }
 
         if (!res.ok){
-          const code = payload?.error || 'unknown_error';
+          const code = payload?.error || payload?.raw || 'unknown_error';
+          console.warn('telegram-link error:', res.status, code, payload);
 
-          if (res.status === 409 && code === 'telegram_already_linked') {
-            showToast('Этот Telegram уже привязан к другому аккаунту', 2600);
-          } else if (res.status === 401 && code === 'telegram_signature_failed') {
-            showToast('Telegram не прошёл проверку. Проверь /setdomain в BotFather', 3000);
+          if (code === 'telegram_signature_failed') {
+            showToast('Telegram не прошёл проверку. Проверь TELEGRAM_BOT_TOKEN и /setdomain', 4200);
+          } else if (code === 'invalid_session') {
+            showToast('Supabase сессия не найдена. Обнови страницу и попробуй снова', 4200);
+          } else if (code === 'missing_authorization') {
+            showToast('Нет Authorization. Обнови страницу и попробуй снова', 4200);
           } else if (code === 'missing_TELEGRAM_BOT_TOKEN') {
-            showToast('На сервере не задан TELEGRAM_BOT_TOKEN (Secrets)', 3000);
+            showToast('В Secrets не задан TELEGRAM_BOT_TOKEN', 4200);
+          } else if (code === 'telegram_already_linked') {
+            showToast('Этот Telegram уже привязан к другому аккаунту', 4200);
           } else {
-            showToast('Не удалось войти. Попробуй ещё раз', 2600);
+            showToast(`Ошибка входа (${res.status}): ${String(code).slice(0,80)}`, 5200);
           }
 
           authLoading.classList.remove('show');
           return;
         }
 
-        // 3) сразу обновляем UI из ответа
         if (payload?.profile) setLoggedInUI(payload.profile);
         closeAuth();
         showToast('Готово! Вы вошли ✅', 2000);
       } catch (e){
         console.error(e);
-        showToast('Ошибка входа. Обнови страницу и попробуй снова', 2800);
+        showToast('Ошибка входа. Обнови страницу и попробуй снова', 3200);
         authLoading.classList.remove('show');
       }
     };
@@ -1079,29 +1107,25 @@
     }
 
     // =========================
-    // ✅ Поведение “баланса”
+    // ✅ Клик по “балансу”
     // =========================
-    balanceChipEl.addEventListener('click', () => {
+    balanceChipEl.addEventListener('click', async () => {
       if (!isTelegramAuthed){
-        openAuth();
+        await openAuth();
         return;
       }
       window.location.href = 'wallet.html';
     });
 
-    // =========================
-    // ✅ ПЕРЕХОД НА profile.html
-    // =========================
+    // ✅ Переходы (заблокированы до входа)
     document.getElementById('profileBtn').addEventListener('click', requireAuth(() => {
       window.location.href = 'profile.html';
     }));
 
-    // Кнопки
     document.getElementById('btnGames').addEventListener('click', requireAuth(() => {
       alert('Игры (позже сделаем переход)');
     }));
 
-    // ✅ ПЕРЕХОД НА ucshop.html
     document.getElementById('btnShop').addEventListener('click', requireAuth(() => {
       window.location.href = 'ucshop.html';
     }));
@@ -1215,12 +1239,10 @@
     menuBtn.addEventListener('click', requireAuth(openMenu));
     menuClose.addEventListener('click', closeMenu);
 
-    menuOverlay.addEventListener('click', (e) => {
-      if (e.target === menuOverlay) closeMenu();
-    });
+    menuOverlay.addEventListener('click', (e) => { if (e.target === menuOverlay) closeMenu(); });
 
     // =========================
-    // ✅ Поддержка popup + открытие Telegram (заблокировано до входа)
+    // ✅ Поддержка popup + Telegram (заблокировано до входа)
     // =========================
     const supportOverlay = document.getElementById('supportOverlay');
     const supportClose = document.getElementById('supportClose');
@@ -1239,10 +1261,7 @@
     }
 
     supportClose.addEventListener('click', closeSupport);
-
-    supportOverlay.addEventListener('click', (e) => {
-      if (e.target === supportOverlay) closeSupport();
-    });
+    supportOverlay.addEventListener('click', (e) => { if (e.target === supportOverlay) closeSupport(); });
 
     function openTelegramLinkSafe(url){
       if (window.Telegram && window.Telegram.WebApp && typeof window.Telegram.WebApp.openTelegramLink === 'function') {
@@ -1264,7 +1283,6 @@
       }
     });
 
-    // ✅ Клики по плиткам меню (все заблокированы до входа)
     document.querySelectorAll('.menu-tile').forEach(btn => {
       btn.addEventListener('click', requireAuth(() => {
         const action = btn.getAttribute('data-action');
@@ -1281,11 +1299,9 @@
     });
 
     // =========================
-    // ✅ Инициализация UI (если уже входил раньше — подтянем баланс)
+    // ✅ Инициализация UI
     // =========================
     refreshAuthUI().catch(() => setLoggedOutUI());
-
-    // Если сессия меняется — обновим UI
     supabaseClient.auth.onAuthStateChange(() => {
       refreshAuthUI().catch(() => setLoggedOutUI());
     });
