@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Профиль</title>
+  <title>Profile</title>
 
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
 
@@ -12,7 +12,9 @@
       --text:#eaf1ff;
       --safe-bottom: env(safe-area-inset-bottom, 0px);
       --safe-top: env(safe-area-inset-top, 0px);
-      --tg:#2AABEE;
+      --radius:18px;
+      --neon:#2AABEE;
+      --neon2:#3b82f6;
     }
 
     *{ box-sizing:border-box; font-family:'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
@@ -45,113 +47,217 @@
     }
 
     .wrap{
-      max-width:520px;
+      max-width: 520px;
       margin: 0 auto;
       display:flex;
       flex-direction:column;
-      gap:14px;
+      gap: 14px;
     }
 
-    .top{
+    .topbar{
       display:flex;
       align-items:center;
       justify-content:space-between;
-      gap:12px;
+      gap: 12px;
       margin-top: 8px;
     }
 
-    .back-btn{
-      height:42px;
-      padding:0 14px;
-      border-radius:14px;
+    .icon-btn{
+      width: 42px; height: 42px;
+      border-radius: 14px;
       border: 1px solid rgba(46, 180, 255, .22);
-      background: rgba(8, 12, 22, .72);
-      color: rgba(234,241,255,.92);
       cursor:pointer;
-      font-weight:900;
-      box-shadow: 0 12px 34px rgba(0,0,0,.55);
+      background: rgba(8, 12, 22, .72);
+      box-shadow:
+        0 12px 34px rgba(0,0,0,.55),
+        0 0 22px rgba(42,171,238,.14);
+      display:grid;
+      place-items:center;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      padding:0;
+      color: rgba(234,241,255,.92);
+      font-weight: 900;
     }
-    .back-btn:active{ transform: scale(.99); }
+    .icon-btn:active{ transform: scale(.98); }
+
+    .title{
+      font-weight: 900;
+      letter-spacing:.3px;
+      font-size: 18px;
+      text-align:center;
+      flex:1;
+      color: rgba(234,241,255,.96);
+      text-shadow: 0 18px 30px rgba(0,0,0,.55);
+    }
 
     .card{
-      border-radius: 22px;
+      border-radius: 24px;
       overflow:hidden;
-      padding: 16px;
-      background: rgba(12,18,34,.86);
+      background: rgba(12,18,34,.92);
       border: 1px solid rgba(46, 180, 255, .18);
-      box-shadow: 0 34px 90px rgba(0,0,0,.45);
+      box-shadow: 0 34px 90px rgba(0,0,0,.55);
       backdrop-filter: blur(14px);
       -webkit-backdrop-filter: blur(14px);
     }
 
-    .title{
+    .card-head{
+      padding: 16px;
+      display:flex;
+      align-items:center;
+      gap: 12px;
+      background: rgba(255,255,255,.03);
+      border-bottom: 1px solid rgba(255,255,255,.06);
+    }
+
+    .avatar{
+      width: 46px; height: 46px;
+      border-radius: 16px;
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(46, 180, 255, .16);
+      overflow:hidden;
+      display:grid;
+      place-items:center;
+      box-shadow: 0 18px 40px rgba(0,0,0,.35);
+      flex: 0 0 auto;
+    }
+    .avatar img{
+      width:100%; height:100%;
+      object-fit: cover;
+      display:block;
+    }
+
+    .head-info{
+      display:flex;
+      flex-direction:column;
+      gap: 3px;
+      min-width: 0;
+    }
+
+    .name{
       font-weight: 900;
-      font-size: 16px;
-      letter-spacing:.2px;
-      margin:0 0 10px 0;
+      font-size: 14px;
+      color: rgba(234,241,255,.96);
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow: ellipsis;
+    }
+
+    .sub{
+      font-size: 12px;
+      color: rgba(234,241,255,.72);
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow: ellipsis;
+    }
+
+    .grid{
+      padding: 14px 16px 16px 16px;
+      display:grid;
+      gap: 10px;
     }
 
     .row{
       display:flex;
       align-items:center;
       justify-content:space-between;
-      gap:12px;
-      padding: 10px 0;
-      border-bottom: 1px solid rgba(255,255,255,.06);
+      gap: 10px;
+      padding: 12px 12px;
+      border-radius: 16px;
+      background: rgba(255,255,255,.04);
+      border: 1px solid rgba(255,255,255,.06);
     }
-    .row:last-child{ border-bottom:none; }
 
-    .k{
+    .label{
       font-size: 12px;
-      font-weight: 900;
-      letter-spacing:.25px;
-      color: rgba(234,241,255,.75);
+      color: rgba(234,241,255,.72);
+      font-weight: 800;
+      letter-spacing: .15px;
     }
-    .v{
-      font-size: 13px;
-      font-weight: 900;
+
+    .value{
+      font-size: 12px;
       color: rgba(234,241,255,.95);
-      text-align:right;
-      word-break: break-word;
-    }
-
-    .logout{
-      width:100%;
-      height:52px;
-      border:none;
-      border-radius: 18px;
-      cursor:pointer;
       font-weight: 900;
-      letter-spacing:.2px;
-      font-size: 14px;
-      color:#fff;
-      background: linear-gradient(180deg, rgba(239,68,68,.98), rgba(220,38,38,.98));
-      box-shadow: 0 18px 44px rgba(0,0,0,.45);
+      text-align:right;
+      word-break: break-all;
+      max-width: 68%;
     }
-    .logout:active{ transform: scale(.99); }
-    .logout:disabled{ opacity:.75; cursor: default; }
 
+    .btns{
+      padding: 0 16px 16px 16px;
+      display:flex;
+      gap: 10px;
+      flex-direction:column;
+    }
+
+    .btn{
+      border:none;
+      cursor:pointer;
+      width:100%;
+      height: 50px;
+      border-radius: 16px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap: 10px;
+
+      background: linear-gradient(180deg, rgba(42,171,238,.95), rgba(33,150,243,.90));
+      box-shadow:
+        0 18px 40px rgba(0,0,0,.45),
+        0 0 24px rgba(42,171,238,.25);
+      color:#fff;
+      font-weight: 900;
+      letter-spacing: .2px;
+      font-size: 14px;
+    }
+    .btn:active{ transform: scale(.99); }
+
+    .btn.danger{
+      background: linear-gradient(180deg, rgba(239,68,68,.95), rgba(185,28,28,.90));
+      box-shadow: 0 18px 40px rgba(0,0,0,.45);
+    }
+
+    .hint{
+      padding: 0 16px 14px 16px;
+      font-size: 12px;
+      line-height: 1.35;
+      color: rgba(234,241,255,.70);
+      text-align:center;
+    }
+
+    /* ✅ TOAST */
     .toast{
       position:fixed;
       left:50%;
       bottom: calc(18px + var(--safe-bottom));
-      transform: translateX(-50%);
-      background: rgba(8, 12, 22, .92);
-      border: 1px solid rgba(46, 180, 255, .22);
-      box-shadow: 0 14px 40px rgba(0,0,0,.55);
-      padding: 10px 12px;
-      border-radius: 14px;
+      transform: translateX(-50%) translateY(18px);
+      opacity:0;
+      pointer-events:none;
+      z-index:999;
+
+      max-width: min(520px, calc(100% - 32px));
+      padding: 12px 14px;
+      border-radius: 16px;
+
+      background: rgba(12,18,34,.92);
+      border: 1px solid rgba(46, 180, 255, .18);
+      box-shadow: 0 26px 70px rgba(0,0,0,.55);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+
       font-weight: 900;
       font-size: 13px;
-      opacity: 0;
-      pointer-events:none;
-      transition: opacity .2s ease, transform .2s ease;
-      z-index: 9999;
-      max-width: min(520px, calc(100% - 24px));
+      letter-spacing:.15px;
+      color: rgba(234,241,255,.95);
       text-align:center;
-      white-space: pre-wrap;
+
+      transition: opacity .18s ease, transform .18s ease;
     }
-    .toast.show{ opacity: 1; transform: translateX(-50%) translateY(-6px); }
+    .toast.show{
+      opacity:1;
+      transform: translateX(-50%) translateY(0);
+    }
   </style>
 </head>
 
@@ -159,136 +265,167 @@
   <div class="app">
     <div class="wrap">
 
-      <div class="top">
-        <button class="back-btn" id="backBtn">Назад</button>
+      <div class="topbar">
+        <button class="icon-btn" id="backBtn" aria-label="Назад">←</button>
+        <div class="title">Профиль</div>
+        <div style="width:42px;height:42px;"></div>
       </div>
 
       <div class="card">
-        <p class="title">Профиль</p>
+        <div class="card-head">
+          <div class="avatar" id="avatarBox" aria-hidden="true">
+            <span style="font-weight:900;color:rgba(234,241,255,.75);">TG</span>
+          </div>
 
-        <div class="row">
-          <div class="k">ID</div>
-          <div class="v" id="tgId">—</div>
+          <div class="head-info">
+            <div class="name" id="displayName">Загрузка…</div>
+            <div class="sub" id="tgUsername">@…</div>
+          </div>
         </div>
 
-        <div class="row">
-          <div class="k">Ник</div>
-          <div class="v" id="tgNick">—</div>
+        <div class="grid">
+          <div class="row">
+            <div class="label">ID аккаунта</div>
+            <div class="value" id="userId">—</div>
+          </div>
+
+          <div class="row">
+            <div class="label">Telegram</div>
+            <div class="value" id="tgId">—</div>
+          </div>
+
+          <div class="row">
+            <div class="label">Баланс</div>
+            <div class="value" id="balance">—</div>
+          </div>
+        </div>
+
+        <div class="btns">
+          <button class="btn danger" id="logoutBtn">Выйти</button>
+        </div>
+
+        <div class="hint">
+          Если после выхода снова зайдёшь — потребуется вход через Telegram.
         </div>
       </div>
 
-      <button class="logout" id="logoutBtn">Выйти</button>
     </div>
   </div>
 
-  <div class="toast" id="toast"></div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
-    // =========================
-    // CONFIG
-    // =========================
-    const SB_FUNCTION_URL = 'https://lazrfierfbhwlduqlvws.supabase.co/functions/v1/telegram-auth';
-    const SB_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxhenJmaWVyZmJod2xkdXFsdndzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE1NzY2ODIsImV4cCI6MjA4NzE1MjY4Mn0.tJtwFrNPrNyGNedGP1h0bNgr98FnyoliR-13mOqlBJI';
+    // ✅ Твои данные Supabase
+    const SUPABASE_URL = 'https://lazrfierfbhwlduqlvws.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxhenJmaWVyZmJod2xkdXFsdndzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE1NzY2ODIsImV4cCI6MjA4NzE1MjY4Mn0.tJtwFrNPrNyGNedGP1h0bNgr98FnyoliR-13mOqlBJI';
 
-    const tgIdEl = document.getElementById('tgId');
-    const tgNickEl = document.getElementById('tgNick');
-    const logoutBtn = document.getElementById('logoutBtn');
-    const backBtn = document.getElementById('backBtn');
+    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+      auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: false }
+    });
 
+    // UI
     const toastEl = document.getElementById('toast');
-    let toastTimer = null;
+    const backBtn = document.getElementById('backBtn');
+    const logoutBtn = document.getElementById('logoutBtn');
 
-    function toast(msg){
+    const displayNameEl = document.getElementById('displayName');
+    const tgUsernameEl = document.getElementById('tgUsername');
+    const userIdEl = document.getElementById('userId');
+    const tgIdEl = document.getElementById('tgId');
+    const balanceEl = document.getElementById('balance');
+    const avatarBox = document.getElementById('avatarBox');
+
+    let toastTimer = null;
+    function showToast(msg, ms = 2200){
       toastEl.textContent = msg;
       toastEl.classList.add('show');
       clearTimeout(toastTimer);
-      toastTimer = setTimeout(()=>toastEl.classList.remove('show'), 2500);
+      toastTimer = setTimeout(() => toastEl.classList.remove('show'), ms);
     }
 
-    function supaHeaders(extra = {}){
-      return {
-        'Content-Type':'application/json',
-        'apikey': SB_ANON_KEY,
-        'Authorization': 'Bearer ' + SB_ANON_KEY,
-        ...extra
-      };
+    function formatBalance(v){
+      const num = Number(v ?? 0);
+      if (!Number.isFinite(num)) return '0 VC';
+      const isInt = Math.abs(num - Math.round(num)) < 1e-9;
+      return (isInt ? String(Math.round(num)) : num.toFixed(2)) + ' VC';
     }
 
-    function getToken(){ return sessionStorage.getItem('vg_session') || ''; }
-    function clearToken(){ sessionStorage.removeItem('vg_session'); }
+    backBtn.addEventListener('click', () => {
+      window.location.href = 'index.html';
+    });
 
-    async function parseResp(r){
-      const raw = await r.text();
-      let data = {};
-      try { data = JSON.parse(raw); } catch { data = { raw }; }
-      return { data, raw };
-    }
-
-    async function getSession(){
-      const token = getToken();
-      const extra = token ? { 'x-vg-session': token } : {};
-
-      const r = await fetch(SB_FUNCTION_URL, {
-        method:'GET',
-        headers: supaHeaders(extra),
-        credentials:'include'
-      });
-
-      const { data, raw } = await parseResp(r);
-      if (!r.ok) return { ok:false, error: data.error || raw || ('HTTP '+r.status) };
-      return data;
-    }
-
-    function normNick(user){
-      const u = user || {};
-      const username = u.username || u.tg_username || u.telegram_username || '';
-      if (username) return '@' + String(username).replace('@','');
-      const name = [u.first_name, u.last_name].filter(Boolean).join(' ').trim();
-      return name || '—';
-    }
+    logoutBtn.addEventListener('click', async () => {
+      try{
+        await supabaseClient.auth.signOut();
+        showToast('Вы вышли ✅', 1200);
+        setTimeout(() => window.location.href = 'index.html', 400);
+      }catch(e){
+        console.error(e);
+        showToast('Ошибка выхода', 2200);
+      }
+    });
 
     async function loadProfile(){
-      const s = await getSession();
-      if (!s.ok){
-        // если не вошёл — назад на главную
+      // 1) должна быть сессия
+      const { data: { session } } = await supabaseClient.auth.getSession();
+      if (!session) {
         window.location.href = 'index.html';
         return;
       }
 
-      const user = s.user || {};
-      const id = user.telegram_id || user.tg_id || user.id || '—';
+      // 2) user
+      const { data: userData, error: userErr } = await supabaseClient.auth.getUser();
+      if (userErr || !userData?.user) {
+        window.location.href = 'index.html';
+        return;
+      }
+      const user = userData.user;
+      userIdEl.textContent = user.id;
 
-      tgIdEl.textContent = String(id);
-      tgNickEl.textContent = normNick(user);
-    }
+      // 3) profile row
+      const { data: prof, error: profErr } = await supabaseClient
+        .from('profiles')
+        .select('telegram_id, username, first_name, last_name, photo_url, balance')
+        .eq('id', user.id)
+        .maybeSingle();
 
-    async function logout(){
-      logoutBtn.disabled = true;
-      try{
-        const token = getToken();
-        const extra = token ? { 'x-vg-session': token } : {};
+      if (profErr) {
+        console.warn(profErr);
+        showToast('Не удалось загрузить профиль', 2600);
+        return;
+      }
 
-        // Пытаемся попросить сервер удалить сессию (если edge это поддерживает)
-        await fetch(SB_FUNCTION_URL, {
-          method:'DELETE',
-          headers: supaHeaders(extra),
-          credentials:'include'
-        });
-      }catch(_){
-        // игнор
-      }finally{
-        clearToken();
-        // чтобы точно не оставалось “входа”
-        toast('Вы вышли');
-        setTimeout(()=> window.location.href = 'index.html', 400);
+      // если Telegram ещё не привязан — назад (или можно показать “войдите”)
+      if (!prof || !prof.telegram_id) {
+        showToast('Сначала войдите через Telegram', 2200);
+        setTimeout(() => window.location.href = 'index.html', 500);
+        return;
+      }
+
+      const niceName =
+        [prof.first_name, prof.last_name].filter(Boolean).join(' ')
+        || (prof.username ? '@' + prof.username : 'Telegram пользователь');
+
+      displayNameEl.textContent = niceName;
+      tgUsernameEl.textContent = prof.username ? '@' + prof.username : '(нет username)';
+      tgIdEl.textContent = String(prof.telegram_id);
+      balanceEl.textContent = formatBalance(prof.balance);
+
+      if (prof.photo_url) {
+        avatarBox.innerHTML = '';
+        const img = document.createElement('img');
+        img.src = prof.photo_url;
+        img.alt = 'avatar';
+        avatarBox.appendChild(img);
       }
     }
 
-    backBtn.addEventListener('click', () => window.location.href = 'index.html');
-    logoutBtn.addEventListener('click', logout);
-
-    window.addEventListener('load', loadProfile);
-    window.addEventListener('pageshow', loadProfile);
+    loadProfile().catch((e) => {
+      console.error(e);
+      showToast('Ошибка загрузки', 2200);
+      setTimeout(() => window.location.href = 'index.html', 700);
+    });
   </script>
 </body>
 </html>
