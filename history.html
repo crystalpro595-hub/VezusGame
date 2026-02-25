@@ -340,6 +340,7 @@
       background: rgba(255,255,255,.06);
       color:#fff;
       text-transform:uppercase;
+      text-align:center;
     }
 
     .status-pending{ background: rgba(245,158,11,.16); color:#fcd34d; border-color: rgba(245,158,11,.24); }
@@ -482,9 +483,7 @@
     }
 
     @media (max-width:480px){
-      .tabs{
-        grid-template-columns: repeat(2, 1fr);
-      }
+      .tabs{ grid-template-columns: repeat(2, 1fr); }
     }
 
     @media (max-width:360px){
@@ -652,8 +651,8 @@
     function normalizeStatus(raw){
       const val = String(raw || "pending").toLowerCase();
       if (["approved","success","completed","done","sent"].includes(val)) return "success";
-      if (["rejected","declined"].includes(val)) return "rejected";
-      if (["cancelled","canceled"].includes(val)) return "cancelled";
+      if (["rejected","declined","failed"].includes(val)) return "rejected";
+      if (["cancelled","canceled","user_cancelled","user_canceled"].includes(val)) return "cancelled";
       return "pending";
     }
 
@@ -661,9 +660,23 @@
       const val = String(raw || "pending").toLowerCase();
       if (["approved","success","completed","done"].includes(val)) return "Одобрено";
       if (["sent"].includes(val)) return "Отправлено";
-      if (["rejected","declined"].includes(val)) return "Отклонено";
-      if (["cancelled","canceled"].includes(val)) return "Отменено";
+      if (["rejected","declined","failed"].includes(val)) return "Отклонено";
+      if (["cancelled","canceled","user_cancelled","user_canceled"].includes(val)) return "Отменено";
       return "В обработке";
+    }
+
+    function getField(obj, names){
+      for (const name of names){
+        const value = obj?.[name];
+        if (value !== undefined && value !== null && String(value).trim() !== "") {
+          return value;
+        }
+      }
+      return null;
+    }
+
+    function getAmount(item){
+      return item.amount_vc ?? item.price_vc ?? item.amount ?? 0;
     }
 
     function iconSvg(type){
@@ -695,6 +708,14 @@
     }
 
     function mapDeposit(item){
+      const senderName = getField(item, [
+        "sender_name",
+        "sender_fio",
+        "full_name",
+        "fio",
+        "name"
+      ]) ?? "—";
+
       return {
         id: item.id,
         type: "deposit",
@@ -703,15 +724,36 @@
         createdAt: item.created_at || "",
         canCancel: false,
         lines: [
-          ["Сумма", formatVc(item.amount_vc ?? item.amount ?? 0)],
-          ["ФИО отправителя", item.sender_name ?? item.sender_fio ?? item.full_name ?? "—"],
+          ["Сумма", formatVc(getAmount(item))],
+          ["ФИО отправителя", senderName],
           ["Дата", formatDate(item.created_at)]
         ]
       };
     }
 
     function mapWithdrawal(item){
-      const status = String(item.status || "pending").toLowerCase();
+      const fioValue = getField(item, [
+        "fio",
+        "receiver_fio",
+        "receiver_name",
+        "full_name",
+        "recipient_name",
+        "name"
+      ]) ?? "—";
+
+      const bankValue = getField(item, [
+        "bank",
+        "bank_name",
+        "receiver_bank",
+        "bank_title"
+      ]) ?? "—";
+
+      const requisitesValue = getField(item, [
+        "requisites",
+        "card_number",
+        "account_number",
+        "details"
+      ]) ?? "—";
 
       return {
         id: item.id,
@@ -719,18 +761,24 @@
         title: "Вывод",
         statusRaw: item.status || "pending",
         createdAt: item.created_at || "",
-        canCancel: status === "pending",
+        canCancel: String(item.status || "").toLowerCase() === "pending",
         lines: [
-          ["Сумма", formatVc(item.amount_vc ?? item.amount ?? 0)],
-          ["Реквизиты", item.requisites ?? "—"],
-          ["Банк", item.bank ?? "—"],
-          ["ФИО получателя", item.fio ?? item.receiver_name ?? "—"],
+          ["Сумма", formatVc(getAmount(item))],
+          ["Реквизиты", requisitesValue],
+          ["Банк", bankValue],
+          ["ФИО получателя", fioValue],
           ["Дата", formatDate(item.created_at)]
         ]
       };
     }
 
     function mapUc(item){
+      const packageName = getField(item, [
+        "package_name",
+        "package",
+        "title"
+      ]) ?? "—";
+
       return {
         id: item.id,
         type: "uc",
@@ -739,9 +787,9 @@
         createdAt: item.created_at || "",
         canCancel: false,
         lines: [
-          ["Пакет", item.package_name ?? "—"],
+          ["Пакет", packageName],
           ["PUBG ID", item.pubg_id ?? "—"],
-          ["Стоимость", formatVc(item.price_vc ?? item.amount_vc ?? item.amount ?? 0)],
+          ["Стоимость", formatVc(getAmount(item))],
           ["Дата", formatDate(item.created_at)]
         ]
       };
@@ -800,10 +848,6 @@
       `;
     }
 
-    function getItemsHtml(items){
-      return items.map(renderCard).join("");
-    }
-
     function renderHistory(){
       const box = $("historyList");
       const items = getItemsForTab();
@@ -817,7 +861,7 @@
         return;
       }
 
-      box.innerHTML = getItemsHtml(items);
+      box.innerHTML = items.map(renderCard).join("");
     }
 
     function setActiveTab(tab){
