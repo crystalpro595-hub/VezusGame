@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Админка</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --bg1:#020617;
+      --bg2:#0f172a;
+      --card:rgba(8,12,22,.76);
+      --line:rgba(46,180,255,.18);
+      --text:#eaf1ff;
+      --muted:rgba(234,241,255,.68);
+      --blue:#2AABEE;
+      --blue2:#3b82f6;
+      --green:#10b981;
+      --red:#ef4444;
+      --yellow:#f59e0b;
+    }
+
+    *{
+      box-sizing:border-box;
+      font-family:'Inter',sans-serif;
+      -webkit-tap-highlight-color:transparent;
+    }
+
+    html,body{
+      margin:0;
+      height:100%;
+      background:linear-gradient(180deg,var(--bg1),var(--bg2));
+      color:var(--text);
+      overflow:hidden;
+    }
+
+    body::before{
+      content:"";
+      position:fixed;
+      inset:0;
+      background:
+        radial-gradient(900px 600px at 20% 0%, rgba(42,171,238,.10), transparent 60%),
+        radial-gradient(700px 500px at 100% 10%, rgba(59,130,246,.08), transparent 60%);
+      pointer-events:none;
+    }
+
+    .app{
+      position:relative;
+      z-index:1;
+      height:100%;
+      overflow:auto;
+      padding:16px;
+    }
+
+    .wrap{
+      max-width:1100px;
+      margin:0 auto;
+      display:flex;
+      flex-direction:column;
+      gap:16px;
+    }
+
+    .topbar{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      flex-wrap:wrap;
+    }
+
+    .title{
+      font-size:24px;
+      font-weight:900;
+      letter-spacing:.2px;
+    }
+
+    .actions{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+
+    .btn{
+      border:none;
+      cursor:pointer;
+      padding:12px 16px;
+      border-radius:14px;
+      font-weight:800;
+      color:#fff;
+      background:linear-gradient(135deg,var(--blue),var(--blue2));
+      box-shadow:0 12px 28px rgba(0,0,0,.28);
+    }
+
+    .btn.secondary{
+      background:rgba(255,255,255,.08);
+      border:1px solid rgba(255,255,255,.08);
+      color:var(--text);
+    }
+
+    .stats{
+      display:grid;
+      grid-template-columns:repeat(4,1fr);
+      gap:12px;
+    }
+
+    .stat{
+      background:var(--card);
+      border:1px solid var(--line);
+      border-radius:20px;
+      padding:16px;
+      box-shadow:0 18px 40px rgba(0,0,0,.35);
+      backdrop-filter:blur(12px);
+      -webkit-backdrop-filter:blur(12px);
+    }
+
+    .stat-label{
+      font-size:12px;
+      font-weight:800;
+      color:var(--muted);
+      margin-bottom:8px;
+    }
+
+    .stat-value{
+      font-size:26px;
+      font-weight:900;
+    }
+
+    .tabs{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+
+    .tab-btn{
+      border:none;
+      cursor:pointer;
+      padding:12px 16px;
+      border-radius:14px;
+      font-weight:800;
+      color:var(--text);
+      background:rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.06);
+    }
+
+    .tab-btn.active{
+      background:linear-gradient(135deg,var(--blue),var(--blue2));
+      color:#fff;
+    }
+
+    .panel{
+      display:none;
+      flex-direction:column;
+      gap:12px;
+    }
+
+    .panel.active{
+      display:flex;
+    }
+
+    .list{
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+    }
+
+    .card{
+      background:var(--card);
+      border:1px solid var(--line);
+      border-radius:20px;
+      padding:16px;
+      box-shadow:0 18px 40px rgba(0,0,0,.35);
+      backdrop-filter:blur(12px);
+      -webkit-backdrop-filter:blur(12px);
+    }
+
+    .card-top{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      gap:12px;
+      margin-bottom:12px;
+      flex-wrap:wrap;
+    }
+
+    .card-title{
+      font-size:16px;
+      font-weight:900;
+    }
+
+    .badge{
+      padding:8px 10px;
+      border-radius:999px;
+      font-size:12px;
+      font-weight:900;
+      color:#fff;
+    }
+
+    .badge.pending{ background:var(--yellow); }
+    .badge.approved{ background:var(--green); }
+    .badge.paid{ background:var(--green); }
+    .badge.rejected{ background:var(--red); }
+
+    .grid{
+      display:grid;
+      grid-template-columns:repeat(2,1fr);
+      gap:10px;
+    }
+
+    .field{
+      background:rgba(255,255,255,.04);
+      border:1px solid rgba(255,255,255,.04);
+      border-radius:14px;
+      padding:12px;
+    }
+
+    .field-label{
+      font-size:11px;
+      font-weight:800;
+      color:var(--muted);
+      margin-bottom:6px;
+      text-transform:uppercase;
+      letter-spacing:.3px;
+    }
+
+    .field-value{
+      font-size:14px;
+      font-weight:800;
+      color:var(--text);
+      word-break:break-word;
+    }
+
+    .empty{
+      text-align:center;
+      padding:28px 18px;
+      color:var(--muted);
+      background:var(--card);
+      border:1px solid var(--line);
+      border-radius:20px;
+    }
+
+    .status-line{
+      font-size:13px;
+      color:var(--muted);
+      min-height:18px;
+    }
+
+    @media (max-width:900px){
+      .stats{ grid-template-columns:repeat(2,1fr); }
+    }
+
+    @media (max-width:640px){
+      .stats{ grid-template-columns:1fr; }
+      .grid{ grid-template-columns:1fr; }
+      .title{ font-size:22px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <div class="wrap">
+
+      <div class="topbar">
+        <div class="title">Админка заявок</div>
+        <div class="actions">
+          <button class="btn secondary" onclick="goBack()">Назад</button>
+          <button class="btn" onclick="loadAdminData()">Обновить</button>
+        </div>
+      </div>
+
+      <div class="stats">
+        <div class="stat">
+          <div class="stat-label">Всего депозитов</div>
+          <div class="stat-value" id="statDepositsTotal">0</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">Ожидают депозиты</div>
+          <div class="stat-value" id="statDepositsPending">0</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">Всего выводов</div>
+          <div class="stat-value" id="statWithdrawsTotal">0</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">Ожидают выводы</div>
+          <div class="stat-value" id="statWithdrawsPending">0</div>
+        </div>
+      </div>
+
+      <div class="tabs">
+        <button class="tab-btn active" id="tabDepositsBtn" onclick="switchTab('deposits')">Депозиты</button>
+        <button class="tab-btn" id="tabWithdrawsBtn" onclick="switchTab('withdraws')">Выводы</button>
+      </div>
+
+      <div class="status-line" id="statusLine">Загрузка...</div>
+
+      <div class="panel active" id="depositsPanel">
+        <div class="list" id="depositsList"></div>
+      </div>
+
+      <div class="panel" id="withdrawsPanel">
+        <div class="list" id="withdrawsList"></div>
+      </div>
+
+    </div>
+  </div>
+
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <script>
+    const GET_ADMIN_URL = "https://lazrfierfbhwlduqlvws.functions.supabase.co/get-admin-requests";
+
+    function $(id){ return document.getElementById(id); }
+
+    function goBack(){
+      window.location.href = 'index.html';
+    }
+
+    function switchTab(tab){
+      const isDeposits = tab === 'deposits';
+
+      $('tabDepositsBtn').classList.toggle('active', isDeposits);
+      $('tabWithdrawsBtn').classList.toggle('active', !isDeposits);
+
+      $('depositsPanel').classList.toggle('active', isDeposits);
+      $('withdrawsPanel').classList.toggle('active', !isDeposits);
+    }
+
+    function escapeHtml(value){
+      return String(value ?? '')
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#039;');
+    }
+
+    function formatDate(value){
+      if (!value) return '—';
+      const d = new Date(value);
+      if (Number.isNaN(d.getTime())) return value;
+      return d.toLocaleString('ru-RU');
+    }
+
+    function statusBadge(status){
+      const safe = escapeHtml(status || 'pending');
+      return `<span class="badge ${safe}">${safe}</span>`;
+    }
+
+    function getInitData(){
+      if (!window.Telegram || !window.Telegram.WebApp) {
+        throw new Error('Открой админку внутри Telegram Mini App');
+      }
+
+      try{
+        Telegram.WebApp.ready();
+        if (typeof Telegram.WebApp.expand === 'function') Telegram.WebApp.expand();
+        if (typeof Telegram.WebApp.setHeaderColor === 'function') Telegram.WebApp.setHeaderColor('#020617');
+      } catch(e){}
+
+      const initData = Telegram.WebApp.initData;
+      if (!initData) throw new Error('Нет initData');
+
+      return initData;
+    }
+
+    async function postJson(url, payload){
+      const res = await fetch(url, {
+        method:'POST',
+        headers:{ 'Content-Type':'application/json' },
+        body: JSON.stringify(payload)
+      });
+
+      const json = await res.json().catch(() => ({}));
+
+      if (!res.ok || !json.ok) {
+        throw new Error(json.error || json.details || `Ошибка ${res.status}`);
+      }
+
+      return json;
+    }
+
+    function renderStats(stats){
+      $('statDepositsTotal').textContent = stats?.deposits_total ?? 0;
+      $('statDepositsPending').textContent = stats?.deposits_pending ?? 0;
+      $('statWithdrawsTotal').textContent = stats?.withdraws_total ?? 0;
+      $('statWithdrawsPending').textContent = stats?.withdraws_pending ?? 0;
+    }
+
+    function renderDeposits(items){
+      const root = $('depositsList');
+
+      if (!items || !items.length) {
+        root.innerHTML = `<div class="empty">Заявок на пополнение пока нет</div>`;
+        return;
+      }
+
+      root.innerHTML = items.map(item => `
+        <div class="card">
+          <div class="card-top">
+            <div class="card-title">Депозит #${escapeHtml(item.id)}</div>
+            ${statusBadge(item.status)}
+          </div>
+
+          <div class="grid">
+            <div class="field">
+              <div class="field-label">Telegram ID</div>
+              <div class="field-value">${escapeHtml(item.user_tg_id)}</div>
+            </div>
+
+            <div class="field">
+              <div class="field-label">ФИО отправителя</div>
+              <div class="field-value">${escapeHtml(item.sender_name)}</div>
+            </div>
+
+            <div class="field">
+              <div class="field-label">Сумма ₽</div>
+              <div class="field-value">${escapeHtml(item.amount_rub)}</div>
+            </div>
+
+            <div class="field">
+              <div class="field-label">Сумма VC</div>
+              <div class="field-value">${escapeHtml(item.amount_vc)}</div>
+            </div>
+
+            <div class="field">
+              <div class="field-label">Способ</div>
+              <div class="field-value">${escapeHtml(item.payment_method)}</div>
+            </div>
+
+            <div class="field">
+              <div class="field-label">Создано</div>
+              <div class="field-value">${escapeHtml(formatDate(item.created_at))}</div>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function renderWithdraws(items){
+      const root = $('withdrawsList');
+
+      if (!items || !items.length) {
+        root.innerHTML = `<div class="empty">Заявок на вывод пока нет</div>`;
+        return;
+      }
+
+      root.innerHTML = items.map(item => `
+        <div class="card">
+          <div class="card-top">
+            <div class="card-title">Вывод #${escapeHtml(item.id)}</div>
+            ${statusBadge(item.status)}
+          </div>
+
+          <div class="grid">
+            <div class="field">
+              <div class="field-label">Telegram ID</div>
+              <div class="field-value">${escapeHtml(item.user_tg_id)}</div>
+            </div>
+
+            <div class="field">
+              <div class="field-label">Сумма VC</div>
+              <div class="field-value">${escapeHtml(item.amount_vc)}</div>
+            </div>
+
+            <div class="field">
+              <div class="field-label">Реквизиты</div>
+              <div class="field-value">${escapeHtml(item.requisites)}</div>
+            </div>
+
+            <div class="field">
+              <div class="field-label">Банк</div>
+              <div class="field-value">${escapeHtml(item.bank_name)}</div>
+            </div>
+
+            <div class="field">
+              <div class="field-label">ФИО получателя</div>
+              <div class="field-value">${escapeHtml(item.recipient_fio)}</div>
+            </div>
+
+            <div class="field">
+              <div class="field-label">Создано</div>
+              <div class="field-value">${escapeHtml(formatDate(item.created_at))}</div>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    async function loadAdminData(){
+      $('statusLine').textContent = 'Загрузка данных...';
+
+      try{
+        const initData = getInitData();
+        const data = await postJson(GET_ADMIN_URL, { initData });
+
+        renderStats(data.stats || {});
+        renderDeposits(data.deposits || []);
+        renderWithdraws(data.withdraws || []);
+
+        $('statusLine').textContent = `Обновлено: ${new Date().toLocaleTimeString('ru-RU')}`;
+      } catch(err){
+        $('statusLine').textContent = err.message || 'Ошибка загрузки';
+        $('depositsList').innerHTML = `<div class="empty">${escapeHtml(err.message || 'Ошибка')}</div>`;
+        $('withdrawsList').innerHTML = `<div class="empty">${escapeHtml(err.message || 'Ошибка')}</div>`;
+      }
+    }
+
+    window.addEventListener('load', loadAdminData);
+  </script>
+</body>
+</html>
