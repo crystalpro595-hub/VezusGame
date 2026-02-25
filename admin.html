@@ -148,6 +148,13 @@
       color:#fff;
     }
 
+    .status-line{
+      font-size:13px;
+      color:var(--muted);
+      min-height:18px;
+      word-break:break-word;
+    }
+
     .panel{
       display:none;
       flex-direction:column;
@@ -238,13 +245,6 @@
       background:var(--card);
       border:1px solid var(--line);
       border-radius:20px;
-    }
-
-    .status-line{
-      font-size:13px;
-      color:var(--muted);
-      min-height:18px;
-      word-break:break-word;
     }
 
     @media (max-width:900px){
@@ -349,7 +349,7 @@
       return `<span class="badge ${escapeHtml(safe)}">${escapeHtml(safe)}</span>`;
     }
 
-    function getInitData(){
+    function getAdminTgId(){
       if (!window.Telegram || !window.Telegram.WebApp) {
         throw new Error('Открой админку внутри Telegram Mini App');
       }
@@ -358,19 +358,22 @@
         Telegram.WebApp.ready();
         if (typeof Telegram.WebApp.expand === 'function') Telegram.WebApp.expand();
         if (typeof Telegram.WebApp.setHeaderColor === 'function') Telegram.WebApp.setHeaderColor('#020617');
-      } catch(e){}
+      } catch (e) {}
 
-      const initData = Telegram.WebApp.initData;
-      if (!initData) throw new Error('Нет initData');
+      const tgId = Telegram.WebApp.initDataUnsafe?.user?.id;
 
-      return initData;
+      if (!tgId) {
+        throw new Error('Не удалось получить Telegram ID');
+      }
+
+      return String(tgId);
     }
 
     async function postJson(url, payload){
       const res = await fetch(url, {
-        method:'POST',
-        headers:{
-          'Content-Type':'application/json',
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
           'apikey': SUPABASE_ANON_KEY,
           'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
         },
@@ -380,7 +383,7 @@
       const json = await res.json().catch(() => ({}));
 
       if (!res.ok || !json.ok) {
-        throw new Error(json.reason || json.error || json.details || `Ошибка ${res.status}`);
+        throw new Error(json.error || json.details || `Ошибка ${res.status}`);
       }
 
       return json;
@@ -497,14 +500,17 @@
       $('statusLine').textContent = 'Загрузка данных...';
 
       try{
-        const initData = getInitData();
-        const data = await postJson(GET_ADMIN_URL, { initData });
+        const adminTgId = getAdminTgId();
+        const data = await postJson(GET_ADMIN_URL, { adminTgId });
+
+        console.log('ADMIN DATA:', data);
 
         renderStats(data.stats || {});
         renderDeposits(data.deposits || []);
         renderWithdraws(data.withdraws || []);
 
-        $('statusLine').textContent = `Обновлено: ${new Date().toLocaleTimeString('ru-RU')}`;
+        $('statusLine').textContent =
+          `tg_id=${adminTgId} • deposits=${data.deposits?.length || 0} • withdraws=${data.withdraws?.length || 0} • обновлено ${new Date().toLocaleTimeString('ru-RU')}`;
       } catch(err){
         const msg = err.message || 'Ошибка загрузки';
         $('statusLine').textContent = msg;
