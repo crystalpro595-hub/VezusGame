@@ -10,20 +10,32 @@
   <style>
     :root{
       --text:#eaf1ff;
+      --muted:rgba(234,241,255,.72);
       --safe-bottom: env(safe-area-inset-bottom, 0px);
       --safe-top: env(safe-area-inset-top, 0px);
-      --radius:18px;
+      --radius:20px;
 
       --neon:#2AABEE;
       --neon2:#3b82f6;
 
-      --glass: rgba(8, 12, 22, .72);
+      --glass: rgba(8, 12, 22, .74);
       --glassBorder: rgba(46, 180, 255, .22);
       --shadow: 0 14px 40px rgba(0,0,0,.55);
     }
 
-    *{ box-sizing:border-box; font-family:'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
-    html, body{ height:100%; margin:0; overflow:hidden; color:var(--text); background:#020617; }
+    *{
+      box-sizing:border-box;
+      font-family:'Inter', sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html, body{
+      height:100%;
+      margin:0;
+      overflow:hidden;
+      color:var(--text);
+      background:#020617;
+    }
 
     body{
       background-image:url("https://i.postimg.cc/fbJT34yY/076E519D-F095-4957-88BF-5591DEB82533.png");
@@ -31,6 +43,7 @@
       background-position:center;
       background-repeat:no-repeat;
     }
+
     body::before{
       content:"";
       position:fixed;
@@ -46,38 +59,35 @@
       height:100%;
       overflow:auto;
       padding: calc(18px + var(--safe-top)) 16px calc(28px + var(--safe-bottom)) 16px;
+      z-index:1;
     }
 
     .content{
-      margin-top: 18px;
+      margin-top:18px;
       display:flex;
       flex-direction:column;
-      gap: 16px;
-      max-width: 520px;
+      gap:16px;
+      max-width:520px;
       margin-left:auto;
       margin-right:auto;
-      position:relative;
-      z-index:1;
       align-items:center;
     }
 
-    /* ===== Top row: Назад + баланс ===== */
     .top-row{
       width:100%;
-      max-width:520px;
       display:flex;
       align-items:center;
       justify-content:center;
-      gap: 16px;
+      gap:16px;
     }
 
     .back-btn-square{
-      width: 42px;
-      height: 42px;
-      border-radius: 14px;
-      border: 1px solid var(--glassBorder);
+      width:42px;
+      height:42px;
+      border-radius:14px;
+      border:1px solid var(--glassBorder);
       cursor:pointer;
-      background: var(--glass);
+      background:var(--glass);
       box-shadow:
         0 12px 34px rgba(0,0,0,.55),
         0 0 22px rgba(42,171,238,.14);
@@ -88,9 +98,9 @@
       transition: transform .15s ease;
       padding:0;
       overflow:hidden;
-      flex: 0 0 auto;
+      flex:0 0 auto;
     }
-    .back-btn-square:active{ transform: scale(.98); }
+    .back-btn-square:active{ transform:scale(.98); }
 
     .back-icon{
       font-size:18px;
@@ -100,21 +110,19 @@
       transform: translateX(-1px);
     }
 
-    /* ===== Баланс ===== */
     .balance-mini{
-      width: min(210px, 70%);
-      height: 38px;
-      border-radius: 999px;
+      width:min(220px, 72%);
+      height:40px;
+      border-radius:999px;
       display:flex;
       align-items:center;
       justify-content:space-between;
-      gap: 10px;
-      padding: 6px 7px 6px 12px;
+      gap:10px;
+      padding:6px 7px 6px 12px;
       position:relative;
       overflow:hidden;
-
-      background: var(--glass);
-      border: 1px solid var(--glassBorder);
+      background:var(--glass);
+      border:1px solid var(--glassBorder);
       box-shadow:
         var(--shadow),
         0 0 0 1px rgba(255,255,255,.04) inset,
@@ -127,21 +135,10 @@
       content:"";
       position:absolute;
       inset:auto -40px 0 -40px;
-      height: 2px;
+      height:2px;
       background: linear-gradient(90deg, transparent, rgba(42,171,238,.95), rgba(59,130,246,.95), transparent);
       opacity:.70;
       pointer-events:none;
-    }
-
-    .balance-mini::after{
-      content:"";
-      position:absolute;
-      inset:-120px -160px auto auto;
-      width:300px;
-      height:300px;
-      background: radial-gradient(circle at 30% 30%, rgba(42,171,238,.16), transparent 62%);
-      pointer-events:none;
-      transform: rotate(10deg);
     }
 
     .bal-title{
@@ -157,48 +154,53 @@
     .bal-amount{
       position:relative;
       z-index:1;
-      height: 26px;
+      height:26px;
       border:none;
-      border-radius: 999px;
+      border-radius:999px;
       cursor:pointer;
-      padding: 0 10px;
-
+      padding:0 10px;
       display:flex;
       align-items:center;
       justify-content:center;
-
       background: linear-gradient(180deg, rgba(42,171,238,.22), rgba(59,130,246,.14));
       border: 1px solid rgba(42,171,238,.24);
       box-shadow:
         0 10px 18px rgba(0,0,0,.35),
         0 0 16px rgba(42,171,238,.12);
       color: rgba(234,241,255,.98);
-      font-weight: 900;
-      font-size: 13px;
+      font-weight:900;
+      font-size:13px;
       white-space:nowrap;
     }
-    .bal-amount:active{ transform: scale(.99); }
 
-    /* ===== Title ===== */
     .title-row{
       width:100%;
-      max-width:520px;
       display:flex;
       align-items:center;
       justify-content:space-between;
       gap:12px;
       margin-top:2px;
     }
+
     .page-title{
-      font-size:18px;
-      font-weight: 900;
+      font-size:20px;
+      font-weight:900;
       letter-spacing:.2px;
       margin:0;
-      text-shadow: 0 14px 25px rgba(0,0,0,.55);
+      text-shadow:0 14px 25px rgba(0,0,0,.55);
     }
 
-    /* ===== Slider (2 баннера) ===== */
-    .slider{ width:100%; max-width:520px; border-radius: var(--radius); }
+    .page-sub{
+      font-size:12px;
+      font-weight:800;
+      color:var(--muted);
+      margin:2px 0 0 0;
+    }
+
+    .slider{
+      width:100%;
+      border-radius:var(--radius);
+    }
 
     .slides{
       display:flex;
@@ -208,34 +210,37 @@
       -webkit-overflow-scrolling: touch;
       scrollbar-width:none;
       padding-bottom:4px;
-      border-radius: var(--radius);
+      border-radius:var(--radius);
     }
     .slides::-webkit-scrollbar{ display:none; }
 
     .slide{
       scroll-snap-align:start;
       flex:0 0 100%;
-      border-radius: var(--radius);
+      border-radius:var(--radius);
       position:relative;
       overflow:hidden;
       background:#000;
       box-shadow: 0 18px 55px rgba(0,0,0,.40);
-      border: 1px solid rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.06);
     }
+
     .slide::before{
       content:"";
       display:block;
-      padding-top: 33.3333%;
+      padding-top:33.3333%;
     }
+
     .slide img{
       position:absolute;
       inset:0;
       width:100%;
       height:100%;
-      object-fit: cover;
+      object-fit:cover;
       object-position:center;
       display:block;
     }
+
     .slide::after{
       content:"";
       position:absolute;
@@ -244,13 +249,22 @@
       pointer-events:none;
     }
 
-    .dots{ display:flex; justify-content:center; gap:8px; margin-top:10px; }
+    .dots{
+      display:flex;
+      justify-content:center;
+      gap:8px;
+      margin-top:10px;
+    }
+
     .dot{
-      width:8px; height:8px; border-radius:999px;
+      width:8px;
+      height:8px;
+      border-radius:999px;
       background: rgba(234,241,255,.26);
       transition: transform .2s ease, background .2s ease, width .2s ease;
       cursor:pointer;
     }
+
     .dot.active{
       background: rgba(42,171,238,.95);
       width:18px;
@@ -258,10 +272,8 @@
       box-shadow: 0 0 12px rgba(42,171,238,.55);
     }
 
-    /* ===== Products ===== */
     .section{
       width:100%;
-      max-width:520px;
       display:flex;
       flex-direction:column;
       gap:12px;
@@ -273,75 +285,83 @@
       align-items:flex-end;
       justify-content:space-between;
       gap:10px;
-      padding: 0 2px;
+      padding:0 2px;
     }
 
     .section-head .h{
       font-size:14px;
-      font-weight: 900;
+      font-weight:900;
       opacity:.92;
       margin:0;
     }
 
     .grid{
       display:grid;
-      grid-template-columns: 1fr;
-      gap:12px;
+      grid-template-columns:1fr;
+      gap:14px;
     }
 
-    .card{
-      border-radius: 20px;
-      background: rgba(8, 12, 22, .78);
-      border: 1px solid rgba(46, 180, 255, .18);
-      box-shadow:
-        0 18px 46px rgba(0,0,0,.38),
-        0 0 18px rgba(42,171,238,.10);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      overflow:hidden;
+    .product-card{
       position:relative;
+      border-radius:24px;
+      overflow:hidden;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02)),
+        rgba(8, 12, 22, .80);
+      border:1px solid rgba(46,180,255,.16);
+      box-shadow:
+        0 22px 58px rgba(0,0,0,.40),
+        0 0 24px rgba(42,171,238,.10);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+
+      opacity:0;
+      transform: translateY(26px) scale(.985);
+      animation: cardInUp .55s cubic-bezier(.2,.9,.2,1) forwards;
+      animation-delay: var(--delay, 0ms);
     }
 
-    .card::before,
-    .card::after{
+    .product-card::before{
       content:"";
       position:absolute;
-      top:-18px; bottom:-18px;
-      width:18px;
-      filter: blur(10px);
-      opacity:.90;
+      inset:0;
+      background:
+        radial-gradient(460px 140px at 0% 0%, rgba(42,171,238,.12), transparent 60%),
+        radial-gradient(360px 120px at 100% 100%, rgba(59,130,246,.10), transparent 60%);
       pointer-events:none;
     }
-    .card::before{
-      left:-10px;
-      background: linear-gradient(180deg, rgba(42,171,238,.0), rgba(42,171,238,.85), rgba(59,130,246,.0));
-    }
-    .card::after{
-      right:-10px;
-      background: linear-gradient(180deg, rgba(59,130,246,.0), rgba(42,171,238,.85), rgba(59,130,246,.0));
+
+    @keyframes cardInUp{
+      to{
+        opacity:1;
+        transform: translateY(0) scale(1);
+      }
     }
 
-    .card-inner{
+    .card-main{
       display:flex;
-      gap:12px;
+      gap:14px;
       padding:14px;
       align-items:center;
+      position:relative;
+      z-index:1;
     }
 
-    .uc-badge{
-      width:56px;
-      height:56px;
-      border-radius: 16px;
+    .art-box{
+      width:78px;
+      height:78px;
+      border-radius:20px;
       overflow:hidden;
       position:relative;
-      background: linear-gradient(135deg, rgba(42,171,238,.32), rgba(59,130,246,.16));
-      border: 1px solid rgba(42,171,238,.22);
-      box-shadow: 0 12px 28px rgba(0,0,0,.35);
       flex:0 0 auto;
-      display:grid;
-      place-items:center;
+      background: linear-gradient(135deg, rgba(42,171,238,.28), rgba(59,130,246,.14));
+      border: 1px solid rgba(42,171,238,.18);
+      box-shadow:
+        0 16px 36px rgba(0,0,0,.35),
+        0 0 16px rgba(42,171,238,.12);
     }
-    .uc-badge img{
+
+    .art-box img{
       width:100%;
       height:100%;
       object-fit:cover;
@@ -353,59 +373,102 @@
       min-width:0;
       display:flex;
       flex-direction:column;
-      gap:6px;
+      gap:8px;
     }
 
     .card-title{
-      font-size:14px;
-      font-weight: 900;
       margin:0;
+      font-size:16px;
+      font-weight:900;
+      letter-spacing:.15px;
       white-space:nowrap;
       overflow:hidden;
       text-overflow:ellipsis;
     }
 
-    .actions-row{
-      display:flex;
-      gap:10px;
-      align-items:center;
-      justify-content:flex-end;
-      padding: 0 14px 14px 14px;
+    .card-sub{
+      margin:0;
+      font-size:12px;
+      font-weight:800;
+      color:var(--muted);
     }
 
-    .price-inline{
-      font-weight: 900;
-      font-size: 13px;
-      color: rgba(234,241,255,.95);
-      opacity:.95;
-      white-space:nowrap;
-      margin-right: 2px;
+    .mini-tags{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
     }
-    .price-inline .label{
+
+    .mini-tag{
+      height:24px;
+      border-radius:999px;
+      padding:0 10px;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      background: rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.06);
       font-size:11px;
-      letter-spacing:.14px;
-      opacity:.80;
-      font-weight: 900;
+      font-weight:900;
+      color:rgba(234,241,255,.92);
+    }
+
+    .card-bottom{
+      position:relative;
+      z-index:1;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      padding:0 14px 14px 14px;
+    }
+
+    .price-box{
+      display:flex;
+      flex-direction:column;
+      gap:2px;
+    }
+
+    .price-label{
+      font-size:11px;
+      font-weight:900;
+      letter-spacing:.18px;
       text-transform:uppercase;
-      margin-right:6px;
+      color:var(--muted);
+    }
+
+    .price-value{
+      font-size:18px;
+      font-weight:900;
+      color:#fff;
+      text-shadow:0 10px 20px rgba(0,0,0,.28);
     }
 
     .buy-btn{
-      height:38px;
-      padding: 0 14px;
-      border-radius: 14px;
+      height:42px;
+      padding:0 18px;
+      border-radius:16px;
       border:none;
       cursor:pointer;
       color:#fff;
-      font-weight: 900;
+      font-weight:900;
       background: linear-gradient(135deg, #3b82f6, #2563eb);
-      box-shadow: 0 18px 34px rgba(37,99,235,.28);
-      transition: transform .15s ease;
+      box-shadow:
+        0 18px 34px rgba(37,99,235,.28),
+        0 0 16px rgba(59,130,246,.12);
+      transition: transform .15s ease, box-shadow .15s ease;
       white-space:nowrap;
     }
-    .buy-btn:active{ transform: scale(.98); }
 
-    /* ===== Popup (универсальный) ===== */
+    .buy-btn:hover{
+      transform: translateY(-1px);
+      box-shadow:
+        0 22px 38px rgba(37,99,235,.34),
+        0 0 18px rgba(59,130,246,.14);
+    }
+
+    .buy-btn:active{ transform:scale(.98); }
+
     .popup-overlay{
       position:fixed;
       inset:0;
@@ -417,16 +480,20 @@
       display:flex;
       align-items:center;
       justify-content:center;
-      padding: 16px;
+      padding:16px;
     }
-    .popup-overlay.show{ opacity:1; pointer-events:auto; }
+
+    .popup-overlay.show{
+      opacity:1;
+      pointer-events:auto;
+    }
 
     .popup{
       width:min(520px, 100%);
-      border-radius: 22px;
+      border-radius:22px;
       background: rgba(12,18,34,.96);
-      border: 1px solid rgba(46, 180, 255, .16);
-      box-shadow: 0 34px 90px rgba(0,0,0,.62);
+      border:1px solid rgba(46, 180, 255, .16);
+      box-shadow:0 34px 90px rgba(0,0,0,.62);
       overflow:hidden;
     }
 
@@ -434,26 +501,28 @@
       display:flex;
       align-items:center;
       justify-content:space-between;
-      padding: 14px 16px;
+      padding:14px 16px;
       background: rgba(255,255,255,.04);
     }
+
     .popup-head .t{
-      font-weight: 900;
+      font-weight:900;
       margin:0;
     }
+
     .close-x{
       width:38px;
       height:38px;
-      border-radius: 14px;
-      border: 1px solid rgba(46, 180, 255, .16);
+      border-radius:14px;
+      border:1px solid rgba(46, 180, 255, .16);
       background: rgba(255,255,255,.06);
       color: rgba(234,241,255,.95);
       cursor:pointer;
-      font-weight: 900;
+      font-weight:900;
     }
 
     .popup-body{
-      padding: 14px 16px 16px 16px;
+      padding:14px 16px 16px 16px;
       display:flex;
       flex-direction:column;
       gap:12px;
@@ -466,133 +535,147 @@
       font-size:13px;
       opacity:.92;
     }
+
     .popup-line b{ opacity:1; }
 
-    /* PUBG ID input */
     .field{
       display:flex;
       flex-direction:column;
       gap:8px;
-      margin-top: 2px;
+      margin-top:2px;
     }
+
     .field label{
-      font-size: 12px;
-      font-weight: 900;
+      font-size:12px;
+      font-weight:900;
       letter-spacing:.12px;
       opacity:.92;
     }
+
     .input{
-      height: 44px;
-      border-radius: 16px;
-      border: 1px solid rgba(46, 180, 255, .16);
+      height:46px;
+      border-radius:16px;
+      border:1px solid rgba(46, 180, 255, .16);
       background: rgba(255,255,255,.06);
       color: rgba(234,241,255,.96);
       padding: 0 14px;
-      outline: none;
-      font-weight: 800;
+      outline:none;
+      font-weight:800;
       letter-spacing:.2px;
       box-shadow: 0 18px 40px rgba(0,0,0,.25);
     }
-    .input::placeholder{ color: rgba(234,241,255,.45); font-weight: 800; }
+
+    .input::placeholder{
+      color: rgba(234,241,255,.45);
+      font-weight:800;
+    }
 
     .hint{
-      font-size: 12px;
-      opacity: .72;
-      line-height: 1.2;
-      margin-top: -2px;
+      font-size:12px;
+      opacity:.72;
+      line-height:1.25;
+      margin-top:-2px;
     }
 
     .error{
       display:none;
-      font-size: 12px;
-      color: #ffb4b4;
-      font-weight: 900;
-      opacity: .95;
+      font-size:12px;
+      color:#ffb4b4;
+      font-weight:900;
+      opacity:.95;
     }
+
     .error.show{ display:block; }
 
     .btn-row{
       display:flex;
       gap:10px;
-      margin-top: 4px;
+      margin-top:4px;
     }
 
     .btn{
-      height: 44px;
+      height:44px;
       border:none;
-      border-radius: 16px;
+      border-radius:16px;
       cursor:pointer;
-      font-weight: 900;
+      font-weight:900;
       letter-spacing:.15px;
-      flex: 1;
+      flex:1;
       transition: transform .15s ease;
       white-space:nowrap;
     }
-    .btn:active{ transform: scale(.99); }
+
+    .btn:active{ transform:scale(.99); }
 
     .btn-primary{
       color:#fff;
       background: linear-gradient(135deg, #3b82f6, #2563eb);
       box-shadow: 0 18px 34px rgba(37,99,235,.28);
     }
+
     .btn-ghost{
       color: rgba(234,241,255,.92);
       background: rgba(255,255,255,.06);
-      border: 1px solid rgba(46, 180, 255, .16);
+      border:1px solid rgba(46, 180, 255, .16);
       box-shadow: 0 18px 34px rgba(0,0,0,.20);
     }
 
-    /* Toast */
     .toast{
       position: fixed;
-      left: 50%;
+      left:50%;
       bottom: calc(18px + var(--safe-bottom));
       transform: translateX(-50%) translateY(14px);
       background: rgba(12,18,34,.92);
-      border: 1px solid rgba(46, 180, 255, .18);
-      box-shadow: 0 22px 60px rgba(0,0,0,.55);
+      border:1px solid rgba(46, 180, 255, .18);
+      box-shadow:0 22px 60px rgba(0,0,0,.55);
       color: rgba(234,241,255,.95);
-      border-radius: 18px;
-      padding: 12px 14px;
+      border-radius:18px;
+      padding:12px 14px;
       width: min(520px, calc(100% - 32px));
-      opacity: 0;
+      opacity:0;
       pointer-events:none;
       transition: opacity .22s ease, transform .22s ease;
-      z-index: 300;
+      z-index:300;
       backdrop-filter: blur(14px);
       -webkit-backdrop-filter: blur(14px);
       display:flex;
       align-items:center;
       justify-content:space-between;
-      gap: 10px;
-      font-weight: 900;
-      font-size: 13px;
+      gap:10px;
+      font-weight:900;
+      font-size:13px;
     }
+
     .toast.show{
-      opacity: 1;
+      opacity:1;
       transform: translateX(-50%) translateY(0);
     }
+
     .toast .ok{
       border:none;
       cursor:pointer;
-      border-radius: 14px;
-      height: 34px;
-      padding: 0 12px;
+      border-radius:14px;
+      height:34px;
+      padding:0 12px;
       background: rgba(255,255,255,.08);
-      border: 1px solid rgba(46, 180, 255, .16);
+      border:1px solid rgba(46, 180, 255, .16);
       color: rgba(234,241,255,.95);
-      font-weight: 900;
+      font-weight:900;
     }
 
-    @media (max-width: 360px){
-      .balance-mini{ width: min(196px, 68%); height: 36px; }
-      .bal-amount{ height: 25px; font-size: 12px; }
-      .back-btn-square{ width: 40px; height: 40px; border-radius: 13px; }
-      .top-row{ gap: 14px; }
+    @media (max-width:360px){
+      .balance-mini{ width:min(200px, 70%); height:38px; }
+      .bal-amount{ height:25px; font-size:12px; }
+      .back-btn-square{ width:40px; height:40px; border-radius:13px; }
+      .top-row{ gap:14px; }
+      .art-box{ width:70px; height:70px; border-radius:18px; }
+      .card-title{ font-size:15px; }
+      .price-value{ font-size:16px; }
     }
 
     @media (prefers-reduced-motion: reduce){
-      *{ transition:none !important; }
+      *{ transition:none !important; animation:none !important; }
+      .product-card{ opacity:1 !important; transform:none !important; }
     }
   </style>
 </head>
@@ -601,7 +684,6 @@
   <div class="app">
     <div class="content">
 
-      <!-- Top row -->
       <div class="top-row">
         <button class="back-btn-square" id="backBtn" aria-label="Назад" title="Назад">
           <span class="back-icon">←</span>
@@ -610,16 +692,18 @@
         <div class="balance-mini" aria-label="Баланс">
           <span class="bal-title">Баланс</span>
           <button class="bal-amount" id="balanceChip" aria-label="Открыть кошелёк">
-            <span id="balanceValue">0 VC</span>
+            <span id="balanceValue">...</span>
           </button>
         </div>
       </div>
 
       <div class="title-row">
-        <h1 class="page-title">UC Shop</h1>
+        <div>
+          <h1 class="page-title">UC Shop</h1>
+          <p class="page-sub">Выбери пакет и отправь заявку</p>
+        </div>
       </div>
 
-      <!-- Slider -->
       <div class="slider" aria-label="Баннеры">
         <div class="slides" id="slides">
           <div class="slide">
@@ -636,7 +720,6 @@
         </div>
       </div>
 
-      <!-- Products -->
       <div class="section">
         <div class="section-head">
           <p class="h">Пакеты UC</p>
@@ -647,7 +730,6 @@
     </div>
   </div>
 
-  <!-- STEP 1: Buy popup (данные + PUBG ID) -->
   <div class="popup-overlay" id="buyPopup" aria-hidden="true">
     <div class="popup" role="dialog" aria-modal="true" aria-label="Покупка UC">
       <div class="popup-head">
@@ -667,13 +749,12 @@
 
         <div class="btn-row">
           <button class="btn btn-ghost" id="cancel1">Отмена</button>
-          <button class="btn btn-primary" id="buyStep1">Купить</button>
+          <button class="btn btn-primary" id="buyStep1">Продолжить</button>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- STEP 2: Confirm popup (верно ли ID) -->
   <div class="popup-overlay" id="confirmPopup" aria-hidden="true">
     <div class="popup" role="dialog" aria-modal="true" aria-label="Подтверждение ID">
       <div class="popup-head">
@@ -686,40 +767,121 @@
         <div class="popup-line"><span>PUBG ID:</span> <b id="cPubg">—</b></div>
 
         <div class="hint" style="opacity:.85">
-          Верно ли указан игровой ID? Если ошибёшься — UC придут на другой аккаунт.
+          Проверь ID внимательно. После создания заявки он уйдёт в обработку.
         </div>
 
         <div class="btn-row">
           <button class="btn btn-ghost" id="backToEdit">Назад</button>
-          <button class="btn btn-primary" id="confirmBuy">Да, верно</button>
+          <button class="btn btn-primary" id="confirmBuy">Создать заявку</button>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- Toast -->
   <div class="toast" id="toast" aria-live="polite">
     <span id="toastText">—</span>
     <button class="ok" id="toastOk">Ок</button>
   </div>
 
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
   <script>
-    // ====== Данные пакетов ======
+    const VERIFY_URL = "https://lazrfierfbhwlduqlvws.functions.supabase.co/verify-telegram";
+    const CREATE_UC_ORDER_URL = "https://lazrfierfbhwlduqlvws.functions.supabase.co/create-uc-order";
+
     const PRODUCTS = [
-      { id:'uc_60',   name:'60 UC',   price: 80,   img: 'https://i.postimg.cc/L6tCqkN3/Picsart-26-02-15-18-22-50-916.png'   },
-      { id:'uc_325',  name:'325 UC',  price: 420,  img: 'https://i.postimg.cc/bwmZ2c1q/Picsart-26-02-17-17-05-40-600.png'  },
-      { id:'uc_660',  name:'660 UC',  price: 810,  img: 'https://i.postimg.cc/pTqGwdFc/Picsart-26-02-17-17-11-01-813.png'  },
-      { id:'uc_1800', name:'1800 UC', price: 2100, img: 'https://i.postimg.cc/QMrSy7HV/Picsart-26-02-17-17-40-40-648.png' },
-      { id:'uc_3850', name:'3850 UC', price: 4100, img: 'https://i.postimg.cc/zvRgNdQX/Picsart-26-02-17-17-42-16-376.png' },
-      { id:'uc_8100', name:'8100 UC', price: 8100, img: 'https://i.postimg.cc/3Jq3m8Wb/Picsart-26-02-17-17-48-00-356.png' },
+      { id:'uc_60',   name:'60 UC',   price:80,   img:'https://i.postimg.cc/L6tCqkN3/Picsart-26-02-15-18-22-50-916.png',   tag:'Стартовый',  sub:'Быстрый заказ' },
+      { id:'uc_325',  name:'325 UC',  price:420,  img:'https://i.postimg.cc/bwmZ2c1q/Picsart-26-02-17-17-05-40-600.png',  tag:'Популярный', sub:'Хороший выбор' },
+      { id:'uc_660',  name:'660 UC',  price:810,  img:'https://i.postimg.cc/pTqGwdFc/Picsart-26-02-17-17-11-01-813.png',  tag:'Выгодно',    sub:'Часто покупают' },
+      { id:'uc_1800', name:'1800 UC', price:2100, img:'https://i.postimg.cc/QMrSy7HV/Picsart-26-02-17-17-40-40-648.png', tag:'Премиум',    sub:'Крупный пакет' },
+      { id:'uc_3850', name:'3850 UC', price:4100, img:'https://i.postimg.cc/zvRgNdQX/Picsart-26-02-17-17-42-16-376.png', tag:'Топ',        sub:'Для активных' },
+      { id:'uc_8100', name:'8100 UC', price:8100, img:'https://i.postimg.cc/3Jq3m8Wb/Picsart-26-02-17-17-48-00-356.png', tag:'Максимум',   sub:'Самый большой' },
     ];
 
-    // ===== Utils =====
+    const STORAGE_KEY = 'pubg_id_last';
+
     const $ = (id) => document.getElementById(id);
     const clamp = (n, min, max) => Math.max(min, Math.min(max, n));
 
+    let current = null;
+    let telegramProfile = null;
+    let isCreatingOrder = false;
+
     function formatRub(n){
       return new Intl.NumberFormat('ru-RU').format(n) + ' ₽';
+    }
+
+    function formatVc(value){
+      const num = Number(value ?? 0);
+      if (!Number.isFinite(num)) return '0 VC';
+      return Number.isInteger(num) ? `${num} VC` : `${num.toFixed(2)} VC`;
+    }
+
+    function loadCachedProfile(){
+      try{
+        const raw = localStorage.getItem('tg_profile');
+        if (!raw) return null;
+        const parsed = JSON.parse(raw);
+        if (!parsed || typeof parsed !== 'object') return null;
+        return parsed;
+      } catch {
+        return null;
+      }
+    }
+
+    function applyProfile(profile){
+      if (!profile) return;
+      telegramProfile = profile;
+      localStorage.setItem('tg_profile', JSON.stringify(profile));
+      $('balanceValue').textContent = formatVc(profile.balance);
+    }
+
+    async function postJson(url, payload){
+      const res = await fetch(url, {
+        method:'POST',
+        headers:{ 'Content-Type':'application/json' },
+        body: JSON.stringify(payload)
+      });
+
+      const json = await res.json().catch(() => ({}));
+
+      if (!res.ok || !json.ok) {
+        const err = new Error(json.error || json.details || `Ошибка ${res.status}`);
+        err.payload = json;
+        throw err;
+      }
+
+      return json;
+    }
+
+    function getTelegramInitData(){
+      if (!window.Telegram || !window.Telegram.WebApp) {
+        throw new Error('Открой страницу внутри Telegram Mini App');
+      }
+
+      try{
+        Telegram.WebApp.ready();
+        if (typeof Telegram.WebApp.expand === 'function') Telegram.WebApp.expand();
+      } catch(e){}
+
+      const initData = Telegram.WebApp.initData;
+      if (!initData) throw new Error('Нет initData');
+
+      return initData;
+    }
+
+    async function refreshProfile(){
+      const cached = loadCachedProfile();
+      if (cached) applyProfile(cached);
+      else $('balanceValue').textContent = '0 VC';
+
+      try{
+        const initData = getTelegramInitData();
+        const json = await postJson(VERIFY_URL, { initData });
+        if (json.profile) applyProfile(json.profile);
+      } catch(err){
+        console.error('Profile load error:', err);
+      }
     }
 
     function setBodyLock(locked){
@@ -731,13 +893,13 @@
       el.setAttribute('aria-hidden', 'false');
       setBodyLock(true);
     }
+
     function closeOverlay(el){
       el.classList.remove('show');
       el.setAttribute('aria-hidden', 'true');
       setBodyLock(false);
     }
 
-    // Toast
     const toast = $('toast');
     const toastText = $('toastText');
     const toastOk = $('toastOk');
@@ -749,36 +911,46 @@
       if (toastTimer) clearTimeout(toastTimer);
       toastTimer = setTimeout(() => toast.classList.remove('show'), 3800);
     }
+
     toastOk.addEventListener('click', () => toast.classList.remove('show'));
 
-    // ===== Баланс (заглушка) =====
-    $('balanceValue').textContent = '0 VC';
     $('balanceChip').addEventListener('click', () => window.location.href = 'wallet.html');
 
-    // Назад
     $('backBtn').addEventListener('click', () => {
       if (history.length > 1) history.back();
       else window.location.href = 'index.html';
     });
 
-    // ====== Рендер товаров ======
     const grid = $('productGrid');
 
-    function createCard(p){
+    function createCard(p, index){
       const card = document.createElement('div');
-      card.className = 'card';
+      card.className = 'product-card';
+      card.style.setProperty('--delay', `${index * 70}ms`);
 
       card.innerHTML = `
-        <div class="card-inner">
-          <div class="uc-badge">
+        <div class="card-main">
+          <div class="art-box">
             <img src="${p.img}" alt="${p.name}">
           </div>
+
           <div class="card-info">
             <p class="card-title">${p.name}</p>
+            <p class="card-sub">${p.sub}</p>
+
+            <div class="mini-tags">
+              <span class="mini-tag">${p.tag}</span>
+              <span class="mini-tag">PUBG ID</span>
+            </div>
           </div>
         </div>
-        <div class="actions-row">
-          <div class="price-inline"><span class="label">Цена</span>${formatRub(p.price)}</div>
+
+        <div class="card-bottom">
+          <div class="price-box">
+            <span class="price-label">Цена</span>
+            <span class="price-value">${formatRub(p.price)}</span>
+          </div>
+
           <button type="button" class="buy-btn">Купить</button>
         </div>
       `;
@@ -787,31 +959,24 @@
       return card;
     }
 
-    PRODUCTS.forEach(p => grid.appendChild(createCard(p)));
+    PRODUCTS.forEach((p, i) => grid.appendChild(createCard(p, i)));
 
-    // ====== Покупка: STEP 1 ======
     const buyPopup = $('buyPopup');
     const confirmPopup = $('confirmPopup');
-
     const pubgInput = $('pubgIdInput');
     const pubgErr = $('pubgErr');
+    const confirmBuyBtn = $('confirmBuy');
 
-    const STORAGE_KEY = 'pubg_id_last';
     pubgInput.value = localStorage.getItem(STORAGE_KEY) || '';
-
-    let current = null; // { product, pubgId }
 
     function sanitizeDigits(str){
       return (str || '').replace(/\D+/g, '');
     }
 
     function isValidPubgId(id){
-      // ✅ можно поменять правила:
-      // сейчас: 6–16 цифр
       return /^\d{6,16}$/.test(id);
     }
 
-    // оставляем только цифры прямо во время ввода
     pubgInput.addEventListener('input', () => {
       const digits = sanitizeDigits(pubgInput.value);
       if (pubgInput.value !== digits) pubgInput.value = digits;
@@ -822,14 +987,9 @@
       current = { product, pubgId: '' };
       $('pName').textContent = product.name;
       $('pTotal').textContent = formatRub(product.price);
-
       pubgErr.classList.remove('show');
-
-      // если уже вводили раньше — подставим
       pubgInput.value = sanitizeDigits(pubgInput.value);
       openOverlay(buyPopup);
-
-      // фокус удобнее на телефоне
       setTimeout(() => pubgInput.focus({ preventScroll:true }), 80);
     }
 
@@ -838,18 +998,11 @@
       current = null;
     }
 
-    $('closePopup1').addEventListener('click', closeStep1);
-    $('cancel1').addEventListener('click', closeStep1);
-    buyPopup.addEventListener('click', (e) => { if (e.target === buyPopup) closeStep1(); });
-
-    // ====== Покупка: STEP 2 (подтверждение) ======
     function openConfirmStep(){
       if (!current) return;
-
-      $('cName').textContent  = current.product.name;
+      $('cName').textContent = current.product.name;
       $('cTotal').textContent = formatRub(current.product.price);
-      $('cPubg').textContent  = current.pubgId;
-
+      $('cPubg').textContent = current.pubgId;
       openOverlay(confirmPopup);
     }
 
@@ -857,9 +1010,15 @@
       closeOverlay(confirmPopup);
     }
 
+    $('closePopup1').addEventListener('click', closeStep1);
+    $('cancel1').addEventListener('click', closeStep1);
+
+    buyPopup.addEventListener('click', (e) => {
+      if (e.target === buyPopup) closeStep1();
+    });
+
     $('closePopup2').addEventListener('click', () => {
       closeStep2();
-      // если закрыли подтверждение — вернём на шаг 1, чтобы не терять форму
       openOverlay(buyPopup);
       setTimeout(() => pubgInput.focus({ preventScroll:true }), 80);
     });
@@ -878,7 +1037,6 @@
       setTimeout(() => pubgInput.focus({ preventScroll:true }), 80);
     });
 
-    // кнопка "Купить" на шаге 1
     $('buyStep1').addEventListener('click', () => {
       if (!current) return;
 
@@ -892,24 +1050,46 @@
       localStorage.setItem(STORAGE_KEY, id);
       current.pubgId = id;
 
-      // переходим на подтверждение
       closeOverlay(buyPopup);
       openConfirmStep();
     });
 
-    // финальное подтверждение
-    $('confirmBuy').addEventListener('click', () => {
-      if (!current) return;
+    async function createUcOrder(){
+      if (!current || isCreatingOrder) return;
 
-      // ✅ тут позже будет реальная оплата/заявка
-      showToast(`Заявка создана: ${current.product.name} • PUBG ID ${current.pubgId}`);
+      isCreatingOrder = true;
+      confirmBuyBtn.textContent = 'Создаём...';
+      confirmBuyBtn.disabled = true;
 
-      closeStep2();
-      current = null;
-      setBodyLock(false);
-    });
+      try{
+        const initData = getTelegramInitData();
 
-    // ESC — закрывает самый верхний попап
+        const json = await postJson(CREATE_UC_ORDER_URL, {
+          initData,
+          packageId: current.product.id,
+          packageName: current.product.name,
+          pubgId: current.pubgId,
+          priceRub: current.product.price
+        });
+
+        showToast(`Заявка создана: ${current.product.name} • PUBG ID ${current.pubgId}`);
+        console.log('UC order created:', json.order);
+
+        closeStep2();
+        current = null;
+      } catch(err){
+        showToast(err.message || 'Ошибка создания заявки');
+        console.error('UC order error:', err);
+      } finally {
+        isCreatingOrder = false;
+        confirmBuyBtn.textContent = 'Создать заявку';
+        confirmBuyBtn.disabled = false;
+        setBodyLock(false);
+      }
+    }
+
+    confirmBuyBtn.addEventListener('click', createUcOrder);
+
     document.addEventListener('keydown', (e) => {
       if (e.key !== 'Escape') return;
 
@@ -919,13 +1099,12 @@
         setTimeout(() => pubgInput.focus({ preventScroll:true }), 80);
         return;
       }
+
       if (buyPopup.classList.contains('show')){
         closeStep1();
-        return;
       }
     });
 
-    // ====== Баннеры: точки ======
     const slides = $('slides');
     const dots = Array.from($('dots').querySelectorAll('.dot'));
 
@@ -950,7 +1129,11 @@
       });
     });
 
-    window.addEventListener('load', updateDotsByScroll);
+    window.addEventListener('load', async () => {
+      updateDotsByScroll();
+      await refreshProfile();
+    });
+
     window.addEventListener('resize', updateDotsByScroll);
   </script>
 </body>
