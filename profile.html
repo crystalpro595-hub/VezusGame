@@ -3,22 +3,32 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Profile</title>
+  <title>Профиль</title>
 
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
 
   <style>
     :root{
       --text:#eaf1ff;
+      --muted:rgba(234,241,255,.72);
       --safe-bottom: env(safe-area-inset-bottom, 0px);
       --safe-top: env(safe-area-inset-top, 0px);
-      --radius:18px;
-      --neon:#2AABEE;
-      --neon2:#3b82f6;
+      --radius:22px;
     }
 
-    *{ box-sizing:border-box; font-family:'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
-    html, body{ height:100%; margin:0; overflow:hidden; color:var(--text); background:#020617; }
+    *{
+      box-sizing:border-box;
+      font-family:'Inter',sans-serif;
+      -webkit-tap-highlight-color:transparent;
+    }
+
+    html,body{
+      height:100%;
+      margin:0;
+      overflow:hidden;
+      color:var(--text);
+      background:#020617;
+    }
 
     body{
       background-image:url("https://i.postimg.cc/fbJT34yY/076E519D-F095-4957-88BF-5591DEB82533.png");
@@ -33,7 +43,7 @@
       inset:0;
       background:
         radial-gradient(900px 600px at 30% 10%, rgba(42,171,238,.10), transparent 60%),
-        linear-gradient(180deg, rgba(0,0,0,.40), rgba(0,0,0,.62));
+        linear-gradient(180deg, rgba(0,0,0,.42), rgba(0,0,0,.68));
       pointer-events:none;
       z-index:0;
     }
@@ -47,385 +57,400 @@
     }
 
     .wrap{
-      max-width: 520px;
-      margin: 0 auto;
+      max-width:520px;
+      margin:0 auto;
       display:flex;
       flex-direction:column;
-      gap: 14px;
+      gap:16px;
     }
 
     .topbar{
       display:flex;
       align-items:center;
       justify-content:space-between;
-      gap: 12px;
-      margin-top: 8px;
+      gap:12px;
     }
 
     .icon-btn{
-      width: 42px; height: 42px;
-      border-radius: 14px;
-      border: 1px solid rgba(46, 180, 255, .22);
+      width:44px;
+      height:44px;
+      border:none;
+      border-radius:16px;
       cursor:pointer;
+      display:grid;
+      place-items:center;
+      color:var(--text);
       background: rgba(8, 12, 22, .72);
+      border: 1px solid rgba(46, 180, 255, .22);
       box-shadow:
         0 12px 34px rgba(0,0,0,.55),
         0 0 22px rgba(42,171,238,.14);
-      display:grid;
-      place-items:center;
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
-      padding:0;
-      color: rgba(234,241,255,.92);
-      font-weight: 900;
     }
-    .icon-btn:active{ transform: scale(.98); }
 
-    .title{
-      font-weight: 900;
-      letter-spacing:.3px;
-      font-size: 18px;
-      text-align:center;
+    .icon-btn:active{ transform:scale(.98); }
+
+    .top-title{
       flex:1;
-      color: rgba(234,241,255,.96);
-      text-shadow: 0 18px 30px rgba(0,0,0,.55);
+      text-align:center;
+      font-weight:900;
+      font-size:18px;
+      letter-spacing:.3px;
+      color:rgba(234,241,255,.96);
     }
 
-    .card{
-      border-radius: 24px;
-      overflow:hidden;
-      background: rgba(12,18,34,.92);
-      border: 1px solid rgba(46, 180, 255, .18);
-      box-shadow: 0 34px 90px rgba(0,0,0,.55);
+    .ghost{
+      visibility:hidden;
+    }
+
+    .profile-card{
+      margin-top:8px;
+      border-radius:28px;
+      padding:22px 18px 18px;
+      background: rgba(8, 12, 22, .74);
+      border: 1px solid rgba(46, 180, 255, .20);
+      box-shadow:
+        0 24px 70px rgba(0,0,0,.56),
+        0 0 0 1px rgba(255,255,255,.04) inset,
+        0 0 28px rgba(42,171,238,.14);
       backdrop-filter: blur(14px);
       -webkit-backdrop-filter: blur(14px);
+      position:relative;
+      overflow:hidden;
     }
 
-    .card-head{
-      padding: 16px;
-      display:flex;
-      align-items:center;
-      gap: 12px;
-      background: rgba(255,255,255,.03);
-      border-bottom: 1px solid rgba(255,255,255,.06);
+    .profile-card::before{
+      content:"";
+      position:absolute;
+      inset:auto -60px 0 -60px;
+      height:2px;
+      background: linear-gradient(90deg, transparent, rgba(42,171,238,.95), rgba(59,130,246,.95), transparent);
+      opacity:.7;
+      pointer-events:none;
+    }
+
+    .profile-card::after{
+      content:"";
+      position:absolute;
+      inset:-140px -160px auto auto;
+      width:320px;
+      height:320px;
+      background: radial-gradient(circle at 30% 30%, rgba(42,171,238,.16), transparent 62%);
+      pointer-events:none;
+      transform: rotate(8deg);
+    }
+
+    .avatar-wrap{
+      position:relative;
+      z-index:1;
+      width:118px;
+      height:118px;
+      margin:0 auto 16px;
+      border-radius:50%;
+      padding:4px;
+      background: linear-gradient(180deg, rgba(42,171,238,.95), rgba(59,130,246,.55));
+      box-shadow:
+        0 16px 40px rgba(0,0,0,.45),
+        0 0 26px rgba(42,171,238,.28);
     }
 
     .avatar{
-      width: 46px; height: 46px;
-      border-radius: 16px;
-      background: rgba(255,255,255,.06);
-      border: 1px solid rgba(46, 180, 255, .16);
-      overflow:hidden;
-      display:grid;
-      place-items:center;
-      box-shadow: 0 18px 40px rgba(0,0,0,.35);
-      flex: 0 0 auto;
-    }
-    .avatar img{
-      width:100%; height:100%;
-      object-fit: cover;
-      display:block;
-    }
-
-    .head-info{
-      display:flex;
-      flex-direction:column;
-      gap: 3px;
-      min-width: 0;
-    }
-
-    .name{
-      font-weight: 900;
-      font-size: 14px;
-      color: rgba(234,241,255,.96);
-      white-space:nowrap;
-      overflow:hidden;
-      text-overflow: ellipsis;
-    }
-
-    .sub{
-      font-size: 12px;
-      color: rgba(234,241,255,.72);
-      white-space:nowrap;
-      overflow:hidden;
-      text-overflow: ellipsis;
-    }
-
-    .grid{
-      padding: 14px 16px 16px 16px;
-      display:grid;
-      gap: 10px;
-    }
-
-    .row{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap: 10px;
-      padding: 12px 12px;
-      border-radius: 16px;
-      background: rgba(255,255,255,.04);
-      border: 1px solid rgba(255,255,255,.06);
-    }
-
-    .label{
-      font-size: 12px;
-      color: rgba(234,241,255,.72);
-      font-weight: 800;
-      letter-spacing: .15px;
-    }
-
-    .value{
-      font-size: 12px;
-      color: rgba(234,241,255,.95);
-      font-weight: 900;
-      text-align:right;
-      word-break: break-all;
-      max-width: 68%;
-    }
-
-    .btns{
-      padding: 0 16px 16px 16px;
-      display:flex;
-      gap: 10px;
-      flex-direction:column;
-    }
-
-    .btn{
-      border:none;
-      cursor:pointer;
       width:100%;
-      height: 50px;
-      border-radius: 16px;
+      height:100%;
+      border-radius:50%;
+      object-fit:cover;
+      display:block;
+      background:#0f172a;
+    }
+
+    .avatar-fallback{
+      width:100%;
+      height:100%;
+      border-radius:50%;
       display:flex;
       align-items:center;
       justify-content:center;
-      gap: 10px;
-
-      background: linear-gradient(180deg, rgba(42,171,238,.95), rgba(33,150,243,.90));
-      box-shadow:
-        0 18px 40px rgba(0,0,0,.45),
-        0 0 24px rgba(42,171,238,.25);
+      font-weight:900;
+      font-size:34px;
       color:#fff;
-      font-weight: 900;
-      letter-spacing: .2px;
-      font-size: 14px;
-    }
-    .btn:active{ transform: scale(.99); }
-
-    .btn.danger{
-      background: linear-gradient(180deg, rgba(239,68,68,.95), rgba(185,28,28,.90));
-      box-shadow: 0 18px 40px rgba(0,0,0,.45);
+      background:
+        radial-gradient(circle at 30% 30%, rgba(42,171,238,.95), rgba(59,130,246,.72)),
+        linear-gradient(180deg, #0f172a, #111827);
     }
 
-    .hint{
-      padding: 0 16px 14px 16px;
-      font-size: 12px;
-      line-height: 1.35;
-      color: rgba(234,241,255,.70);
+    .name{
+      position:relative;
+      z-index:1;
       text-align:center;
+      font-size:20px;
+      font-weight:900;
+      letter-spacing:.2px;
+      margin:0 0 4px 0;
+      color:rgba(234,241,255,.98);
     }
 
-    /* ✅ TOAST */
-    .toast{
-      position:fixed;
-      left:50%;
-      bottom: calc(18px + var(--safe-bottom));
-      transform: translateX(-50%) translateY(18px);
-      opacity:0;
-      pointer-events:none;
-      z-index:999;
-
-      max-width: min(520px, calc(100% - 32px));
-      padding: 12px 14px;
-      border-radius: 16px;
-
-      background: rgba(12,18,34,.92);
-      border: 1px solid rgba(46, 180, 255, .18);
-      box-shadow: 0 26px 70px rgba(0,0,0,.55);
-      backdrop-filter: blur(14px);
-      -webkit-backdrop-filter: blur(14px);
-
-      font-weight: 900;
-      font-size: 13px;
-      letter-spacing:.15px;
-      color: rgba(234,241,255,.95);
+    .username{
+      position:relative;
+      z-index:1;
       text-align:center;
-
-      transition: opacity .18s ease, transform .18s ease;
+      margin:0 0 18px 0;
+      font-size:14px;
+      font-weight:700;
+      color:rgba(42,171,238,.96);
     }
-    .toast.show{
-      opacity:1;
-      transform: translateX(-50%) translateY(0);
+
+    .info-list{
+      position:relative;
+      z-index:1;
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+    }
+
+    .info-item{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      padding:14px 14px;
+      border-radius:18px;
+      background: rgba(255,255,255,.04);
+      border: 1px solid rgba(255,255,255,.05);
+      box-shadow: 0 10px 24px rgba(0,0,0,.22);
+    }
+
+    .info-label{
+      font-size:13px;
+      font-weight:800;
+      color:var(--muted);
+    }
+
+    .info-value{
+      font-size:14px;
+      font-weight:900;
+      color:rgba(234,241,255,.98);
+      text-align:right;
+      word-break:break-word;
+    }
+
+    .balance-box{
+      margin-top:4px;
+      border-radius:20px;
+      padding:16px;
+      background: linear-gradient(180deg, rgba(42,171,238,.14), rgba(59,130,246,.08));
+      border:1px solid rgba(42,171,238,.20);
+      box-shadow:
+        0 14px 28px rgba(0,0,0,.28),
+        0 0 18px rgba(42,171,238,.10);
+    }
+
+    .balance-label{
+      font-size:13px;
+      font-weight:800;
+      color:var(--muted);
+      margin-bottom:8px;
+    }
+
+    .balance-value{
+      font-size:28px;
+      line-height:1;
+      font-weight:900;
+      color:#fff;
+      letter-spacing:.2px;
+      text-shadow:0 12px 24px rgba(0,0,0,.28);
+    }
+
+    .status{
+      margin-top:6px;
+      text-align:center;
+      font-size:12px;
+      color:rgba(234,241,255,.62);
+      min-height:16px;
+    }
+
+    @media (max-width:360px){
+      .avatar-wrap{ width:108px; height:108px; }
+      .balance-value{ font-size:24px; }
+      .top-title{ font-size:17px; }
     }
   </style>
 </head>
-
 <body>
   <div class="app">
     <div class="wrap">
 
       <div class="topbar">
         <button class="icon-btn" id="backBtn" aria-label="Назад">←</button>
-        <div class="title">Профиль</div>
-        <div style="width:42px;height:42px;"></div>
+        <div class="top-title">Профиль</div>
+        <div class="icon-btn ghost">←</div>
       </div>
 
-      <div class="card">
-        <div class="card-head">
-          <div class="avatar" id="avatarBox" aria-hidden="true">
-            <span style="font-weight:900;color:rgba(234,241,255,.75);">TG</span>
+      <div class="profile-card">
+        <div class="avatar-wrap" id="avatarWrap">
+          <div class="avatar-fallback" id="avatarFallback">?</div>
+        </div>
+
+        <h1 class="name" id="displayName">Загрузка...</h1>
+        <p class="username" id="usernameValue">@username</p>
+
+        <div class="info-list">
+          <div class="info-item">
+            <div class="info-label">Telegram ID</div>
+            <div class="info-value" id="tgIdValue">—</div>
           </div>
 
-          <div class="head-info">
-            <div class="name" id="displayName">Загрузка…</div>
-            <div class="sub" id="tgUsername">@…</div>
+          <div class="info-item">
+            <div class="info-label">Ник Telegram</div>
+            <div class="info-value" id="tgUsernameValue">—</div>
+          </div>
+
+          <div class="balance-box">
+            <div class="balance-label">Баланс</div>
+            <div class="balance-value" id="balanceValue">0 VC</div>
           </div>
         </div>
 
-        <div class="grid">
-          <div class="row">
-            <div class="label">ID аккаунта</div>
-            <div class="value" id="userId">—</div>
-          </div>
-
-          <div class="row">
-            <div class="label">Telegram</div>
-            <div class="value" id="tgId">—</div>
-          </div>
-
-          <div class="row">
-            <div class="label">Баланс</div>
-            <div class="value" id="balance">—</div>
-          </div>
-        </div>
-
-        <div class="btns">
-          <button class="btn danger" id="logoutBtn">Выйти</button>
-        </div>
-
-        <div class="hint">
-          Если после выхода снова зайдёшь — потребуется вход через Telegram.
-        </div>
+        <div class="status" id="statusText"></div>
       </div>
 
     </div>
   </div>
 
-  <div class="toast" id="toast" role="status" aria-live="polite"></div>
-
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <script>
-    // ✅ Твои данные Supabase
-    const SUPABASE_URL = 'https://lazrfierfbhwlduqlvws.supabase.co';
-    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxhenJmaWVyZmJod2xkdXFsdndzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE1NzY2ODIsImV4cCI6MjA4NzE1MjY4Mn0.tJtwFrNPrNyGNedGP1h0bNgr98FnyoliR-13mOqlBJI';
+    const VERIFY_URL = "https://lazrfierfbhwlduqlvws.functions.supabase.co/verify-telegram";
 
-    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-      auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: false }
-    });
-
-    // UI
-    const toastEl = document.getElementById('toast');
     const backBtn = document.getElementById('backBtn');
-    const logoutBtn = document.getElementById('logoutBtn');
-
+    const avatarWrap = document.getElementById('avatarWrap');
+    const avatarFallback = document.getElementById('avatarFallback');
     const displayNameEl = document.getElementById('displayName');
-    const tgUsernameEl = document.getElementById('tgUsername');
-    const userIdEl = document.getElementById('userId');
-    const tgIdEl = document.getElementById('tgId');
-    const balanceEl = document.getElementById('balance');
-    const avatarBox = document.getElementById('avatarBox');
+    const usernameEl = document.getElementById('usernameValue');
+    const tgIdEl = document.getElementById('tgIdValue');
+    const tgUsernameEl = document.getElementById('tgUsernameValue');
+    const balanceEl = document.getElementById('balanceValue');
+    const statusEl = document.getElementById('statusText');
 
-    let toastTimer = null;
-    function showToast(msg, ms = 2200){
-      toastEl.textContent = msg;
-      toastEl.classList.add('show');
-      clearTimeout(toastTimer);
-      toastTimer = setTimeout(() => toastEl.classList.remove('show'), ms);
+    function formatVc(value) {
+      const num = Number(value ?? 0);
+      if (!Number.isFinite(num)) return '0 VC';
+      return Number.isInteger(num) ? `${num} VC` : `${num.toFixed(2)} VC`;
     }
 
-    function formatBalance(v){
-      const num = Number(v ?? 0);
-      if (!Number.isFinite(num)) return '0 VC';
-      const isInt = Math.abs(num - Math.round(num)) < 1e-9;
-      return (isInt ? String(Math.round(num)) : num.toFixed(2)) + ' VC';
+    function getDisplayName(profile) {
+      const full = [profile.first_name, profile.last_name].filter(Boolean).join(' ').trim();
+      if (full) return full;
+      if (profile.username) return '@' + profile.username;
+      return 'Пользователь';
+    }
+
+    function getInitial(profile) {
+      const source = (profile.first_name || profile.username || 'U').trim();
+      return source.charAt(0).toUpperCase();
+    }
+
+    function setAvatar(profile) {
+      avatarWrap.innerHTML = '';
+
+      if (profile.photo_url) {
+        const img = document.createElement('img');
+        img.className = 'avatar';
+        img.alt = 'Аватар';
+        img.src = profile.photo_url;
+        img.onerror = () => {
+          avatarWrap.innerHTML = `<div class="avatar-fallback">${getInitial(profile)}</div>`;
+        };
+        avatarWrap.appendChild(img);
+        return;
+      }
+
+      avatarWrap.innerHTML = `<div class="avatar-fallback">${getInitial(profile)}</div>`;
+    }
+
+    function renderProfile(profile) {
+      if (!profile) return;
+
+      localStorage.setItem('tg_profile', JSON.stringify(profile));
+
+      setAvatar(profile);
+      displayNameEl.textContent = getDisplayName(profile);
+      usernameEl.textContent = profile.username ? `@${profile.username}` : 'Без ника';
+      tgIdEl.textContent = profile.tg_id ?? '—';
+      tgUsernameEl.textContent = profile.username ? `@${profile.username}` : '—';
+      balanceEl.textContent = formatVc(profile.balance);
+    }
+
+    function loadCachedProfile() {
+      try {
+        const raw = localStorage.getItem('tg_profile');
+        if (!raw) return null;
+        const parsed = JSON.parse(raw);
+        if (!parsed || typeof parsed !== 'object') return null;
+        return parsed;
+      } catch {
+        return null;
+      }
+    }
+
+    async function refreshProfileFromTelegram() {
+      if (!window.Telegram || !window.Telegram.WebApp) {
+        statusEl.textContent = '';
+        return;
+      }
+
+      try {
+        Telegram.WebApp.ready();
+        if (typeof Telegram.WebApp.expand === 'function') Telegram.WebApp.expand();
+        if (typeof Telegram.WebApp.setHeaderColor === 'function') Telegram.WebApp.setHeaderColor('#020617');
+      } catch (e) {}
+
+      const initData = Telegram.WebApp.initData;
+      if (!initData) return;
+
+      statusEl.textContent = 'Обновляем профиль...';
+
+      try {
+        const res = await fetch(VERIFY_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ initData })
+        });
+
+        const json = await res.json().catch(() => ({}));
+
+        if (!res.ok || !json.ok || !json.profile) {
+          statusEl.textContent = '';
+          return;
+        }
+
+        renderProfile(json.profile);
+        statusEl.textContent = '';
+      } catch (e) {
+        statusEl.textContent = '';
+      }
+    }
+
+    function initPage() {
+      const cached = loadCachedProfile();
+
+      if (cached) {
+        renderProfile(cached);
+      } else {
+        displayNameEl.textContent = 'Профиль не найден';
+        usernameEl.textContent = 'Сначала зайди через главную страницу';
+        tgIdEl.textContent = '—';
+        tgUsernameEl.textContent = '—';
+        balanceEl.textContent = '0 VC';
+      }
+
+      refreshProfileFromTelegram();
     }
 
     backBtn.addEventListener('click', () => {
       window.location.href = 'index.html';
     });
 
-    logoutBtn.addEventListener('click', async () => {
-      try{
-        await supabaseClient.auth.signOut();
-        showToast('Вы вышли ✅', 1200);
-        setTimeout(() => window.location.href = 'index.html', 400);
-      }catch(e){
-        console.error(e);
-        showToast('Ошибка выхода', 2200);
-      }
-    });
-
-    async function loadProfile(){
-      // 1) должна быть сессия
-      const { data: { session } } = await supabaseClient.auth.getSession();
-      if (!session) {
-        window.location.href = 'index.html';
-        return;
-      }
-
-      // 2) user
-      const { data: userData, error: userErr } = await supabaseClient.auth.getUser();
-      if (userErr || !userData?.user) {
-        window.location.href = 'index.html';
-        return;
-      }
-      const user = userData.user;
-      userIdEl.textContent = user.id;
-
-      // 3) profile row
-      const { data: prof, error: profErr } = await supabaseClient
-        .from('profiles')
-        .select('telegram_id, username, first_name, last_name, photo_url, balance')
-        .eq('id', user.id)
-        .maybeSingle();
-
-      if (profErr) {
-        console.warn(profErr);
-        showToast('Не удалось загрузить профиль', 2600);
-        return;
-      }
-
-      // если Telegram ещё не привязан — назад (или можно показать “войдите”)
-      if (!prof || !prof.telegram_id) {
-        showToast('Сначала войдите через Telegram', 2200);
-        setTimeout(() => window.location.href = 'index.html', 500);
-        return;
-      }
-
-      const niceName =
-        [prof.first_name, prof.last_name].filter(Boolean).join(' ')
-        || (prof.username ? '@' + prof.username : 'Telegram пользователь');
-
-      displayNameEl.textContent = niceName;
-      tgUsernameEl.textContent = prof.username ? '@' + prof.username : '(нет username)';
-      tgIdEl.textContent = String(prof.telegram_id);
-      balanceEl.textContent = formatBalance(prof.balance);
-
-      if (prof.photo_url) {
-        avatarBox.innerHTML = '';
-        const img = document.createElement('img');
-        img.src = prof.photo_url;
-        img.alt = 'avatar';
-        avatarBox.appendChild(img);
-      }
-    }
-
-    loadProfile().catch((e) => {
-      console.error(e);
-      showToast('Ошибка загрузки', 2200);
-      setTimeout(() => window.location.href = 'index.html', 700);
-    });
+    window.addEventListener('load', initPage);
   </script>
 </body>
 </html>
