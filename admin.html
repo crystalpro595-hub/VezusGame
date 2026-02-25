@@ -238,6 +238,31 @@
       word-break:break-word;
     }
 
+    .action-row{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-top:12px;
+    }
+
+    .action-btn{
+      border:none;
+      cursor:pointer;
+      padding:10px 14px;
+      border-radius:12px;
+      font-weight:800;
+      color:#fff;
+      box-shadow:0 10px 24px rgba(0,0,0,.25);
+    }
+
+    .action-btn.approve{
+      background:linear-gradient(135deg,#10b981,#059669);
+    }
+
+    .action-btn.reject{
+      background:linear-gradient(135deg,#ef4444,#dc2626);
+    }
+
     .empty{
       text-align:center;
       padding:28px 18px;
@@ -255,6 +280,7 @@
       .stats{ grid-template-columns:1fr; }
       .grid{ grid-template-columns:1fr; }
       .title{ font-size:22px; }
+      .action-row{ flex-direction:column; }
     }
   </style>
 </head>
@@ -310,6 +336,7 @@
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <script>
     const GET_ADMIN_URL = "https://lazrfierfbhwlduqlvws.functions.supabase.co/get-admin-requests";
+    const PROCESS_ADMIN_URL = "https://lazrfierfbhwlduqlvws.functions.supabase.co/admin-process-request";
     const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxhenJmaWVyZmJod2xkdXFsdndzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE1NzY2ODIsImV4cCI6MjA4NzE1MjY4Mn0.tJtwFrNPrNyGNedGP1h0bNgr98FnyoliR-13mOqlBJI";
 
     function $(id){ return document.getElementById(id); }
@@ -320,10 +347,8 @@
 
     function switchTab(tab){
       const isDeposits = tab === 'deposits';
-
       $('tabDepositsBtn').classList.toggle('active', isDeposits);
       $('tabWithdrawsBtn').classList.toggle('active', !isDeposits);
-
       $('depositsPanel').classList.toggle('active', isDeposits);
       $('withdrawsPanel').classList.toggle('active', !isDeposits);
     }
@@ -361,11 +386,7 @@
       } catch (e) {}
 
       const tgId = Telegram.WebApp.initDataUnsafe?.user?.id;
-
-      if (!tgId) {
-        throw new Error('Не удалось получить Telegram ID');
-      }
-
+      if (!tgId) throw new Error('Не удалось получить Telegram ID');
       return String(tgId);
     }
 
@@ -394,6 +415,26 @@
       $('statDepositsPending').textContent = stats?.deposits_pending ?? 0;
       $('statWithdrawsTotal').textContent = stats?.withdraws_total ?? 0;
       $('statWithdrawsPending').textContent = stats?.withdraws_pending ?? 0;
+    }
+
+    function depositActions(item){
+      if (String(item.status).toLowerCase() !== 'pending') return '';
+      return `
+        <div class="action-row">
+          <button class="action-btn approve" onclick="processRequest('deposit','approve','${item.id}')">Одобрить</button>
+          <button class="action-btn reject" onclick="processRequest('deposit','reject','${item.id}')">Отклонить</button>
+        </div>
+      `;
+    }
+
+    function withdrawActions(item){
+      if (String(item.status).toLowerCase() !== 'pending') return '';
+      return `
+        <div class="action-row">
+          <button class="action-btn approve" onclick="processRequest('withdraw','approve','${item.id}')">Оплачено</button>
+          <button class="action-btn reject" onclick="processRequest('withdraw','reject','${item.id}')">Отклонить</button>
+        </div>
+      `;
     }
 
     function renderDeposits(items){
@@ -442,6 +483,8 @@
               <div class="field-value">${escapeHtml(formatDate(item.created_at))}</div>
             </div>
           </div>
+
+          ${depositActions(item)}
         </div>
       `).join('');
     }
@@ -492,8 +535,38 @@
               <div class="field-value">${escapeHtml(formatDate(item.created_at))}</div>
             </div>
           </div>
+
+          ${withdrawActions(item)}
         </div>
       `).join('');
+    }
+
+    async function processRequest(requestType, action, requestId){
+      const adminTgId = getAdminTgId();
+
+      const actionText =
+        requestType === 'deposit'
+          ? (action === 'approve' ? 'одобрить депозит' : 'отклонить депозит')
+          : (action === 'approve' ? 'подтвердить вывод' : 'отклонить вывод');
+
+      if (!confirm(`Ты точно хочешь ${actionText}?`)) return;
+
+      $('statusLine').textContent = 'Обработка заявки...';
+
+      try{
+        await postJson(PROCESS_ADMIN_URL, {
+          adminTgId,
+          requestType,
+          action,
+          requestId
+        });
+
+        $('statusLine').textContent = 'Готово. Обновляем список...';
+        await loadAdminData();
+      } catch(err){
+        $('statusLine').textContent = err.message || 'Ошибка обработки';
+        alert(err.message || 'Ошибка обработки');
+      }
     }
 
     async function loadAdminData(){
@@ -502,8 +575,6 @@
       try{
         const adminTgId = getAdminTgId();
         const data = await postJson(GET_ADMIN_URL, { adminTgId });
-
-        console.log('ADMIN DATA:', data);
 
         renderStats(data.stats || {});
         renderDeposits(data.deposits || []);
