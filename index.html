@@ -1,4 +1,4 @@
-    <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
@@ -16,11 +16,14 @@
       --radius:18px;
 
       --glass: rgba(12, 14, 20, .74);
-      --glass-2: rgba(18, 20, 28, .92);
+      --glass-2: rgba(14, 16, 24, .94);
       --stroke: rgba(255,255,255,.08);
       --stroke-2: rgba(255,255,255,.05);
       --shadow: 0 18px 42px rgba(0,0,0,.48);
       --shadow-soft: 0 12px 28px rgba(0,0,0,.34);
+
+      --tg1:#2AABEE;
+      --tg2:#229ED9;
     }
 
     *{ box-sizing:border-box; font-family:'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
@@ -99,7 +102,6 @@
       overflow:hidden;
     }
     .menu-btn:active, .profile-btn:active{ transform: scale(.98); }
-    .menu-btn:hover, .profile-btn:hover{ background: rgba(20,23,32,.82); }
 
     .burger{ width:18px; height:14px; display:grid; gap:3px; }
     .burger span{
@@ -260,11 +262,6 @@
       transition: transform .18s ease, box-shadow .18s ease;
     }
     .action-btn:active{ transform: scale(.985); }
-    .action-btn:hover{
-      box-shadow:
-        0 22px 44px rgba(0,0,0,.40),
-        inset 0 1px 0 rgba(255,255,255,.06);
-    }
 
     .action-btn .bg{
       position:absolute; inset:0;
@@ -296,7 +293,7 @@
       text-shadow: 0 10px 18px rgba(0,0,0,.55);
     }
 
-    /* ===== Новое красивое меню снизу ===== */
+    /* ===== Меню: ровно 4 карточки в один ряд ===== */
     .menu-overlay{
       position:fixed;
       inset:0;
@@ -318,7 +315,7 @@
     .menu-sheet{
       width:min(620px, 100%);
       border-radius:28px;
-      background: rgba(14,16,24,.94);
+      background: rgba(14,16,24,.95);
       border:1px solid rgba(255,255,255,.08);
       box-shadow:
         0 30px 80px rgba(0,0,0,.58),
@@ -348,13 +345,7 @@
       align-items:center;
       justify-content:space-between;
       gap:12px;
-      padding: 12px 14px 8px 14px;
-    }
-
-    .sheet-title-wrap{
-      display:flex;
-      flex-direction:column;
-      gap:2px;
+      padding: 12px 14px 10px 14px;
     }
 
     .sheet-title{
@@ -362,13 +353,6 @@
       font-size:16px;
       font-weight:900;
       color: rgba(234,241,255,.96);
-    }
-
-    .sheet-sub{
-      margin:0;
-      font-size:12px;
-      font-weight:800;
-      color: var(--muted);
     }
 
     .menu-close{
@@ -382,95 +366,72 @@
       display:grid;
       place-items:center;
       box-shadow: inset 0 1px 0 rgba(255,255,255,.04);
-      transition: transform .15s ease, background .15s ease;
+      transition: transform .15s ease;
       flex:0 0 auto;
     }
     .menu-close:active{ transform: scale(.98); }
-    .menu-close:hover{ background: rgba(255,255,255,.08); }
 
-    .menu-row{
-      display:flex;
-      gap:12px;
-      overflow-x:auto;
-      padding: 8px 14px 16px 14px;
-      scrollbar-width:none;
-      -webkit-overflow-scrolling: touch;
+    .menu-grid{
+      display:grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap:10px;
+      padding: 0 14px 16px 14px;
     }
-    .menu-row::-webkit-scrollbar{ display:none; }
 
     .menu-card{
-      min-width: 158px;
-      flex: 0 0 158px;
       border:none;
       cursor:pointer;
-      border-radius:24px;
+      border-radius:20px;
       overflow:hidden;
-      padding:10px;
+      padding:8px;
       background:
         linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02)),
         rgba(255,255,255,.03);
       border:1px solid rgba(255,255,255,.06);
       box-shadow:
-        0 18px 34px rgba(0,0,0,.26),
+        0 14px 26px rgba(0,0,0,.22),
         inset 0 1px 0 rgba(255,255,255,.03);
-      transition: transform .18s ease, background .18s ease, box-shadow .18s ease;
+      transition: transform .18s ease, background .18s ease;
       display:flex;
       flex-direction:column;
-      gap:10px;
+      gap:8px;
+      min-width:0;
     }
     .menu-card:active{ transform: scale(.985); }
-    .menu-card:hover{
-      transform: translateY(-1px);
-      background:
-        linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.025)),
-        rgba(255,255,255,.03);
-      box-shadow:
-        0 22px 38px rgba(0,0,0,.30),
-        inset 0 1px 0 rgba(255,255,255,.04);
-    }
 
     .menu-card-cover{
       width:100%;
-      aspect-ratio: 1.2 / 1;
-      border-radius:18px;
+      aspect-ratio: 1 / 1;
+      border-radius:16px;
       overflow:hidden;
       position:relative;
       background-image: var(--img);
       background-size: cover;
       background-position: center;
       background-repeat:no-repeat;
-      box-shadow: 0 10px 24px rgba(0,0,0,.24);
+      box-shadow: 0 8px 18px rgba(0,0,0,.18);
     }
     .menu-card-cover::after{
       content:"";
       position:absolute;
       inset:0;
-      background:
-        linear-gradient(180deg, rgba(0,0,0,.08), rgba(0,0,0,.38)),
-        radial-gradient(120px 70px at 50% 100%, rgba(255,255,255,.05), transparent 70%);
+      background: linear-gradient(180deg, rgba(0,0,0,.06), rgba(0,0,0,.22));
       pointer-events:none;
     }
 
-    .menu-card-body{
-      display:flex;
-      flex-direction:column;
-      gap:4px;
-      text-align:left;
-      padding: 0 2px 2px 2px;
-    }
-
     .menu-card-title{
-      font-size:14px;
-      font-weight:900;
-      color: rgba(234,241,255,.97);
-      line-height:1.15;
-    }
-
-    .menu-card-desc{
+      display:block;
+      text-align:center;
       font-size:11px;
-      font-weight:800;
-      color: rgba(234,241,255,.62);
-      line-height:1.25;
+      font-weight:900;
+      line-height:1.15;
+      color: rgba(234,241,255,.96);
+      min-height:26px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding: 0 2px;
+      word-break:break-word;
     }
 
     /* ===== Support ===== */
@@ -552,7 +513,7 @@
     .support-text{
       margin:0;
       font-size:13px;
-      line-height:1.35;
+      line-height: 1.35;
       color: rgba(234,241,255,.84);
     }
 
@@ -566,9 +527,10 @@
       align-items:center;
       justify-content:center;
       gap:10px;
-      background: rgba(255,255,255,.08);
-      border:1px solid rgba(255,255,255,.08);
-      box-shadow: 0 18px 40px rgba(0,0,0,.30);
+      background: linear-gradient(180deg, var(--tg1), var(--tg2));
+      box-shadow:
+        0 18px 40px rgba(34,158,217,.28),
+        inset 0 1px 0 rgba(255,255,255,.14);
       color:#fff;
       font-weight:900;
       letter-spacing:.2px;
@@ -580,13 +542,24 @@
       width:22px;
       height:22px;
       display:block;
-      filter: drop-shadow(0 8px 14px rgba(0,0,0,.25));
+      filter: drop-shadow(0 8px 14px rgba(0,0,0,.18));
     }
 
-    @media (max-width: 520px){
+    @media (max-width: 420px){
+      .menu-grid{
+        gap:8px;
+        padding: 0 12px 14px 12px;
+      }
       .menu-card{
-        min-width: 148px;
-        flex-basis: 148px;
+        padding:6px;
+        border-radius:18px;
+      }
+      .menu-card-cover{
+        border-radius:14px;
+      }
+      .menu-card-title{
+        font-size:10px;
+        min-height:24px;
       }
     }
 
@@ -596,12 +569,6 @@
       .menu-btn, .profile-btn{ width: 40px; height: 40px; border-radius: 13px; }
       .left-buttons{ transform: translateX(-8px); }
       .top-row{ gap: 14px; }
-      .menu-card{
-        min-width: 138px;
-        flex-basis: 138px;
-        border-radius:22px;
-      }
-      .menu-card-cover{ border-radius:16px; }
       .tg-btn{ height: 48px; border-radius: 15px; }
     }
 
@@ -678,55 +645,38 @@
     </div>
   </div>
 
-  <!-- Новое меню -->
   <div class="menu-overlay" id="menuOverlay" aria-hidden="true">
     <div class="menu-sheet" role="dialog" aria-modal="true" aria-label="Меню">
       <div class="sheet-handle" aria-hidden="true"></div>
 
       <div class="menu-sheet-head">
-        <div class="sheet-title-wrap">
-          <p class="sheet-title">Меню</p>
-          <p class="sheet-sub">Быстрые разделы и полезные ссылки</p>
-        </div>
-
+        <p class="sheet-title">Меню</p>
         <button class="menu-close" id="menuClose" aria-label="Закрыть меню">✕</button>
       </div>
 
-      <div class="menu-row">
+      <div class="menu-grid">
         <button class="menu-card" data-action="support"
           style="--img:url('https://i.postimg.cc/3NGRJh4G/file-000000006f747246895391c411a6b70f.png')">
           <span class="menu-card-cover" aria-hidden="true"></span>
-          <span class="menu-card-body">
-            <span class="menu-card-title">Поддержка</span>
-            <span class="menu-card-desc">Связаться с менеджером</span>
-          </span>
+          <span class="menu-card-title">Поддержка</span>
         </button>
 
         <button class="menu-card" data-action="vouchers"
           style="--img:url('https://i.postimg.cc/xCt8Fgry/file-000000009a147243b409376278ab22bd.png')">
           <span class="menu-card-cover" aria-hidden="true"></span>
-          <span class="menu-card-body">
-            <span class="menu-card-title">Ваучеры</span>
-            <span class="menu-card-desc">Активировать и проверить</span>
-          </span>
+          <span class="menu-card-title">Ваучеры</span>
         </button>
 
         <button class="menu-card" data-action="ref"
           style="--img:url('https://i.postimg.cc/GtwVSbmY/file-000000005e94722f9294319ad4c8eb41-(1).png')">
           <span class="menu-card-cover" aria-hidden="true"></span>
-          <span class="menu-card-body">
-            <span class="menu-card-title">Реферальная</span>
-            <span class="menu-card-desc">Поделиться ссылкой</span>
-          </span>
+          <span class="menu-card-title">Реферальная ссылка</span>
         </button>
 
         <button class="menu-card" data-action="history"
           style="--img:url('https://i.postimg.cc/DwwTxFv8/file-00000000fee07243ab2744a3e771bb84-(1).png')">
           <span class="menu-card-cover" aria-hidden="true"></span>
-          <span class="menu-card-body">
-            <span class="menu-card-title">История</span>
-            <span class="menu-card-desc">Последние действия</span>
-          </span>
+          <span class="menu-card-title">История</span>
         </button>
       </div>
     </div>
@@ -810,12 +760,8 @@
 
       try {
         Telegram.WebApp.ready();
-        if (typeof Telegram.WebApp.expand === 'function') {
-          Telegram.WebApp.expand();
-        }
-        if (typeof Telegram.WebApp.setHeaderColor === 'function') {
-          Telegram.WebApp.setHeaderColor('#020617');
-        }
+        if (typeof Telegram.WebApp.expand === 'function') Telegram.WebApp.expand();
+        if (typeof Telegram.WebApp.setHeaderColor === 'function') Telegram.WebApp.setHeaderColor('#020617');
       } catch (e) {
         console.warn('Telegram WebApp init warning:', e);
       }
