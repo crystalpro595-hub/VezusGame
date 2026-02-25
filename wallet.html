@@ -39,13 +39,6 @@ body{
   gap:12px;
   justify-content:space-between;
 }
-.header button{
-  background:none;
-  border:none;
-  color:#475569;
-  font-size:20px;
-  cursor:pointer;
-}
 .header h1{margin:0;font-size:20px;font-weight:900;}
 
 /* Карточка баланса */
@@ -126,7 +119,7 @@ body{
   color:#94a3b8;
   margin-top:2px;
   margin-left:2px;
-  height:16px;
+  min-height:16px;
   display:block;
   transition:color .3s;
 }
@@ -584,7 +577,6 @@ body{
   <button class="back-gradient-btn" type="button" onclick="goToIndex()">Вернуться назад</button>
 </div>
 
-<!-- Экран вывода -->
 <div class="screen hidden" id="withdrawScreen">
   <div class="header">
     <span></span>
@@ -597,7 +589,7 @@ body{
       <div class="wallet-label">Баланс</div>
       <div class="wallet-balance" id="withdrawBalance">0 VC</div>
     </div>
-    <div style="width: 100px;"></div>
+    <div style="width:100px;"></div>
   </div>
 
   <div class="deposit">
@@ -634,7 +626,6 @@ body{
   </div>
 </div>
 
-<!-- Попап пополнения -->
 <div class="popup-overlay" id="paymentPopup">
   <div class="popup">
     <span class="close-btn" onclick="closePaymentPopup()">×</span>
@@ -705,7 +696,6 @@ body{
   </div>
 </div>
 
-<!-- Попап проверки платежа -->
 <div class="popup-overlay" id="depositCheckPopup">
   <div class="popup">
     <div class="popup-content">
@@ -715,7 +705,6 @@ body{
   </div>
 </div>
 
-<!-- Попап обработки вывода -->
 <div class="popup-overlay" id="withdrawProcessingPopup">
   <div class="popup">
     <div class="popup-content">
@@ -730,12 +719,10 @@ body{
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
 <script>
-/* -------------------- Конфиг -------------------- */
 const VERIFY_URL = "https://lazrfierfbhwlduqlvws.functions.supabase.co/verify-telegram";
 const CREATE_DEPOSIT_URL = "https://lazrfierfbhwlduqlvws.functions.supabase.co/create-deposit-request";
 const CREATE_WITHDRAW_URL = "https://lazrfierfbhwlduqlvws.functions.supabase.co/create-withdraw-request";
 
-/* -------------------- Состояния -------------------- */
 let activePaymentMethod = 'phone';
 let isWithdrawProcessing = false;
 let isAndroid = /Android/i.test(navigator.userAgent);
@@ -750,7 +737,6 @@ let withdrawTimer = null;
 let telegramProfile = null;
 let currentBalance = 0;
 
-/* -------------------- Утилиты -------------------- */
 function $(id){ return document.getElementById(id); }
 
 function closeAllPopups(){
@@ -773,7 +759,6 @@ function formatVc(value){
 function setBalanceUI(value){
   const num = Number(value ?? 0);
   currentBalance = Number.isFinite(num) ? num : 0;
-
   const text = formatVc(currentBalance);
   $('walletBalance').textContent = text;
   $('withdrawBalance').textContent = text;
@@ -890,13 +875,11 @@ function resetWithdrawForm(){
   updateWithdrawButton(false);
 }
 
-/* -------------------- Переход -------------------- */
 function goToIndex(){
   closeAllPopups();
   window.location.href = 'index.html';
 }
 
-/* -------------------- Toast -------------------- */
 function showToast(text, color){
   const toast = $('toast');
   toast.textContent = text || "Готово";
@@ -905,7 +888,6 @@ function showToast(text, color){
   setTimeout(() => toast.classList.remove('show'), 2200);
 }
 
-/* -------------------- Copy -------------------- */
 function copyDetails(text){
   if (navigator.clipboard && window.isSecureContext){
     navigator.clipboard.writeText(text).then(() => showToast("Реквизиты скопированы!"))
@@ -926,13 +908,11 @@ function fallbackCopyText(text){
   ta.remove();
 }
 
-/* -------------------- Инструкция -------------------- */
 function toggleInstruction(){
   const content = $('instructionContent');
   content.style.display = (content.style.display === 'block') ? 'none' : 'block';
 }
 
-/* -------------------- Пополнение -------------------- */
 function setAmount(value){
   depositTouched = true;
   const amountInput = $('amountInput');
@@ -1116,7 +1096,6 @@ async function openCheckPopup(){
   }
 }
 
-/* -------------------- Экран вывода -------------------- */
 function openWithdrawScreen(){
   closeAllPopups();
   isWithdrawProcessing = false;
@@ -1292,7 +1271,6 @@ async function processWithdraw(){
   }
 }
 
-/* -------------------- Init -------------------- */
 document.addEventListener('DOMContentLoaded', async () => {
   detectDevice();
 
