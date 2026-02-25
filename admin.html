@@ -3,36 +3,43 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Админка</title>
+  <title>Admin Panel</title>
+
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
 
   <style>
     :root{
-      --bg1:#020617;
-      --bg2:#0f172a;
-      --card:rgba(8,12,22,.76);
-      --line:rgba(46,180,255,.18);
       --text:#eaf1ff;
-      --muted:rgba(234,241,255,.68);
-      --blue:#2AABEE;
-      --blue2:#3b82f6;
-      --green:#10b981;
-      --red:#ef4444;
-      --yellow:#f59e0b;
+      --muted:rgba(234,241,255,.72);
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+      --safe-top: env(safe-area-inset-top, 0px);
+
+      --glass: rgba(12, 14, 20, .78);
+      --glassStrong: rgba(14, 16, 24, .94);
+      --glassBorder: rgba(255,255,255,.08);
+      --shadow: 0 18px 42px rgba(0,0,0,.48);
+      --shadowSoft: 0 12px 28px rgba(0,0,0,.34);
     }
 
     *{
       box-sizing:border-box;
-      font-family:'Inter',sans-serif;
-      -webkit-tap-highlight-color:transparent;
+      font-family:'Inter', sans-serif;
+      -webkit-tap-highlight-color: transparent;
     }
 
-    html,body{
-      margin:0;
+    html, body{
       height:100%;
-      background:linear-gradient(180deg,var(--bg1),var(--bg2));
-      color:var(--text);
+      margin:0;
       overflow:hidden;
+      color:var(--text);
+      background:#020617;
+    }
+
+    body{
+      background-image:url("https://i.postimg.cc/fbJT34yY/076E519D-F095-4957-88BF-5591DEB82533.png");
+      background-size:cover;
+      background-position:center;
+      background-repeat:no-repeat;
     }
 
     body::before{
@@ -40,21 +47,21 @@
       position:fixed;
       inset:0;
       background:
-        radial-gradient(900px 600px at 20% 0%, rgba(42,171,238,.10), transparent 60%),
-        radial-gradient(700px 500px at 100% 10%, rgba(59,130,246,.08), transparent 60%);
+        radial-gradient(900px 600px at 30% 10%, rgba(255,255,255,.05), transparent 60%),
+        linear-gradient(180deg, rgba(0,0,0,.42), rgba(0,0,0,.68));
       pointer-events:none;
     }
 
     .app{
       position:relative;
-      z-index:1;
       height:100%;
       overflow:auto;
-      padding:16px;
+      padding: calc(18px + var(--safe-top)) 16px calc(28px + var(--safe-bottom)) 16px;
+      z-index:1;
     }
 
-    .wrap{
-      max-width:1100px;
+    .content{
+      max-width:760px;
       margin:0 auto;
       display:flex;
       flex-direction:column;
@@ -62,342 +69,755 @@
     }
 
     .topbar{
+      position:sticky;
+      top:4px;
+      z-index:30;
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+      padding:12px;
+      border-radius:24px;
+      background: rgba(10,12,18,.42);
+      border:1px solid rgba(255,255,255,.04);
+      box-shadow: 0 10px 30px rgba(0,0,0,.22);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+
+    .topbar-head{
       display:flex;
       align-items:center;
       justify-content:space-between;
       gap:12px;
-      flex-wrap:wrap;
     }
 
-    .title{
-      font-size:24px;
+    .title-wrap h1{
+      margin:0;
+      font-size:22px;
       font-weight:900;
       letter-spacing:.2px;
     }
 
-    .actions{
-      display:flex;
-      gap:10px;
-      flex-wrap:wrap;
-    }
-
-    .btn{
-      border:none;
-      cursor:pointer;
-      padding:12px 16px;
-      border-radius:14px;
+    .title-wrap p{
+      margin:4px 0 0 0;
+      font-size:12px;
       font-weight:800;
-      color:#fff;
-      background:linear-gradient(135deg,var(--blue),var(--blue2));
-      box-shadow:0 12px 28px rgba(0,0,0,.28);
+      color:var(--muted);
     }
 
-    .btn.secondary{
-      background:rgba(255,255,255,.08);
+    .refresh-btn{
+      height:42px;
+      border:none;
+      border-radius:14px;
+      padding:0 14px;
+      cursor:pointer;
+      background: rgba(255,255,255,.08);
+      color:#fff;
       border:1px solid rgba(255,255,255,.08);
-      color:var(--text);
+      font-size:13px;
+      font-weight:900;
+    }
+
+    .auth-box{
+      display:grid;
+      grid-template-columns: 1fr auto auto;
+      gap:10px;
+    }
+
+    .input{
+      height:44px;
+      border-radius:16px;
+      border:1px solid rgba(255,255,255,.08);
+      background: rgba(255,255,255,.06);
+      color: rgba(234,241,255,.96);
+      padding: 0 14px;
+      outline:none;
+      font-weight:800;
+      letter-spacing:.2px;
+      box-shadow: 0 18px 40px rgba(0,0,0,.18);
+    }
+
+    .input::placeholder{
+      color: rgba(234,241,255,.42);
+      font-weight:800;
+    }
+
+    .primary-btn, .ghost-btn, .danger-btn{
+      height:44px;
+      border:none;
+      border-radius:16px;
+      cursor:pointer;
+      font-weight:900;
+      padding:0 14px;
+      transition: transform .15s ease, opacity .15s ease;
+      white-space:nowrap;
+    }
+
+    .primary-btn:active, .ghost-btn:active, .danger-btn:active{
+      transform:scale(.98);
+    }
+
+    .primary-btn{
+      color:#fff;
+      background: linear-gradient(135deg, #3b82f6, #2563eb);
+      box-shadow: 0 18px 34px rgba(37,99,235,.28);
+    }
+
+    .ghost-btn{
+      color:#fff;
+      background: rgba(255,255,255,.08);
+      border:1px solid rgba(255,255,255,.08);
+    }
+
+    .danger-btn{
+      height:36px;
+      padding:0 12px;
+      border-radius:12px;
+      background: rgba(239,68,68,.14);
+      color:#fecaca;
+      border:1px solid rgba(239,68,68,.22);
+      font-size:12px;
+    }
+
+    .action-btn{
+      height:36px;
+      padding:0 12px;
+      border:none;
+      border-radius:12px;
+      cursor:pointer;
+      font-size:12px;
+      font-weight:900;
+      color:#fff;
+      background: rgba(255,255,255,.08);
+      border:1px solid rgba(255,255,255,.08);
+    }
+
+    .approve-btn{
+      background: rgba(16,185,129,.16);
+      color:#6ee7b7;
+      border:1px solid rgba(16,185,129,.24);
+    }
+
+    .reject-btn{
+      background: rgba(239,68,68,.14);
+      color:#fecaca;
+      border:1px solid rgba(239,68,68,.22);
+    }
+
+    .tabs{
+      display:grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap:8px;
+      padding:4px;
+      border-radius:20px;
+      background: rgba(14,16,24,.72);
+      border:1px solid rgba(255,255,255,.06);
+      box-shadow: 0 18px 34px rgba(0,0,0,.18);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+
+    .tab-btn{
+      height:42px;
+      border:none;
+      border-radius:14px;
+      cursor:pointer;
+      background: rgba(255,255,255,.04);
+      color: rgba(234,241,255,.86);
+      font-size:12px;
+      font-weight:900;
+      padding:0 8px;
+    }
+
+    .tab-btn.active{
+      background: rgba(255,255,255,.10);
+      color:#fff;
     }
 
     .stats{
       display:grid;
-      grid-template-columns:repeat(4,1fr);
-      gap:12px;
+      grid-template-columns: repeat(4, 1fr);
+      gap:10px;
     }
 
     .stat{
-      background:var(--card);
-      border:1px solid var(--line);
       border-radius:20px;
-      padding:16px;
-      box-shadow:0 18px 40px rgba(0,0,0,.35);
-      backdrop-filter:blur(12px);
-      -webkit-backdrop-filter:blur(12px);
+      padding:14px;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02)),
+        rgba(12, 14, 20, .84);
+      border:1px solid rgba(255,255,255,.07);
+      box-shadow:
+        0 20px 48px rgba(0,0,0,.26),
+        inset 0 1px 0 rgba(255,255,255,.03);
     }
 
     .stat-label{
-      font-size:12px;
-      font-weight:800;
+      font-size:11px;
+      font-weight:900;
       color:var(--muted);
-      margin-bottom:8px;
+      text-transform:uppercase;
+      letter-spacing:.15px;
     }
 
     .stat-value{
-      font-size:26px;
+      margin-top:6px;
+      font-size:22px;
       font-weight:900;
-    }
-
-    .tabs{
-      display:flex;
-      gap:10px;
-      flex-wrap:wrap;
-    }
-
-    .tab-btn{
-      border:none;
-      cursor:pointer;
-      padding:12px 16px;
-      border-radius:14px;
-      font-weight:800;
-      color:var(--text);
-      background:rgba(255,255,255,.06);
-      border:1px solid rgba(255,255,255,.06);
-    }
-
-    .tab-btn.active{
-      background:linear-gradient(135deg,var(--blue),var(--blue2));
       color:#fff;
-    }
-
-    .status-line{
-      font-size:13px;
-      color:var(--muted);
-      min-height:18px;
-      word-break:break-word;
-    }
-
-    .panel{
-      display:none;
-      flex-direction:column;
-      gap:12px;
-    }
-
-    .panel.active{
-      display:flex;
     }
 
     .list{
       display:flex;
       flex-direction:column;
       gap:12px;
+      min-height:140px;
     }
 
     .card{
-      background:var(--card);
-      border:1px solid var(--line);
-      border-radius:20px;
-      padding:16px;
-      box-shadow:0 18px 40px rgba(0,0,0,.35);
-      backdrop-filter:blur(12px);
-      -webkit-backdrop-filter:blur(12px);
+      position:relative;
+      border-radius:22px;
+      overflow:hidden;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02)),
+        rgba(12, 14, 20, .84);
+      border:1px solid rgba(255,255,255,.07);
+      box-shadow:
+        0 20px 48px rgba(0,0,0,.26),
+        inset 0 1px 0 rgba(255,255,255,.03);
+      padding:14px;
+      display:flex;
+      gap:12px;
+      align-items:flex-start;
     }
 
-    .card-top{
+    .icon{
+      width:48px;
+      height:48px;
+      border-radius:16px;
+      flex:0 0 auto;
+      display:grid;
+      place-items:center;
+      background: rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.08);
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.04),
+        0 8px 18px rgba(0,0,0,.18);
+    }
+
+    .icon svg{
+      width:22px;
+      height:22px;
+      stroke: rgba(234,241,255,.96);
+      fill:none;
+      stroke-width:2;
+      stroke-linecap:round;
+      stroke-linejoin:round;
+      display:block;
+    }
+
+    .body{
+      flex:1;
+      min-width:0;
       display:flex;
-      justify-content:space-between;
+      flex-direction:column;
+      gap:8px;
+    }
+
+    .row-top{
+      display:flex;
       align-items:flex-start;
-      gap:12px;
-      margin-bottom:12px;
-      flex-wrap:wrap;
+      justify-content:space-between;
+      gap:10px;
     }
 
     .card-title{
-      font-size:16px;
+      margin:0;
+      font-size:15px;
       font-weight:900;
+      color:#fff;
     }
 
     .badge{
-      padding:8px 10px;
+      height:24px;
       border-radius:999px;
-      font-size:12px;
+      padding:0 10px;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      font-size:11px;
       font-weight:900;
+      border:1px solid rgba(255,255,255,.08);
+      background: rgba(255,255,255,.06);
       color:#fff;
       text-transform:uppercase;
+      flex:0 0 auto;
     }
 
-    .badge.pending{ background:var(--yellow); }
-    .badge.approved{ background:var(--green); }
-    .badge.paid{ background:var(--green); }
-    .badge.rejected{ background:var(--red); }
+    .status-pending{ background: rgba(245,158,11,.16); color:#fcd34d; border-color: rgba(245,158,11,.24); }
+    .status-approved{ background: rgba(16,185,129,.16); color:#6ee7b7; border-color: rgba(16,185,129,.24); }
+    .status-rejected{ background: rgba(239,68,68,.16); color:#fca5a5; border-color: rgba(239,68,68,.24); }
+    .status-cancelled{ background: rgba(148,163,184,.16); color:#cbd5e1; border-color: rgba(148,163,184,.24); }
 
-    .grid{
+    .meta{
       display:grid;
-      grid-template-columns:repeat(2,1fr);
-      gap:10px;
+      gap:6px;
     }
 
-    .field{
-      background:rgba(255,255,255,.04);
-      border:1px solid rgba(255,255,255,.04);
-      border-radius:14px;
-      padding:12px;
-    }
-
-    .field-label{
-      font-size:11px;
-      font-weight:800;
-      color:var(--muted);
-      margin-bottom:6px;
-      text-transform:uppercase;
-      letter-spacing:.3px;
-    }
-
-    .field-value{
-      font-size:14px;
-      font-weight:800;
-      color:var(--text);
-      word-break:break-word;
-    }
-
-    .action-row{
+    .meta-row{
       display:flex;
+      justify-content:space-between;
       gap:10px;
-      flex-wrap:wrap;
-      margin-top:12px;
+      font-size:12px;
+      line-height:1.35;
     }
 
-    .action-btn{
+    .meta-label{
+      color:var(--muted);
+      font-weight:800;
+    }
+
+    .meta-value{
+      color:#fff;
+      font-weight:800;
+      text-align:right;
+      word-break:break-word;
+      max-width:65%;
+    }
+
+    .actions{
+      display:flex;
+      justify-content:flex-end;
+      gap:8px;
+      flex-wrap:wrap;
+      margin-top:2px;
+    }
+
+    .empty, .loading{
+      min-height:140px;
+      border-radius:22px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      text-align:center;
+      padding:20px;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02)),
+        rgba(12, 14, 20, .84);
+      border:1px solid rgba(255,255,255,.07);
+      box-shadow:
+        0 20px 48px rgba(0,0,0,.26),
+        inset 0 1px 0 rgba(255,255,255,.03);
+      color: rgba(234,241,255,.76);
+      font-size:13px;
+      font-weight:900;
+      line-height:1.45;
+      flex-direction:column;
+      gap:12px;
+    }
+
+    .spinner{
+      width:34px;
+      height:34px;
+      border-radius:50%;
+      border:3px solid rgba(255,255,255,.10);
+      border-top-color: rgba(255,255,255,.68);
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin{
+      to{ transform: rotate(360deg); }
+    }
+
+    .toast{
+      position: fixed;
+      left:50%;
+      bottom: calc(18px + var(--safe-bottom));
+      transform: translateX(-50%) translateY(14px);
+      background: rgba(14,16,24,.92);
+      border:1px solid rgba(255,255,255,.08);
+      box-shadow:0 22px 60px rgba(0,0,0,.55);
+      color: rgba(234,241,255,.95);
+      border-radius:18px;
+      padding:12px 14px;
+      width: min(520px, calc(100% - 32px));
+      opacity:0;
+      pointer-events:none;
+      transition: opacity .22s ease, transform .22s ease;
+      z-index:300;
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      font-weight:900;
+      font-size:13px;
+    }
+
+    .toast.show{
+      opacity:1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    .toast .ok{
       border:none;
       cursor:pointer;
-      padding:10px 14px;
-      border-radius:12px;
-      font-weight:800;
-      color:#fff;
-      box-shadow:0 10px 24px rgba(0,0,0,.25);
+      border-radius:14px;
+      height:34px;
+      padding:0 12px;
+      background: rgba(255,255,255,.08);
+      border:1px solid rgba(255,255,255,.08);
+      color: rgba(234,241,255,.95);
+      font-weight:900;
     }
 
-    .action-btn.approve{
-      background:linear-gradient(135deg,#10b981,#059669);
+    @media (max-width:720px){
+      .stats{
+        grid-template-columns: repeat(2, 1fr);
+      }
     }
 
-    .action-btn.reject{
-      background:linear-gradient(135deg,#ef4444,#dc2626);
+    @media (max-width:560px){
+      .auth-box{
+        grid-template-columns: 1fr;
+      }
+
+      .tabs{
+        grid-template-columns: repeat(2, 1fr);
+      }
     }
 
-    .empty{
-      text-align:center;
-      padding:28px 18px;
-      color:var(--muted);
-      background:var(--card);
-      border:1px solid var(--line);
-      border-radius:20px;
-    }
-
-    @media (max-width:900px){
-      .stats{ grid-template-columns:repeat(2,1fr); }
-    }
-
-    @media (max-width:640px){
-      .stats{ grid-template-columns:1fr; }
-      .grid{ grid-template-columns:1fr; }
-      .title{ font-size:22px; }
-      .action-row{ flex-direction:column; }
+    @media (max-width:360px){
+      .icon{ width:44px; height:44px; border-radius:14px; }
+      .icon svg{ width:20px; height:20px; }
+      .card-title{ font-size:14px; }
+      .meta-row{ font-size:11px; }
     }
   </style>
 </head>
+
 <body>
   <div class="app">
-    <div class="wrap">
+    <div class="content">
 
       <div class="topbar">
-        <div class="title">Админка заявок</div>
-        <div class="actions">
-          <button class="btn secondary" onclick="goBack()">Назад</button>
-          <button class="btn" onclick="loadAdminData()">Обновить</button>
-        </div>
-      </div>
+        <div class="topbar-head">
+          <div class="title-wrap">
+            <h1>Admin Panel</h1>
+            <p>Депозиты, выводы, UC и отменённые пользователем заявки</p>
+          </div>
 
-      <div class="stats">
-        <div class="stat">
-          <div class="stat-label">Всего депозитов</div>
-          <div class="stat-value" id="statDepositsTotal">0</div>
+          <button class="refresh-btn" id="refreshBtn">Обновить</button>
         </div>
-        <div class="stat">
-          <div class="stat-label">Ожидают депозиты</div>
-          <div class="stat-value" id="statDepositsPending">0</div>
-        </div>
-        <div class="stat">
-          <div class="stat-label">Всего выводов</div>
-          <div class="stat-value" id="statWithdrawsTotal">0</div>
-        </div>
-        <div class="stat">
-          <div class="stat-label">Ожидают выводы</div>
-          <div class="stat-value" id="statWithdrawsPending">0</div>
+
+        <div class="auth-box">
+          <input class="input" id="adminKeyInput" type="password" placeholder="ADMIN_PANEL_KEY">
+          <button class="primary-btn" id="saveKeyBtn">Сохранить ключ</button>
+          <button class="ghost-btn" id="clearKeyBtn">Очистить</button>
         </div>
       </div>
 
       <div class="tabs">
-        <button class="tab-btn active" id="tabDepositsBtn" onclick="switchTab('deposits')">Депозиты</button>
-        <button class="tab-btn" id="tabWithdrawsBtn" onclick="switchTab('withdraws')">Выводы</button>
+        <button class="tab-btn active" data-tab="all">Все</button>
+        <button class="tab-btn" data-tab="deposits">Депозиты</button>
+        <button class="tab-btn" data-tab="withdrawals">Выводы</button>
+        <button class="tab-btn" data-tab="uc">UC</button>
       </div>
 
-      <div class="status-line" id="statusLine">Загрузка...</div>
-
-      <div class="panel active" id="depositsPanel">
-        <div class="list" id="depositsList"></div>
+      <div class="stats">
+        <div class="stat">
+          <div class="stat-label">Всего</div>
+          <div class="stat-value" id="statAll">0</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">Депозиты</div>
+          <div class="stat-value" id="statDeposits">0</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">Выводы</div>
+          <div class="stat-value" id="statWithdrawals">0</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">UC</div>
+          <div class="stat-value" id="statUc">0</div>
+        </div>
       </div>
 
-      <div class="panel" id="withdrawsPanel">
-        <div class="list" id="withdrawsList"></div>
+      <div class="list" id="adminList">
+        <div class="loading">
+          <div class="spinner"></div>
+          <div>Введи ключ и нажми “Обновить”</div>
+        </div>
       </div>
 
     </div>
   </div>
 
-  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <div class="toast" id="toast" aria-live="polite">
+    <span id="toastText">—</span>
+    <button class="ok" id="toastOk">Ок</button>
+  </div>
+
   <script>
-    const GET_ADMIN_URL = "https://lazrfierfbhwlduqlvws.functions.supabase.co/get-admin-requests";
-    const PROCESS_ADMIN_URL = "https://lazrfierfbhwlduqlvws.functions.supabase.co/admin-process-request";
-    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxhenJmaWVyZmJod2xkdXFsdndzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE1NzY2ODIsImV4cCI6MjA4NzE1MjY4Mn0.tJtwFrNPrNyGNedGP1h0bNgr98FnyoliR-13mOqlBJI";
+    const GET_URL = "https://lazrfierfbhwlduqlvws.functions.supabase.co/get-admin-requests";
+    const PROCESS_URL = "https://lazrfierfbhwlduqlvws.functions.supabase.co/process-admin-request";
 
-    function $(id){ return document.getElementById(id); }
+    const $ = (id) => document.getElementById(id);
 
-    function goBack(){
-      window.location.href = 'index.html';
+    let activeTab = "all";
+    let state = {
+      deposits: [],
+      withdrawals: [],
+      ucOrders: []
+    };
+
+    const STORAGE_KEY = "admin_panel_key";
+
+    function getAdminKey() {
+      return localStorage.getItem(STORAGE_KEY) || "";
     }
 
-    function switchTab(tab){
-      const isDeposits = tab === 'deposits';
-      $('tabDepositsBtn').classList.toggle('active', isDeposits);
-      $('tabWithdrawsBtn').classList.toggle('active', !isDeposits);
-      $('depositsPanel').classList.toggle('active', isDeposits);
-      $('withdrawsPanel').classList.toggle('active', !isDeposits);
+    function setAdminKey(value) {
+      localStorage.setItem(STORAGE_KEY, value);
+      $("adminKeyInput").value = value;
     }
+
+    function clearAdminKey() {
+      localStorage.removeItem(STORAGE_KEY);
+      $("adminKeyInput").value = "";
+    }
+
+    function showToast(text){
+      $("toastText").textContent = text;
+      $("toast").classList.add("show");
+      clearTimeout(showToast._t);
+      showToast._t = setTimeout(() => $("toast").classList.remove("show"), 3200);
+    }
+
+    $("toastOk").addEventListener("click", () => $("toast").classList.remove("show"));
 
     function escapeHtml(value){
-      return String(value ?? '')
-        .replaceAll('&', '&amp;')
-        .replaceAll('<', '&lt;')
-        .replaceAll('>', '&gt;')
-        .replaceAll('"', '&quot;')
-        .replaceAll("'", '&#039;');
+      return String(value ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
     }
 
-    function formatDate(value){
-      if (!value) return '—';
-      const d = new Date(value);
-      if (Number.isNaN(d.getTime())) return value;
-      return d.toLocaleString('ru-RU');
+    function formatVc(value){
+      const num = Number(value ?? 0);
+      if (!Number.isFinite(num)) return "0 VC";
+      return Number.isInteger(num) ? `${num} VC` : `${num.toFixed(2)} VC`;
     }
 
-    function statusBadge(status){
-      const safe = String(status || 'pending').toLowerCase();
-      return `<span class="badge ${escapeHtml(safe)}">${escapeHtml(safe)}</span>`;
+    function formatDate(dateStr){
+      if (!dateStr) return "—";
+      const d = new Date(dateStr);
+      if (Number.isNaN(d.getTime())) return dateStr;
+      return new Intl.DateTimeFormat("ru-RU", {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit"
+      }).format(d);
     }
 
-    function getAdminTgId(){
-      if (!window.Telegram || !window.Telegram.WebApp) {
-        throw new Error('Открой админку внутри Telegram Mini App');
+    function iconSvg(type){
+      if (type === "deposit") {
+        return `
+          <svg viewBox="0 0 24 24">
+            <path d="M12 3v14"></path>
+            <path d="M7 12l5 5 5-5"></path>
+            <path d="M5 21h14"></path>
+          </svg>
+        `;
       }
 
-      try{
-        Telegram.WebApp.ready();
-        if (typeof Telegram.WebApp.expand === 'function') Telegram.WebApp.expand();
-        if (typeof Telegram.WebApp.setHeaderColor === 'function') Telegram.WebApp.setHeaderColor('#020617');
-      } catch (e) {}
+      if (type === "withdraw") {
+        return `
+          <svg viewBox="0 0 24 24">
+            <path d="M12 21V7"></path>
+            <path d="M17 12l-5-5-5 5"></path>
+            <path d="M5 3h14"></path>
+          </svg>
+        `;
+      }
 
-      const tgId = Telegram.WebApp.initDataUnsafe?.user?.id;
-      if (!tgId) throw new Error('Не удалось получить Telegram ID');
-      return String(tgId);
+      return `
+        <svg viewBox="0 0 24 24">
+          <path d="M12 3l2.8 5.7L21 9.6l-4.5 4.4 1.1 6.2L12 17.3 6.4 20.2 7.5 14 3 9.6l6.2-.9z"></path>
+        </svg>
+      `;
     }
 
-    async function postJson(url, payload){
+    function normalizeStatus(raw){
+      const val = String(raw || "pending").toLowerCase();
+      if (["approved","success","completed","done","sent"].includes(val)) return "approved";
+      if (["rejected","declined","failed"].includes(val)) return "rejected";
+      if (["cancelled","canceled","user_cancelled","user_canceled"].includes(val)) return "cancelled";
+      return "pending";
+    }
+
+    function statusLabel(raw, type){
+      const val = String(raw || "pending").toLowerCase();
+
+      if (["approved","success","completed","done"].includes(val)) return "Одобрено";
+      if (["sent"].includes(val)) return "Отправлено";
+      if (["rejected","declined","failed"].includes(val)) return "Отклонено";
+      if (["cancelled","canceled","user_cancelled","user_canceled"].includes(val)) {
+        if (type === "withdraw") return "Отменено пользователем";
+        return "Отменено";
+      }
+      return "В обработке";
+    }
+
+    function mapDeposit(item){
+      return {
+        id: item.id,
+        type: "deposit",
+        status: item.status || "pending",
+        title: "Пополнение",
+        createdAt: item.created_at || "",
+        lines: [
+          ["TG ID", item.user_tg_id ?? "—"],
+          ["Сумма", formatVc(item.amount_vc ?? item.amount ?? 0)],
+          ["ФИО отправителя", item.sender_name ?? item.sender_fio ?? item.full_name ?? "—"],
+          ["Дата", formatDate(item.created_at)]
+        ]
+      };
+    }
+
+    function mapWithdraw(item){
+      return {
+        id: item.id,
+        type: "withdraw",
+        status: item.status || "pending",
+        title: "Вывод",
+        createdAt: item.created_at || "",
+        lines: [
+          ["TG ID", item.user_tg_id ?? "—"],
+          ["Сумма", formatVc(item.amount_vc ?? item.amount ?? 0)],
+          ["Реквизиты", item.requisites ?? "—"],
+          ["Банк", item.bank ?? "—"],
+          ["ФИО", item.fio ?? item.receiver_name ?? "—"],
+          ["Дата", formatDate(item.created_at)]
+        ]
+      };
+    }
+
+    function mapUc(item){
+      return {
+        id: item.id,
+        type: "uc",
+        status: item.status || "pending",
+        title: "Покупка UC",
+        createdAt: item.created_at || "",
+        lines: [
+          ["TG ID", item.user_tg_id ?? "—"],
+          ["Пакет", item.package_name ?? "—"],
+          ["PUBG ID", item.pubg_id ?? "—"],
+          ["Цена", formatVc(item.price_vc ?? item.amount_vc ?? item.amount ?? 0)],
+          ["Дата", formatDate(item.created_at)]
+        ]
+      };
+    }
+
+    function getAllItems() {
+      const deposits = (state.deposits || []).map(mapDeposit);
+      const withdrawals = (state.withdrawals || []).map(mapWithdraw);
+      const uc = (state.ucOrders || []).map(mapUc);
+
+      if (activeTab === "deposits") return deposits;
+      if (activeTab === "withdrawals") return withdrawals;
+      if (activeTab === "uc") return uc;
+
+      return [...deposits, ...withdrawals, ...uc].sort((a, b) => {
+        const da = new Date(a.createdAt || 0).getTime();
+        const db = new Date(b.createdAt || 0).getTime();
+        return db - da;
+      });
+    }
+
+    function updateStats() {
+      const deposits = state.deposits?.length || 0;
+      const withdrawals = state.withdrawals?.length || 0;
+      const uc = state.ucOrders?.length || 0;
+
+      $("statDeposits").textContent = String(deposits);
+      $("statWithdrawals").textContent = String(withdrawals);
+      $("statUc").textContent = String(uc);
+      $("statAll").textContent = String(deposits + withdrawals + uc);
+    }
+
+    function renderCard(item){
+      const statusType = normalizeStatus(item.status);
+      const linesHtml = item.lines.map(([label, value]) => `
+        <div class="meta-row">
+          <span class="meta-label">${escapeHtml(label)}</span>
+          <span class="meta-value">${escapeHtml(value)}</span>
+        </div>
+      `).join("");
+
+      const isPending = statusType === "pending";
+
+      const actionsHtml = isPending ? `
+        <div class="actions">
+          <button class="action-btn approve-btn" data-action="approve" data-type="${item.type}" data-id="${escapeHtml(item.id)}">Одобрить</button>
+          <button class="action-btn reject-btn" data-action="reject" data-type="${item.type}" data-id="${escapeHtml(item.id)}">Отклонить</button>
+        </div>
+      ` : "";
+
+      return `
+        <div class="card">
+          <div class="icon">${iconSvg(item.type)}</div>
+
+          <div class="body">
+            <div class="row-top">
+              <p class="card-title">${escapeHtml(item.title)}</p>
+              <span class="badge status-${statusType}">${escapeHtml(statusLabel(item.status, item.type))}</span>
+            </div>
+
+            <div class="meta">
+              ${linesHtml}
+            </div>
+
+            ${actionsHtml}
+          </div>
+        </div>
+      `;
+    }
+
+    function renderList() {
+      const box = $("adminList");
+      const items = getAllItems();
+
+      if (!items.length) {
+        box.innerHTML = `
+          <div class="empty">
+            Здесь пока нет заявок.
+          </div>
+        `;
+        return;
+      }
+
+      box.innerHTML = items.map(renderCard).join("");
+    }
+
+    function setActiveTab(tab){
+      activeTab = tab;
+      document.querySelectorAll(".tab-btn").forEach(btn => {
+        btn.classList.toggle("active", btn.dataset.tab === tab);
+      });
+      renderList();
+    }
+
+    async function postJson(url, payload) {
       const res = await fetch(url, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'apikey': SUPABASE_ANON_KEY,
-          'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
-        },
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload)
       });
 
@@ -410,187 +830,122 @@
       return json;
     }
 
-    function renderStats(stats){
-      $('statDepositsTotal').textContent = stats?.deposits_total ?? 0;
-      $('statDepositsPending').textContent = stats?.deposits_pending ?? 0;
-      $('statWithdrawsTotal').textContent = stats?.withdraws_total ?? 0;
-      $('statWithdrawsPending').textContent = stats?.withdraws_pending ?? 0;
-    }
+    async function loadAdminData() {
+      const adminKey = getAdminKey();
 
-    function depositActions(item){
-      if (String(item.status).toLowerCase() !== 'pending') return '';
-      return `
-        <div class="action-row">
-          <button class="action-btn approve" onclick="processRequest('deposit','approve','${item.id}')">Одобрить</button>
-          <button class="action-btn reject" onclick="processRequest('deposit','reject','${item.id}')">Отклонить</button>
-        </div>
-      `;
-    }
-
-    function withdrawActions(item){
-      if (String(item.status).toLowerCase() !== 'pending') return '';
-      return `
-        <div class="action-row">
-          <button class="action-btn approve" onclick="processRequest('withdraw','approve','${item.id}')">Оплачено</button>
-          <button class="action-btn reject" onclick="processRequest('withdraw','reject','${item.id}')">Отклонить</button>
-        </div>
-      `;
-    }
-
-    function renderDeposits(items){
-      const root = $('depositsList');
-
-      if (!items || !items.length) {
-        root.innerHTML = `<div class="empty">Заявок на пополнение пока нет</div>`;
+      if (!adminKey) {
+        $("adminList").innerHTML = `
+          <div class="empty">
+            Сначала введи ADMIN_PANEL_KEY.
+          </div>
+        `;
         return;
       }
 
-      root.innerHTML = items.map(item => `
-        <div class="card">
-          <div class="card-top">
-            <div class="card-title">Депозит #${escapeHtml(item.id)}</div>
-            ${statusBadge(item.status)}
-          </div>
-
-          <div class="grid">
-            <div class="field">
-              <div class="field-label">Telegram ID</div>
-              <div class="field-value">${escapeHtml(item.user_tg_id)}</div>
-            </div>
-
-            <div class="field">
-              <div class="field-label">ФИО отправителя</div>
-              <div class="field-value">${escapeHtml(item.sender_name)}</div>
-            </div>
-
-            <div class="field">
-              <div class="field-label">Сумма ₽</div>
-              <div class="field-value">${escapeHtml(item.amount_rub)}</div>
-            </div>
-
-            <div class="field">
-              <div class="field-label">Сумма VC</div>
-              <div class="field-value">${escapeHtml(item.amount_vc)}</div>
-            </div>
-
-            <div class="field">
-              <div class="field-label">Способ</div>
-              <div class="field-value">${escapeHtml(item.payment_method)}</div>
-            </div>
-
-            <div class="field">
-              <div class="field-label">Создано</div>
-              <div class="field-value">${escapeHtml(formatDate(item.created_at))}</div>
-            </div>
-          </div>
-
-          ${depositActions(item)}
+      $("adminList").innerHTML = `
+        <div class="loading">
+          <div class="spinner"></div>
+          <div>Загружаю заявки...</div>
         </div>
-      `).join('');
+      `;
+
+      try {
+        const json = await postJson(GET_URL, { adminKey });
+
+        state.deposits = Array.isArray(json.deposits) ? json.deposits : [];
+        state.withdrawals = Array.isArray(json.withdrawals) ? json.withdrawals : [];
+        state.ucOrders = Array.isArray(json.ucOrders) ? json.ucOrders : [];
+
+        updateStats();
+        renderList();
+        showToast("Данные обновлены");
+      } catch (err) {
+        console.error(err);
+        $("adminList").innerHTML = `
+          <div class="empty">
+            Не удалось загрузить заявки.<br>
+            ${escapeHtml(err.message || "Ошибка")}
+          </div>
+        `;
+      }
     }
 
-    function renderWithdraws(items){
-      const root = $('withdrawsList');
-
-      if (!items || !items.length) {
-        root.innerHTML = `<div class="empty">Заявок на вывод пока нет</div>`;
+    async function processRequest(type, requestId, action, buttonEl) {
+      const adminKey = getAdminKey();
+      if (!adminKey) {
+        showToast("Сначала введи ADMIN_PANEL_KEY");
         return;
       }
 
-      root.innerHTML = items.map(item => `
-        <div class="card">
-          <div class="card-top">
-            <div class="card-title">Вывод #${escapeHtml(item.id)}</div>
-            ${statusBadge(item.status)}
-          </div>
+      const prevText = buttonEl.textContent;
+      buttonEl.disabled = true;
+      buttonEl.textContent = action === "approve" ? "..." : "...";
 
-          <div class="grid">
-            <div class="field">
-              <div class="field-label">Telegram ID</div>
-              <div class="field-value">${escapeHtml(item.user_tg_id)}</div>
-            </div>
-
-            <div class="field">
-              <div class="field-label">Сумма VC</div>
-              <div class="field-value">${escapeHtml(item.amount_vc)}</div>
-            </div>
-
-            <div class="field">
-              <div class="field-label">Реквизиты</div>
-              <div class="field-value">${escapeHtml(item.requisites)}</div>
-            </div>
-
-            <div class="field">
-              <div class="field-label">Банк</div>
-              <div class="field-value">${escapeHtml(item.bank_name)}</div>
-            </div>
-
-            <div class="field">
-              <div class="field-label">ФИО получателя</div>
-              <div class="field-value">${escapeHtml(item.recipient_fio)}</div>
-            </div>
-
-            <div class="field">
-              <div class="field-label">Создано</div>
-              <div class="field-value">${escapeHtml(formatDate(item.created_at))}</div>
-            </div>
-          </div>
-
-          ${withdrawActions(item)}
-        </div>
-      `).join('');
-    }
-
-    async function processRequest(requestType, action, requestId){
-      const adminTgId = getAdminTgId();
-
-      const actionText =
-        requestType === 'deposit'
-          ? (action === 'approve' ? 'одобрить депозит' : 'отклонить депозит')
-          : (action === 'approve' ? 'подтвердить вывод' : 'отклонить вывод');
-
-      if (!confirm(`Ты точно хочешь ${actionText}?`)) return;
-
-      $('statusLine').textContent = 'Обработка заявки...';
-
-      try{
-        await postJson(PROCESS_ADMIN_URL, {
-          adminTgId,
-          requestType,
-          action,
-          requestId
+      try {
+        await postJson(PROCESS_URL, {
+          adminKey,
+          type,
+          requestId,
+          action
         });
 
-        $('statusLine').textContent = 'Готово. Обновляем список...';
         await loadAdminData();
-      } catch(err){
-        $('statusLine').textContent = err.message || 'Ошибка обработки';
-        alert(err.message || 'Ошибка обработки');
+        showToast(action === "approve" ? "Заявка одобрена" : "Заявка отклонена");
+      } catch (err) {
+        console.error(err);
+        buttonEl.disabled = false;
+        buttonEl.textContent = prevText;
+        showToast(err.message || "Ошибка обработки");
       }
     }
 
-    async function loadAdminData(){
-      $('statusLine').textContent = 'Загрузка данных...';
-
-      try{
-        const adminTgId = getAdminTgId();
-        const data = await postJson(GET_ADMIN_URL, { adminTgId });
-
-        renderStats(data.stats || {});
-        renderDeposits(data.deposits || []);
-        renderWithdraws(data.withdraws || []);
-
-        $('statusLine').textContent =
-          `tg_id=${adminTgId} • deposits=${data.deposits?.length || 0} • withdraws=${data.withdraws?.length || 0} • обновлено ${new Date().toLocaleTimeString('ru-RU')}`;
-      } catch(err){
-        const msg = err.message || 'Ошибка загрузки';
-        $('statusLine').textContent = msg;
-        $('depositsList').innerHTML = `<div class="empty">${escapeHtml(msg)}</div>`;
-        $('withdrawsList').innerHTML = `<div class="empty">${escapeHtml(msg)}</div>`;
+    $("saveKeyBtn").addEventListener("click", () => {
+      const val = $("adminKeyInput").value.trim();
+      if (!val) {
+        showToast("Введи ключ");
+        return;
       }
-    }
+      setAdminKey(val);
+      showToast("Ключ сохранён");
+      loadAdminData();
+    });
 
-    window.addEventListener('load', loadAdminData);
+    $("clearKeyBtn").addEventListener("click", () => {
+      clearAdminKey();
+      showToast("Ключ очищен");
+      $("adminList").innerHTML = `
+        <div class="empty">
+          Сначала введи ADMIN_PANEL_KEY.
+        </div>
+      `;
+    });
+
+    $("refreshBtn").addEventListener("click", loadAdminData);
+
+    document.querySelectorAll(".tab-btn").forEach(btn => {
+      btn.addEventListener("click", () => setActiveTab(btn.dataset.tab));
+    });
+
+    $("adminList").addEventListener("click", async (e) => {
+      const btn = e.target.closest("[data-action]");
+      if (!btn) return;
+
+      const action = btn.dataset.action;
+      const type = btn.dataset.type;
+      const requestId = btn.dataset.id;
+
+      if (!action || !type || !requestId) return;
+
+      await processRequest(type, requestId, action, btn);
+    });
+
+    window.addEventListener("load", () => {
+      const saved = getAdminKey();
+      if (saved) {
+        $("adminKeyInput").value = saved;
+        loadAdminData();
+      }
+    });
   </script>
 </body>
 </html>
