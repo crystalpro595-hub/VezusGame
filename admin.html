@@ -105,108 +105,31 @@
       color:var(--muted);
     }
 
-    .refresh-btn{
+    .topbar-actions{
+      display:flex;
+      gap:8px;
+      align-items:center;
+      flex-wrap:wrap;
+    }
+
+    .refresh-btn,
+    .open-auth-btn{
       height:42px;
       border:none;
       border-radius:14px;
       padding:0 14px;
       cursor:pointer;
-      background: rgba(255,255,255,.08);
-      color:#fff;
-      border:1px solid rgba(255,255,255,.08);
       font-size:13px;
       font-weight:900;
-    }
-
-    .auth-box{
-      display:grid;
-      grid-template-columns: 1fr auto auto;
-      gap:10px;
-    }
-
-    .input{
-      height:44px;
-      border-radius:16px;
-      border:1px solid rgba(255,255,255,.08);
-      background: rgba(255,255,255,.06);
-      color: rgba(234,241,255,.96);
-      padding: 0 14px;
-      outline:none;
-      font-weight:800;
-      letter-spacing:.2px;
-      box-shadow: 0 18px 40px rgba(0,0,0,.18);
-    }
-
-    .input::placeholder{
-      color: rgba(234,241,255,.42);
-      font-weight:800;
-    }
-
-    .primary-btn, .ghost-btn, .danger-btn{
-      height:44px;
-      border:none;
-      border-radius:16px;
-      cursor:pointer;
-      font-weight:900;
-      padding:0 14px;
-      transition: transform .15s ease, opacity .15s ease;
-      white-space:nowrap;
-    }
-
-    .primary-btn:active, .ghost-btn:active, .danger-btn:active{
-      transform:scale(.98);
-    }
-
-    .primary-btn{
-      color:#fff;
-      background: linear-gradient(135deg, #3b82f6, #2563eb);
-      box-shadow: 0 18px 34px rgba(37,99,235,.28);
-    }
-
-    .ghost-btn{
       color:#fff;
       background: rgba(255,255,255,.08);
       border:1px solid rgba(255,255,255,.08);
-    }
-
-    .danger-btn{
-      height:36px;
-      padding:0 12px;
-      border-radius:12px;
-      background: rgba(239,68,68,.14);
-      color:#fecaca;
-      border:1px solid rgba(239,68,68,.22);
-      font-size:12px;
-    }
-
-    .action-btn{
-      height:36px;
-      padding:0 12px;
-      border:none;
-      border-radius:12px;
-      cursor:pointer;
-      font-size:12px;
-      font-weight:900;
-      color:#fff;
-      background: rgba(255,255,255,.08);
-      border:1px solid rgba(255,255,255,.08);
-    }
-
-    .approve-btn{
-      background: rgba(16,185,129,.16);
-      color:#6ee7b7;
-      border:1px solid rgba(16,185,129,.24);
-    }
-
-    .reject-btn{
-      background: rgba(239,68,68,.14);
-      color:#fecaca;
-      border:1px solid rgba(239,68,68,.22);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.04);
     }
 
     .tabs{
       display:grid;
-      grid-template-columns: repeat(4, 1fr);
+      grid-template-columns: repeat(5, 1fr);
       gap:8px;
       padding:4px;
       border-radius:20px;
@@ -227,6 +150,7 @@
       font-size:12px;
       font-weight:900;
       padding:0 8px;
+      white-space:nowrap;
     }
 
     .tab-btn.active{
@@ -236,7 +160,7 @@
 
     .stats{
       display:grid;
-      grid-template-columns: repeat(4, 1fr);
+      grid-template-columns: repeat(5, 1fr);
       gap:10px;
     }
 
@@ -352,6 +276,7 @@
       color:#fff;
       text-transform:uppercase;
       flex:0 0 auto;
+      text-align:center;
     }
 
     .status-pending{ background: rgba(245,158,11,.16); color:#fcd34d; border-color: rgba(245,158,11,.24); }
@@ -391,6 +316,31 @@
       gap:8px;
       flex-wrap:wrap;
       margin-top:2px;
+    }
+
+    .action-btn{
+      height:36px;
+      padding:0 12px;
+      border:none;
+      border-radius:12px;
+      cursor:pointer;
+      font-size:12px;
+      font-weight:900;
+      color:#fff;
+      background: rgba(255,255,255,.08);
+      border:1px solid rgba(255,255,255,.08);
+    }
+
+    .approve-btn{
+      background: rgba(16,185,129,.16);
+      color:#6ee7b7;
+      border:1px solid rgba(16,185,129,.24);
+    }
+
+    .reject-btn{
+      background: rgba(239,68,68,.14);
+      color:#fecaca;
+      border:1px solid rgba(239,68,68,.22);
     }
 
     .empty, .loading{
@@ -444,7 +394,7 @@
       opacity:0;
       pointer-events:none;
       transition: opacity .22s ease, transform .22s ease;
-      z-index:300;
+      z-index:500;
       backdrop-filter: blur(14px);
       -webkit-backdrop-filter: blur(14px);
       display:flex;
@@ -472,17 +422,159 @@
       font-weight:900;
     }
 
+    /* ===== Панель входа ===== */
+    .auth-overlay{
+      position:fixed;
+      inset:0;
+      z-index:700;
+      background: rgba(0,0,0,.36);
+      opacity:1;
+      pointer-events:auto;
+      transition: opacity .25s ease;
+    }
+
+    .auth-overlay.hidden{
+      opacity:0;
+      pointer-events:none;
+    }
+
+    .auth-panel{
+      position:fixed;
+      top:16px;
+      left:16px;
+      bottom:16px;
+      width:min(420px, calc(100% - 32px));
+      z-index:710;
+      border-radius:26px;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02)),
+        rgba(14, 16, 24, .96);
+      border:1px solid rgba(255,255,255,.08);
+      box-shadow:
+        0 30px 80px rgba(0,0,0,.45),
+        inset 0 1px 0 rgba(255,255,255,.04);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+
+      padding:16px;
+      display:flex;
+      flex-direction:column;
+      gap:16px;
+
+      transform: translateX(0);
+      transition: transform .32s cubic-bezier(.2,.9,.2,1);
+    }
+
+    .auth-panel.hidden-left{
+      transform: translateX(calc(-100% - 28px));
+    }
+
+    .auth-head{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+    }
+
+    .auth-title{
+      margin:0;
+      font-size:18px;
+      font-weight:900;
+    }
+
+    .auth-close{
+      width:38px;
+      height:38px;
+      border:none;
+      border-radius:14px;
+      cursor:pointer;
+      background: rgba(255,255,255,.08);
+      border:1px solid rgba(255,255,255,.08);
+      color:#fff;
+      font-size:18px;
+      font-weight:900;
+    }
+
+    .auth-text{
+      margin:0;
+      font-size:13px;
+      line-height:1.45;
+      font-weight:800;
+      color:var(--muted);
+    }
+
+    .auth-input{
+      height:46px;
+      border-radius:16px;
+      border:1px solid rgba(255,255,255,.08);
+      background: rgba(255,255,255,.06);
+      color: rgba(234,241,255,.96);
+      padding: 0 14px;
+      outline:none;
+      font-weight:800;
+      letter-spacing:.2px;
+      box-shadow: 0 18px 40px rgba(0,0,0,.18);
+    }
+
+    .auth-input::placeholder{
+      color: rgba(234,241,255,.42);
+      font-weight:800;
+    }
+
+    .auth-actions{
+      display:grid;
+      grid-template-columns: 1fr;
+      gap:10px;
+    }
+
+    .auth-login,
+    .auth-reset{
+      height:44px;
+      border:none;
+      border-radius:16px;
+      cursor:pointer;
+      font-weight:900;
+      font-size:13px;
+    }
+
+    .auth-login{
+      color:#fff;
+      background: linear-gradient(135deg, #3b82f6, #2563eb);
+      box-shadow: 0 18px 34px rgba(37,99,235,.28);
+    }
+
+    .auth-reset{
+      color:#fff;
+      background: rgba(255,255,255,.08);
+      border:1px solid rgba(255,255,255,.08);
+    }
+
+    .auth-status{
+      min-height:18px;
+      font-size:12px;
+      font-weight:900;
+      color:#fecaca;
+    }
+
+    .auth-mini{
+      margin-top:auto;
+      border-radius:18px;
+      padding:12px;
+      background: rgba(255,255,255,.04);
+      border:1px solid rgba(255,255,255,.06);
+      font-size:12px;
+      font-weight:800;
+      color:var(--muted);
+      line-height:1.45;
+    }
+
     @media (max-width:720px){
       .stats{
         grid-template-columns: repeat(2, 1fr);
       }
     }
 
-    @media (max-width:560px){
-      .auth-box{
-        grid-template-columns: 1fr;
-      }
-
+    @media (max-width:640px){
       .tabs{
         grid-template-columns: repeat(2, 1fr);
       }
@@ -493,6 +585,9 @@
       .icon svg{ width:20px; height:20px; }
       .card-title{ font-size:14px; }
       .meta-row{ font-size:11px; }
+      .topbar-head{ align-items:flex-start; flex-direction:column; }
+      .topbar-actions{ width:100%; }
+      .refresh-btn, .open-auth-btn{ flex:1; }
     }
   </style>
 </head>
@@ -508,18 +603,16 @@
             <p>Депозиты, выводы, UC и отменённые пользователем заявки</p>
           </div>
 
-          <button class="refresh-btn" id="refreshBtn">Обновить</button>
-        </div>
-
-        <div class="auth-box">
-          <input class="input" id="adminKeyInput" type="password" placeholder="ADMIN_PANEL_KEY">
-          <button class="primary-btn" id="saveKeyBtn">Сохранить ключ</button>
-          <button class="ghost-btn" id="clearKeyBtn">Очистить</button>
+          <div class="topbar-actions">
+            <button class="refresh-btn" id="refreshBtn">Обновить</button>
+            <button class="open-auth-btn" id="openAuthBtn">Ключ</button>
+          </div>
         </div>
       </div>
 
       <div class="tabs">
         <button class="tab-btn active" data-tab="all">Все</button>
+        <button class="tab-btn" data-tab="active">Актуальные</button>
         <button class="tab-btn" data-tab="deposits">Депозиты</button>
         <button class="tab-btn" data-tab="withdrawals">Выводы</button>
         <button class="tab-btn" data-tab="uc">UC</button>
@@ -529,6 +622,10 @@
         <div class="stat">
           <div class="stat-label">Всего</div>
           <div class="stat-value" id="statAll">0</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">Актуальные</div>
+          <div class="stat-value" id="statActive">0</div>
         </div>
         <div class="stat">
           <div class="stat-label">Депозиты</div>
@@ -545,12 +642,40 @@
       </div>
 
       <div class="list" id="adminList">
-        <div class="loading">
-          <div class="spinner"></div>
-          <div>Введи ключ и нажми “Обновить”</div>
+        <div class="empty">
+          Введи ADMIN_PANEL_KEY для входа.
         </div>
       </div>
 
+    </div>
+  </div>
+
+  <!-- Панель входа -->
+  <div class="auth-overlay" id="authOverlay"></div>
+
+  <div class="auth-panel" id="authPanel">
+    <div class="auth-head">
+      <h2 class="auth-title">Вход в админку</h2>
+      <button class="auth-close" id="authCloseBtn" aria-label="Скрыть панель">×</button>
+    </div>
+
+    <p class="auth-text">
+      Введи <b>ADMIN_PANEL_KEY</b>. После успешного входа панель уедет влево.
+      Её можно открыть обратно кнопкой <b>“Ключ”</b>.
+    </p>
+
+    <input class="auth-input" id="adminKeyInput" type="password" placeholder="ADMIN_PANEL_KEY" />
+
+    <div class="auth-actions">
+      <button class="auth-login" id="loginBtn">Войти</button>
+      <button class="auth-reset" id="resetAuthBtn">Сбросить вход</button>
+    </div>
+
+    <div class="auth-status" id="authStatus"></div>
+
+    <div class="auth-mini">
+      Если нажмёшь <b>“Сбросить вход”</b>, текущий ключ удалится, данные скроются,
+      и снова потребуется вход в админ-панель.
     </div>
   </div>
 
@@ -566,27 +691,14 @@
     const $ = (id) => document.getElementById(id);
 
     let activeTab = "all";
+    let adminAuthorized = false;
+    let adminKey = "";
+
     let state = {
       deposits: [],
       withdrawals: [],
       ucOrders: []
     };
-
-    const STORAGE_KEY = "admin_panel_key";
-
-    function getAdminKey() {
-      return localStorage.getItem(STORAGE_KEY) || "";
-    }
-
-    function setAdminKey(value) {
-      localStorage.setItem(STORAGE_KEY, value);
-      $("adminKeyInput").value = value;
-    }
-
-    function clearAdminKey() {
-      localStorage.removeItem(STORAGE_KEY);
-      $("adminKeyInput").value = "";
-    }
 
     function showToast(text){
       $("toastText").textContent = text;
@@ -725,14 +837,10 @@
       };
     }
 
-    function getAllItems() {
+    function getMergedItems() {
       const deposits = (state.deposits || []).map(mapDeposit);
       const withdrawals = (state.withdrawals || []).map(mapWithdraw);
       const uc = (state.ucOrders || []).map(mapUc);
-
-      if (activeTab === "deposits") return deposits;
-      if (activeTab === "withdrawals") return withdrawals;
-      if (activeTab === "uc") return uc;
 
       return [...deposits, ...withdrawals, ...uc].sort((a, b) => {
         const da = new Date(a.createdAt || 0).getTime();
@@ -741,15 +849,40 @@
       });
     }
 
-    function updateStats() {
-      const deposits = state.deposits?.length || 0;
-      const withdrawals = state.withdrawals?.length || 0;
-      const uc = state.ucOrders?.length || 0;
+    function getFilteredItems() {
+      const all = getMergedItems();
 
+      if (activeTab === "active") {
+        return all.filter(item => normalizeStatus(item.status) === "pending");
+      }
+
+      if (activeTab === "deposits") {
+        return all.filter(item => item.type === "deposit");
+      }
+
+      if (activeTab === "withdrawals") {
+        return all.filter(item => item.type === "withdraw");
+      }
+
+      if (activeTab === "uc") {
+        return all.filter(item => item.type === "uc");
+      }
+
+      return all;
+    }
+
+    function updateStats() {
+      const all = getMergedItems();
+      const active = all.filter(item => normalizeStatus(item.status) === "pending").length;
+      const deposits = all.filter(item => item.type === "deposit").length;
+      const withdrawals = all.filter(item => item.type === "withdraw").length;
+      const uc = all.filter(item => item.type === "uc").length;
+
+      $("statAll").textContent = String(all.length);
+      $("statActive").textContent = String(active);
       $("statDeposits").textContent = String(deposits);
       $("statWithdrawals").textContent = String(withdrawals);
       $("statUc").textContent = String(uc);
-      $("statAll").textContent = String(deposits + withdrawals + uc);
     }
 
     function renderCard(item){
@@ -792,7 +925,17 @@
 
     function renderList() {
       const box = $("adminList");
-      const items = getAllItems();
+
+      if (!adminAuthorized) {
+        box.innerHTML = `
+          <div class="empty">
+            Сначала введи ADMIN_PANEL_KEY.
+          </div>
+        `;
+        return;
+      }
+
+      const items = getFilteredItems();
 
       if (!items.length) {
         box.innerHTML = `
@@ -830,56 +973,105 @@
       return json;
     }
 
-    async function loadAdminData() {
-      const adminKey = getAdminKey();
+    function openAuthPanel() {
+      $("authPanel").classList.remove("hidden-left");
+      $("authOverlay").classList.remove("hidden");
+      $("authStatus").textContent = "";
+      setTimeout(() => $("adminKeyInput").focus(), 50);
+    }
 
-      if (!adminKey) {
-        $("adminList").innerHTML = `
-          <div class="empty">
-            Сначала введи ADMIN_PANEL_KEY.
-          </div>
-        `;
+    function closeAuthPanel() {
+      $("authPanel").classList.add("hidden-left");
+      $("authOverlay").classList.add("hidden");
+    }
+
+    function forceLockAdmin() {
+      adminAuthorized = false;
+      adminKey = "";
+      state = { deposits: [], withdrawals: [], ucOrders: [] };
+
+      $("adminKeyInput").value = "";
+      $("authStatus").textContent = "";
+      $("adminList").innerHTML = `
+        <div class="empty">
+          Вход сброшен. Введи ADMIN_PANEL_KEY.
+        </div>
+      `;
+      $("statAll").textContent = "0";
+      $("statActive").textContent = "0";
+      $("statDeposits").textContent = "0";
+      $("statWithdrawals").textContent = "0";
+      $("statUc").textContent = "0";
+
+      openAuthPanel();
+    }
+
+    async function loadAdminData(showLoader = true) {
+      if (!adminAuthorized || !adminKey) {
+        renderList();
         return;
       }
 
-      $("adminList").innerHTML = `
-        <div class="loading">
-          <div class="spinner"></div>
-          <div>Загружаю заявки...</div>
-        </div>
-      `;
-
-      try {
-        const json = await postJson(GET_URL, { adminKey });
-
-        state.deposits = Array.isArray(json.deposits) ? json.deposits : [];
-        state.withdrawals = Array.isArray(json.withdrawals) ? json.withdrawals : [];
-        state.ucOrders = Array.isArray(json.ucOrders) ? json.ucOrders : [];
-
-        updateStats();
-        renderList();
-        showToast("Данные обновлены");
-      } catch (err) {
-        console.error(err);
+      if (showLoader) {
         $("adminList").innerHTML = `
-          <div class="empty">
-            Не удалось загрузить заявки.<br>
-            ${escapeHtml(err.message || "Ошибка")}
+          <div class="loading">
+            <div class="spinner"></div>
+            <div>Загружаю заявки...</div>
           </div>
         `;
+      }
+
+      const json = await postJson(GET_URL, { adminKey });
+
+      state.deposits = Array.isArray(json.deposits) ? json.deposits : [];
+      state.withdrawals = Array.isArray(json.withdrawals) ? json.withdrawals : [];
+      state.ucOrders = Array.isArray(json.ucOrders) ? json.ucOrders : [];
+
+      updateStats();
+      renderList();
+    }
+
+    async function tryLogin() {
+      const value = $("adminKeyInput").value.trim();
+
+      if (!value) {
+        $("authStatus").textContent = "Введи ключ.";
+        return;
+      }
+
+      $("authStatus").textContent = "Проверяю ключ...";
+
+      const prevKey = adminKey;
+      const prevAuth = adminAuthorized;
+
+      try {
+        adminKey = value;
+        adminAuthorized = true;
+
+        await loadAdminData(true);
+
+        $("authStatus").textContent = "";
+        closeAuthPanel();
+        showToast("Вход выполнен");
+      } catch (err) {
+        console.error(err);
+        adminKey = prevKey;
+        adminAuthorized = prevAuth;
+        $("authStatus").textContent = err.message || "Неверный ключ";
+        showToast(err.message || "Неверный ключ");
       }
     }
 
     async function processRequest(type, requestId, action, buttonEl) {
-      const adminKey = getAdminKey();
-      if (!adminKey) {
-        showToast("Сначала введи ADMIN_PANEL_KEY");
+      if (!adminAuthorized || !adminKey) {
+        showToast("Сначала войди в админку");
+        openAuthPanel();
         return;
       }
 
       const prevText = buttonEl.textContent;
       buttonEl.disabled = true;
-      buttonEl.textContent = action === "approve" ? "..." : "...";
+      buttonEl.textContent = "...";
 
       try {
         await postJson(PROCESS_URL, {
@@ -889,7 +1081,7 @@
           action
         });
 
-        await loadAdminData();
+        await loadAdminData(false);
         showToast(action === "approve" ? "Заявка одобрена" : "Заявка отклонена");
       } catch (err) {
         console.error(err);
@@ -899,28 +1091,49 @@
       }
     }
 
-    $("saveKeyBtn").addEventListener("click", () => {
-      const val = $("adminKeyInput").value.trim();
-      if (!val) {
-        showToast("Введи ключ");
+    $("loginBtn").addEventListener("click", tryLogin);
+
+    $("adminKeyInput").addEventListener("keydown", (e) => {
+      if (e.key === "Enter") tryLogin();
+    });
+
+    $("resetAuthBtn").addEventListener("click", () => {
+      forceLockAdmin();
+      showToast("Вход сброшен");
+    });
+
+    $("openAuthBtn").addEventListener("click", () => {
+      openAuthPanel();
+    });
+
+    $("authCloseBtn").addEventListener("click", () => {
+      if (!adminAuthorized) {
+        $("authStatus").textContent = "Сначала нужно войти.";
         return;
       }
-      setAdminKey(val);
-      showToast("Ключ сохранён");
-      loadAdminData();
+      closeAuthPanel();
     });
 
-    $("clearKeyBtn").addEventListener("click", () => {
-      clearAdminKey();
-      showToast("Ключ очищен");
-      $("adminList").innerHTML = `
-        <div class="empty">
-          Сначала введи ADMIN_PANEL_KEY.
-        </div>
-      `;
+    $("authOverlay").addEventListener("click", () => {
+      if (!adminAuthorized) return;
+      closeAuthPanel();
     });
 
-    $("refreshBtn").addEventListener("click", loadAdminData);
+    $("refreshBtn").addEventListener("click", async () => {
+      if (!adminAuthorized) {
+        openAuthPanel();
+        showToast("Сначала войди в админку");
+        return;
+      }
+
+      try {
+        await loadAdminData(true);
+        showToast("Данные обновлены");
+      } catch (err) {
+        console.error(err);
+        showToast(err.message || "Ошибка загрузки");
+      }
+    });
 
     document.querySelectorAll(".tab-btn").forEach(btn => {
       btn.addEventListener("click", () => setActiveTab(btn.dataset.tab));
@@ -940,11 +1153,8 @@
     });
 
     window.addEventListener("load", () => {
-      const saved = getAdminKey();
-      if (saved) {
-        $("adminKeyInput").value = saved;
-        loadAdminData();
-      }
+      openAuthPanel();
+      renderList();
     });
   </script>
 </body>
