@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Wallet</title>
+  <title>Vezus Game</title>
 
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
 
@@ -18,7 +18,6 @@
       --glass: rgba(12, 14, 20, .74);
       --glass-2: rgba(14, 16, 24, .94);
       --stroke: rgba(255,255,255,.08);
-      --stroke-2: rgba(255,255,255,.05);
       --shadow: 0 18px 42px rgba(0,0,0,.48);
       --shadow-soft: 0 12px 28px rgba(0,0,0,.34);
 
@@ -112,9 +111,16 @@
       padding:0;
       overflow:hidden;
     }
+
     .menu-btn:active, .profile-btn:active{ transform: scale(.98); }
 
-    .burger{ width:18px; height:14px; display:grid; gap:3px; }
+    .burger{
+      width:18px;
+      height:14px;
+      display:grid;
+      gap:3px;
+    }
+
     .burger span{
       height:2px;
       border-radius:999px;
@@ -145,7 +151,7 @@
       position:relative;
       overflow:hidden;
       background: var(--glass);
-      border: 1px solid var(--stroke);
+      border:1px solid var(--stroke);
       box-shadow: var(--shadow), inset 0 1px 0 rgba(255,255,255,.04);
       backdrop-filter: blur(10px);
       -webkit-backdrop-filter: blur(10px);
@@ -191,6 +197,7 @@
       font-size:13px;
       white-space:nowrap;
     }
+
     .bal-amount:active{ transform: scale(.99); }
 
     .slider{
@@ -208,6 +215,7 @@
       scrollbar-width:none;
       padding-bottom:4px;
     }
+
     .slides::-webkit-scrollbar{ display:none; }
 
     .slide{
@@ -219,6 +227,7 @@
       background:#000;
       box-shadow: 0 18px 55px rgba(0,0,0,.40);
     }
+
     .slide::before{
       content:"";
       display:block;
@@ -289,6 +298,7 @@
       border:1px solid rgba(255,255,255,.06);
       transition: transform .18s ease, box-shadow .18s ease;
     }
+
     .action-btn:active{ transform: scale(.985); }
 
     .action-btn .bg{
@@ -343,6 +353,7 @@
       justify-content:center;
       padding: 16px 16px calc(16px + var(--safe-bottom)) 16px;
     }
+
     .menu-overlay.show{
       opacity:1;
       pointer-events:auto;
@@ -363,6 +374,7 @@
       transition: transform .28s ease, opacity .28s ease;
       overflow:hidden;
     }
+
     .menu-overlay.show .menu-sheet{
       transform: translateY(0);
       opacity:1;
@@ -405,6 +417,7 @@
       transition: transform .15s ease;
       flex:0 0 auto;
     }
+
     .menu-close:active{ transform: scale(.98); }
 
     .menu-grid{
@@ -434,6 +447,7 @@
       width:100%;
       min-width:0;
     }
+
     .menu-card:active{ transform: scale(.985); }
 
     .menu-icon{
@@ -448,8 +462,17 @@
       box-shadow:
         inset 0 1px 0 rgba(255,255,255,.04),
         0 8px 18px rgba(0,0,0,.18);
-      font-size:22px;
-      line-height:1;
+    }
+
+    .menu-icon svg{
+      width:22px;
+      height:22px;
+      stroke: rgba(234,241,255,.96);
+      fill:none;
+      stroke-width:2;
+      stroke-linecap:round;
+      stroke-linejoin:round;
+      display:block;
     }
 
     .menu-card-title{
@@ -477,6 +500,7 @@
       justify-content:center;
       padding:18px;
     }
+
     .support-overlay.show{
       opacity:1;
       pointer-events:auto;
@@ -496,6 +520,7 @@
       opacity:.95;
       transition: transform .22s ease, opacity .22s ease;
     }
+
     .support-overlay.show .support-card{
       transform: translateY(0) scale(1);
       opacity: 1;
@@ -530,6 +555,7 @@
       place-items:center;
       box-shadow: 0 12px 28px rgba(0,0,0,.32);
     }
+
     .support-x:active{ transform: scale(.98); }
 
     .support-body{
@@ -565,6 +591,7 @@
       letter-spacing:.2px;
       font-size:14px;
     }
+
     .tg-btn:active{ transform: scale(.99); }
 
     .tg-ico{
@@ -591,7 +618,11 @@
         width:44px;
         height:44px;
         border-radius:14px;
-        font-size:20px;
+      }
+
+      .menu-icon svg{
+        width:20px;
+        height:20px;
       }
 
       .menu-card-title{
@@ -639,9 +670,15 @@
 
       <div class="slider" aria-label="Баннеры">
         <div class="slides" id="slides">
-          <div class="slide"><img src="https://i.postimg.cc/SNYsKWq4/Picsart-26-02-25-18-45-57-193.png" alt="Banner 1"></div>
-          <div class="slide"><img src="YOUR_BANNER_1200x400.png" alt="Banner 2"></div>
-          <div class="slide"><img src="YOUR_BANNER_1200x400.png" alt="Banner 3"></div>
+          <div class="slide">
+            <img src="https://i.postimg.cc/SNYsKWq4/Picsart-26-02-25-18-45-57-193.png" alt="Banner 1">
+          </div>
+          <div class="slide">
+            <img src="https://i.postimg.cc/85VtJ6hd/Picsart-26-02-17-16-56-47-885.png" alt="Banner 2">
+          </div>
+          <div class="slide">
+            <img src="https://i.postimg.cc/YCPP62Bz/Picsart-26-02-15-18-03-19-524.jpg" alt="Banner 3">
+          </div>
         </div>
 
         <div class="dots" id="dots" aria-label="Индикатор баннера">
@@ -685,22 +722,44 @@
 
       <div class="menu-grid">
         <button class="menu-card" data-action="support">
-          <span class="menu-icon" aria-hidden="true">💬</span>
+          <span class="menu-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24">
+              <path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z"></path>
+            </svg>
+          </span>
           <span class="menu-card-title">Поддержка</span>
         </button>
 
         <button class="menu-card" data-action="vouchers">
-          <span class="menu-icon" aria-hidden="true">🎟️</span>
+          <span class="menu-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24">
+              <path d="M3 9V6a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v3"></path>
+              <path d="M21 15v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-3"></path>
+              <path d="M3 9h18v6H3z"></path>
+              <path d="M12 9v6"></path>
+            </svg>
+          </span>
           <span class="menu-card-title">Ваучеры</span>
         </button>
 
         <button class="menu-card" data-action="ref">
-          <span class="menu-icon" aria-hidden="true">🔗</span>
+          <span class="menu-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24">
+              <path d="M10 13a5 5 0 0 0 7.07 0l2.83-2.83a5 5 0 0 0-7.07-7.07L10.59 5.3"></path>
+              <path d="M14 11a5 5 0 0 0-7.07 0L4.1 13.83a5 5 0 1 0 7.07 7.07L13.41 18.7"></path>
+            </svg>
+          </span>
           <span class="menu-card-title">Реферальная ссылка</span>
         </button>
 
         <button class="menu-card" data-action="history">
-          <span class="menu-icon" aria-hidden="true">🕘</span>
+          <span class="menu-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24">
+              <path d="M3 12a9 9 0 1 0 3-6.7"></path>
+              <path d="M3 3v6h6"></path>
+              <path d="M12 7v5l3 3"></path>
+            </svg>
+          </span>
           <span class="menu-card-title">История</span>
         </button>
       </div>
@@ -735,6 +794,17 @@
   <script>
     const clamp = (n, min, max) => Math.max(min, Math.min(max, n));
     const VERIFY_URL = "https://lazrfierfbhwlduqlvws.functions.supabase.co/verify-telegram";
+
+    const FILES = {
+      wallet: 'wallet.html',
+      profile: 'profile.html',
+      games: 'games.html',
+      shop: 'ucshop.html',
+      custom: 'custom.html',
+      vouchers: 'vouchers.html',
+      referral: 'referral.html',
+      history: 'history.html'
+    };
 
     const balanceValueEl = document.getElementById('balanceValue');
     const balanceChipEl  = document.getElementById('balanceChip');
@@ -823,21 +893,16 @@
       }
     }
 
-    balanceChipEl.addEventListener('click', () => {
-      window.location.href = 'wallet.html';
-    });
+    function goTo(file){
+      window.location.href = file;
+    }
 
-    profileBtnEl.addEventListener('click', () => {
-      window.location.href = 'profile.html';
-    });
+    balanceChipEl.addEventListener('click', () => goTo(FILES.wallet));
+    profileBtnEl.addEventListener('click', () => goTo(FILES.profile));
 
-    document.getElementById('btnGames').addEventListener('click', () => alert('Игры (позже сделаем переход)'));
-
-    document.getElementById('btnShop').addEventListener('click', () => {
-      window.location.href = 'ucshop.html';
-    });
-
-    document.getElementById('btnCustom').addEventListener('click', () => alert('Кастомки (позже сделаем переход)'));
+    document.getElementById('btnGames').addEventListener('click', () => goTo(FILES.games));
+    document.getElementById('btnShop').addEventListener('click', () => goTo(FILES.shop));
+    document.getElementById('btnCustom').addEventListener('click', () => goTo(FILES.custom));
 
     const slides = document.getElementById('slides');
     const dotsWrap = document.getElementById('dots');
@@ -912,12 +977,6 @@
     document.addEventListener('visibilitychange', () => {
       if (document.hidden) stopAutoplay();
       else startAutoplay();
-    });
-
-    window.addEventListener('load', () => {
-      updateDotsByScroll();
-      startAutoplay();
-      autoAuthTelegram();
     });
 
     const menuBtn = document.getElementById('menuBtn');
@@ -995,8 +1054,17 @@
         }
 
         closeMenu();
-        alert('Открыть: ' + action);
+
+        if (action === 'vouchers') return goTo(FILES.vouchers);
+        if (action === 'ref') return goTo(FILES.referral);
+        if (action === 'history') return goTo(FILES.history);
       });
+    });
+
+    window.addEventListener('load', () => {
+      updateDotsByScroll();
+      startAutoplay();
+      autoAuthTelegram();
     });
   </script>
 </body>
