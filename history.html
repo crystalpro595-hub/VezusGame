@@ -1,0 +1,767 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>История</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --text:#eaf1ff;
+      --muted:rgba(234,241,255,.72);
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+      --safe-top: env(safe-area-inset-top, 0px);
+      --radius:20px;
+
+      --glass: rgba(12, 14, 20, .74);
+      --glassStrong: rgba(14, 16, 24, .92);
+      --glassBorder: rgba(255,255,255,.08);
+      --glassBorder2: rgba(255,255,255,.06);
+      --shadow: 0 18px 42px rgba(0,0,0,.48);
+      --shadowSoft: 0 12px 28px rgba(0,0,0,.34);
+    }
+
+    *{
+      box-sizing:border-box;
+      font-family:'Inter', sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html, body{
+      height:100%;
+      margin:0;
+      overflow:hidden;
+      color:var(--text);
+      background:#020617;
+    }
+
+    body{
+      background-image:url("https://i.postimg.cc/fbJT34yY/076E519D-F095-4957-88BF-5591DEB82533.png");
+      background-size:cover;
+      background-position:center;
+      background-repeat:no-repeat;
+    }
+
+    body::before{
+      content:"";
+      position:fixed;
+      inset:0;
+      background:
+        radial-gradient(900px 600px at 30% 10%, rgba(255,255,255,.05), transparent 60%),
+        linear-gradient(180deg, rgba(0,0,0,.40), rgba(0,0,0,.64));
+      pointer-events:none;
+    }
+
+    .app{
+      position:relative;
+      height:100%;
+      overflow:auto;
+      padding: calc(18px + var(--safe-top)) 16px calc(28px + var(--safe-bottom)) 16px;
+      z-index:1;
+    }
+
+    .content{
+      margin-top:18px;
+      display:flex;
+      flex-direction:column;
+      gap:16px;
+      max-width:520px;
+      margin-left:auto;
+      margin-right:auto;
+      align-items:center;
+      position:relative;
+      z-index:1;
+    }
+
+    .top-row{
+      width:100%;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:16px;
+      position:sticky;
+      top:4px;
+      z-index:30;
+      padding:6px 8px;
+      border-radius:22px;
+      background: rgba(10,12,18,.38);
+      border:1px solid rgba(255,255,255,.04);
+      box-shadow: 0 10px 30px rgba(0,0,0,.22);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+    }
+
+    .back-btn-square{
+      width:42px;
+      height:42px;
+      border-radius:14px;
+      border:1px solid var(--glassBorder);
+      cursor:pointer;
+      background:var(--glass);
+      box-shadow: var(--shadowSoft), inset 0 1px 0 rgba(255,255,255,.04);
+      display:grid;
+      place-items:center;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      transition: transform .15s ease;
+      padding:0;
+      overflow:hidden;
+      flex:0 0 auto;
+    }
+    .back-btn-square:active{ transform:scale(.98); }
+
+    .back-svg{
+      width:20px;
+      height:20px;
+      display:block;
+      stroke: rgba(234,241,255,.92);
+      fill:none;
+      stroke-width:2.2;
+      stroke-linecap:round;
+      stroke-linejoin:round;
+    }
+
+    .balance-mini{
+      width:min(220px, 72%);
+      height:40px;
+      border-radius:999px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      padding:6px 7px 6px 12px;
+      position:relative;
+      overflow:hidden;
+      background:var(--glass);
+      border:1px solid var(--glassBorder);
+      box-shadow: var(--shadow), inset 0 1px 0 rgba(255,255,255,.04);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+
+    .balance-mini::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      background:
+        radial-gradient(180px 60px at 0% 0%, rgba(255,255,255,.05), transparent 55%),
+        radial-gradient(180px 60px at 100% 100%, rgba(255,255,255,.03), transparent 55%);
+      pointer-events:none;
+    }
+
+    .bal-title{
+      position:relative;
+      z-index:1;
+      font-size:12px;
+      font-weight:900;
+      letter-spacing:.2px;
+      color: rgba(234,241,255,.92);
+      white-space:nowrap;
+    }
+
+    .bal-amount{
+      position:relative;
+      z-index:1;
+      height:26px;
+      border:none;
+      border-radius:999px;
+      cursor:pointer;
+      padding:0 10px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background: rgba(255,255,255,.08);
+      border:1px solid rgba(255,255,255,.08);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.05);
+      color: rgba(234,241,255,.98);
+      font-weight:900;
+      font-size:13px;
+      white-space:nowrap;
+    }
+
+    .page-head{
+      width:100%;
+      display:flex;
+      flex-direction:column;
+      gap:4px;
+      margin-top:2px;
+    }
+
+    .page-title{
+      margin:0;
+      font-size:22px;
+      font-weight:900;
+      letter-spacing:.2px;
+      text-shadow:0 14px 25px rgba(0,0,0,.55);
+    }
+
+    .page-sub{
+      margin:0;
+      font-size:12px;
+      font-weight:800;
+      color:var(--muted);
+    }
+
+    .tabs{
+      width:100%;
+      display:grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap:8px;
+      padding:4px;
+      border-radius:20px;
+      background: rgba(14,16,24,.72);
+      border:1px solid rgba(255,255,255,.06);
+      box-shadow: 0 18px 34px rgba(0,0,0,.22);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+
+    .tab-btn{
+      height:40px;
+      border:none;
+      border-radius:14px;
+      cursor:pointer;
+      background: rgba(255,255,255,.04);
+      color: rgba(234,241,255,.86);
+      font-size:12px;
+      font-weight:900;
+      letter-spacing:.15px;
+      transition: transform .15s ease, background .15s ease;
+      white-space:nowrap;
+      padding:0 6px;
+    }
+
+    .tab-btn.active{
+      background: rgba(255,255,255,.10);
+      color:#fff;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.06);
+    }
+
+    .tab-btn:active{ transform:scale(.98); }
+
+    .history-list{
+      width:100%;
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+      min-height:120px;
+    }
+
+    .history-card{
+      position:relative;
+      border-radius:22px;
+      overflow:hidden;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02)),
+        rgba(12, 14, 20, .84);
+      border:1px solid rgba(255,255,255,.07);
+      box-shadow:
+        0 20px 48px rgba(0,0,0,.34),
+        inset 0 1px 0 rgba(255,255,255,.03);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      padding:14px;
+      display:flex;
+      gap:12px;
+      align-items:flex-start;
+    }
+
+    .history-card::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      background:
+        radial-gradient(380px 120px at 0% 0%, rgba(255,255,255,.04), transparent 60%),
+        radial-gradient(320px 120px at 100% 100%, rgba(255,255,255,.025), transparent 60%);
+      pointer-events:none;
+    }
+
+    .card-icon{
+      position:relative;
+      z-index:1;
+      width:48px;
+      height:48px;
+      border-radius:16px;
+      flex:0 0 auto;
+      display:grid;
+      place-items:center;
+      border:1px solid rgba(255,255,255,.08);
+      background: rgba(255,255,255,.06);
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.04),
+        0 8px 18px rgba(0,0,0,.18);
+      font-size:20px;
+    }
+
+    .card-body{
+      position:relative;
+      z-index:1;
+      flex:1;
+      min-width:0;
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+    }
+
+    .card-top{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:10px;
+    }
+
+    .card-title{
+      margin:0;
+      font-size:15px;
+      font-weight:900;
+      color:#fff;
+    }
+
+    .status-badge{
+      flex:0 0 auto;
+      height:24px;
+      border-radius:999px;
+      padding:0 10px;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      font-size:11px;
+      font-weight:900;
+      border:1px solid rgba(255,255,255,.08);
+      background: rgba(255,255,255,.06);
+      color:#fff;
+      text-transform:uppercase;
+    }
+
+    .status-pending{ background: rgba(245,158,11,.16); color:#fcd34d; border-color: rgba(245,158,11,.24); }
+    .status-approved,
+    .status-completed,
+    .status-success,
+    .status-sent{ background: rgba(16,185,129,.16); color:#6ee7b7; border-color: rgba(16,185,129,.24); }
+    .status-rejected,
+    .status-declined,
+    .status-cancelled{ background: rgba(239,68,68,.16); color:#fca5a5; border-color: rgba(239,68,68,.24); }
+
+    .meta-grid{
+      display:grid;
+      grid-template-columns: 1fr;
+      gap:6px;
+    }
+
+    .meta-row{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:10px;
+      font-size:12px;
+      line-height:1.35;
+    }
+
+    .meta-label{
+      color:var(--muted);
+      font-weight:800;
+    }
+
+    .meta-value{
+      color:#fff;
+      font-weight:800;
+      text-align:right;
+      word-break:break-word;
+      max-width:65%;
+    }
+
+    .empty{
+      width:100%;
+      min-height:140px;
+      border-radius:22px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      text-align:center;
+      padding:20px;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02)),
+        rgba(12, 14, 20, .84);
+      border:1px solid rgba(255,255,255,.07);
+      box-shadow:
+        0 20px 48px rgba(0,0,0,.34),
+        inset 0 1px 0 rgba(255,255,255,.03);
+      color: rgba(234,241,255,.76);
+      font-size:13px;
+      font-weight:900;
+      line-height:1.45;
+    }
+
+    .loading{
+      width:100%;
+      min-height:140px;
+      border-radius:22px;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      gap:12px;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02)),
+        rgba(12, 14, 20, .84);
+      border:1px solid rgba(255,255,255,.07);
+      box-shadow:
+        0 20px 48px rgba(0,0,0,.34),
+        inset 0 1px 0 rgba(255,255,255,.03);
+      color: rgba(234,241,255,.76);
+      font-size:13px;
+      font-weight:900;
+    }
+
+    .spinner{
+      width:34px;
+      height:34px;
+      border-radius:50%;
+      border:3px solid rgba(255,255,255,.10);
+      border-top-color: rgba(255,255,255,.68);
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin{
+      to{ transform: rotate(360deg); }
+    }
+
+    @media (max-width:480px){
+      .tabs{
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width:360px){
+      .balance-mini{ width:min(200px, 70%); height:38px; }
+      .bal-amount{ height:25px; font-size:12px; }
+      .back-btn-square{ width:40px; height:40px; border-radius:13px; }
+      .top-row{ gap:14px; padding:5px 6px; }
+      .card-icon{ width:44px; height:44px; border-radius:14px; }
+      .card-title{ font-size:14px; }
+      .meta-row{ font-size:11px; }
+    }
+
+    @media (prefers-reduced-motion: reduce){
+      *{ transition:none !important; animation:none !important; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="app">
+    <div class="content">
+
+      <div class="top-row">
+        <button class="back-btn-square" id="backBtn" aria-label="Назад" title="На главную">
+          <svg class="back-svg" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M15 18l-6-6 6-6"></path>
+            <path d="M9 12h10"></path>
+          </svg>
+        </button>
+
+        <div class="balance-mini" aria-label="Баланс">
+          <span class="bal-title">Баланс</span>
+          <button class="bal-amount" id="balanceChip" aria-label="Открыть кошелёк">
+            <span id="balanceValue">...</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="page-head">
+        <h1 class="page-title">История</h1>
+        <p class="page-sub">Пополнения, выводы и покупки UC</p>
+      </div>
+
+      <div class="tabs" id="tabs">
+        <button class="tab-btn active" data-tab="all">Все</button>
+        <button class="tab-btn" data-tab="deposits">Пополнения</button>
+        <button class="tab-btn" data-tab="withdrawals">Выводы</button>
+        <button class="tab-btn" data-tab="uc">UC</button>
+      </div>
+
+      <div class="history-list" id="historyList">
+        <div class="loading">
+          <div class="spinner"></div>
+          <div>Загружаю историю...</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+  <script>
+    const HISTORY_URL = "https://lazrfierfbhwlduqlvws.functions.supabase.co/get-user-history";
+
+    const $ = (id) => document.getElementById(id);
+
+    let activeTab = "all";
+    let state = {
+      profile: null,
+      deposits: [],
+      withdrawals: [],
+      ucOrders: []
+    };
+
+    function formatVc(value){
+      const num = Number(value ?? 0);
+      if (!Number.isFinite(num)) return "0 VC";
+      return Number.isInteger(num) ? `${num} VC` : `${num.toFixed(2)} VC`;
+    }
+
+    function formatDate(dateStr){
+      if (!dateStr) return "—";
+      const d = new Date(dateStr);
+      if (Number.isNaN(d.getTime())) return dateStr;
+      return new Intl.DateTimeFormat("ru-RU", {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit"
+      }).format(d);
+    }
+
+    function escapeHtml(value){
+      return String(value ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    function normalizeStatus(raw){
+      const val = String(raw || "pending").toLowerCase();
+      if (["approved","success","completed","done","sent"].includes(val)) return "success";
+      if (["rejected","declined","cancelled","canceled"].includes(val)) return "rejected";
+      return "pending";
+    }
+
+    function statusLabel(raw){
+      const val = String(raw || "pending").toLowerCase();
+      if (["approved","success","completed","done"].includes(val)) return "Одобрено";
+      if (["sent"].includes(val)) return "Отправлено";
+      if (["rejected","declined"].includes(val)) return "Отклонено";
+      if (["cancelled","canceled"].includes(val)) return "Отменено";
+      return "В обработке";
+    }
+
+    function loadCachedProfile(){
+      try{
+        const raw = localStorage.getItem("tg_profile");
+        if (!raw) return null;
+        const parsed = JSON.parse(raw);
+        if (!parsed || typeof parsed !== "object") return null;
+        return parsed;
+      } catch {
+        return null;
+      }
+    }
+
+    function setBalanceUI(value){
+      $("balanceValue").textContent = formatVc(value);
+    }
+
+    function applyProfile(profile){
+      if (!profile) return;
+      state.profile = profile;
+      localStorage.setItem("tg_profile", JSON.stringify(profile));
+      setBalanceUI(profile.balance);
+    }
+
+    async function postJson(url, payload){
+      const res = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+
+      const json = await res.json().catch(() => ({}));
+
+      if (!res.ok || !json.ok) {
+        throw new Error(json.error || json.details || `Ошибка ${res.status}`);
+      }
+
+      return json;
+    }
+
+    function getTelegramInitData(){
+      if (!window.Telegram || !window.Telegram.WebApp) {
+        throw new Error("Открой страницу внутри Telegram Mini App");
+      }
+
+      try{
+        Telegram.WebApp.ready();
+        if (typeof Telegram.WebApp.expand === "function") Telegram.WebApp.expand();
+      } catch(e){}
+
+      const initData = Telegram.WebApp.initData;
+      if (!initData) throw new Error("Нет initData");
+      return initData;
+    }
+
+    function mapDeposit(item){
+      return {
+        type: "deposit",
+        icon: "⬇️",
+        title: "Пополнение",
+        statusRaw: item.status || "pending",
+        createdAt: item.created_at || "",
+        lines: [
+          ["Сумма", formatVc(item.amount_vc ?? item.amount ?? item.sum ?? 0)],
+          ["ФИО отправителя", item.sender_name ?? item.sender_fio ?? item.fio_sender ?? item.full_name ?? "—"],
+          ["Дата", formatDate(item.created_at)]
+        ]
+      };
+    }
+
+    function mapWithdrawal(item){
+      return {
+        type: "withdrawal",
+        icon: "⬆️",
+        title: "Вывод",
+        statusRaw: item.status || "pending",
+        createdAt: item.created_at || "",
+        lines: [
+          ["Сумма", formatVc(item.amount_vc ?? item.amount ?? item.sum ?? 0)],
+          ["Реквизиты", item.requisites ?? item.card_number ?? item.account_number ?? "—"],
+          ["Банк", item.bank ?? item.bank_name ?? "—"],
+          ["ФИО получателя", item.fio ?? item.receiver_name ?? item.full_name ?? "—"],
+          ["Дата", formatDate(item.created_at)]
+        ]
+      };
+    }
+
+    function mapUc(item){
+      return {
+        type: "uc",
+        icon: "💎",
+        title: "Покупка UC",
+        statusRaw: item.status || "pending",
+        createdAt: item.created_at || "",
+        lines: [
+          ["Пакет", item.package_name ?? item.package ?? "—"],
+          ["PUBG ID", item.pubg_id ?? "—"],
+          ["Стоимость", formatVc(item.price_vc ?? item.amount_vc ?? item.amount ?? 0)],
+          ["Дата", formatDate(item.created_at)]
+        ]
+      };
+    }
+
+    function getItemsForTab(){
+      const deposits = (state.deposits || []).map(mapDeposit);
+      const withdrawals = (state.withdrawals || []).map(mapWithdrawal);
+      const uc = (state.ucOrders || []).map(mapUc);
+
+      if (activeTab === "deposits") return deposits;
+      if (activeTab === "withdrawals") return withdrawals;
+      if (activeTab === "uc") return uc;
+
+      return [...deposits, ...withdrawals, ...uc].sort((a, b) => {
+        const da = new Date(a.createdAt || 0).getTime();
+        const db = new Date(b.createdAt || 0).getTime();
+        return db - da;
+      });
+    }
+
+    function renderCard(item){
+      const statusType = normalizeStatus(item.statusRaw);
+      const linesHtml = item.lines.map(([label, value]) => `
+        <div class="meta-row">
+          <span class="meta-label">${escapeHtml(label)}</span>
+          <span class="meta-value">${escapeHtml(value)}</span>
+        </div>
+      `).join("");
+
+      return `
+        <div class="history-card">
+          <div class="card-icon">${escapeHtml(item.icon)}</div>
+
+          <div class="card-body">
+            <div class="card-top">
+              <p class="card-title">${escapeHtml(item.title)}</p>
+              <span class="status-badge status-${statusType}">${escapeHtml(statusLabel(item.statusRaw))}</span>
+            </div>
+
+            <div class="meta-grid">
+              ${linesHtml}
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderHistory(){
+      const box = $("historyList");
+      const items = getItemsForTab();
+
+      if (!items.length) {
+        box.innerHTML = `
+          <div class="empty">
+            Здесь пока нет записей.
+          </div>
+        `;
+        return;
+      }
+
+      box.innerHTML = items.map(renderCard).join("");
+    }
+
+    function setActiveTab(tab){
+      activeTab = tab;
+      document.querySelectorAll(".tab-btn").forEach(btn => {
+        btn.classList.toggle("active", btn.dataset.tab === tab);
+      });
+      renderHistory();
+    }
+
+    async function loadHistory(){
+      const cached = loadCachedProfile();
+      if (cached) applyProfile(cached);
+      else setBalanceUI(0);
+
+      try{
+        const initData = getTelegramInitData();
+        const json = await postJson(HISTORY_URL, { initData });
+
+        if (json.profile) applyProfile(json.profile);
+
+        state.deposits = Array.isArray(json.deposits) ? json.deposits : [];
+        state.withdrawals = Array.isArray(json.withdrawals) ? json.withdrawals : [];
+        state.ucOrders = Array.isArray(json.ucOrders) ? json.ucOrders : [];
+
+        renderHistory();
+      } catch(err){
+        console.error("History load error:", err);
+        $("historyList").innerHTML = `
+          <div class="empty">
+            Не удалось загрузить историю.<br>
+            ${escapeHtml(err.message || "Попробуй позже")}
+          </div>
+        `;
+      }
+    }
+
+    $("balanceChip").addEventListener("click", () => {
+      window.location.href = "wallet.html";
+    });
+
+    $("backBtn").addEventListener("click", () => {
+      window.location.href = "index.html";
+    });
+
+    document.querySelectorAll(".tab-btn").forEach(btn => {
+      btn.addEventListener("click", () => setActiveTab(btn.dataset.tab));
+    });
+
+    window.addEventListener("load", async () => {
+      await loadHistory();
+    });
+  </script>
+</body>
+</html>
