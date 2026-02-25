@@ -13,12 +13,10 @@
       --muted:rgba(234,241,255,.72);
       --safe-bottom: env(safe-area-inset-bottom, 0px);
       --safe-top: env(safe-area-inset-top, 0px);
-      --radius:20px;
 
       --glass: rgba(12, 14, 20, .74);
       --glassStrong: rgba(14, 16, 24, .92);
       --glassBorder: rgba(255,255,255,.08);
-      --glassBorder2: rgba(255,255,255,.06);
       --shadow: 0 18px 42px rgba(0,0,0,.48);
       --shadowSoft: 0 12px 28px rgba(0,0,0,.34);
     }
@@ -110,6 +108,7 @@
       overflow:hidden;
       flex:0 0 auto;
     }
+
     .back-btn-square:active{ transform:scale(.98); }
 
     .back-svg{
@@ -227,7 +226,6 @@
       color: rgba(234,241,255,.86);
       font-size:12px;
       font-weight:900;
-      letter-spacing:.15px;
       transition: transform .15s ease, background .15s ease;
       white-space:nowrap;
       padding:0 6px;
@@ -236,7 +234,6 @@
     .tab-btn.active{
       background: rgba(255,255,255,.10);
       color:#fff;
-      box-shadow: inset 0 1px 0 rgba(255,255,255,.06);
     }
 
     .tab-btn:active{ transform:scale(.98); }
@@ -292,7 +289,17 @@
       box-shadow:
         inset 0 1px 0 rgba(255,255,255,.04),
         0 8px 18px rgba(0,0,0,.18);
-      font-size:20px;
+    }
+
+    .card-icon svg{
+      width:22px;
+      height:22px;
+      stroke: rgba(234,241,255,.96);
+      fill:none;
+      stroke-width:2;
+      stroke-linecap:round;
+      stroke-linejoin:round;
+      display:block;
     }
 
     .card-body{
@@ -336,13 +343,9 @@
     }
 
     .status-pending{ background: rgba(245,158,11,.16); color:#fcd34d; border-color: rgba(245,158,11,.24); }
-    .status-approved,
-    .status-completed,
-    .status-success,
-    .status-sent{ background: rgba(16,185,129,.16); color:#6ee7b7; border-color: rgba(16,185,129,.24); }
-    .status-rejected,
-    .status-declined,
-    .status-cancelled{ background: rgba(239,68,68,.16); color:#fca5a5; border-color: rgba(239,68,68,.24); }
+    .status-success{ background: rgba(16,185,129,.16); color:#6ee7b7; border-color: rgba(16,185,129,.24); }
+    .status-rejected{ background: rgba(239,68,68,.16); color:#fca5a5; border-color: rgba(239,68,68,.24); }
+    .status-cancelled{ background: rgba(148,163,184,.16); color:#cbd5e1; border-color: rgba(148,163,184,.24); }
 
     .meta-grid{
       display:grid;
@@ -372,7 +375,33 @@
       max-width:65%;
     }
 
-    .empty{
+    .card-actions{
+      margin-top:2px;
+      display:flex;
+      justify-content:flex-end;
+    }
+
+    .cancel-btn{
+      height:34px;
+      border:none;
+      border-radius:12px;
+      padding:0 12px;
+      cursor:pointer;
+      background: rgba(239,68,68,.14);
+      color:#fecaca;
+      border:1px solid rgba(239,68,68,.22);
+      font-size:12px;
+      font-weight:900;
+      transition: transform .15s ease, opacity .15s ease;
+    }
+
+    .cancel-btn:active{ transform:scale(.98); }
+    .cancel-btn:disabled{
+      opacity:.6;
+      cursor:not-allowed;
+    }
+
+    .empty, .loading{
       width:100%;
       min-height:140px;
       border-radius:22px;
@@ -392,27 +421,8 @@
       font-size:13px;
       font-weight:900;
       line-height:1.45;
-    }
-
-    .loading{
-      width:100%;
-      min-height:140px;
-      border-radius:22px;
-      display:flex;
       flex-direction:column;
-      align-items:center;
-      justify-content:center;
       gap:12px;
-      background:
-        linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02)),
-        rgba(12, 14, 20, .84);
-      border:1px solid rgba(255,255,255,.07);
-      box-shadow:
-        0 20px 48px rgba(0,0,0,.34),
-        inset 0 1px 0 rgba(255,255,255,.03);
-      color: rgba(234,241,255,.76);
-      font-size:13px;
-      font-weight:900;
     }
 
     .spinner{
@@ -428,6 +438,49 @@
       to{ transform: rotate(360deg); }
     }
 
+    .toast{
+      position: fixed;
+      left:50%;
+      bottom: calc(18px + var(--safe-bottom));
+      transform: translateX(-50%) translateY(14px);
+      background: rgba(14,16,24,.92);
+      border:1px solid rgba(255,255,255,.08);
+      box-shadow:0 22px 60px rgba(0,0,0,.55);
+      color: rgba(234,241,255,.95);
+      border-radius:18px;
+      padding:12px 14px;
+      width: min(520px, calc(100% - 32px));
+      opacity:0;
+      pointer-events:none;
+      transition: opacity .22s ease, transform .22s ease;
+      z-index:300;
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      font-weight:900;
+      font-size:13px;
+    }
+
+    .toast.show{
+      opacity:1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    .toast .ok{
+      border:none;
+      cursor:pointer;
+      border-radius:14px;
+      height:34px;
+      padding:0 12px;
+      background: rgba(255,255,255,.08);
+      border:1px solid rgba(255,255,255,.08);
+      color: rgba(234,241,255,.95);
+      font-weight:900;
+    }
+
     @media (max-width:480px){
       .tabs{
         grid-template-columns: repeat(2, 1fr);
@@ -440,6 +493,7 @@
       .back-btn-square{ width:40px; height:40px; border-radius:13px; }
       .top-row{ gap:14px; padding:5px 6px; }
       .card-icon{ width:44px; height:44px; border-radius:14px; }
+      .card-icon svg{ width:20px; height:20px; }
       .card-title{ font-size:14px; }
       .meta-row{ font-size:11px; }
     }
@@ -492,10 +546,16 @@
     </div>
   </div>
 
+  <div class="toast" id="toast" aria-live="polite">
+    <span id="toastText">—</span>
+    <button class="ok" id="toastOk">Ок</button>
+  </div>
+
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
   <script>
     const HISTORY_URL = "https://lazrfierfbhwlduqlvws.functions.supabase.co/get-user-history";
+    const CANCEL_WITHDRAW_URL = "https://lazrfierfbhwlduqlvws.functions.supabase.co/cancel-withdraw-request";
 
     const $ = (id) => document.getElementById(id);
 
@@ -533,22 +593,6 @@
         .replaceAll(">", "&gt;")
         .replaceAll('"', "&quot;")
         .replaceAll("'", "&#039;");
-    }
-
-    function normalizeStatus(raw){
-      const val = String(raw || "pending").toLowerCase();
-      if (["approved","success","completed","done","sent"].includes(val)) return "success";
-      if (["rejected","declined","cancelled","canceled"].includes(val)) return "rejected";
-      return "pending";
-    }
-
-    function statusLabel(raw){
-      const val = String(raw || "pending").toLowerCase();
-      if (["approved","success","completed","done"].includes(val)) return "Одобрено";
-      if (["sent"].includes(val)) return "Отправлено";
-      if (["rejected","declined"].includes(val)) return "Отклонено";
-      if (["cancelled","canceled"].includes(val)) return "Отменено";
-      return "В обработке";
     }
 
     function loadCachedProfile(){
@@ -605,33 +649,82 @@
       return initData;
     }
 
+    function normalizeStatus(raw){
+      const val = String(raw || "pending").toLowerCase();
+      if (["approved","success","completed","done","sent"].includes(val)) return "success";
+      if (["rejected","declined"].includes(val)) return "rejected";
+      if (["cancelled","canceled"].includes(val)) return "cancelled";
+      return "pending";
+    }
+
+    function statusLabel(raw){
+      const val = String(raw || "pending").toLowerCase();
+      if (["approved","success","completed","done"].includes(val)) return "Одобрено";
+      if (["sent"].includes(val)) return "Отправлено";
+      if (["rejected","declined"].includes(val)) return "Отклонено";
+      if (["cancelled","canceled"].includes(val)) return "Отменено";
+      return "В обработке";
+    }
+
+    function iconSvg(type){
+      if (type === "deposit") {
+        return `
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M12 3v14"></path>
+            <path d="M7 12l5 5 5-5"></path>
+            <path d="M5 21h14"></path>
+          </svg>
+        `;
+      }
+
+      if (type === "withdrawal") {
+        return `
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M12 21V7"></path>
+            <path d="M17 12l-5-5-5 5"></path>
+            <path d="M5 3h14"></path>
+          </svg>
+        `;
+      }
+
+      return `
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M12 3l2.8 5.7L21 9.6l-4.5 4.4 1.1 6.2L12 17.3 6.4 20.2 7.5 14 3 9.6l6.2-.9z"></path>
+        </svg>
+      `;
+    }
+
     function mapDeposit(item){
       return {
+        id: item.id,
         type: "deposit",
-        icon: "⬇️",
         title: "Пополнение",
         statusRaw: item.status || "pending",
         createdAt: item.created_at || "",
+        canCancel: false,
         lines: [
-          ["Сумма", formatVc(item.amount_vc ?? item.amount ?? item.sum ?? 0)],
-          ["ФИО отправителя", item.sender_name ?? item.sender_fio ?? item.fio_sender ?? item.full_name ?? "—"],
+          ["Сумма", formatVc(item.amount_vc ?? item.amount ?? 0)],
+          ["ФИО отправителя", item.sender_name ?? item.sender_fio ?? item.full_name ?? "—"],
           ["Дата", formatDate(item.created_at)]
         ]
       };
     }
 
     function mapWithdrawal(item){
+      const status = String(item.status || "pending").toLowerCase();
+
       return {
+        id: item.id,
         type: "withdrawal",
-        icon: "⬆️",
         title: "Вывод",
         statusRaw: item.status || "pending",
         createdAt: item.created_at || "",
+        canCancel: status === "pending",
         lines: [
-          ["Сумма", formatVc(item.amount_vc ?? item.amount ?? item.sum ?? 0)],
-          ["Реквизиты", item.requisites ?? item.card_number ?? item.account_number ?? "—"],
-          ["Банк", item.bank ?? item.bank_name ?? "—"],
-          ["ФИО получателя", item.fio ?? item.receiver_name ?? item.full_name ?? "—"],
+          ["Сумма", formatVc(item.amount_vc ?? item.amount ?? 0)],
+          ["Реквизиты", item.requisites ?? "—"],
+          ["Банк", item.bank ?? "—"],
+          ["ФИО получателя", item.fio ?? item.receiver_name ?? "—"],
           ["Дата", formatDate(item.created_at)]
         ]
       };
@@ -639,13 +732,14 @@
 
     function mapUc(item){
       return {
+        id: item.id,
         type: "uc",
-        icon: "💎",
         title: "Покупка UC",
         statusRaw: item.status || "pending",
         createdAt: item.created_at || "",
+        canCancel: false,
         lines: [
-          ["Пакет", item.package_name ?? item.package ?? "—"],
+          ["Пакет", item.package_name ?? "—"],
           ["PUBG ID", item.pubg_id ?? "—"],
           ["Стоимость", formatVc(item.price_vc ?? item.amount_vc ?? item.amount ?? 0)],
           ["Дата", formatDate(item.created_at)]
@@ -678,9 +772,17 @@
         </div>
       `).join("");
 
+      const cancelHtml = item.type === "withdrawal" && item.canCancel
+        ? `
+          <div class="card-actions">
+            <button class="cancel-btn" data-cancel-id="${escapeHtml(item.id)}">Отменить вывод</button>
+          </div>
+        `
+        : "";
+
       return `
         <div class="history-card">
-          <div class="card-icon">${escapeHtml(item.icon)}</div>
+          <div class="card-icon">${iconSvg(item.type)}</div>
 
           <div class="card-body">
             <div class="card-top">
@@ -691,9 +793,15 @@
             <div class="meta-grid">
               ${linesHtml}
             </div>
+
+            ${cancelHtml}
           </div>
         </div>
       `;
+    }
+
+    function getItemsHtml(items){
+      return items.map(renderCard).join("");
     }
 
     function renderHistory(){
@@ -709,7 +817,7 @@
         return;
       }
 
-      box.innerHTML = items.map(renderCard).join("");
+      box.innerHTML = getItemsHtml(items);
     }
 
     function setActiveTab(tab){
@@ -719,6 +827,20 @@
       });
       renderHistory();
     }
+
+    const toast = $("toast");
+    const toastText = $("toastText");
+    const toastOk = $("toastOk");
+    let toastTimer = null;
+
+    function showToast(text){
+      toastText.textContent = text;
+      toast.classList.add("show");
+      if (toastTimer) clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => toast.classList.remove("show"), 3200);
+    }
+
+    toastOk.addEventListener("click", () => toast.classList.remove("show"));
 
     async function loadHistory(){
       const cached = loadCachedProfile();
@@ -747,6 +869,39 @@
       }
     }
 
+    async function cancelWithdraw(requestId, buttonEl){
+      const ok = confirm("Отменить заявку на вывод и вернуть деньги на баланс?");
+      if (!ok) return;
+
+      const prevText = buttonEl.textContent;
+      buttonEl.disabled = true;
+      buttonEl.textContent = "Отмена...";
+
+      try{
+        const initData = getTelegramInitData();
+        const json = await postJson(CANCEL_WITHDRAW_URL, {
+          initData,
+          requestId
+        });
+
+        if (typeof json.current_balance !== "undefined") {
+          setBalanceUI(json.current_balance);
+
+          const cached = loadCachedProfile() || {};
+          cached.balance = Number(json.current_balance) || 0;
+          localStorage.setItem("tg_profile", JSON.stringify(cached));
+        }
+
+        await loadHistory();
+        showToast("Заявка отменена. Деньги возвращены на баланс.");
+      } catch(err){
+        console.error("Cancel withdraw error:", err);
+        buttonEl.disabled = false;
+        buttonEl.textContent = prevText;
+        showToast(err.message || "Не удалось отменить заявку");
+      }
+    }
+
     $("balanceChip").addEventListener("click", () => {
       window.location.href = "wallet.html";
     });
@@ -757,6 +912,16 @@
 
     document.querySelectorAll(".tab-btn").forEach(btn => {
       btn.addEventListener("click", () => setActiveTab(btn.dataset.tab));
+    });
+
+    $("historyList").addEventListener("click", async (e) => {
+      const btn = e.target.closest("[data-cancel-id]");
+      if (!btn) return;
+
+      const requestId = btn.getAttribute("data-cancel-id");
+      if (!requestId) return;
+
+      await cancelWithdraw(requestId, btn);
     });
 
     window.addEventListener("load", async () => {
