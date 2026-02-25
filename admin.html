@@ -422,7 +422,6 @@
       font-weight:900;
     }
 
-    /* ===== Панель входа ===== */
     .auth-overlay{
       position:fixed;
       inset:0;
@@ -569,15 +568,11 @@
     }
 
     @media (max-width:720px){
-      .stats{
-        grid-template-columns: repeat(2, 1fr);
-      }
+      .stats{ grid-template-columns: repeat(2, 1fr); }
     }
 
     @media (max-width:640px){
-      .tabs{
-        grid-template-columns: repeat(2, 1fr);
-      }
+      .tabs{ grid-template-columns: repeat(2, 1fr); }
     }
 
     @media (max-width:360px){
@@ -650,7 +645,6 @@
     </div>
   </div>
 
-  <!-- Панель входа -->
   <div class="auth-overlay" id="authOverlay"></div>
 
   <div class="auth-panel" id="authPanel">
@@ -660,8 +654,8 @@
     </div>
 
     <p class="auth-text">
-      Введи <b>ADMIN_PANEL_KEY</b>. После успешного входа панель уедет влево.
-      Её можно открыть обратно кнопкой <b>“Ключ”</b>.
+      Введи <b>ADMIN_PANEL_KEY</b>. После входа панель уедет влево.
+      Кнопкой <b>“Ключ”</b> можно открыть её обратно.
     </p>
 
     <input class="auth-input" id="adminKeyInput" type="password" placeholder="ADMIN_PANEL_KEY" />
@@ -737,6 +731,20 @@
       }).format(d);
     }
 
+    function getField(obj, names){
+      for (const name of names){
+        const value = obj?.[name];
+        if (value !== undefined && value !== null && String(value).trim() !== "") {
+          return value;
+        }
+      }
+      return null;
+    }
+
+    function getAmount(item){
+      return item.amount_vc ?? item.price_vc ?? item.amount ?? 0;
+    }
+
     function iconSvg(type){
       if (type === "deposit") {
         return `
@@ -787,6 +795,14 @@
     }
 
     function mapDeposit(item){
+      const senderName = getField(item, [
+        "sender_name",
+        "sender_fio",
+        "full_name",
+        "fio",
+        "name"
+      ]) ?? "—";
+
       return {
         id: item.id,
         type: "deposit",
@@ -795,14 +811,37 @@
         createdAt: item.created_at || "",
         lines: [
           ["TG ID", item.user_tg_id ?? "—"],
-          ["Сумма", formatVc(item.amount_vc ?? item.amount ?? 0)],
-          ["ФИО отправителя", item.sender_name ?? item.sender_fio ?? item.full_name ?? "—"],
+          ["Сумма", formatVc(getAmount(item))],
+          ["ФИО отправителя", senderName],
           ["Дата", formatDate(item.created_at)]
         ]
       };
     }
 
     function mapWithdraw(item){
+      const fioValue = getField(item, [
+        "fio",
+        "receiver_fio",
+        "receiver_name",
+        "full_name",
+        "recipient_name",
+        "name"
+      ]) ?? "—";
+
+      const bankValue = getField(item, [
+        "bank",
+        "bank_name",
+        "receiver_bank",
+        "bank_title"
+      ]) ?? "—";
+
+      const requisitesValue = getField(item, [
+        "requisites",
+        "card_number",
+        "account_number",
+        "details"
+      ]) ?? "—";
+
       return {
         id: item.id,
         type: "withdraw",
@@ -811,16 +850,22 @@
         createdAt: item.created_at || "",
         lines: [
           ["TG ID", item.user_tg_id ?? "—"],
-          ["Сумма", formatVc(item.amount_vc ?? item.amount ?? 0)],
-          ["Реквизиты", item.requisites ?? "—"],
-          ["Банк", item.bank ?? "—"],
-          ["ФИО", item.fio ?? item.receiver_name ?? "—"],
+          ["Сумма", formatVc(getAmount(item))],
+          ["Реквизиты", requisitesValue],
+          ["Банк", bankValue],
+          ["ФИО", fioValue],
           ["Дата", formatDate(item.created_at)]
         ]
       };
     }
 
     function mapUc(item){
+      const packageName = getField(item, [
+        "package_name",
+        "package",
+        "title"
+      ]) ?? "—";
+
       return {
         id: item.id,
         type: "uc",
@@ -829,9 +874,9 @@
         createdAt: item.created_at || "",
         lines: [
           ["TG ID", item.user_tg_id ?? "—"],
-          ["Пакет", item.package_name ?? "—"],
+          ["Пакет", packageName],
           ["PUBG ID", item.pubg_id ?? "—"],
-          ["Цена", formatVc(item.price_vc ?? item.amount_vc ?? item.amount ?? 0)],
+          ["Цена", formatVc(getAmount(item))],
           ["Дата", formatDate(item.created_at)]
         ]
       };
@@ -898,8 +943,8 @@
 
       const actionsHtml = isPending ? `
         <div class="actions">
-          <button class="action-btn approve-btn" data-action="approve" data-type="${item.type}" data-id="${escapeHtml(item.id)}">Одобрить</button>
-          <button class="action-btn reject-btn" data-action="reject" data-type="${item.type}" data-id="${escapeHtml(item.id)}">Отклонить</button>
+          <button class="action-btn approve-btn" data-action="approve" data-type="${item.type}" data-id="${item.id}">Одобрить</button>
+          <button class="action-btn reject-btn" data-action="reject" data-type="${item.type}" data-id="${item.id}">Отклонить</button>
         </div>
       ` : "";
 
