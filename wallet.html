@@ -178,25 +178,21 @@ body{
 .pay:hover{box-shadow:0 20px 40px rgba(37,99,235,.45);}
 .pay:active{transform:scale(.97);}
 
-/* ✅ Градиентная кнопка "Назад" (по центру) */
+/* Кнопка "Назад" */
 .back-gradient-btn{
-  margin: 10px auto 22px;         /* центрируем */
-  padding: 18px;
-  border-radius: 18px;
-  border: none;
-
-  background: linear-gradient(135deg,#60a5fa,#2563eb);
+  margin:10px auto 22px;
+  padding:18px;
+  border-radius:18px;
+  border:none;
+  background:linear-gradient(135deg,#60a5fa,#2563eb);
   color:#fff;
   font-size:17px;
   font-weight:900;
-
   box-shadow:0 15px 30px rgba(37,99,235,.35);
   cursor:pointer;
-
-  width: min(400px, calc(100% - 32px)); /* вместо full-width делаем “карточную” ширину */
+  width:min(400px, calc(100% - 32px));
   display:block;
-
-  transition: .3s;
+  transition:.3s;
 }
 .back-gradient-btn:hover{
   box-shadow:0 20px 40px rgba(37,99,235,.45);
@@ -204,9 +200,9 @@ body{
 }
 .back-gradient-btn:active{ transform:scale(.97); }
 
-/* ✅ Кнопка вывода (по центру) */
+/* Кнопка вывода */
 .withdraw-button{
-  margin:30px auto 12px;          /* центрируем */
+  margin:30px auto 12px;
   padding:20px;
   border-radius:18px;
   border:none;
@@ -218,8 +214,7 @@ body{
   transition:all .3s;
   cursor:pointer;
   opacity:.6;
-
-  width: min(400px, calc(100% - 32px)); /* центрированная ширина */
+  width:min(400px, calc(100% - 32px));
   display:block;
 }
 .withdraw-button.active{opacity:1;}
@@ -229,7 +224,6 @@ body{
 }
 .withdraw-button:active{transform:scale(.97);}
 
-/* ✅ ВАЖНО: НИКАКОГО pointer-events:none у disabled */
 .withdraw-button:disabled,
 .pay:disabled{
   opacity:.6!important;
@@ -457,16 +451,8 @@ body{
   margin-top:4px;
 }
 
-/* Загрузка для пополнения */
-.loader{
-  border:6px solid #f1f1f1;
-  border-top:6px solid #2563eb;
-  border-radius:50%;
-  width:48px;height:48px;
-  margin:16px auto;
-  animation:spin 1s linear infinite;
-}
-/* Загрузка для вывода */
+/* Загрузка */
+.loader,
 .withdraw-loader{
   border:6px solid #f1f1f1;
   border-top:6px solid #2563eb;
@@ -719,42 +705,50 @@ body{
   </div>
 </div>
 
-<!-- Попап проверки платежа (только пополнение) -->
+<!-- Попап проверки платежа -->
 <div class="popup-overlay" id="depositCheckPopup">
   <div class="popup">
     <div class="popup-content">
       <div class="loader"></div>
-      <p>Проверка платежа…<br>Обычно от 1 до 15 минут</p>
+      <p>Проверка платежа…<br>Создаём заявку</p>
     </div>
   </div>
 </div>
 
-<!-- Попап обработки вывода (только вывод) -->
+<!-- Попап обработки вывода -->
 <div class="popup-overlay" id="withdrawProcessingPopup">
   <div class="popup">
     <div class="popup-content">
       <div class="withdraw-loader"></div>
-      <p>Вывод обрабатывается<br>Ожидайте зачисления средств</p>
+      <p>Создаём заявку на вывод…</p>
     </div>
   </div>
 </div>
 
-<div class="toast" id="toast">Реквизиты скопированы!</div>
+<div class="toast" id="toast">Готово</div>
+
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
 
 <script>
+/* -------------------- Конфиг -------------------- */
+const VERIFY_URL = "https://lazrfierfbhwlduqlvws.functions.supabase.co/verify-telegram";
+const CREATE_DEPOSIT_URL = "https://lazrfierfbhwlduqlvws.functions.supabase.co/create-deposit-request";
+const CREATE_WITHDRAW_URL = "https://lazrfierfbhwlduqlvws.functions.supabase.co/create-withdraw-request";
+
 /* -------------------- Состояния -------------------- */
 let activePaymentMethod = 'phone';
 let isWithdrawProcessing = false;
 let isAndroid = /Android/i.test(navigator.userAgent);
 
-// ✅ Чтобы "Минимум" не был красным изначально
 let depositTouched = false;
 let withdrawTouched = false;
 
-// Таймеры, чтобы не было наложения "загрузок"
 let paymentLoaderTimer = null;
 let depositCheckTimer = null;
 let withdrawTimer = null;
+
+let telegramProfile = null;
+let currentBalance = 0;
 
 /* -------------------- Утилиты -------------------- */
 function $(id){ return document.getElementById(id); }
@@ -770,7 +764,133 @@ function detectDevice(){
   isAndroid = /android/i.test(userAgent);
 }
 
-/* ✅ Переход на index.html */
+function formatVc(value){
+  const num = Number(value ?? 0);
+  if (!Number.isFinite(num)) return '0 VC';
+  return Number.isInteger(num) ? `${num} VC` : `${num.toFixed(2)} VC`;
+}
+
+function setBalanceUI(value){
+  const num = Number(value ?? 0);
+  currentBalance = Number.isFinite(num) ? num : 0;
+
+  const text = formatVc(currentBalance);
+  $('walletBalance').textContent = text;
+  $('withdrawBalance').textContent = text;
+}
+
+function loadCachedProfile(){
+  try{
+    const raw = localStorage.getItem('tg_profile');
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    if (!parsed || typeof parsed !== 'object') return null;
+    return parsed;
+  } catch {
+    return null;
+  }
+}
+
+function applyProfile(profile){
+  if (!profile) return;
+  telegramProfile = profile;
+  localStorage.setItem('tg_profile', JSON.stringify(profile));
+  setBalanceUI(profile.balance);
+}
+
+function getTelegramInitData(){
+  if (!window.Telegram || !window.Telegram.WebApp) {
+    throw new Error('Открой страницу внутри Telegram Mini App');
+  }
+
+  try{
+    Telegram.WebApp.ready();
+    if (typeof Telegram.WebApp.expand === 'function') Telegram.WebApp.expand();
+  } catch(e){}
+
+  const initData = Telegram.WebApp.initData;
+  if (!initData) {
+    throw new Error('Нет initData');
+  }
+
+  return initData;
+}
+
+async function postJson(url, payload){
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  });
+
+  const json = await res.json().catch(() => ({}));
+
+  if (!res.ok || !json.ok) {
+    const message = json.error || json.details || `Ошибка ${res.status}`;
+    const err = new Error(message);
+    err.payload = json;
+    throw err;
+  }
+
+  return json;
+}
+
+async function refreshWalletProfile(){
+  const cached = loadCachedProfile();
+
+  if (cached) applyProfile(cached);
+  else setBalanceUI(0);
+
+  try{
+    const initData = getTelegramInitData();
+    const json = await postJson(VERIFY_URL, { initData });
+
+    if (json.profile) {
+      applyProfile(json.profile);
+    }
+  } catch(err){
+    console.error('Ошибка загрузки профиля:', err);
+  }
+}
+
+function resetDepositForm(){
+  $('amountInput').value = '';
+  $('senderName').value = '';
+  $('vcDisplay').textContent = '0 VC';
+  $('popupAmount').textContent = 'Сумма: 0 ₽';
+  $('senderNameContainer').classList.remove('show');
+  $('senderName').classList.remove('error');
+  $('senderError').classList.remove('show');
+  $('amountInput').classList.remove('error');
+  $('minimumHint').classList.remove('error');
+  $('minimumHint').textContent = 'Минимум 100₽';
+  depositTouched = false;
+  updatePayButton(false);
+}
+
+function resetWithdrawForm(){
+  $('withdrawAmount').value = '';
+  $('requisitesInput').value = '';
+  $('fioInput').value = '';
+  $('bankInput').value = '';
+
+  $('withdrawAmount').classList.remove('error');
+  $('withdrawMinimumHint').classList.remove('error');
+  $('withdrawMinimumHint').textContent = 'Минимум 1000 VC';
+  $('withdrawFields').classList.remove('show');
+
+  $('requisitesInput').classList.remove('error');
+  $('requisitesError').classList.remove('show');
+  $('fioInput').classList.remove('error');
+  $('fioWithdrawError').classList.remove('show');
+  $('bankInput').classList.remove('error');
+  $('bankWithdrawError').classList.remove('show');
+
+  withdrawTouched = false;
+  updateWithdrawButton(false);
+}
+
+/* -------------------- Переход -------------------- */
 function goToIndex(){
   closeAllPopups();
   window.location.href = 'index.html';
@@ -779,10 +899,10 @@ function goToIndex(){
 /* -------------------- Toast -------------------- */
 function showToast(text, color){
   const toast = $('toast');
-  toast.textContent = text || "Реквизиты скопированы!";
+  toast.textContent = text || "Готово";
   toast.style.background = color || '#10b981';
   toast.classList.add('show');
-  setTimeout(() => toast.classList.remove('show'), 2000);
+  setTimeout(() => toast.classList.remove('show'), 2200);
 }
 
 /* -------------------- Copy -------------------- */
@@ -800,7 +920,8 @@ function fallbackCopyText(text){
   ta.style.left = "-999999px";
   ta.style.top = "-999999px";
   document.body.appendChild(ta);
-  ta.focus(); ta.select();
+  ta.focus();
+  ta.select();
   try { document.execCommand('copy'); showToast("Реквизиты скопированы!"); } catch(e){}
   ta.remove();
 }
@@ -854,12 +975,10 @@ function validateForm(){
   const senderError = $('senderError');
   const minHint = $('minimumHint');
 
-  // UI суммы/VC
   const vcVal = hasValue ? amount : 0;
   $('vcDisplay').textContent = `${vcVal} VC`;
   $('popupAmount').textContent = `Сумма: ${vcVal} ₽`;
 
-  // ✅ Если поле пустое — ничего не красим
   if (!hasValue){
     amountEl.classList.remove('error');
     minHint.classList.remove('error');
@@ -870,11 +989,9 @@ function validateForm(){
     return;
   }
 
-  // Порог
   if (amount >= 100){
     amountEl.classList.remove('error');
     minHint.classList.remove('error');
-
     senderContainer.classList.add('show');
 
     if (fio.length === 0){
@@ -958,46 +1075,57 @@ function selectPaymentMethod(method){
   }, 1000);
 }
 
-function openCheckPopup(){
+async function openCheckPopup(){
+  const btn = $('payButton');
+  if (btn.disabled) return;
+
+  const amount = Number($('amountInput').value);
+  const senderName = $('senderName').value.trim();
+
+  if (!amount || amount < 100 || !senderName) {
+    validateForm();
+    return;
+  }
+
   closePaymentPopup();
   closeAllPopups();
   $('depositCheckPopup').classList.add('show');
 
-  if (depositCheckTimer) clearTimeout(depositCheckTimer);
-  depositCheckTimer = setTimeout(() => {
+  try{
+    const initData = getTelegramInitData();
+
+    const json = await postJson(CREATE_DEPOSIT_URL, {
+      initData,
+      amountRub: amount,
+      senderName,
+      paymentMethod: activePaymentMethod
+    });
+
+    if (depositCheckTimer) clearTimeout(depositCheckTimer);
+    depositCheckTimer = setTimeout(() => {
+      $('depositCheckPopup').classList.remove('show');
+      showToast(`Заявка на пополнение ${amount}₽ создана`, '#3b82f6');
+      resetDepositForm();
+    }, 1200);
+
+    console.log('Deposit request created:', json.request);
+  } catch(err){
     $('depositCheckPopup').classList.remove('show');
-    showToast("Платеж проверяется. Баланс обновится после подтверждения.", '#3b82f6');
-  }, 3000);
+    showToast(err.message || 'Ошибка создания заявки', '#ef4444');
+    console.error('Deposit request error:', err);
+  }
 }
 
 /* -------------------- Экран вывода -------------------- */
 function openWithdrawScreen(){
   closeAllPopups();
-  withdrawTouched = false;
   isWithdrawProcessing = false;
 
   $('mainScreen').classList.add('hidden');
   $('withdrawScreen').classList.remove('hidden');
 
-  $('withdrawBalance').textContent = $('walletBalance').textContent;
-
-  $('withdrawAmount').value = '';
-  $('requisitesInput').value = '';
-  $('fioInput').value = '';
-  $('bankInput').value = '';
-
-  $('withdrawAmount').classList.remove('error');
-  $('withdrawMinimumHint').classList.remove('error');
-  $('withdrawFields').classList.remove('show');
-
-  $('requisitesInput').classList.remove('error');
-  $('requisitesError').classList.remove('show');
-  $('fioInput').classList.remove('error');
-  $('fioWithdrawError').classList.remove('show');
-  $('bankInput').classList.remove('error');
-  $('bankWithdrawError').classList.remove('show');
-
-  updateWithdrawButton(false);
+  setBalanceUI(currentBalance);
+  resetWithdrawForm();
 }
 
 function backToMain(){
@@ -1043,6 +1171,7 @@ function validateWithdraw(){
   if (!hasValue){
     amountEl.classList.remove('error');
     minHint.classList.remove('error');
+    minHint.textContent = 'Минимум 1000 VC';
     fields.classList.remove('show');
 
     reqEl.classList.remove('error');  reqErr.classList.remove('show');
@@ -1053,13 +1182,10 @@ function validateWithdraw(){
     return;
   }
 
-  if (amount >= 1000){
-    amountEl.classList.remove('error');
-    minHint.classList.remove('error');
-    fields.classList.add('show');
-  } else {
+  if (amount < 1000){
     amountEl.classList.add('error');
     minHint.classList.add('error');
+    minHint.textContent = 'Минимум 1000 VC';
     fields.classList.remove('show');
 
     reqEl.classList.remove('error');  reqErr.classList.remove('show');
@@ -1069,6 +1195,25 @@ function validateWithdraw(){
     updateWithdrawButton(false);
     return;
   }
+
+  if (amount > currentBalance){
+    amountEl.classList.add('error');
+    minHint.classList.add('error');
+    minHint.textContent = `Недостаточно средств · Доступно ${formatVc(currentBalance)}`;
+    fields.classList.remove('show');
+
+    reqEl.classList.remove('error');  reqErr.classList.remove('show');
+    fioEl.classList.remove('error');  fioErr.classList.remove('show');
+    bankEl.classList.remove('error'); bankErr.classList.remove('show');
+
+    updateWithdrawButton(false);
+    return;
+  }
+
+  amountEl.classList.remove('error');
+  minHint.classList.remove('error');
+  minHint.textContent = `Доступно ${formatVc(currentBalance)}`;
+  fields.classList.add('show');
 
   const isReq  = reqEl.value.trim().length > 0;
   const isFio  = fioEl.value.trim().length > 0;
@@ -1087,7 +1232,7 @@ function validateWithdraw(){
   updateWithdrawButton(allOk && !isWithdrawProcessing);
 }
 
-function processWithdraw(){
+async function processWithdraw(){
   const btn = $('withdrawButton');
   if (btn.disabled) return;
   if (isWithdrawProcessing) return;
@@ -1097,7 +1242,7 @@ function processWithdraw(){
   const fio = $('fioInput').value.trim();
   const bank = $('bankInput').value.trim();
 
-  if (!amount || amount < 1000 || !requisites || !fio || !bank){
+  if (!amount || amount < 1000 || amount > currentBalance || !requisites || !fio || !bank){
     validateWithdraw();
     return;
   }
@@ -1108,22 +1253,48 @@ function processWithdraw(){
   closeAllPopups();
   $('withdrawProcessingPopup').classList.add('show');
 
-  if (withdrawTimer) clearTimeout(withdrawTimer);
-  withdrawTimer = setTimeout(() => {
-    $('withdrawProcessingPopup').classList.remove('show');
-    showToast(`Заявка на вывод ${amount} VC отправлена на обработку!`, '#3b82f6');
+  try{
+    const initData = getTelegramInitData();
 
-    setTimeout(() => {
+    const json = await postJson(CREATE_WITHDRAW_URL, {
+      initData,
+      amountVc: amount,
+      requisites,
+      bankName: bank,
+      recipientFio: fio
+    });
+
+    if (withdrawTimer) clearTimeout(withdrawTimer);
+    withdrawTimer = setTimeout(() => {
+      $('withdrawProcessingPopup').classList.remove('show');
+
+      if (typeof json.current_balance !== 'undefined') {
+        setBalanceUI(json.current_balance);
+        const cached = loadCachedProfile() || {};
+        cached.balance = json.current_balance;
+        localStorage.setItem('tg_profile', JSON.stringify(cached));
+      }
+
+      showToast(`Заявка на вывод ${amount} VC создана`, '#3b82f6');
+
       isWithdrawProcessing = false;
       backToMain();
+      resetWithdrawForm();
     }, 1200);
-  }, 5000);
+
+    console.log('Withdraw request created:', json.request);
+  } catch(err){
+    $('withdrawProcessingPopup').classList.remove('show');
+    isWithdrawProcessing = false;
+    validateWithdraw();
+    showToast(err.message || 'Ошибка создания заявки', '#ef4444');
+    console.error('Withdraw request error:', err);
+  }
 }
 
-document.addEventListener('DOMContentLoaded', () => {
+/* -------------------- Init -------------------- */
+document.addEventListener('DOMContentLoaded', async () => {
   detectDevice();
-  $('walletBalance').textContent = '0 VC';
-  $('withdrawBalance').textContent = '0 VC';
 
   closeAllPopups();
   updatePayButton(false);
@@ -1131,6 +1302,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
   $('minimumHint').classList.remove('error');
   $('withdrawMinimumHint').classList.remove('error');
+
+  setBalanceUI(0);
+  await refreshWalletProfile();
 });
 
 document.addEventListener('touchstart', (event) => {
