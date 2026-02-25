@@ -194,6 +194,7 @@
       font-size:12px;
       font-weight:900;
       color:#fff;
+      text-transform:uppercase;
     }
 
     .badge.pending{ background:var(--yellow); }
@@ -243,6 +244,7 @@
       font-size:13px;
       color:var(--muted);
       min-height:18px;
+      word-break:break-word;
     }
 
     @media (max-width:900px){
@@ -308,6 +310,7 @@
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <script>
     const GET_ADMIN_URL = "https://lazrfierfbhwlduqlvws.functions.supabase.co/get-admin-requests";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxhenJmaWVyZmJod2xkdXFsdndzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE1NzY2ODIsImV4cCI6MjA4NzE1MjY4Mn0.tJtwFrNPrNyGNedGP1h0bNgr98FnyoliR-13mOqlBJI";
 
     function $(id){ return document.getElementById(id); }
 
@@ -342,8 +345,8 @@
     }
 
     function statusBadge(status){
-      const safe = escapeHtml(status || 'pending');
-      return `<span class="badge ${safe}">${safe}</span>`;
+      const safe = String(status || 'pending').toLowerCase();
+      return `<span class="badge ${escapeHtml(safe)}">${escapeHtml(safe)}</span>`;
     }
 
     function getInitData(){
@@ -366,14 +369,18 @@
     async function postJson(url, payload){
       const res = await fetch(url, {
         method:'POST',
-        headers:{ 'Content-Type':'application/json' },
+        headers:{
+          'Content-Type':'application/json',
+          'apikey': SUPABASE_ANON_KEY,
+          'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+        },
         body: JSON.stringify(payload)
       });
 
       const json = await res.json().catch(() => ({}));
 
       if (!res.ok || !json.ok) {
-        throw new Error(json.error || json.details || `Ошибка ${res.status}`);
+        throw new Error(json.reason || json.error || json.details || `Ошибка ${res.status}`);
       }
 
       return json;
@@ -499,9 +506,10 @@
 
         $('statusLine').textContent = `Обновлено: ${new Date().toLocaleTimeString('ru-RU')}`;
       } catch(err){
-        $('statusLine').textContent = err.message || 'Ошибка загрузки';
-        $('depositsList').innerHTML = `<div class="empty">${escapeHtml(err.message || 'Ошибка')}</div>`;
-        $('withdrawsList').innerHTML = `<div class="empty">${escapeHtml(err.message || 'Ошибка')}</div>`;
+        const msg = err.message || 'Ошибка загрузки';
+        $('statusLine').textContent = msg;
+        $('depositsList').innerHTML = `<div class="empty">${escapeHtml(msg)}</div>`;
+        $('withdrawsList').innerHTML = `<div class="empty">${escapeHtml(msg)}</div>`;
       }
     }
 
