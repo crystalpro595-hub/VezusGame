@@ -60,7 +60,6 @@
       align-items:center;
     }
 
-    /* ✅ Верхняя строка */
     .top-row{
       width:100%;
       max-width:520px;
@@ -117,7 +116,6 @@
       stroke-linejoin: round;
     }
 
-    /* ✅ Баланс */
     .balance-mini{
       width: min(210px, 70%);
       height: 38px;
@@ -197,20 +195,6 @@
     }
     .bal-amount:active{ transform: scale(.99); }
 
-    .bal-content{
-      display:flex;
-      align-items:center;
-      gap:8px;
-      line-height:1;
-    }
-    .tg-mini{
-      width:16px;
-      height:16px;
-      display:none; /* покажем только когда НЕ вошёл */
-      filter: drop-shadow(0 8px 14px rgba(0,0,0,.25));
-    }
-
-    /* ✅ Баннеры — 3:1 cover */
     .slider{ width:100%; max-width:520px; border-radius: var(--radius); }
 
     .slides{
@@ -267,7 +251,6 @@
       box-shadow: 0 0 12px rgba(42,171,238,.55);
     }
 
-    /* ✅ 3 кнопки */
     .actions{
       width:100%;
       max-width:520px;
@@ -341,9 +324,6 @@
       text-shadow: 0 10px 18px rgba(0,0,0,.55);
     }
 
-    /* =========================================
-       ✅ МЕНЮ
-    ========================================== */
     .menu-overlay{
       position:fixed;
       inset:0;
@@ -460,9 +440,6 @@
     }
     .menu-close:active{ transform: scale(.98); }
 
-    /* =========================================
-       ✅ SUPPORT POPUP
-    ========================================== */
     .support-overlay{
       position:fixed;
       inset:0;
@@ -574,141 +551,6 @@
       filter: drop-shadow(0 8px 14px rgba(0,0,0,.25));
     }
 
-    /* =========================================
-       ✅ AUTH (Telegram login)
-    ========================================== */
-    .auth-overlay{
-      position:fixed;
-      inset:0;
-      background: rgba(0,0,0,.72);
-      opacity:0;
-      pointer-events:none;
-      transition: opacity .22s ease;
-      z-index:300;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      padding: 18px;
-    }
-    .auth-overlay.show{
-      opacity:1;
-      pointer-events:auto;
-    }
-
-    .auth-card{
-      width: min(440px, 100%);
-      border-radius: 24px;
-      overflow:hidden;
-      background: rgba(12,18,34,.92);
-      border: 1px solid rgba(46, 180, 255, .18);
-      box-shadow: 0 34px 90px rgba(0,0,0,.62);
-      backdrop-filter: blur(14px);
-      -webkit-backdrop-filter: blur(14px);
-      position:relative;
-      transform: translateY(12px) scale(.98);
-      opacity:.95;
-      transition: transform .22s ease, opacity .22s ease;
-    }
-    .auth-overlay.show .auth-card{
-      transform: translateY(0) scale(1);
-      opacity: 1;
-    }
-
-    .auth-head{
-      padding: 16px 16px 10px 16px;
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap: 10px;
-      background: rgba(255,255,255,.03);
-      border-bottom: 1px solid rgba(255,255,255,.06);
-    }
-    .auth-title{
-      font-weight: 900;
-      letter-spacing:.25px;
-      font-size: 14px;
-      color: rgba(234,241,255,.95);
-    }
-    .auth-x{
-      width: 38px;
-      height: 38px;
-      border-radius: 14px;
-      border: 1px solid rgba(46, 180, 255, .16);
-      background: rgba(8, 12, 22, .55);
-      color: rgba(234,241,255,.92);
-      cursor:pointer;
-      display:grid;
-      place-items:center;
-      box-shadow: 0 12px 28px rgba(0,0,0,.45);
-    }
-    .auth-x:active{ transform: scale(.98); }
-
-    .auth-body{
-      padding: 14px 16px 16px 16px;
-      display:flex;
-      flex-direction:column;
-      gap: 12px;
-      align-items:center;
-      text-align:center;
-    }
-
-    .auth-text{
-      margin:0;
-      font-size: 13px;
-      line-height: 1.35;
-      color: rgba(234,241,255,.84);
-    }
-
-    .auth-loading{
-      display:none;
-      font-size: 12px;
-      color: rgba(234,241,255,.75);
-    }
-    .auth-loading.show{ display:block; }
-
-    .tg-widget-wrap{
-      width: 100%;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      padding: 6px 0 2px 0;
-    }
-
-    /* =========================================
-       ✅ TOAST
-    ========================================== */
-    .toast{
-      position:fixed;
-      left:50%;
-      bottom: calc(18px + var(--safe-bottom));
-      transform: translateX(-50%) translateY(18px);
-      opacity:0;
-      pointer-events:none;
-      z-index:999;
-
-      max-width: min(520px, calc(100% - 32px));
-      padding: 12px 14px;
-      border-radius: 16px;
-
-      background: rgba(12,18,34,.92);
-      border: 1px solid rgba(46, 180, 255, .18);
-      box-shadow: 0 26px 70px rgba(0,0,0,.55);
-      backdrop-filter: blur(14px);
-      -webkit-backdrop-filter: blur(14px);
-
-      font-weight: 900;
-      font-size: 13px;
-      letter-spacing:.15px;
-      color: rgba(234,241,255,.95);
-      text-align:center;
-
-      transition: opacity .18s ease, transform .18s ease;
-    }
-    .toast.show{
-      opacity:1;
-      transform: translateX(-50%) translateY(0);
-    }
-
     @media (max-width: 360px){
       .balance-mini{ width: min(196px, 68%); height: 36px; }
       .bal-amount{ height: 25px; font-size: 12px; }
@@ -726,14 +568,11 @@
       *{ transition:none !important; }
       .menu-overlay.show .menu-tile{ animation:none !important; opacity:1 !important; transform:none !important; }
       .support-overlay.show .support-card{ transform:none !important; }
-      .auth-overlay.show .auth-card{ transform:none !important; }
-      .toast{ transition:none !important; }
     }
   </style>
 </head>
 
 <body>
-  <!-- ✅ ТВОЯ ГЛАВНАЯ -->
   <div class="app" id="appRoot">
     <div class="content">
 
@@ -754,19 +593,13 @@
         </div>
 
         <div class="balance-mini" aria-label="Баланс">
-          <span class="bal-title" id="balTitle">Вход</span>
-          <button class="bal-amount" id="balanceChip" aria-label="Войти / Открыть кошелёк">
-            <span class="bal-content">
-              <svg class="tg-mini" id="tgMiniIcon" viewBox="0 0 240 240" aria-hidden="true">
-                <path fill="#fff" d="M120 0C53.7 0 0 53.7 0 120s53.7 120 120 120 120-53.7 120-120S186.3 0 120 0zm58.7 82.3l-19.7 92.8c-1.5 6.6-5.4 8.2-10.9 5.1l-30.2-22.3-14.6 14c-1.6 1.6-3 3-6.1 3l2.2-31.6 57.5-52c2.5-2.2-.5-3.4-3.9-1.2l-71 44.7-30.6-9.6c-6.6-2.1-6.7-6.6 1.4-9.7l119.6-46.1c5.5-2 10.3 1.3 8.8 9.9z"/>
-              </svg>
-              <span id="balanceValue">Войти</span>
-            </span>
+          <span class="bal-title">Баланс</span>
+          <button class="bal-amount" id="balanceChip" aria-label="Открыть кошелёк">
+            <span id="balanceValue">...</span>
           </button>
         </div>
       </div>
 
-      <!-- ✅ Баннеры (3:1) -->
       <div class="slider" aria-label="Баннеры">
         <div class="slides" id="slides">
           <div class="slide"><img src="YOUR_BANNER_1200x400.png" alt="Banner 1"></div>
@@ -804,7 +637,6 @@
     </div>
   </div>
 
-  <!-- ✅ МЕНЮ -->
   <div class="menu-overlay" id="menuOverlay" aria-hidden="true">
     <div class="menu-panel" role="dialog" aria-modal="true" aria-label="Меню">
       <button class="menu-close" id="menuClose" aria-label="Закрыть меню">✕</button>
@@ -836,7 +668,6 @@
     </div>
   </div>
 
-  <!-- ✅ POPUP ПОДДЕРЖКИ -->
   <div class="support-overlay" id="supportOverlay" aria-hidden="true">
     <div class="support-card" role="dialog" aria-modal="true" aria-label="Поддержка">
       <div class="support-head">
@@ -860,283 +691,119 @@
     </div>
   </div>
 
-  <!-- ✅ AUTH POPUP (вход через Telegram) -->
-  <div class="auth-overlay" id="authOverlay" aria-hidden="true">
-    <div class="auth-card" role="dialog" aria-modal="true" aria-label="Вход через Telegram">
-      <div class="auth-head">
-        <div class="auth-title">Вход через Telegram</div>
-        <button class="auth-x" id="authClose" aria-label="Закрыть">✕</button>
-      </div>
-
-      <div class="auth-body">
-        <p class="auth-text">
-          Нажми кнопку ниже и подтверди вход в Telegram.
-        </p>
-
-        <div class="tg-widget-wrap" id="tgWidgetWrap">
-          <script async src="https://telegram.org/js/telegram-widget.js?22"
-            data-telegram-login="vezusgamebot"
-            data-size="large"
-            data-userpic="false"
-            data-radius="16"
-            data-request-access="write"
-            data-onauth="onTelegramAuth(user)">
-          </script>
-        </div>
-
-        <div class="auth-loading" id="authLoading">Подключаем…</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ✅ TOAST -->
-  <div class="toast" id="toast" role="status" aria-live="polite"></div>
-
-  <!-- ✅ Supabase JS -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
   <script>
     const clamp = (n, min, max) => Math.max(min, Math.min(max, n));
+    const VERIFY_URL = "https://lazrfierfbhwlduqlvws.functions.supabase.co/verify-telegram";
 
-    // =========================
-    // ✅ НАСТРОЙКИ (твои)
-    // =========================
-    const SUPABASE_URL = 'https://lazrfierfbhwlduqlvws.supabase.co';
-    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxhenJmaWVyZmJod2xkdXFsdndzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE1NzY2ODIsImV4cCI6MjA4NzE1MjY4Mn0.tJtwFrNPrNyGNedGP1h0bNgr98FnyoliR-13mOqlBJI';
-    const TG_LINK_FUNCTION_URL = 'https://lazrfierfbhwlduqlvws.supabase.co/functions/v1/telegram-link';
-
-    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-      auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: false }
-    });
-
-    // =========================
-    // ✅ UI refs
-    // =========================
-    const balTitleEl = document.getElementById('balTitle');
     const balanceValueEl = document.getElementById('balanceValue');
     const balanceChipEl  = document.getElementById('balanceChip');
-    const tgMiniIconEl   = document.getElementById('tgMiniIcon');
+    const profileBtnEl   = document.getElementById('profileBtn');
 
-    const toastEl = document.getElementById('toast');
-    const authOverlay = document.getElementById('authOverlay');
-    const authClose = document.getElementById('authClose');
-    const authLoading = document.getElementById('authLoading');
+    let telegramProfile = null;
 
-    // =========================
-    // ✅ State
-    // =========================
-    let isTelegramAuthed = false;
-    let profileCache = null;
-
-    // =========================
-    // ✅ Toast
-    // =========================
-    let toastTimer = null;
-    function showToast(msg, ms = 2200){
-      toastEl.textContent = msg;
-      toastEl.classList.add('show');
-      clearTimeout(toastTimer);
-      toastTimer = setTimeout(() => toastEl.classList.remove('show'), ms);
-    }
-
-    function needAuthToast(){
-      showToast('Сначала войдите через Telegram', 2200);
-    }
-
-    // =========================
-    // ✅ Auth modal
-    // =========================
-    async function openAuth(){
-      try{
-        await ensureSession(); // создаём сессию заранее (чтобы не было invalid_session)
-      }catch(e){
-        console.error(e);
-        showToast('Не удалось создать сессию Supabase', 2600);
-        return;
-      }
-      authOverlay.classList.add('show');
-      authOverlay.setAttribute('aria-hidden', 'false');
-      document.body.style.overflow = 'hidden';
-    }
-
-    function closeAuth(){
-      authOverlay.classList.remove('show');
-      authOverlay.setAttribute('aria-hidden', 'true');
-      document.body.style.overflow = '';
-      authLoading.classList.remove('show');
-    }
-
-    authClose.addEventListener('click', closeAuth);
-    authOverlay.addEventListener('click', (e) => { if (e.target === authOverlay) closeAuth(); });
-
-    // =========================
-    // ✅ Helpers
-    // =========================
-    function formatBalance(v){
-      const num = Number(v ?? 0);
+    function formatVc(value) {
+      const num = Number(value ?? 0);
       if (!Number.isFinite(num)) return '0 VC';
-      const isInt = Math.abs(num - Math.round(num)) < 1e-9;
-      return (isInt ? String(Math.round(num)) : num.toFixed(2)) + ' VC';
+      return Number.isInteger(num) ? `${num} VC` : `${num.toFixed(2)} VC`;
     }
 
-    function setLoggedOutUI(){
-      isTelegramAuthed = false;
-      profileCache = null;
-      balTitleEl.textContent = 'Вход';
-      balanceValueEl.textContent = 'Войти';
-      tgMiniIconEl.style.display = 'block';
+    function applyProfile(profile) {
+      if (!profile) return;
+
+      telegramProfile = profile;
+      localStorage.setItem('tg_profile', JSON.stringify(profile));
+
+      balanceValueEl.textContent = formatVc(profile.balance);
+
+      const username = profile.username ? `@${profile.username}` : 'Профиль';
+      profileBtnEl.setAttribute('title', username);
+      profileBtnEl.setAttribute('aria-label', username);
     }
 
-    function setLoggedInUI(profile){
-      isTelegramAuthed = true;
-      profileCache = profile;
-      balTitleEl.textContent = 'Баланс';
-      balanceValueEl.textContent = formatBalance(profile?.balance);
-      tgMiniIconEl.style.display = 'none';
-    }
-
-    async function ensureSession(){
-      const { data: { session } } = await supabaseClient.auth.getSession();
-      if (session) return session;
-
-      const { data, error } = await supabaseClient.auth.signInAnonymously();
-      if (error) throw error;
-      return data.session;
-    }
-
-    async function tryLoadProfile(){
-      const { data: { session } } = await supabaseClient.auth.getSession();
-      if (!session) return null;
-
-      const { data: { user } } = await supabaseClient.auth.getUser();
-      if (!user) return null;
-
-      const { data, error } = await supabaseClient
-        .from('profiles')
-        .select('id, telegram_id, balance, username, first_name, last_name')
-        .eq('id', user.id)
-        .maybeSingle();
-
-      if (error) {
-        console.warn('profiles select error:', error);
+    function loadCachedProfile() {
+      try {
+        const raw = localStorage.getItem('tg_profile');
+        if (!raw) return null;
+        const parsed = JSON.parse(raw);
+        if (!parsed || typeof parsed !== 'object') return null;
+        return parsed;
+      } catch {
         return null;
       }
-      return data;
     }
 
-    async function refreshAuthUI(){
-      const prof = await tryLoadProfile();
-      if (prof && prof.telegram_id) setLoggedInUI(prof);
-      else setLoggedOutUI();
-    }
+    async function autoAuthTelegram() {
+      const cached = loadCachedProfile();
+      if (cached) applyProfile(cached);
+      else balanceValueEl.textContent = '0 VC';
 
-    // =========================
-    // ✅ Telegram callback (вызывает виджет)
-    // =========================
-    window.onTelegramAuth = async function(user){
-      try{
-        if (!user || !user.hash) {
-          showToast('Telegram не передал hash. Проверь /setdomain', 3200);
-          return;
-        }
-
-        authLoading.classList.add('show');
-
-        // 1) сессия supabase
-        const session = await ensureSession();
-
-        // 2) вызов edge function
-        const res = await fetch(TG_LINK_FUNCTION_URL, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'apikey': SUPABASE_ANON_KEY,
-            'Authorization': `Bearer ${session.access_token}`,
-          },
-          body: JSON.stringify(user),
-        });
-
-        // ✅ Читаем текст (чтобы видеть точную ошибку даже если не JSON)
-        const raw = await res.text();
-        let payload = {};
-        try { payload = JSON.parse(raw); } catch { payload = { raw }; }
-
-        if (!res.ok){
-          const code = payload?.error || payload?.raw || 'unknown_error';
-          console.warn('telegram-link error:', res.status, code, payload);
-
-          if (code === 'telegram_signature_failed') {
-            showToast('Telegram не прошёл проверку. Проверь TELEGRAM_BOT_TOKEN и /setdomain', 4200);
-          } else if (code === 'invalid_session') {
-            showToast('Supabase сессия не найдена. Обнови страницу и попробуй снова', 4200);
-          } else if (code === 'missing_authorization') {
-            showToast('Нет Authorization. Обнови страницу и попробуй снова', 4200);
-          } else if (code === 'missing_TELEGRAM_BOT_TOKEN') {
-            showToast('В Secrets не задан TELEGRAM_BOT_TOKEN', 4200);
-          } else if (code === 'telegram_already_linked') {
-            showToast('Этот Telegram уже привязан к другому аккаунту', 4200);
-          } else {
-            showToast(`Ошибка входа (${res.status}): ${String(code).slice(0,80)}`, 5200);
-          }
-
-          authLoading.classList.remove('show');
-          return;
-        }
-
-        if (payload?.profile) setLoggedInUI(payload.profile);
-        closeAuth();
-        showToast('Готово! Вы вошли ✅', 2000);
-      } catch (e){
-        console.error(e);
-        showToast('Ошибка входа. Обнови страницу и попробуй снова', 3200);
-        authLoading.classList.remove('show');
-      }
-    };
-
-    // =========================
-    // ✅ Guard (блок до авторизации)
-    // =========================
-    function requireAuth(fn){
-      return (...args) => {
-        if (!isTelegramAuthed){
-          needAuthToast();
-          return;
-        }
-        return fn(...args);
-      };
-    }
-
-    // =========================
-    // ✅ Клик по “балансу”
-    // =========================
-    balanceChipEl.addEventListener('click', async () => {
-      if (!isTelegramAuthed){
-        await openAuth();
+      if (!window.Telegram || !window.Telegram.WebApp) {
+        console.warn('Сайт открыт не в Telegram Mini App');
         return;
       }
+
+      try {
+        Telegram.WebApp.ready();
+        if (typeof Telegram.WebApp.expand === 'function') {
+          Telegram.WebApp.expand();
+        }
+        if (typeof Telegram.WebApp.setHeaderColor === 'function') {
+          Telegram.WebApp.setHeaderColor('#020617');
+        }
+      } catch (e) {
+        console.warn('Telegram WebApp init warning:', e);
+      }
+
+      const initData = Telegram.WebApp.initData;
+      if (!initData) {
+        console.warn('Нет initData');
+        return;
+      }
+
+      balanceValueEl.textContent = '...';
+
+      try {
+        const res = await fetch(VERIFY_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ initData })
+        });
+
+        const json = await res.json().catch(() => ({}));
+
+        if (!res.ok || !json.ok || !json.profile) {
+          console.error('Ошибка авторизации:', json);
+          if (cached) applyProfile(cached);
+          else balanceValueEl.textContent = '0 VC';
+          return;
+        }
+
+        applyProfile(json.profile);
+      } catch (err) {
+        console.error('Ошибка запроса авторизации:', err);
+        if (cached) applyProfile(cached);
+        else balanceValueEl.textContent = '0 VC';
+      }
+    }
+
+    balanceChipEl.addEventListener('click', () => {
       window.location.href = 'wallet.html';
     });
 
-    // ✅ Переходы (заблокированы до входа)
-    document.getElementById('profileBtn').addEventListener('click', requireAuth(() => {
+    profileBtnEl.addEventListener('click', () => {
       window.location.href = 'profile.html';
-    }));
+    });
 
-    document.getElementById('btnGames').addEventListener('click', requireAuth(() => {
-      alert('Игры (позже сделаем переход)');
-    }));
+    document.getElementById('btnGames').addEventListener('click', () => alert('Игры (позже сделаем переход)'));
 
-    document.getElementById('btnShop').addEventListener('click', requireAuth(() => {
+    document.getElementById('btnShop').addEventListener('click', () => {
       window.location.href = 'ucshop.html';
-    }));
+    });
 
-    document.getElementById('btnCustom').addEventListener('click', requireAuth(() => {
-      alert('Кастомки (позже сделаем переход)');
-    }));
+    document.getElementById('btnCustom').addEventListener('click', () => alert('Кастомки (позже сделаем переход)'));
 
-    // =========================
-    // Баннеры: точки + автоплей (оставляем доступным)
-    // =========================
     const slides = document.getElementById('slides');
     const dotsWrap = document.getElementById('dots');
     const dots = Array.from(dotsWrap.querySelectorAll('.dot'));
@@ -1215,11 +882,9 @@
     window.addEventListener('load', () => {
       updateDotsByScroll();
       startAutoplay();
+      autoAuthTelegram();
     });
 
-    // =========================
-    // ✅ Меню (заблокировано до входа)
-    // =========================
     const menuBtn = document.getElementById('menuBtn');
     const menuOverlay = document.getElementById('menuOverlay');
     const menuClose = document.getElementById('menuClose');
@@ -1236,14 +901,13 @@
       document.body.style.overflow = '';
     }
 
-    menuBtn.addEventListener('click', requireAuth(openMenu));
+    menuBtn.addEventListener('click', openMenu);
     menuClose.addEventListener('click', closeMenu);
 
-    menuOverlay.addEventListener('click', (e) => { if (e.target === menuOverlay) closeMenu(); });
+    menuOverlay.addEventListener('click', (e) => {
+      if (e.target === menuOverlay) closeMenu();
+    });
 
-    // =========================
-    // ✅ Поддержка popup + Telegram (заблокировано до входа)
-    // =========================
     const supportOverlay = document.getElementById('supportOverlay');
     const supportClose = document.getElementById('supportClose');
     const goTelegram = document.getElementById('goTelegram');
@@ -1261,7 +925,10 @@
     }
 
     supportClose.addEventListener('click', closeSupport);
-    supportOverlay.addEventListener('click', (e) => { if (e.target === supportOverlay) closeSupport(); });
+
+    supportOverlay.addEventListener('click', (e) => {
+      if (e.target === supportOverlay) closeSupport();
+    });
 
     function openTelegramLinkSafe(url){
       if (window.Telegram && window.Telegram.WebApp && typeof window.Telegram.WebApp.openTelegramLink === 'function') {
@@ -1271,20 +938,19 @@
       window.open(url, '_blank', 'noopener');
     }
 
-    goTelegram.addEventListener('click', requireAuth(() => {
+    goTelegram.addEventListener('click', () => {
       openTelegramLinkSafe('https://t.me/vezusmanager');
-    }));
+    });
 
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') {
         closeSupport();
         closeMenu();
-        closeAuth();
       }
     });
 
     document.querySelectorAll('.menu-tile').forEach(btn => {
-      btn.addEventListener('click', requireAuth(() => {
+      btn.addEventListener('click', () => {
         const action = btn.getAttribute('data-action');
 
         if (action === 'support') {
@@ -1295,15 +961,7 @@
 
         closeMenu();
         alert('Открыть: ' + action);
-      }));
-    });
-
-    // =========================
-    // ✅ Инициализация UI
-    // =========================
-    refreshAuthUI().catch(() => setLoggedOutUI());
-    supabaseClient.auth.onAuthStateChange(() => {
-      refreshAuthUI().catch(() => setLoggedOutUI());
+      });
     });
   </script>
 </body>
