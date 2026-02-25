@@ -14,10 +14,8 @@
       --safe-bottom: env(safe-area-inset-bottom, 0px);
       --safe-top: env(safe-area-inset-top, 0px);
       --radius:20px;
-
       --neon:#2AABEE;
       --neon2:#3b82f6;
-
       --glass: rgba(8, 12, 22, .74);
       --glassBorder: rgba(46, 180, 255, .22);
       --shadow: 0 14px 40px rgba(0,0,0,.55);
@@ -314,7 +312,6 @@
         0 0 24px rgba(42,171,238,.10);
       backdrop-filter: blur(14px);
       -webkit-backdrop-filter: blur(14px);
-
       opacity:0;
       transform: translateY(26px) scale(.985);
       animation: cardInUp .55s cubic-bezier(.2,.9,.2,1) forwards;
@@ -700,7 +697,7 @@
       <div class="title-row">
         <div>
           <h1 class="page-title">UC Shop</h1>
-          <p class="page-sub">Выбери пакет и отправь заявку</p>
+          <p class="page-sub">Покупка за VC</p>
         </div>
       </div>
 
@@ -767,12 +764,12 @@
         <div class="popup-line"><span>PUBG ID:</span> <b id="cPubg">—</b></div>
 
         <div class="hint" style="opacity:.85">
-          Проверь ID внимательно. После создания заявки он уйдёт в обработку.
+          После создания заявки стоимость сразу спишется с баланса.
         </div>
 
         <div class="btn-row">
           <button class="btn btn-ghost" id="backToEdit">Назад</button>
-          <button class="btn btn-primary" id="confirmBuy">Создать заявку</button>
+          <button class="btn btn-primary" id="confirmBuy">Купить</button>
         </div>
       </div>
     </div>
@@ -806,10 +803,7 @@
     let current = null;
     let telegramProfile = null;
     let isCreatingOrder = false;
-
-    function formatRub(n){
-      return new Intl.NumberFormat('ru-RU').format(n) + ' ₽';
-    }
+    let currentBalance = 0;
 
     function formatVc(value){
       const num = Number(value ?? 0);
@@ -829,11 +823,17 @@
       }
     }
 
+    function setBalanceUI(value){
+      const num = Number(value ?? 0);
+      currentBalance = Number.isFinite(num) ? num : 0;
+      $('balanceValue').textContent = formatVc(currentBalance);
+    }
+
     function applyProfile(profile){
       if (!profile) return;
       telegramProfile = profile;
       localStorage.setItem('tg_profile', JSON.stringify(profile));
-      $('balanceValue').textContent = formatVc(profile.balance);
+      setBalanceUI(profile.balance);
     }
 
     async function postJson(url, payload){
@@ -873,7 +873,7 @@
     async function refreshProfile(){
       const cached = loadCachedProfile();
       if (cached) applyProfile(cached);
-      else $('balanceValue').textContent = '0 VC';
+      else setBalanceUI(0);
 
       try{
         const initData = getTelegramInitData();
@@ -940,7 +940,7 @@
 
             <div class="mini-tags">
               <span class="mini-tag">${p.tag}</span>
-              <span class="mini-tag">PUBG ID</span>
+              <span class="mini-tag">Оплата VC</span>
             </div>
           </div>
         </div>
@@ -948,7 +948,7 @@
         <div class="card-bottom">
           <div class="price-box">
             <span class="price-label">Цена</span>
-            <span class="price-value">${formatRub(p.price)}</span>
+            <span class="price-value">${formatVc(p.price)}</span>
           </div>
 
           <button type="button" class="buy-btn">Купить</button>
@@ -986,7 +986,7 @@
     function openBuyStep1(product){
       current = { product, pubgId: '' };
       $('pName').textContent = product.name;
-      $('pTotal').textContent = formatRub(product.price);
+      $('pTotal').textContent = formatVc(product.price);
       pubgErr.classList.remove('show');
       pubgInput.value = sanitizeDigits(pubgInput.value);
       openOverlay(buyPopup);
@@ -1001,7 +1001,7 @@
     function openConfirmStep(){
       if (!current) return;
       $('cName').textContent = current.product.name;
-      $('cTotal').textContent = formatRub(current.product.price);
+      $('cTotal').textContent = formatVc(current.product.price);
       $('cPubg').textContent = current.pubgId;
       openOverlay(confirmPopup);
     }
@@ -1058,7 +1058,7 @@
       if (!current || isCreatingOrder) return;
 
       isCreatingOrder = true;
-      confirmBuyBtn.textContent = 'Создаём...';
+      confirmBuyBtn.textContent = 'Покупка...';
       confirmBuyBtn.disabled = true;
 
       try{
@@ -1069,10 +1069,17 @@
           packageId: current.product.id,
           packageName: current.product.name,
           pubgId: current.pubgId,
-          priceRub: current.product.price
+          priceVc: current.product.price
         });
 
-        showToast(`Заявка создана: ${current.product.name} • PUBG ID ${current.pubgId}`);
+        if (typeof json.current_balance !== 'undefined') {
+          setBalanceUI(json.current_balance);
+          const cached = loadCachedProfile() || {};
+          cached.balance = Number(json.current_balance) || 0;
+          localStorage.setItem('tg_profile', JSON.stringify(cached));
+        }
+
+        showToast(`Куплено: ${current.product.name} • списано ${formatVc(current.product.price)}`);
         console.log('UC order created:', json.order);
 
         closeStep2();
@@ -1082,9 +1089,8 @@
         console.error('UC order error:', err);
       } finally {
         isCreatingOrder = false;
-        confirmBuyBtn.textContent = 'Создать заявку';
+        confirmBuyBtn.textContent = 'Купить';
         confirmBuyBtn.disabled = false;
-        setBodyLock(false);
       }
     }
 
