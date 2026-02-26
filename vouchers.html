@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Ваучеры</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --text:#eaf1ff;
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+      --safe-top: env(safe-area-inset-top, 0px);
+      --glass: rgba(12, 14, 20, .74);
+      --glassBorder: rgba(255,255,255,.08);
+      --shadow: 0 18px 42px rgba(0,0,0,.48);
+      --shadowSoft: 0 12px 28px rgba(0,0,0,.34);
+    }
+
+    *{
+      box-sizing:border-box;
+      font-family:'Inter', sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html, body{
+      height:100%;
+      margin:0;
+      overflow:hidden;
+      color:var(--text);
+      background:#020617;
+    }
+
+    body{
+      background-image:url("https://i.postimg.cc/fbJT34yY/076E519D-F095-4957-88BF-5591DEB82533.png");
+      background-size:cover;
+      background-position:center;
+      background-repeat:no-repeat;
+    }
+
+    body::before{
+      content:"";
+      position:fixed;
+      inset:0;
+      background:
+        radial-gradient(900px 600px at 30% 10%, rgba(255,255,255,.05), transparent 60%),
+        linear-gradient(180deg, rgba(0,0,0,.40), rgba(0,0,0,.64));
+      pointer-events:none;
+    }
+
+    .app{
+      position:relative;
+      height:100%;
+      overflow:auto;
+      padding: calc(18px + var(--safe-top)) 16px calc(28px + var(--safe-bottom)) 16px;
+      z-index:1;
+    }
+
+    .content{
+      margin-top:18px;
+      display:flex;
+      flex-direction:column;
+      gap:16px;
+      max-width:520px;
+      margin-left:auto;
+      margin-right:auto;
+      align-items:center;
+      position:relative;
+      z-index:1;
+    }
+
+    .top-row{
+      width:100%;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:16px;
+      position:sticky;
+      top:4px;
+      z-index:30;
+      padding:6px 8px;
+      border-radius:22px;
+      background: rgba(10,12,18,.38);
+      border:1px solid rgba(255,255,255,.04);
+      box-shadow: 0 10px 30px rgba(0,0,0,.22);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+    }
+
+    .back-btn-square{
+      width:42px;
+      height:42px;
+      border-radius:14px;
+      border:1px solid var(--glassBorder);
+      cursor:pointer;
+      background:var(--glass);
+      box-shadow: var(--shadowSoft), inset 0 1px 0 rgba(255,255,255,.04);
+      display:grid;
+      place-items:center;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      padding:0;
+      overflow:hidden;
+      flex:0 0 auto;
+    }
+
+    .back-btn-square:active{ transform:scale(.98); }
+
+    .back-svg{
+      width:20px;
+      height:20px;
+      display:block;
+      stroke: rgba(234,241,255,.92);
+      fill:none;
+      stroke-width:2.2;
+      stroke-linecap:round;
+      stroke-linejoin:round;
+    }
+
+    .balance-mini{
+      width:min(220px, 72%);
+      height:40px;
+      border-radius:999px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      padding:6px 7px 6px 12px;
+      position:relative;
+      overflow:hidden;
+      background:var(--glass);
+      border:1px solid var(--glassBorder);
+      box-shadow: var(--shadow), inset 0 1px 0 rgba(255,255,255,.04);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+
+    .balance-mini::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      background:
+        radial-gradient(180px 60px at 0% 0%, rgba(255,255,255,.05), transparent 55%),
+        radial-gradient(180px 60px at 100% 100%, rgba(255,255,255,.03), transparent 55%);
+      pointer-events:none;
+    }
+
+    .bal-title{
+      position:relative;
+      z-index:1;
+      font-size:12px;
+      font-weight:900;
+      letter-spacing:.2px;
+      color: rgba(234,241,255,.92);
+      white-space:nowrap;
+    }
+
+    .bal-amount{
+      position:relative;
+      z-index:1;
+      height:26px;
+      border:none;
+      border-radius:999px;
+      cursor:pointer;
+      padding:0 10px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background: rgba(255,255,255,.08);
+      border:1px solid rgba(255,255,255,.08);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.05);
+      color: rgba(234,241,255,.98);
+      font-weight:900;
+      font-size:13px;
+      white-space:nowrap;
+    }
+
+    .page-title{
+      width:100%;
+      margin:0;
+      font-size:22px;
+      font-weight:900;
+      letter-spacing:.2px;
+      text-shadow:0 14px 25px rgba(0,0,0,.55);
+    }
+
+    .card{
+      width:100%;
+      border-radius:24px;
+      overflow:hidden;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02)),
+        rgba(12, 14, 20, .84);
+      border:1px solid rgba(255,255,255,.07);
+      box-shadow:
+        0 20px 48px rgba(0,0,0,.34),
+        inset 0 1px 0 rgba(255,255,255,.03);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      padding:16px;
+      display:flex;
+      flex-direction:column;
+      gap:14px;
+      position:relative;
+    }
+
+    .card::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      background:
+        radial-gradient(380px 120px at 0% 0%, rgba(255,255,255,.04), transparent 60%),
+        radial-gradient(320px 120px at 100% 100%, rgba(255,255,255,.025), transparent 60%);
+      pointer-events:none;
+    }
+
+    .card > *{
+      position:relative;
+      z-index:1;
+    }
+
+    .field{
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+    }
+
+    .input{
+      width:100%;
+      height:50px;
+      border-radius:16px;
+      border:1px solid rgba(255,255,255,.08);
+      background: rgba(255,255,255,.06);
+      color: rgba(234,241,255,.96);
+      padding:0 14px;
+      outline:none;
+      font-size:15px;
+      font-weight:800;
+      letter-spacing:.3px;
+      text-transform:uppercase;
+      box-shadow: 0 18px 40px rgba(0,0,0,.18);
+    }
+
+    .input::placeholder{
+      color: rgba(234,241,255,.42);
+      text-transform:none;
+      letter-spacing:0;
+    }
+
+    .error{
+      display:none;
+      font-size:12px;
+      font-weight:900;
+      color:#fecaca;
+    }
+
+    .error.show{
+      display:block;
+    }
+
+    .activate-btn{
+      height:50px;
+      border:none;
+      border-radius:16px;
+      cursor:pointer;
+      font-size:14px;
+      font-weight:900;
+      color:#fff;
+      background: linear-gradient(135deg, #3b82f6, #2563eb);
+      box-shadow: 0 18px 34px rgba(37,99,235,.28);
+    }
+
+    .activate-btn:disabled{
+      opacity:.65;
+      cursor:not-allowed;
+    }
+
+    .toast{
+      position: fixed;
+      left:50%;
+      bottom: calc(18px + var(--safe-bottom));
+      transform: translateX(-50%) translateY(14px);
+      background: rgba(14,16,24,.92);
+      border:1px solid rgba(255,255,255,.08);
+      box-shadow:0 22px 60px rgba(0,0,0,.55);
+      color: rgba(234,241,255,.95);
+      border-radius:18px;
+      padding:12px 14px;
+      width: min(520px, calc(100% - 32px));
+      opacity:0;
+      pointer-events:none;
+      transition: opacity .22s ease, transform .22s ease;
+      z-index:300;
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      font-weight:900;
+      font-size:13px;
+    }
+
+    .toast.show{
+      opacity:1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    .toast .ok{
+      border:none;
+      cursor:pointer;
+      border-radius:14px;
+      height:34px;
+      padding:0 12px;
+      background: rgba(255,255,255,.08);
+      border:1px solid rgba(255,255,255,.08);
+      color: rgba(234,241,255,.95);
+      font-weight:900;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="app">
+    <div class="content">
+
+      <div class="top-row">
+        <button class="back-btn-square" id="backBtn" aria-label="Назад" title="На главную">
+          <svg class="back-svg" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M15 18l-6-6 6-6"></path>
+            <path d="M9 12h10"></path>
+          </svg>
+        </button>
+
+        <div class="balance-mini" aria-label="Баланс">
+          <span class="bal-title">Баланс</span>
+          <button class="bal-amount" id="balanceChip" aria-label="Открыть кошелёк">
+            <span id="balanceValue">0 VC</span>
+          </button>
+        </div>
+      </div>
+
+      <h1 class="page-title">Ваучеры</h1>
+
+      <div class="card">
+        <div class="field">
+          <input
+            id="voucherInput"
+            class="input"
+            type="text"
+            placeholder="Введите ваучер"
+            maxlength="40"
+            autocomplete="off"
+          >
+          <div class="error" id="voucherError">Введите ваучер</div>
+        </div>
+
+        <button class="activate-btn" id="activateBtn">Активировать</button>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="toast" id="toast" aria-live="polite">
+    <span id="toastText">—</span>
+    <button class="ok" id="toastOk">Ок</button>
+  </div>
+
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+  <script>
+    const VERIFY_URL = "https://lazrfierfbhwlduqlvws.functions.supabase.co/verify-telegram";
+    const REDEEM_URL = "https://lazrfierfbhwlduqlvws.functions.supabase.co/redeem-voucher";
+
+    const $ = (id) => document.getElementById(id);
+
+    let isRedeeming = false;
+
+    function formatVc(value){
+      const num = Number(value ?? 0);
+      if (!Number.isFinite(num)) return "0 VC";
+      return Number.isInteger(num) ? `${num} VC` : `${num.toFixed(2)} VC`;
+    }
+
+    function loadCachedProfile(){
+      try{
+        const raw = localStorage.getItem("tg_profile");
+        if (!raw) return null;
+        const parsed = JSON.parse(raw);
+        if (!parsed || typeof parsed !== "object") return null;
+        return parsed;
+      } catch {
+        return null;
+      }
+    }
+
+    function setBalanceUI(value){
+      $("balanceValue").textContent = formatVc(value);
+    }
+
+    function applyProfile(profile){
+      if (!profile) return;
+      localStorage.setItem("tg_profile", JSON.stringify(profile));
+      setBalanceUI(profile.balance);
+    }
+
+    async function postJson(url, payload){
+      const res = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+
+      const json = await res.json().catch(() => ({}));
+
+      if (!res.ok || !json.ok) {
+        throw new Error(json.error || json.details || `Ошибка ${res.status}`);
+      }
+
+      return json;
+    }
+
+    function getTelegramInitData(){
+      if (!window.Telegram || !window.Telegram.WebApp) {
+        throw new Error("Открой страницу внутри Telegram Mini App");
+      }
+
+      try{
+        Telegram.WebApp.ready();
+        if (typeof Telegram.WebApp.expand === "function") Telegram.WebApp.expand();
+      } catch(e){}
+
+      const initData = Telegram.WebApp.initData;
+      if (!initData) throw new Error("Нет initData");
+      return initData;
+    }
+
+    const toast = $("toast");
+    const toastText = $("toastText");
+    const toastOk = $("toastOk");
+    let toastTimer = null;
+
+    function showToast(text){
+      toastText.textContent = text;
+      toast.classList.add("show");
+      if (toastTimer) clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => toast.classList.remove("show"), 3200);
+    }
+
+    toastOk.addEventListener("click", () => toast.classList.remove("show"));
+
+    async function refreshProfile(){
+      const cached = loadCachedProfile();
+      if (cached) applyProfile(cached);
+      else setBalanceUI(0);
+
+      try{
+        const initData = getTelegramInitData();
+        const json = await postJson(VERIFY_URL, { initData });
+        if (json.profile) applyProfile(json.profile);
+      } catch(err){
+        console.error("Profile load error:", err);
+      }
+    }
+
+    const voucherInput = $("voucherInput");
+    const voucherError = $("voucherError");
+    const activateBtn = $("activateBtn");
+
+    function setRedeemLoading(loading){
+      isRedeeming = loading;
+      activateBtn.disabled = loading;
+      voucherInput.disabled = loading;
+      activateBtn.textContent = loading ? "Активация..." : "Активировать";
+    }
+
+    async function redeemVoucher(){
+      if (isRedeeming) return;
+
+      const code = voucherInput.value.trim().toUpperCase();
+
+      if (!code) {
+        voucherError.classList.add("show");
+        voucherInput.focus();
+        return;
+      }
+
+      voucherError.classList.remove("show");
+      setRedeemLoading(true);
+
+      try{
+        const initData = getTelegramInitData();
+
+        const json = await postJson(REDEEM_URL, {
+          initData,
+          code
+        });
+
+        if (typeof json.current_balance !== "undefined") {
+          setBalanceUI(json.current_balance);
+
+          const cached = loadCachedProfile() || {};
+          cached.balance = Number(json.current_balance) || 0;
+          localStorage.setItem("tg_profile", JSON.stringify(cached));
+        }
+
+        voucherInput.value = "";
+        showToast(json.message || `Начислено ${formatVc(json.reward_vc)}`);
+      } catch(err){
+        console.error("Redeem error:", err);
+        showToast(err.message || "Не удалось активировать ваучер");
+      } finally {
+        setRedeemLoading(false);
+      }
+    }
+
+    activateBtn.addEventListener("click", redeemVoucher);
+
+    voucherInput.addEventListener("input", () => {
+      voucherError.classList.remove("show");
+      voucherInput.value = voucherInput.value.toUpperCase();
+    });
+
+    voucherInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        redeemVoucher();
+      }
+    });
+
+    $("balanceChip").addEventListener("click", () => {
+      window.location.href = "wallet.html";
+    });
+
+    $("backBtn").addEventListener("click", () => {
+      window.location.href = "index.html";
+    });
+
+    window.addEventListener("load", async () => {
+      await refreshProfile();
+    });
+  </script>
+</body>
+</html>
