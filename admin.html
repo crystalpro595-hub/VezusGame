@@ -15,7 +15,6 @@
       --safe-top: env(safe-area-inset-top, 0px);
 
       --glass: rgba(12, 14, 20, .78);
-      --glassStrong: rgba(14, 16, 24, .94);
       --glassBorder: rgba(255,255,255,.08);
       --shadow: 0 18px 42px rgba(0,0,0,.48);
       --shadowSoft: 0 12px 28px rgba(0,0,0,.34);
@@ -454,12 +453,10 @@
         inset 0 1px 0 rgba(255,255,255,.04);
       backdrop-filter: blur(14px);
       -webkit-backdrop-filter: blur(14px);
-
       padding:16px;
       display:flex;
       flex-direction:column;
       gap:16px;
-
       transform: translateX(0);
       transition: transform .32s cubic-bezier(.2,.9,.2,1);
     }
@@ -576,10 +573,6 @@
     }
 
     @media (max-width:360px){
-      .icon{ width:44px; height:44px; border-radius:14px; }
-      .icon svg{ width:20px; height:20px; }
-      .card-title{ font-size:14px; }
-      .meta-row{ font-size:11px; }
       .topbar-head{ align-items:flex-start; flex-direction:column; }
       .topbar-actions{ width:100%; }
       .refresh-btn, .open-auth-btn{ flex:1; }
@@ -731,12 +724,27 @@
       }).format(d);
     }
 
-    function getField(obj, names){
-      for (const name of names){
-        const value = obj?.[name];
-        if (value !== undefined && value !== null && String(value).trim() !== "") {
-          return value;
+    function normalizePicked(value){
+      if (value === undefined || value === null) return null;
+      const text = String(value).trim();
+      return text ? text : null;
+    }
+
+    function getDeepField(obj, paths){
+      for (const path of paths){
+        const parts = path.split(".");
+        let current = obj;
+
+        for (const part of parts){
+          if (current == null || typeof current !== "object" || !(part in current)) {
+            current = undefined;
+            break;
+          }
+          current = current[part];
         }
+
+        const picked = normalizePicked(current);
+        if (picked !== null) return picked;
       }
       return null;
     }
@@ -747,30 +755,12 @@
 
     function iconSvg(type){
       if (type === "deposit") {
-        return `
-          <svg viewBox="0 0 24 24">
-            <path d="M12 3v14"></path>
-            <path d="M7 12l5 5 5-5"></path>
-            <path d="M5 21h14"></path>
-          </svg>
-        `;
+        return `<svg viewBox="0 0 24 24"><path d="M12 3v14"></path><path d="M7 12l5 5 5-5"></path><path d="M5 21h14"></path></svg>`;
       }
-
       if (type === "withdraw") {
-        return `
-          <svg viewBox="0 0 24 24">
-            <path d="M12 21V7"></path>
-            <path d="M17 12l-5-5-5 5"></path>
-            <path d="M5 3h14"></path>
-          </svg>
-        `;
+        return `<svg viewBox="0 0 24 24"><path d="M12 21V7"></path><path d="M17 12l-5-5-5 5"></path><path d="M5 3h14"></path></svg>`;
       }
-
-      return `
-        <svg viewBox="0 0 24 24">
-          <path d="M12 3l2.8 5.7L21 9.6l-4.5 4.4 1.1 6.2L12 17.3 6.4 20.2 7.5 14 3 9.6l6.2-.9z"></path>
-        </svg>
-      `;
+      return `<svg viewBox="0 0 24 24"><path d="M12 3l2.8 5.7L21 9.6l-4.5 4.4 1.1 6.2L12 17.3 6.4 20.2 7.5 14 3 9.6l6.2-.9z"></path></svg>`;
     }
 
     function normalizeStatus(raw){
@@ -795,12 +785,16 @@
     }
 
     function mapDeposit(item){
-      const senderName = getField(item, [
+      const senderName = getDeepField(item, [
         "sender_name",
         "sender_fio",
         "full_name",
         "fio",
-        "name"
+        "name",
+        "meta.fio",
+        "payload.fio",
+        "data.fio",
+        "request_data.fio"
       ]) ?? "—";
 
       return {
@@ -819,27 +813,42 @@
     }
 
     function mapWithdraw(item){
-      const fioValue = getField(item, [
+      const fioValue = getDeepField(item, [
+        "recipient_fio",
         "fio",
         "receiver_fio",
         "receiver_name",
         "full_name",
         "recipient_name",
-        "name"
+        "withdraw_fio",
+        "fio_input",
+        "user_fio",
+        "meta.fio",
+        "payload.fio",
+        "data.fio",
+        "request_data.fio"
       ]) ?? "—";
 
-      const bankValue = getField(item, [
-        "bank",
+      const bankValue = getDeepField(item, [
         "bank_name",
+        "bank",
         "receiver_bank",
-        "bank_title"
+        "bank_title",
+        "meta.bank",
+        "payload.bank",
+        "data.bank",
+        "request_data.bank"
       ]) ?? "—";
 
-      const requisitesValue = getField(item, [
+      const requisitesValue = getDeepField(item, [
         "requisites",
         "card_number",
         "account_number",
-        "details"
+        "details",
+        "meta.requisites",
+        "payload.requisites",
+        "data.requisites",
+        "request_data.requisites"
       ]) ?? "—";
 
       return {
@@ -860,7 +869,7 @@
     }
 
     function mapUc(item){
-      const packageName = getField(item, [
+      const packageName = getDeepField(item, [
         "package_name",
         "package",
         "title"
@@ -951,17 +960,12 @@
       return `
         <div class="card">
           <div class="icon">${iconSvg(item.type)}</div>
-
           <div class="body">
             <div class="row-top">
               <p class="card-title">${escapeHtml(item.title)}</p>
               <span class="badge status-${statusType}">${escapeHtml(statusLabel(item.status, item.type))}</span>
             </div>
-
-            <div class="meta">
-              ${linesHtml}
-            </div>
-
+            <div class="meta">${linesHtml}</div>
             ${actionsHtml}
           </div>
         </div>
@@ -972,22 +976,14 @@
       const box = $("adminList");
 
       if (!adminAuthorized) {
-        box.innerHTML = `
-          <div class="empty">
-            Сначала введи ADMIN_PANEL_KEY.
-          </div>
-        `;
+        box.innerHTML = `<div class="empty">Сначала введи ADMIN_PANEL_KEY.</div>`;
         return;
       }
 
       const items = getFilteredItems();
 
       if (!items.length) {
-        box.innerHTML = `
-          <div class="empty">
-            Здесь пока нет заявок.
-          </div>
-        `;
+        box.innerHTML = `<div class="empty">Здесь пока нет заявок.</div>`;
         return;
       }
 
@@ -1037,11 +1033,7 @@
 
       $("adminKeyInput").value = "";
       $("authStatus").textContent = "";
-      $("adminList").innerHTML = `
-        <div class="empty">
-          Вход сброшен. Введи ADMIN_PANEL_KEY.
-        </div>
-      `;
+      $("adminList").innerHTML = `<div class="empty">Вход сброшен. Введи ADMIN_PANEL_KEY.</div>`;
       $("statAll").textContent = "0";
       $("statActive").textContent = "0";
       $("statDeposits").textContent = "0";
