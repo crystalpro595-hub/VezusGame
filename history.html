@@ -15,7 +15,6 @@
       --safe-top: env(safe-area-inset-top, 0px);
 
       --glass: rgba(12, 14, 20, .74);
-      --glassStrong: rgba(14, 16, 24, .92);
       --glassBorder: rgba(255,255,255,.08);
       --shadow: 0 18px 42px rgba(0,0,0,.48);
       --shadowSoft: 0 12px 28px rgba(0,0,0,.34);
@@ -103,7 +102,6 @@
       place-items:center;
       backdrop-filter: blur(10px);
       -webkit-backdrop-filter: blur(10px);
-      transition: transform .15s ease;
       padding:0;
       overflow:hidden;
       flex:0 0 auto;
@@ -226,7 +224,6 @@
       color: rgba(234,241,255,.86);
       font-size:12px;
       font-weight:900;
-      transition: transform .15s ease, background .15s ease;
       white-space:nowrap;
       padding:0 6px;
     }
@@ -235,8 +232,6 @@
       background: rgba(255,255,255,.10);
       color:#fff;
     }
-
-    .tab-btn:active{ transform:scale(.98); }
 
     .history-list{
       width:100%;
@@ -393,10 +388,8 @@
       border:1px solid rgba(239,68,68,.22);
       font-size:12px;
       font-weight:900;
-      transition: transform .15s ease, opacity .15s ease;
     }
 
-    .cancel-btn:active{ transform:scale(.98); }
     .cancel-btn:disabled{
       opacity:.6;
       cursor:not-allowed;
@@ -484,21 +477,6 @@
 
     @media (max-width:480px){
       .tabs{ grid-template-columns: repeat(2, 1fr); }
-    }
-
-    @media (max-width:360px){
-      .balance-mini{ width:min(200px, 70%); height:38px; }
-      .bal-amount{ height:25px; font-size:12px; }
-      .back-btn-square{ width:40px; height:40px; border-radius:13px; }
-      .top-row{ gap:14px; padding:5px 6px; }
-      .card-icon{ width:44px; height:44px; border-radius:14px; }
-      .card-icon svg{ width:20px; height:20px; }
-      .card-title{ font-size:14px; }
-      .meta-row{ font-size:11px; }
-    }
-
-    @media (prefers-reduced-motion: reduce){
-      *{ transition:none !important; animation:none !important; }
     }
   </style>
 </head>
@@ -594,6 +572,31 @@
         .replaceAll("'", "&#039;");
     }
 
+    function normalizePicked(value){
+      if (value === undefined || value === null) return null;
+      const text = String(value).trim();
+      return text ? text : null;
+    }
+
+    function getDeepField(obj, paths){
+      for (const path of paths){
+        const parts = path.split(".");
+        let current = obj;
+
+        for (const part of parts){
+          if (current == null || typeof current !== "object" || !(part in current)) {
+            current = undefined;
+            break;
+          }
+          current = current[part];
+        }
+
+        const picked = normalizePicked(current);
+        if (picked !== null) return picked;
+      }
+      return null;
+    }
+
     function loadCachedProfile(){
       try{
         const raw = localStorage.getItem("tg_profile");
@@ -665,55 +668,31 @@
       return "В обработке";
     }
 
-    function getField(obj, names){
-      for (const name of names){
-        const value = obj?.[name];
-        if (value !== undefined && value !== null && String(value).trim() !== "") {
-          return value;
-        }
+    function iconSvg(type){
+      if (type === "deposit") {
+        return `<svg viewBox="0 0 24 24"><path d="M12 3v14"></path><path d="M7 12l5 5 5-5"></path><path d="M5 21h14"></path></svg>`;
       }
-      return null;
+      if (type === "withdrawal") {
+        return `<svg viewBox="0 0 24 24"><path d="M12 21V7"></path><path d="M17 12l-5-5-5 5"></path><path d="M5 3h14"></path></svg>`;
+      }
+      return `<svg viewBox="0 0 24 24"><path d="M12 3l2.8 5.7L21 9.6l-4.5 4.4 1.1 6.2L12 17.3 6.4 20.2 7.5 14 3 9.6l6.2-.9z"></path></svg>`;
     }
 
     function getAmount(item){
       return item.amount_vc ?? item.price_vc ?? item.amount ?? 0;
     }
 
-    function iconSvg(type){
-      if (type === "deposit") {
-        return `
-          <svg viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M12 3v14"></path>
-            <path d="M7 12l5 5 5-5"></path>
-            <path d="M5 21h14"></path>
-          </svg>
-        `;
-      }
-
-      if (type === "withdrawal") {
-        return `
-          <svg viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M12 21V7"></path>
-            <path d="M17 12l-5-5-5 5"></path>
-            <path d="M5 3h14"></path>
-          </svg>
-        `;
-      }
-
-      return `
-        <svg viewBox="0 0 24 24" aria-hidden="true">
-          <path d="M12 3l2.8 5.7L21 9.6l-4.5 4.4 1.1 6.2L12 17.3 6.4 20.2 7.5 14 3 9.6l6.2-.9z"></path>
-        </svg>
-      `;
-    }
-
     function mapDeposit(item){
-      const senderName = getField(item, [
+      const senderName = getDeepField(item, [
         "sender_name",
         "sender_fio",
         "full_name",
         "fio",
-        "name"
+        "name",
+        "meta.fio",
+        "payload.fio",
+        "data.fio",
+        "request_data.fio"
       ]) ?? "—";
 
       return {
@@ -732,27 +711,41 @@
     }
 
     function mapWithdrawal(item){
-      const fioValue = getField(item, [
+      const fioValue = getDeepField(item, [
         "fio",
         "receiver_fio",
         "receiver_name",
         "full_name",
         "recipient_name",
-        "name"
+        "withdraw_fio",
+        "fio_input",
+        "user_fio",
+        "meta.fio",
+        "payload.fio",
+        "data.fio",
+        "request_data.fio"
       ]) ?? "—";
 
-      const bankValue = getField(item, [
+      const bankValue = getDeepField(item, [
         "bank",
         "bank_name",
         "receiver_bank",
-        "bank_title"
+        "bank_title",
+        "meta.bank",
+        "payload.bank",
+        "data.bank",
+        "request_data.bank"
       ]) ?? "—";
 
-      const requisitesValue = getField(item, [
+      const requisitesValue = getDeepField(item, [
         "requisites",
         "card_number",
         "account_number",
-        "details"
+        "details",
+        "meta.requisites",
+        "payload.requisites",
+        "data.requisites",
+        "request_data.requisites"
       ]) ?? "—";
 
       return {
@@ -773,7 +766,7 @@
     }
 
     function mapUc(item){
-      const packageName = getField(item, [
+      const packageName = getDeepField(item, [
         "package_name",
         "package",
         "title"
@@ -821,27 +814,18 @@
       `).join("");
 
       const cancelHtml = item.type === "withdrawal" && item.canCancel
-        ? `
-          <div class="card-actions">
-            <button class="cancel-btn" data-cancel-id="${escapeHtml(item.id)}">Отменить вывод</button>
-          </div>
-        `
+        ? `<div class="card-actions"><button class="cancel-btn" data-cancel-id="${escapeHtml(item.id)}">Отменить вывод</button></div>`
         : "";
 
       return `
         <div class="history-card">
           <div class="card-icon">${iconSvg(item.type)}</div>
-
           <div class="card-body">
             <div class="card-top">
               <p class="card-title">${escapeHtml(item.title)}</p>
               <span class="status-badge status-${statusType}">${escapeHtml(statusLabel(item.statusRaw))}</span>
             </div>
-
-            <div class="meta-grid">
-              ${linesHtml}
-            </div>
-
+            <div class="meta-grid">${linesHtml}</div>
             ${cancelHtml}
           </div>
         </div>
@@ -853,11 +837,7 @@
       const items = getItemsForTab();
 
       if (!items.length) {
-        box.innerHTML = `
-          <div class="empty">
-            Здесь пока нет записей.
-          </div>
-        `;
+        box.innerHTML = `<div class="empty">Здесь пока нет записей.</div>`;
         return;
       }
 
@@ -930,7 +910,6 @@
 
         if (typeof json.current_balance !== "undefined") {
           setBalanceUI(json.current_balance);
-
           const cached = loadCachedProfile() || {};
           cached.balance = Number(json.current_balance) || 0;
           localStorage.setItem("tg_profile", JSON.stringify(cached));
@@ -961,10 +940,8 @@
     $("historyList").addEventListener("click", async (e) => {
       const btn = e.target.closest("[data-cancel-id]");
       if (!btn) return;
-
       const requestId = btn.getAttribute("data-cancel-id");
       if (!requestId) return;
-
       await cancelWithdraw(requestId, btn);
     });
 
