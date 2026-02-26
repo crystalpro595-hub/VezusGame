@@ -276,6 +276,79 @@
       cursor:not-allowed;
     }
 
+    .voucher-stats{
+      width:100%;
+      border-radius:18px;
+      padding:12px 14px;
+      background: rgba(255,255,255,.05);
+      border:1px solid rgba(255,255,255,.06);
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      font-size:13px;
+      font-weight:900;
+      color: rgba(234,241,255,.95);
+      min-height:48px;
+    }
+
+    .voucher-stats .label{
+      color: rgba(234,241,255,.72);
+      font-weight:800;
+    }
+
+    .help-box{
+      width:100%;
+      border-radius:18px;
+      overflow:hidden;
+      background: rgba(255,255,255,.04);
+      border:1px solid rgba(255,255,255,.06);
+    }
+
+    .help-toggle{
+      width:100%;
+      border:none;
+      background:transparent;
+      color: rgba(234,241,255,.96);
+      cursor:pointer;
+      padding:14px;
+      font-size:13px;
+      font-weight:900;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      text-align:left;
+    }
+
+    .help-arrow{
+      font-size:14px;
+      transition: transform .25s ease;
+      flex:0 0 auto;
+    }
+
+    .help-box.open .help-arrow{
+      transform: rotate(180deg);
+    }
+
+    .help-content{
+      max-height:0;
+      overflow:hidden;
+      transition: max-height .28s ease, padding .28s ease, opacity .22s ease;
+      opacity:0;
+      padding:0 14px;
+      font-size:12px;
+      line-height:1.45;
+      font-weight:800;
+      color: rgba(234,241,255,.72);
+    }
+
+    .help-box.open .help-content{
+      max-height:120px;
+      padding:0 14px 14px 14px;
+      opacity:1;
+    }
+
     .toast{
       position: fixed;
       left:50%;
@@ -357,6 +430,21 @@
         </div>
 
         <button class="activate-btn" id="activateBtn">Активировать</button>
+
+        <div class="voucher-stats">
+          <span class="label">Активировано вами:</span>
+          <span id="voucherCount">...</span>
+        </div>
+
+        <div class="help-box" id="helpBox">
+          <button class="help-toggle" id="helpToggle" type="button">
+            <span>Где взять ваучер ?</span>
+            <span class="help-arrow">⌄</span>
+          </button>
+          <div class="help-content" id="helpContent">
+            Следите за постами в нашем Telegram канале.
+          </div>
+        </div>
       </div>
 
     </div>
@@ -372,6 +460,7 @@
   <script>
     const VERIFY_URL = "https://lazrfierfbhwlduqlvws.functions.supabase.co/verify-telegram";
     const REDEEM_URL = "https://lazrfierfbhwlduqlvws.functions.supabase.co/redeem-voucher";
+    const STATS_URL = "https://lazrfierfbhwlduqlvws.functions.supabase.co/get-voucher-stats";
 
     const $ = (id) => document.getElementById(id);
 
@@ -464,6 +553,19 @@
       }
     }
 
+    async function loadVoucherStats(){
+      $("voucherCount").textContent = "...";
+
+      try{
+        const initData = getTelegramInitData();
+        const json = await postJson(STATS_URL, { initData });
+        $("voucherCount").textContent = String(json.activated_count ?? 0);
+      } catch(err){
+        console.error("Stats error:", err);
+        $("voucherCount").textContent = "0";
+      }
+    }
+
     const voucherInput = $("voucherInput");
     const voucherError = $("voucherError");
     const activateBtn = $("activateBtn");
@@ -506,6 +608,7 @@
         }
 
         voucherInput.value = "";
+        await loadVoucherStats();
         showToast(json.message || `Начислено ${formatVc(json.reward_vc)}`);
       } catch(err){
         console.error("Redeem error:", err);
@@ -536,8 +639,16 @@
       window.location.href = "index.html";
     });
 
+    const helpBox = $("helpBox");
+    const helpToggle = $("helpToggle");
+
+    helpToggle.addEventListener("click", () => {
+      helpBox.classList.toggle("open");
+    });
+
     window.addEventListener("load", async () => {
       await refreshProfile();
+      await loadVoucherStats();
     });
   </script>
 </body>
