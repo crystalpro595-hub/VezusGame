@@ -712,6 +712,7 @@
 
     function mapWithdrawal(item){
       const fioValue = getDeepField(item, [
+        "recipient_fio",
         "fio",
         "receiver_fio",
         "receiver_name",
@@ -727,8 +728,8 @@
       ]) ?? "—";
 
       const bankValue = getDeepField(item, [
-        "bank",
         "bank_name",
+        "bank",
         "receiver_bank",
         "bank_title",
         "meta.bank",
