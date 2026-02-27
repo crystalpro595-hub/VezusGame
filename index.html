@@ -61,15 +61,16 @@
       position:relative;
       height:100%;
       overflow:auto;
-      padding: calc(18px + var(--safe-top)) 16px calc(28px + var(--safe-bottom)) 16px;
+      padding: calc(4px + var(--safe-top)) 16px calc(28px + var(--safe-bottom)) 16px;
       z-index:1;
     }
 
     .content{
-      margin-top:18px;
+      margin-top:0;
       display:flex;
       flex-direction:column;
       gap:16px;
+      width:100%;
       max-width:520px;
       margin-left:auto;
       margin-right:auto;
@@ -84,12 +85,13 @@
       display:flex;
       justify-content:flex-start;
       align-items:center;
-      padding-left:2px;
+      margin-left:-12px;
+      margin-bottom:-2px;
     }
 
     .hero-logo{
-      width:72px;
-      height:72px;
+      width:82px;
+      height:82px;
       display:flex;
       align-items:center;
       justify-content:center;
@@ -97,6 +99,12 @@
       background:transparent;
       border:none;
       box-shadow:none;
+      padding:0;
+      cursor:pointer;
+    }
+
+    .hero-logo:active{
+      transform:scale(.98);
     }
 
     .hero-logo img{
@@ -513,7 +521,8 @@
       flex:1;
     }
 
-    .support-overlay{
+    .support-overlay,
+    .channel-overlay{
       position:fixed;
       inset:0;
       background: rgba(0,0,0,.72);
@@ -527,12 +536,14 @@
       padding:18px;
     }
 
-    .support-overlay.show{
+    .support-overlay.show,
+    .channel-overlay.show{
       opacity:1;
       pointer-events:auto;
     }
 
-    .support-card{
+    .support-card,
+    .channel-card{
       width: min(440px, 100%);
       border-radius: 24px;
       overflow:hidden;
@@ -547,12 +558,14 @@
       transition: transform .22s ease, opacity .22s ease;
     }
 
-    .support-overlay.show .support-card{
+    .support-overlay.show .support-card,
+    .channel-overlay.show .channel-card{
       transform: translateY(0) scale(1);
       opacity: 1;
     }
 
-    .support-head{
+    .support-head,
+    .channel-head{
       padding:16px 16px 10px 16px;
       display:flex;
       align-items:center;
@@ -562,14 +575,16 @@
       border-bottom: 1px solid rgba(255,255,255,.06);
     }
 
-    .support-title{
+    .support-title,
+    .channel-title{
       font-weight:900;
       letter-spacing:.25px;
       font-size:14px;
       color: rgba(234,241,255,.95);
     }
 
-    .support-x{
+    .support-x,
+    .channel-x{
       width:38px;
       height:38px;
       border-radius:14px;
@@ -582,16 +597,19 @@
       box-shadow: 0 12px 28px rgba(0,0,0,.32);
     }
 
-    .support-x:active{ transform: scale(.98); }
+    .support-x:active,
+    .channel-x:active{ transform: scale(.98); }
 
-    .support-body{
+    .support-body,
+    .channel-body{
       padding:14px 16px 16px 16px;
       display:flex;
       flex-direction:column;
       gap:12px;
     }
 
-    .support-text{
+    .support-text,
+    .channel-text{
       margin:0;
       font-size:13px;
       line-height: 1.35;
@@ -628,9 +646,13 @@
     }
 
     @media (max-width: 360px){
+      .hero-logo-wrap{
+        margin-left:-10px;
+      }
+
       .hero-logo{
-        width:64px;
-        height:64px;
+        width:72px;
+        height:72px;
       }
 
       .balance-mini{ width: min(196px, 68%); height: 36px; }
@@ -666,7 +688,8 @@
     @media (prefers-reduced-motion: reduce){
       *{ transition:none !important; }
       .support-overlay.show .support-card,
-      .menu-overlay.show .menu-sheet{ transform:none !important; }
+      .menu-overlay.show .menu-sheet,
+      .channel-overlay.show .channel-card{ transform:none !important; }
     }
   </style>
 </head>
@@ -676,9 +699,9 @@
     <div class="content">
 
       <div class="hero-logo-wrap">
-        <div class="hero-logo" aria-label="Логотип Vezus Game">
+        <button class="hero-logo" id="brandLogoBtn" aria-label="Открыть Telegram канал Vezus Game">
           <img src="https://i.postimg.cc/qvL497mF/Picsart-26-02-27-02-02-37-502.png" alt="Vezus Game">
-        </div>
+        </button>
       </div>
 
       <div class="top-row">
@@ -826,6 +849,29 @@
     </div>
   </div>
 
+  <div class="channel-overlay" id="channelOverlay" aria-hidden="true">
+    <div class="channel-card" role="dialog" aria-modal="true" aria-label="Telegram канал">
+      <div class="channel-head">
+        <div class="channel-title">Наш Telegram канал</div>
+        <button class="channel-x" id="channelClose" aria-label="Закрыть">✕</button>
+      </div>
+
+      <div class="channel-body">
+        <p class="channel-text">
+          Нажми кнопку ниже — откроется наш Telegram канал:
+          <b>@vezuspubg</b>
+        </p>
+
+        <button class="tg-btn" id="goChannel" aria-label="Перейти в Telegram канал">
+          <svg class="tg-ico" viewBox="0 0 240 240" aria-hidden="true">
+            <path fill="#fff" d="M120 0C53.7 0 0 53.7 0 120s53.7 120 120 120 120-53.7 120-120S186.3 0 120 0zm58.7 82.3l-19.7 92.8c-1.5 6.6-5.4 8.2-10.9 5.1l-30.2-22.3-14.6 14c-1.6 1.6-3 3-6.1 3l2.2-31.6 57.5-52c2.5-2.2-.5-3.4-3.9-1.2l-71 44.7-30.6-9.6c-6.6-2.1-6.7-6.6 1.4-9.7l119.6-46.1c5.5-2 10.3 1.3 8.8 9.9z"/>
+          </svg>
+          Перейти в Telegram канал
+        </button>
+      </div>
+    </div>
+  </div>
+
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
   <script>
@@ -932,6 +978,14 @@
 
     function goTo(file){
       window.location.href = file;
+    }
+
+    function openTelegramLinkSafe(url){
+      if (window.Telegram && window.Telegram.WebApp && typeof window.Telegram.WebApp.openTelegramLink === 'function') {
+        window.Telegram.WebApp.openTelegramLink(url);
+        return;
+      }
+      window.open(url, '_blank', 'noopener');
     }
 
     balanceChipEl.addEventListener('click', () => goTo(FILES.wallet));
@@ -1061,22 +1115,43 @@
       if (e.target === supportOverlay) closeSupport();
     });
 
-    function openTelegramLinkSafe(url){
-      if (window.Telegram && window.Telegram.WebApp && typeof window.Telegram.WebApp.openTelegramLink === 'function') {
-        window.Telegram.WebApp.openTelegramLink(url);
-        return;
-      }
-      window.open(url, '_blank', 'noopener');
-    }
-
     goTelegram.addEventListener('click', () => {
       openTelegramLinkSafe('https://t.me/vezusmanager');
+    });
+
+    const brandLogoBtn = document.getElementById('brandLogoBtn');
+    const channelOverlay = document.getElementById('channelOverlay');
+    const channelClose = document.getElementById('channelClose');
+    const goChannel = document.getElementById('goChannel');
+
+    function openChannel(){
+      channelOverlay.classList.add('show');
+      channelOverlay.setAttribute('aria-hidden', 'false');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeChannel(){
+      channelOverlay.classList.remove('show');
+      channelOverlay.setAttribute('aria-hidden', 'true');
+      document.body.style.overflow = '';
+    }
+
+    brandLogoBtn.addEventListener('click', openChannel);
+    channelClose.addEventListener('click', closeChannel);
+
+    channelOverlay.addEventListener('click', (e) => {
+      if (e.target === channelOverlay) closeChannel();
+    });
+
+    goChannel.addEventListener('click', () => {
+      openTelegramLinkSafe('https://t.me/vezuspubg');
     });
 
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') {
         closeSupport();
         closeMenu();
+        closeChannel();
       }
     });
 
