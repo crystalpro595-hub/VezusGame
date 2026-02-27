@@ -7,7 +7,6 @@
 
   <link rel="preconnect" href="https://i.postimg.cc" crossorigin>
   <link rel="dns-prefetch" href="https://i.postimg.cc">
-
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
@@ -935,7 +934,6 @@
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
   <script>
-    const clamp = (n, min, max) => Math.max(min, Math.min(max, n));
     const VERIFY_URL = "https://lazrfierfbhwlduqlvws.functions.supabase.co/verify-telegram";
 
     const FILES = {
@@ -953,20 +951,14 @@
     const balanceChipEl  = document.getElementById('balanceChip');
     const profileBtnEl   = document.getElementById('profileBtn');
 
+    function clamp(n, min, max) {
+      return Math.max(min, Math.min(max, n));
+    }
+
     function formatVc(value) {
       const num = Number(value ?? 0);
       if (!Number.isFinite(num)) return '0 VC';
       return Number.isInteger(num) ? `${num} VC` : `${num.toFixed(2)} VC`;
-    }
-
-    function applyProfile(profile) {
-      if (!profile) return;
-      localStorage.setItem('tg_profile', JSON.stringify(profile));
-      balanceValueEl.textContent = formatVc(profile.balance);
-
-      const username = profile.username ? `@${profile.username}` : 'Профиль';
-      profileBtnEl.setAttribute('title', username);
-      profileBtnEl.setAttribute('aria-label', username);
     }
 
     function loadCachedProfile() {
@@ -981,34 +973,47 @@
       }
     }
 
-    function getRefCode() {
-      const fromTelegram =
-        (window.Telegram?.WebApp?.initDataUnsafe?.start_param || '')
-          .trim()
-          .toUpperCase();
+    function applyProfile(profile) {
+      if (!profile) return;
 
-      if (fromTelegram) return fromTelegram;
+      localStorage.setItem('tg_profile', JSON.stringify(profile));
+      balanceValueEl.textContent = formatVc(profile.balance);
 
-      const params = new URLSearchParams(window.location.search);
-
-      const fromTgQuery = (params.get('tgWebAppStartParam') || '')
-        .trim()
-        .toUpperCase();
-
-      if (fromTgQuery) return fromTgQuery;
-
-      const oldRef = (params.get('ref') || '')
-        .trim()
-        .toUpperCase();
-
-      return oldRef;
+      const username = profile.username ? `@${profile.username}` : 'Профиль';
+      profileBtnEl.setAttribute('title', username);
+      profileBtnEl.setAttribute('aria-label', username);
     }
 
-    function clearRefCodeFromUrl() {
-      const url = new URL(window.location.href);
-      url.searchParams.delete('ref');
-      url.searchParams.delete('tgWebAppStartParam');
-      history.replaceState({}, '', `${url.pathname}${url.search}${url.hash}`);
+    function getStartParam() {
+      try {
+        const tgStart = (window.Telegram?.WebApp?.initDataUnsafe?.start_param || '').trim();
+        if (tgStart) return tgStart.toUpperCase();
+
+        const url = new URL(window.location.href);
+
+        const q1 = (url.searchParams.get('tgWebAppStartParam') || '').trim();
+        if (q1) return q1.toUpperCase();
+
+        const q2 = (url.searchParams.get('startapp') || '').trim();
+        if (q2) return q2.toUpperCase();
+
+        const q3 = (url.searchParams.get('ref') || '').trim();
+        if (q3) return q3.toUpperCase();
+
+        return '';
+      } catch {
+        return '';
+      }
+    }
+
+    function clearStartParamsFromUrl() {
+      try {
+        const url = new URL(window.location.href);
+        url.searchParams.delete('tgWebAppStartParam');
+        url.searchParams.delete('startapp');
+        url.searchParams.delete('ref');
+        history.replaceState({}, '', `${url.pathname}${url.search}${url.hash}`);
+      } catch {}
     }
 
     async function autoAuthTelegram() {
@@ -1022,13 +1027,12 @@
         Telegram.WebApp.ready();
         if (typeof Telegram.WebApp.expand === 'function') Telegram.WebApp.expand();
         if (typeof Telegram.WebApp.setHeaderColor === 'function') Telegram.WebApp.setHeaderColor('#020617');
-      } catch (e) {}
+      } catch {}
 
       const initData = Telegram.WebApp.initData;
       if (!initData) return;
 
-      const refCode = getRefCode();
-
+      const refCode = getStartParam();
       balanceValueEl.textContent = '...';
 
       try {
@@ -1056,9 +1060,9 @@
         }
 
         if (refCode) {
-          clearRefCodeFromUrl();
+          clearStartParamsFromUrl();
         }
-      } catch (err) {
+      } catch {
         if (cached) applyProfile(cached);
         else balanceValueEl.textContent = '0 VC';
       }
@@ -1102,7 +1106,7 @@
 
     function updateDotsByScroll(){
       const idx = getCurrentIndex();
-      dots.forEach((d,i)=>d.classList.toggle('active', i === idx));
+      dots.forEach((d, i) => d.classList.toggle('active', i === idx));
     }
 
     let rafId = null;
@@ -1149,7 +1153,7 @@
       resumeTimeout = setTimeout(startAutoplay, RESUME_DELAY);
     }
 
-    ['pointerdown','touchstart','mousedown','wheel'].forEach(evt => {
+    ['pointerdown', 'touchstart', 'mousedown', 'wheel'].forEach(evt => {
       slides.addEventListener(evt, pauseAndResume, { passive:true });
     });
 
