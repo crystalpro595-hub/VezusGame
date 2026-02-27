@@ -5,18 +5,25 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Vezus Game</title>
 
+  <link rel="preconnect" href="https://i.postimg.cc" crossorigin>
+  <link rel="dns-prefetch" href="https://i.postimg.cc">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  <link rel="preload" as="image" href="https://i.postimg.cc/qvL497mF/Picsart-26-02-27-02-02-37-502.png">
+  <link rel="preload" as="image" href="https://i.postimg.cc/kgfc4B78/Picsart-26-02-26-17-32-07-162.jpg">
+
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
 
   <style>
     :root{
       --text:#eaf1ff;
-      --muted:rgba(234,241,255,.72);
       --safe-bottom: env(safe-area-inset-bottom, 0px);
       --safe-top: env(safe-area-inset-top, 0px);
       --radius:18px;
 
       --glass: rgba(12, 14, 20, .74);
-      --glass-2: rgba(14, 16, 24, .94);
       --stroke: rgba(255,255,255,.08);
       --shadow: 0 18px 42px rgba(0,0,0,.48);
       --shadow-soft: 0 12px 28px rgba(0,0,0,.34);
@@ -63,13 +70,14 @@
       overflow:auto;
       padding: calc(4px + var(--safe-top)) 16px calc(28px + var(--safe-bottom)) 16px;
       z-index:1;
+      overscroll-behavior: contain;
     }
 
     .content{
       margin-top:0;
       display:flex;
       flex-direction:column;
-      gap:16px;
+      gap:14px;
       width:100%;
       max-width:520px;
       margin-left:auto;
@@ -79,62 +87,20 @@
       align-items:center;
     }
 
-    .hero-logo-wrap{
-      width:100%;
-      max-width:520px;
-      display:flex;
-      justify-content:flex-start;
-      align-items:center;
-      margin-left:-12px;
-      margin-bottom:-2px;
-    }
-
-    .hero-logo{
-      width:82px;
-      height:82px;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      flex:0 0 auto;
-      background:transparent;
-      border:none;
-      box-shadow:none;
-      padding:0;
-      cursor:pointer;
-    }
-
-    .hero-logo:active{
-      transform:scale(.98);
-    }
-
-    .hero-logo img{
-      width:100%;
-      height:100%;
-      object-fit:contain;
-      display:block;
-    }
-
+    /* ===== Верхний ряд ===== */
     .top-row{
       width:100%;
       max-width:520px;
-      display:flex;
+      display:grid;
+      grid-template-columns:38px 38px minmax(0,1fr) 54px;
       align-items:center;
-      justify-content:center;
-      gap:16px;
+      gap:8px;
     }
 
-    .left-buttons{
-      display:flex;
-      align-items:center;
-      gap:10px;
-      transform: translateX(-10px);
-      flex: 0 0 auto;
-    }
-
-    .menu-btn, .profile-btn{
-      width:42px;
-      height:42px;
-      border-radius:14px;
+    .icon-btn{
+      width:38px;
+      height:38px;
+      border-radius:13px;
       border:1px solid var(--stroke);
       cursor:pointer;
       background: var(--glass);
@@ -146,13 +112,14 @@
       transition: transform .15s ease, background .15s ease;
       padding:0;
       overflow:hidden;
+      flex:0 0 auto;
     }
 
-    .menu-btn:active, .profile-btn:active{ transform: scale(.98); }
+    .icon-btn:active{ transform: scale(.98); }
 
     .burger{
-      width:18px;
-      height:14px;
+      width:16px;
+      height:12px;
       display:grid;
       gap:3px;
     }
@@ -165,24 +132,25 @@
     }
 
     .profile-svg{
-      width:20px;
-      height:20px;
+      width:18px;
+      height:18px;
       display:block;
       stroke: rgba(234,241,255,.92);
-      fill: none;
-      stroke-width: 2;
-      stroke-linecap: round;
-      stroke-linejoin: round;
+      fill:none;
+      stroke-width:2;
+      stroke-linecap:round;
+      stroke-linejoin:round;
     }
 
     .balance-mini{
-      width:min(214px, 70%);
-      height:40px;
+      width:100%;
+      min-width:0;
+      height:42px;
       border-radius:999px;
       display:flex;
       align-items:center;
       justify-content:space-between;
-      gap:10px;
+      gap:8px;
       padding:6px 7px 6px 12px;
       position:relative;
       overflow:hidden;
@@ -191,7 +159,6 @@
       box-shadow: var(--shadow), inset 0 1px 0 rgba(255,255,255,.04);
       backdrop-filter: blur(10px);
       -webkit-backdrop-filter: blur(10px);
-      flex: 0 1 auto;
     }
 
     .balance-mini::before{
@@ -212,12 +179,13 @@
       letter-spacing:.2px;
       color: rgba(234,241,255,.92);
       white-space:nowrap;
+      flex:0 1 auto;
     }
 
     .bal-amount{
       position:relative;
       z-index:1;
-      height:26px;
+      height:28px;
       border:none;
       border-radius:999px;
       cursor:pointer;
@@ -232,10 +200,37 @@
       font-weight:900;
       font-size:13px;
       white-space:nowrap;
+      flex:0 0 auto;
+      min-width:88px;
     }
 
     .bal-amount:active{ transform: scale(.99); }
 
+    .hero-logo{
+      width:54px;
+      height:54px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background:transparent;
+      border:none;
+      box-shadow:none;
+      padding:0;
+      cursor:pointer;
+      margin-right:-2px;
+      flex:0 0 auto;
+    }
+
+    .hero-logo:active{ transform:scale(.98); }
+
+    .hero-logo img{
+      width:100%;
+      height:100%;
+      object-fit:contain;
+      display:block;
+    }
+
+    /* ===== Баннер ===== */
     .slider{
       width:100%;
       max-width:520px;
@@ -275,8 +270,8 @@
       inset:0;
       width:100%;
       height:100%;
-      object-fit: cover;
-      object-position: center;
+      object-fit:cover;
+      object-position:center;
       display:block;
     }
 
@@ -310,6 +305,7 @@
       transform: translateY(-.5px);
     }
 
+    /* ===== Карточки ===== */
     .actions{
       width:100%;
       max-width:520px;
@@ -337,18 +333,19 @@
 
     .action-btn:active{ transform: scale(.985); }
 
-    .action-btn .bg{
+    .action-img{
       position:absolute;
       inset:0;
-      background-image: var(--bg);
-      background-size: cover;
-      background-position: center;
-      background-repeat:no-repeat;
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      object-position:center;
+      display:block;
       transform: scale(1.03);
       filter: saturate(1.02) contrast(1.02);
     }
 
-    .action-btn .bg::after{
+    .action-btn::before{
       content:"";
       position:absolute;
       inset:0;
@@ -356,6 +353,7 @@
         linear-gradient(180deg, rgba(0,0,0,.04), rgba(0,0,0,.52)),
         radial-gradient(120px 70px at 50% 100%, rgba(255,255,255,.04), transparent 70%);
       pointer-events:none;
+      z-index:1;
     }
 
     .action-btn .label{
@@ -373,8 +371,10 @@
       color: rgba(234,241,255,.96);
       background: linear-gradient(180deg, rgba(0,0,0,.00), rgba(0,0,0,.64));
       text-shadow: 0 10px 18px rgba(0,0,0,.55);
+      z-index:2;
     }
 
+    /* ===== Меню ===== */
     .menu-overlay{
       position:fixed;
       inset:0;
@@ -386,7 +386,7 @@
       display:flex;
       align-items:flex-end;
       justify-content:center;
-      padding: 16px 16px calc(16px + var(--safe-bottom)) 16px;
+      padding:16px 16px calc(16px + var(--safe-bottom)) 16px;
     }
 
     .menu-overlay.show{
@@ -420,7 +420,7 @@
       height:5px;
       border-radius:999px;
       background: rgba(255,255,255,.16);
-      margin: 10px auto 2px auto;
+      margin:10px auto 2px auto;
     }
 
     .menu-sheet-head{
@@ -428,7 +428,7 @@
       align-items:center;
       justify-content:space-between;
       gap:12px;
-      padding: 12px 14px 10px 14px;
+      padding:12px 14px 10px 14px;
     }
 
     .sheet-title{
@@ -459,7 +459,7 @@
       display:flex;
       flex-direction:column;
       gap:10px;
-      padding: 0 14px 16px 14px;
+      padding:0 14px 16px 14px;
     }
 
     .menu-card{
@@ -521,6 +521,7 @@
       flex:1;
     }
 
+    /* ===== Попапы ===== */
     .support-overlay,
     .channel-overlay{
       position:fixed;
@@ -544,8 +545,8 @@
 
     .support-card,
     .channel-card{
-      width: min(440px, 100%);
-      border-radius: 24px;
+      width:min(440px, 100%);
+      border-radius:24px;
       overflow:hidden;
       background: rgba(14,16,24,.94);
       border: 1px solid rgba(255,255,255,.08);
@@ -561,7 +562,7 @@
     .support-overlay.show .support-card,
     .channel-overlay.show .channel-card{
       transform: translateY(0) scale(1);
-      opacity: 1;
+      opacity:1;
     }
 
     .support-head,
@@ -588,7 +589,7 @@
       width:38px;
       height:38px;
       border-radius:14px;
-      border: 1px solid rgba(255,255,255,.08);
+      border:1px solid rgba(255,255,255,.08);
       background: rgba(255,255,255,.05);
       color: rgba(234,241,255,.92);
       cursor:pointer;
@@ -612,7 +613,7 @@
     .channel-text{
       margin:0;
       font-size:13px;
-      line-height: 1.35;
+      line-height:1.35;
       color: rgba(234,241,255,.84);
     }
 
@@ -646,20 +647,48 @@
     }
 
     @media (max-width: 360px){
-      .hero-logo-wrap{
-        margin-left:-10px;
+      .top-row{
+        grid-template-columns:36px 36px minmax(0,1fr) 46px;
+        gap:6px;
+      }
+
+      .icon-btn{
+        width:36px;
+        height:36px;
+        border-radius:12px;
+      }
+
+      .profile-svg{
+        width:18px;
+        height:18px;
+      }
+
+      .burger{
+        width:16px;
+        height:12px;
+      }
+
+      .balance-mini{
+        height:38px;
+        padding:5px 6px 5px 10px;
+      }
+
+      .bal-title{
+        font-size:11px;
+      }
+
+      .bal-amount{
+        height:24px;
+        font-size:12px;
+        min-width:70px;
+        padding:0 8px;
       }
 
       .hero-logo{
-        width:72px;
-        height:72px;
+        width:46px;
+        height:46px;
+        margin-right:0;
       }
-
-      .balance-mini{ width: min(196px, 68%); height: 36px; }
-      .bal-amount{ height: 25px; font-size: 12px; }
-      .menu-btn, .profile-btn{ width: 40px; height: 40px; border-radius: 13px; }
-      .left-buttons{ transform: translateX(-8px); }
-      .top-row{ gap: 14px; }
 
       .menu-card{
         padding:10px;
@@ -682,7 +711,10 @@
         font-size:12px;
       }
 
-      .tg-btn{ height: 48px; border-radius: 15px; }
+      .tg-btn{
+        height:48px;
+        border-radius:15px;
+      }
     }
 
     @media (prefers-reduced-motion: reduce){
@@ -698,27 +730,19 @@
   <div class="app" id="appRoot">
     <div class="content">
 
-      <div class="hero-logo-wrap">
-        <button class="hero-logo" id="brandLogoBtn" aria-label="Открыть Telegram канал Vezus Game">
-          <img src="https://i.postimg.cc/qvL497mF/Picsart-26-02-27-02-02-37-502.png" alt="Vezus Game">
-        </button>
-      </div>
-
       <div class="top-row">
-        <div class="left-buttons">
-          <button class="menu-btn" id="menuBtn" aria-label="Открыть меню">
-            <div class="burger" aria-hidden="true">
-              <span></span><span></span><span></span>
-            </div>
-          </button>
+        <button class="icon-btn" id="menuBtn" aria-label="Открыть меню">
+          <div class="burger" aria-hidden="true">
+            <span></span><span></span><span></span>
+          </div>
+        </button>
 
-          <button class="profile-btn" id="profileBtn" aria-label="Профиль" title="Профиль">
-            <svg class="profile-svg" viewBox="0 0 24 24" aria-hidden="true">
-              <path d="M20 21a8 8 0 0 0-16 0"></path>
-              <circle cx="12" cy="8" r="4"></circle>
-            </svg>
-          </button>
-        </div>
+        <button class="icon-btn" id="profileBtn" aria-label="Профиль" title="Профиль">
+          <svg class="profile-svg" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M20 21a8 8 0 0 0-16 0"></path>
+            <circle cx="12" cy="8" r="4"></circle>
+          </svg>
+        </button>
 
         <div class="balance-mini" aria-label="Баланс">
           <span class="bal-title">Баланс</span>
@@ -726,18 +750,44 @@
             <span id="balanceValue">...</span>
           </button>
         </div>
+
+        <button class="hero-logo" id="brandLogoBtn" aria-label="Открыть Telegram канал Vezus Game">
+          <img
+            src="https://i.postimg.cc/qvL497mF/Picsart-26-02-27-02-02-37-502.png"
+            alt="Vezus Game"
+            loading="eager"
+            fetchpriority="high"
+            decoding="async"
+          >
+        </button>
       </div>
 
       <div class="slider" aria-label="Баннеры">
         <div class="slides" id="slides">
           <div class="slide">
-            <img src="https://i.postimg.cc/kgfc4B78/Picsart-26-02-26-17-32-07-162.jpg" alt="Banner 1">
+            <img
+              src="https://i.postimg.cc/kgfc4B78/Picsart-26-02-26-17-32-07-162.jpg"
+              alt="Banner 1"
+              loading="eager"
+              fetchpriority="high"
+              decoding="async"
+            >
           </div>
           <div class="slide">
-            <img src="https://i.postimg.cc/85VtJ6hd/Picsart-26-02-17-16-56-47-885.png" alt="Banner 2">
+            <img
+              src="https://i.postimg.cc/85VtJ6hd/Picsart-26-02-17-16-56-47-885.png"
+              alt="Banner 2"
+              loading="lazy"
+              decoding="async"
+            >
           </div>
           <div class="slide">
-            <img src="https://i.postimg.cc/YCPP62Bz/Picsart-26-02-15-18-03-19-524.jpg" alt="Banner 3">
+            <img
+              src="https://i.postimg.cc/YCPP62Bz/Picsart-26-02-15-18-03-19-524.jpg"
+              alt="Banner 3"
+              loading="lazy"
+              decoding="async"
+            >
           </div>
         </div>
 
@@ -749,21 +799,36 @@
       </div>
 
       <div class="actions" aria-label="Разделы">
-        <button class="action-btn" id="btnGames"
-          style="--bg:url('https://i.postimg.cc/8khGybLS/d9e9d314-fd90-4cad-ad74-b2ed14a51f38.png');">
-          <div class="bg" aria-hidden="true"></div>
+        <button class="action-btn" id="btnGames" type="button">
+          <img
+            class="action-img"
+            src="https://i.postimg.cc/8khGybLS/d9e9d314-fd90-4cad-ad74-b2ed14a51f38.png"
+            alt="Игры"
+            loading="lazy"
+            decoding="async"
+          >
           <div class="label">Игры</div>
         </button>
 
-        <button class="action-btn" id="btnShop"
-          style="--bg:url('https://i.postimg.cc/XvWZvSqj/file-0000000059bc72438dd485df46f69309-(1).png');">
-          <div class="bg" aria-hidden="true"></div>
+        <button class="action-btn" id="btnShop" type="button">
+          <img
+            class="action-img"
+            src="https://i.postimg.cc/XvWZvSqj/file-0000000059bc72438dd485df46f69309-(1).png"
+            alt="UC Shop"
+            loading="lazy"
+            decoding="async"
+          >
           <div class="label">UC Shop</div>
         </button>
 
-        <button class="action-btn" id="btnCustom"
-          style="--bg:url('https://i.postimg.cc/TY9sZp02/46F82521-51BE-4FB1-B831-B19958E9872E.png');">
-          <div class="bg" aria-hidden="true"></div>
+        <button class="action-btn" id="btnCustom" type="button">
+          <img
+            class="action-img"
+            src="https://i.postimg.cc/TY9sZp02/46F82521-51BE-4FB1-B831-B19958E9872E.png"
+            alt="Кастомки"
+            loading="lazy"
+            decoding="async"
+          >
           <div class="label">Кастомки</div>
         </button>
       </div>
@@ -893,8 +958,6 @@
     const balanceChipEl  = document.getElementById('balanceChip');
     const profileBtnEl   = document.getElementById('profileBtn');
 
-    let telegramProfile = null;
-
     function formatVc(value) {
       const num = Number(value ?? 0);
       if (!Number.isFinite(num)) return '0 VC';
@@ -903,10 +966,7 @@
 
     function applyProfile(profile) {
       if (!profile) return;
-
-      telegramProfile = profile;
       localStorage.setItem('tg_profile', JSON.stringify(profile));
-
       balanceValueEl.textContent = formatVc(profile.balance);
 
       const username = profile.username ? `@${profile.username}` : 'Профиль';
@@ -931,24 +991,16 @@
       if (cached) applyProfile(cached);
       else balanceValueEl.textContent = '0 VC';
 
-      if (!window.Telegram || !window.Telegram.WebApp) {
-        console.warn('Сайт открыт не в Telegram Mini App');
-        return;
-      }
+      if (!window.Telegram || !window.Telegram.WebApp) return;
 
       try {
         Telegram.WebApp.ready();
         if (typeof Telegram.WebApp.expand === 'function') Telegram.WebApp.expand();
         if (typeof Telegram.WebApp.setHeaderColor === 'function') Telegram.WebApp.setHeaderColor('#020617');
-      } catch (e) {
-        console.warn('Telegram WebApp init warning:', e);
-      }
+      } catch (e) {}
 
       const initData = Telegram.WebApp.initData;
-      if (!initData) {
-        console.warn('Нет initData');
-        return;
-      }
+      if (!initData) return;
 
       balanceValueEl.textContent = '...';
 
@@ -962,7 +1014,6 @@
         const json = await res.json().catch(() => ({}));
 
         if (!res.ok || !json.ok || !json.profile) {
-          console.error('Ошибка авторизации:', json);
           if (cached) applyProfile(cached);
           else balanceValueEl.textContent = '0 VC';
           return;
@@ -970,7 +1021,6 @@
 
         applyProfile(json.profile);
       } catch (err) {
-        console.error('Ошибка запроса авторизации:', err);
         if (cached) applyProfile(cached);
         else balanceValueEl.textContent = '0 VC';
       }
