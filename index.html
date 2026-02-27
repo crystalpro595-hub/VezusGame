@@ -981,15 +981,34 @@
       }
     }
 
-    function getRefCodeFromUrl() {
-      return (new URLSearchParams(window.location.search).get('ref') || '')
+    function getRefCode() {
+      const fromTelegram =
+        (window.Telegram?.WebApp?.initDataUnsafe?.start_param || '')
+          .trim()
+          .toUpperCase();
+
+      if (fromTelegram) return fromTelegram;
+
+      const params = new URLSearchParams(window.location.search);
+
+      const fromTgQuery = (params.get('tgWebAppStartParam') || '')
         .trim()
         .toUpperCase();
+
+      if (fromTgQuery) return fromTgQuery;
+
+      const oldRef = (params.get('ref') || '')
+        .trim()
+        .toUpperCase();
+
+      return oldRef;
     }
 
     function clearRefCodeFromUrl() {
-      const cleanUrl = `${window.location.pathname}${window.location.hash || ''}`;
-      history.replaceState({}, '', cleanUrl);
+      const url = new URL(window.location.href);
+      url.searchParams.delete('ref');
+      url.searchParams.delete('tgWebAppStartParam');
+      history.replaceState({}, '', `${url.pathname}${url.search}${url.hash}`);
     }
 
     async function autoAuthTelegram() {
@@ -1008,7 +1027,7 @@
       const initData = Telegram.WebApp.initData;
       if (!initData) return;
 
-      const refCode = getRefCodeFromUrl();
+      const refCode = getRefCode();
 
       balanceValueEl.textContent = '...';
 
