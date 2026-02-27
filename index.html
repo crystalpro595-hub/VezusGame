@@ -78,6 +78,34 @@
       align-items:center;
     }
 
+    .hero-logo-wrap{
+      width:100%;
+      max-width:520px;
+      display:flex;
+      justify-content:flex-start;
+      align-items:center;
+      padding-left:2px;
+    }
+
+    .hero-logo{
+      width:72px;
+      height:72px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      flex:0 0 auto;
+      background:transparent;
+      border:none;
+      box-shadow:none;
+    }
+
+    .hero-logo img{
+      width:100%;
+      height:100%;
+      object-fit:contain;
+      display:block;
+    }
+
     .top-row{
       width:100%;
       max-width:520px;
@@ -339,7 +367,6 @@
       text-shadow: 0 10px 18px rgba(0,0,0,.55);
     }
 
-    /* ===== Вертикальное меню ===== */
     .menu-overlay{
       position:fixed;
       inset:0;
@@ -486,7 +513,6 @@
       flex:1;
     }
 
-    /* ===== Support ===== */
     .support-overlay{
       position:fixed;
       inset:0;
@@ -602,6 +628,11 @@
     }
 
     @media (max-width: 360px){
+      .hero-logo{
+        width:64px;
+        height:64px;
+      }
+
       .balance-mini{ width: min(196px, 68%); height: 36px; }
       .bal-amount{ height: 25px; font-size: 12px; }
       .menu-btn, .profile-btn{ width: 40px; height: 40px; border-radius: 13px; }
@@ -643,6 +674,12 @@
 <body>
   <div class="app" id="appRoot">
     <div class="content">
+
+      <div class="hero-logo-wrap">
+        <div class="hero-logo" aria-label="Логотип Vezus Game">
+          <img src="https://i.postimg.cc/qvL497mF/Picsart-26-02-27-02-02-37-502.png" alt="Vezus Game">
+        </div>
+      </div>
 
       <div class="top-row">
         <div class="left-buttons">
