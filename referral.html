@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Referral</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://i.postimg.cc" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --text:#eaf1ff;
+      --muted:rgba(234,241,255,.72);
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+      --safe-top: env(safe-area-inset-top, 0px);
+
+      --glass: rgba(12, 14, 20, .74);
+      --glass-2: rgba(14, 16, 24, .94);
+      --stroke: rgba(255,255,255,.08);
+      --shadow: 0 18px 42px rgba(0,0,0,.48);
+      --shadow-soft: 0 12px 28px rgba(0,0,0,.34);
+
+      --tg1:#2AABEE;
+      --tg2:#229ED9;
+
+      --radius:22px;
+    }
+
+    *{
+      box-sizing:border-box;
+      font-family:'Inter', sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html, body{
+      height:100%;
+      margin:0;
+      overflow:hidden;
+      color:var(--text);
+      background:#020617;
+    }
+
+    body{
+      background-image:url("https://i.postimg.cc/fbJT34yY/076E519D-F095-4957-88BF-5591DEB82533.png");
+      background-size:cover;
+      background-position:center;
+      background-repeat:no-repeat;
+    }
+
+    body::before{
+      content:"";
+      position:fixed;
+      inset:0;
+      background:
+        radial-gradient(900px 600px at 30% 10%, rgba(255,255,255,.05), transparent 60%),
+        linear-gradient(180deg, rgba(0,0,0,.40), rgba(0,0,0,.64));
+      pointer-events:none;
+      z-index:0;
+    }
+
+    .app{
+      position:relative;
+      height:100%;
+      overflow:auto;
+      padding: calc(6px + var(--safe-top)) 16px calc(28px + var(--safe-bottom)) 16px;
+      z-index:1;
+      overscroll-behavior: contain;
+    }
+
+    .content{
+      width:100%;
+      max-width:520px;
+      margin:0 auto;
+      display:flex;
+      flex-direction:column;
+      gap:14px;
+    }
+
+    .top-row{
+      width:100%;
+      display:grid;
+      grid-template-columns:40px minmax(0,1fr) 54px;
+      gap:8px;
+      align-items:center;
+    }
+
+    .icon-btn{
+      width:40px;
+      height:40px;
+      border:none;
+      border-radius:14px;
+      background: var(--glass);
+      border:1px solid var(--stroke);
+      box-shadow: var(--shadow-soft), inset 0 1px 0 rgba(255,255,255,.04);
+      display:grid;
+      place-items:center;
+      color:var(--text);
+      cursor:pointer;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      font-size:18px;
+      font-weight:900;
+      padding:0;
+    }
+
+    .icon-btn:active{ transform:scale(.98); }
+
+    .balance-mini{
+      width:100%;
+      min-width:0;
+      height:42px;
+      border-radius:999px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:8px;
+      padding:6px 7px 6px 12px;
+      position:relative;
+      overflow:hidden;
+      background: var(--glass);
+      border:1px solid var(--stroke);
+      box-shadow: var(--shadow), inset 0 1px 0 rgba(255,255,255,.04);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      cursor:pointer;
+    }
+
+    .balance-mini::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      background:
+        radial-gradient(180px 60px at 0% 0%, rgba(255,255,255,.05), transparent 55%),
+        radial-gradient(180px 60px at 100% 100%, rgba(255,255,255,.03), transparent 55%);
+      pointer-events:none;
+    }
+
+    .bal-title{
+      position:relative;
+      z-index:1;
+      font-size:12px;
+      font-weight:900;
+      color: rgba(234,241,255,.92);
+      white-space:nowrap;
+    }
+
+    .bal-amount{
+      position:relative;
+      z-index:1;
+      height:28px;
+      border:none;
+      border-radius:999px;
+      padding:0 10px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background: rgba(255,255,255,.08);
+      border:1px solid rgba(255,255,255,.08);
+      color: rgba(234,241,255,.98);
+      font-weight:900;
+      font-size:13px;
+      min-width:88px;
+      white-space:nowrap;
+    }
+
+    .logo-btn{
+      width:54px;
+      height:54px;
+      border:none;
+      background:transparent;
+      padding:0;
+      cursor:pointer;
+    }
+
+    .logo-btn:active{ transform:scale(.98); }
+
+    .logo-btn img{
+      width:100%;
+      height:100%;
+      object-fit:contain;
+      display:block;
+    }
+
+    .card{
+      border-radius: var(--radius);
+      background: var(--glass);
+      border:1px solid var(--stroke);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+
+    .hero-card{
+      padding:16px;
+      display:flex;
+      flex-direction:column;
+      gap:14px;
+    }
+
+    .title{
+      margin:0;
+      font-size:18px;
+      font-weight:900;
+      letter-spacing:.2px;
+    }
+
+    .sub{
+      margin:0;
+      font-size:13px;
+      color:var(--muted);
+      line-height:1.35;
+    }
+
+    .field{
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+    }
+
+    .field-label{
+      font-size:12px;
+      font-weight:900;
+      color:rgba(234,241,255,.9);
+    }
+
+    .input-row{
+      display:flex;
+      gap:8px;
+      width:100%;
+    }
+
+    .ref-input{
+      flex:1;
+      min-width:0;
+      height:46px;
+      border-radius:16px;
+      border:1px solid rgba(255,255,255,.08);
+      background: rgba(255,255,255,.06);
+      color: rgba(234,241,255,.96);
+      padding:0 12px;
+      outline:none;
+      font-weight:800;
+      font-size:13px;
+    }
+
+    .btn{
+      border:none;
+      cursor:pointer;
+      border-radius:16px;
+      font-weight:900;
+      transition: transform .15s ease, opacity .15s ease, box-shadow .15s ease;
+    }
+
+    .btn:active{ transform:scale(.98); }
+
+    .btn-blue{
+      height:46px;
+      min-width:96px;
+      padding:0 14px;
+      background: linear-gradient(180deg, var(--tg1), var(--tg2));
+      color:#fff;
+      box-shadow: 0 16px 30px rgba(34,158,217,.28);
+      font-size:13px;
+    }
+
+    .btn-primary{
+      width:100%;
+      height:50px;
+      background: linear-gradient(180deg, var(--tg1), var(--tg2));
+      color:#fff;
+      box-shadow: 0 18px 34px rgba(34,158,217,.28);
+      font-size:14px;
+      letter-spacing:.2px;
+    }
+
+    .btn-primary:disabled{
+      opacity:.55;
+      cursor:not-allowed;
+      box-shadow:none;
+      transform:none !important;
+    }
+
+    .stats-grid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:12px;
+    }
+
+    .stats-card{
+      padding:14px;
+    }
+
+    .stats-label{
+      font-size:12px;
+      font-weight:800;
+      color:var(--muted);
+      margin:0 0 8px 0;
+      line-height:1.25;
+    }
+
+    .stats-value{
+      margin:0;
+      font-size:22px;
+      font-weight:900;
+      color:#fff;
+      line-height:1.15;
+      word-break:break-word;
+    }
+
+    .earn-card{
+      padding:16px;
+      display:flex;
+      flex-direction:column;
+      gap:14px;
+    }
+
+    .earn-top{
+      display:flex;
+      align-items:flex-end;
+      justify-content:space-between;
+      gap:12px;
+    }
+
+    .earn-label{
+      margin:0;
+      font-size:13px;
+      font-weight:800;
+      color:var(--muted);
+    }
+
+    .earn-value{
+      margin:4px 0 0 0;
+      font-size:28px;
+      font-weight:900;
+      color:#fff;
+      line-height:1;
+    }
+
+    .info-card{
+      padding:16px;
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+    }
+
+    .info-title{
+      margin:0;
+      font-size:14px;
+      font-weight:900;
+    }
+
+    .rule{
+      margin:0;
+      font-size:13px;
+      line-height:1.42;
+      color:rgba(234,241,255,.9);
+    }
+
+    .toast{
+      position:fixed;
+      left:50%;
+      bottom:calc(18px + var(--safe-bottom));
+      transform:translateX(-50%) translateY(20px);
+      width:min(520px, calc(100% - 32px));
+      border-radius:18px;
+      background: rgba(12,14,20,.92);
+      border:1px solid rgba(255,255,255,.08);
+      box-shadow:0 20px 50px rgba(0,0,0,.45);
+      color:#fff;
+      padding:12px 14px;
+      font-size:13px;
+      font-weight:900;
+      opacity:0;
+      pointer-events:none;
+      transition:opacity .22s ease, transform .22s ease;
+      z-index:50;
+      text-align:center;
+    }
+
+    .toast.show{
+      opacity:1;
+      transform:translateX(-50%) translateY(0);
+    }
+
+    @media (max-width: 360px){
+      .top-row{
+        grid-template-columns:36px minmax(0,1fr) 46px;
+        gap:6px;
+      }
+
+      .icon-btn{
+        width:36px;
+        height:36px;
+        border-radius:12px;
+      }
+
+      .logo-btn{
+        width:46px;
+        height:46px;
+      }
+
+      .balance-mini{
+        height:38px;
+      }
+
+      .bal-amount{
+        min-width:74px;
+        height:24px;
+        font-size:12px;
+      }
+
+      .btn-blue{
+        min-width:84px;
+        font-size:12px;
+      }
+
+      .stats-value{
+        font-size:19px;
+      }
+
+      .earn-value{
+        font-size:24px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce){
+      *{ transition:none !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <div class="content">
+
+      <div class="top-row">
+        <button class="icon-btn" id="backBtn" aria-label="Назад">←</button>
+
+        <div class="balance-mini" id="balanceChip" aria-label="Баланс">
+          <span class="bal-title">Баланс</span>
+          <div class="bal-amount" id="balanceValue">...</div>
+        </div>
+
+        <button class="logo-btn" id="logoBtn" aria-label="Telegram канал">
+          <img
+            src="https://i.postimg.cc/qvL497mF/Picsart-26-02-27-02-02-37-502.png"
+            alt="Vezus"
+            loading="eager"
+            decoding="async"
+          >
+        </button>
+      </div>
+
+      <div class="card hero-card">
+        <h1 class="title">Реферальная система</h1>
+        <p class="sub">
+          Приглашай друзей и получай награды. За нового друга — <b>5 VC</b>.
+          Когда его общие траты достигнут <b>1000 VC</b> — ты получишь ещё <b>50 VC</b>.
+        </p>
+
+        <div class="field">
+          <div class="field-label">Твоя ссылка</div>
+          <div class="input-row">
+            <input class="ref-input" id="refLinkInput" readonly value="Загрузка...">
+            <button class="btn btn-blue" id="copyLinkBtn">Ссылка</button>
+          </div>
+        </div>
+
+        <div class="field">
+          <div class="field-label">Твой код</div>
+          <div class="input-row">
+            <input class="ref-input" id="refCodeInput" readonly value="...">
+            <button class="btn btn-blue" id="copyCodeBtn">Код</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="stats-grid">
+        <div class="card stats-card">
+          <p class="stats-label">Приглашено друзей</p>
+          <p class="stats-value" id="invitedCount">0</p>
+        </div>
+
+        <div class="card stats-card">
+          <p class="stats-label">Уже забрано</p>
+          <p class="stats-value" id="claimedTotal">0 VC</p>
+        </div>
+      </div>
+
+      <div class="card earn-card">
+        <div class="earn-top">
+          <div>
+            <p class="earn-label">Заработок с друзей</p>
+            <p class="earn-value" id="pendingValue">0 VC</p>
+          </div>
+        </div>
+
+        <button class="btn btn-primary" id="claimBtn" disabled>Забрать на баланс</button>
+      </div>
+
+      <div class="card info-card">
+        <p class="info-title">Правила</p>
+        <p class="rule">• За каждого нового приглашённого: <b>+5 VC</b> в реферальный заработок</p>
+        <p class="rule">• Когда друг суммарно потратит <b>1000 VC</b> в любом разделе сайта: ещё <b>+50 VC</b></p>
+        <p class="rule">• Награды сначала копятся отдельно, потом ты сам нажимаешь <b>«Забрать на баланс»</b></p>
+        <p class="rule">• Самого себя пригласить нельзя</p>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="toast" id="toast">Скопировано</div>
+
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <script>
+    const VERIFY_URL = "https://lazrfierfbhwlduqlvws.functions.supabase.co/verify-telegram";
+    const CLAIM_REFERRAL_URL = "https://lazrfierfbhwlduqlvws.functions.supabase.co/claim-referral-rewards";
+
+    const FILES = {
+      index: "index.html",
+      wallet: "wallet.html"
+    };
+
+    const $ = (id) => document.getElementById(id);
+
+    let currentPending = 0;
+    let currentClaimed = 0;
+    let currentInvited = 0;
+    let currentCode = "";
+    let isClaiming = false;
+
+    function formatVc(value){
+      const num = Number(value ?? 0);
+      if (!Number.isFinite(num)) return "0 VC";
+      return Number.isInteger(num) ? `${num} VC` : `${num.toFixed(2)} VC`;
+    }
+
+    function showToast(text){
+      const el = $("toast");
+      el.textContent = text;
+      el.classList.add("show");
+      clearTimeout(showToast._t);
+      showToast._t = setTimeout(() => el.classList.remove("show"), 2200);
+    }
+
+    async function copyText(text){
+      try{
+        if (!text || text === "—" || text === "Загрузка...") {
+          showToast("Нечего копировать");
+          return;
+        }
+
+        if (navigator.clipboard && window.isSecureContext) {
+          await navigator.clipboard.writeText(text);
+        } else {
+          const ta = document.createElement("textarea");
+          ta.value = text;
+          ta.style.position = "fixed";
+          ta.style.left = "-999999px";
+          document.body.appendChild(ta);
+          ta.focus();
+          ta.select();
+          document.execCommand("copy");
+          ta.remove();
+        }
+
+        showToast("Скопировано");
+      } catch {
+        showToast("Не удалось скопировать");
+      }
+    }
+
+    function goTo(file){
+      window.location.href = file;
+    }
+
+    function openTelegramLinkSafe(url){
+      if (window.Telegram && window.Telegram.WebApp && typeof window.Telegram.WebApp.openTelegramLink === "function") {
+        window.Telegram.WebApp.openTelegramLink(url);
+        return;
+      }
+      window.open(url, "_blank", "noopener");
+    }
+
+    function getTelegramInitData(){
+      if (!window.Telegram || !window.Telegram.WebApp) return "";
+
+      try{
+        Telegram.WebApp.ready();
+        if (typeof Telegram.WebApp.expand === "function") Telegram.WebApp.expand();
+      } catch {}
+
+      return Telegram.WebApp.initData || "";
+    }
+
+    function loadCachedProfile(){
+      try{
+        return JSON.parse(localStorage.getItem("tg_profile") || "null");
+      } catch {
+        return null;
+      }
+    }
+
+    function setClaimButtonState(){
+      const btn = $("claimBtn");
+      btn.disabled = isClaiming || currentPending <= 0;
+
+      if (isClaiming) {
+        btn.textContent = "Зачисление...";
+      } else if (currentPending > 0) {
+        btn.textContent = `Забрать ${formatVc(currentPending)}`;
+      } else {
+        btn.textContent = "Забрать на баланс";
+      }
+    }
+
+    function renderReferralStats(referral){
+      currentInvited = Number(referral?.invited_count || 0);
+      currentPending = Number(referral?.pending_vc || 0);
+      currentClaimed = Number(referral?.claimed_vc || 0);
+      currentCode = referral?.referral_code || "";
+
+      $("invitedCount").textContent = String(currentInvited);
+      $("claimedTotal").textContent = formatVc(currentClaimed);
+      $("pendingValue").textContent = formatVc(currentPending);
+      $("refCodeInput").value = currentCode || "—";
+
+      const base = new URL("index.html", window.location.href);
+      base.search = "";
+
+      $("refLinkInput").value = currentCode
+        ? `${base.href}?ref=${encodeURIComponent(currentCode)}`
+        : "—";
+
+      setClaimButtonState();
+    }
+
+    function updateBalanceUI(value){
+      $("balanceValue").textContent = formatVc(value);
+    }
+
+    async function loadReferralPage(){
+      const cached = loadCachedProfile();
+
+      if (cached?.balance != null) {
+        updateBalanceUI(cached.balance);
+      } else {
+        updateBalanceUI(0);
+      }
+
+      const initData = getTelegramInitData();
+      if (!initData) {
+        $("refLinkInput").value = "Открой страницу в Telegram";
+        $("refCodeInput").value = "—";
+        renderReferralStats({});
+        return;
+      }
+
+      const refCodeFromUrl = (new URLSearchParams(window.location.search).get("ref") || "")
+        .trim()
+        .toUpperCase();
+
+      try{
+        const res = await fetch(VERIFY_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            initData,
+            refCode: refCodeFromUrl
+          })
+        });
+
+        const json = await res.json().catch(() => ({}));
+
+        if (!res.ok || !json.ok || !json.profile) {
+          $("refLinkInput").value = "Ошибка загрузки";
+          $("refCodeInput").value = "—";
+          renderReferralStats({});
+          return;
+        }
+
+        localStorage.setItem("tg_profile", JSON.stringify(json.profile));
+        updateBalanceUI(json.profile.balance);
+
+        renderReferralStats(json.referral || {});
+
+        if (refCodeFromUrl) {
+          history.replaceState({}, "", window.location.pathname);
+        }
+      } catch {
+        $("refLinkInput").value = "Ошибка сети";
+        $("refCodeInput").value = "—";
+        renderReferralStats({});
+      }
+    }
+
+    async function claimReferralRewards(){
+      if (isClaiming || currentPending <= 0) return;
+
+      const initData = getTelegramInitData();
+      if (!initData) {
+        showToast("Открой страницу в Telegram");
+        return;
+      }
+
+      isClaiming = true;
+      setClaimButtonState();
+
+      try{
+        const res = await fetch(CLAIM_REFERRAL_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ initData })
+        });
+
+        const json = await res.json().catch(() => ({}));
+
+        if (!res.ok || !json.ok) {
+          showToast(json.error || "Ошибка зачисления");
+          return;
+        }
+
+        const claimedVc = Number(json.claimed_vc || 0);
+        const newBalance = Number(json.current_balance || 0);
+
+        currentClaimed += claimedVc;
+        currentPending = 0;
+
+        $("claimedTotal").textContent = formatVc(currentClaimed);
+        $("pendingValue").textContent = formatVc(currentPending);
+        updateBalanceUI(newBalance);
+        setClaimButtonState();
+
+        const cached = loadCachedProfile() || {};
+        cached.balance = newBalance;
+        localStorage.setItem("tg_profile", JSON.stringify(cached));
+
+        showToast(claimedVc > 0 ? `Зачислено ${formatVc(claimedVc)}` : "Нечего забирать");
+      } catch {
+        showToast("Ошибка сети");
+      } finally {
+        isClaiming = false;
+        setClaimButtonState();
+      }
+    }
+
+    $("copyLinkBtn").addEventListener("click", () => copyText($("refLinkInput").value));
+    $("copyCodeBtn").addEventListener("click", () => copyText($("refCodeInput").value));
+    $("claimBtn").addEventListener("click", claimReferralRewards);
+
+    $("backBtn").addEventListener("click", () => goTo(FILES.index));
+    $("balanceChip").addEventListener("click", () => goTo(FILES.wallet));
+    $("logoBtn").addEventListener("click", () => openTelegramLinkSafe("https://t.me/vezuspubg"));
+
+    window.addEventListener("load", loadReferralPage);
+  </script>
+</body>
+</html>
