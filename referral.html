@@ -593,9 +593,49 @@
       return Telegram.WebApp.initData || "";
     }
 
+    function getStartParam(){
+      try{
+        const tgStart = (window.Telegram?.WebApp?.initDataUnsafe?.start_param || "").trim();
+        if (tgStart) return tgStart.toUpperCase();
+
+        const url = new URL(window.location.href);
+
+        const q1 = (url.searchParams.get("tgWebAppStartParam") || "").trim();
+        if (q1) return q1.toUpperCase();
+
+        const q2 = (url.searchParams.get("startapp") || "").trim();
+        if (q2) return q2.toUpperCase();
+
+        const q3 = (url.searchParams.get("ref") || "").trim();
+        if (q3) return q3.toUpperCase();
+
+        return "";
+      } catch {
+        return "";
+      }
+    }
+
+    function clearStartParamsFromUrl(){
+      try{
+        const url = new URL(window.location.href);
+        url.searchParams.delete("tgWebAppStartParam");
+        url.searchParams.delete("startapp");
+        url.searchParams.delete("ref");
+        history.replaceState({}, "", `${url.pathname}${url.search}${url.hash}`);
+      } catch {}
+    }
+
     function loadCachedProfile(){
       try{
         return JSON.parse(localStorage.getItem("tg_profile") || "null");
+      } catch {
+        return null;
+      }
+    }
+
+    function loadCachedReferral(){
+      try{
+        return JSON.parse(localStorage.getItem("tg_referral") || "null");
       } catch {
         return null;
       }
@@ -618,7 +658,7 @@
       const invitedCount = Number(referral?.invited_count || 0);
       currentPending = Number(referral?.pending_vc || 0);
       currentClaimed = Number(referral?.claimed_vc || 0);
-      const code = referral?.referral_code || "";
+      const code = String(referral?.referral_code || "").trim();
 
       $("invitedCount").textContent = String(invitedCount);
       $("claimedTotal").textContent = formatVc(currentClaimed);
@@ -636,33 +676,41 @@
     }
 
     async function loadReferralPage(){
-      const cached = loadCachedProfile();
+      const cachedProfile = loadCachedProfile();
+      const cachedReferral = loadCachedReferral();
 
-      if (cached?.balance != null) {
-        updateBalanceUI(cached.balance);
-      } else {
-        updateBalanceUI(0);
-      }
+      if (cachedProfile?.balance != null) updateBalanceUI(cachedProfile.balance);
+      else updateBalanceUI(0);
+
+      if (cachedReferral) renderReferralStats(cachedReferral);
+      else renderReferralStats({});
 
       const initData = getTelegramInitData();
       if (!initData) {
-        $("refLinkInput").value = "Открой страницу в Telegram";
-        renderReferralStats({});
+        if (!$("refLinkInput").value || $("refLinkInput").value === "—") {
+          $("refLinkInput").value = "Открой страницу в Telegram";
+        }
         return;
       }
+
+      const refCode = getStartParam();
 
       try{
         const res = await fetch(VERIFY_URL, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ initData })
+          body: JSON.stringify({
+            initData,
+            refCode
+          })
         });
 
         const json = await res.json().catch(() => ({}));
 
         if (!res.ok || !json.ok || !json.profile) {
-          $("refLinkInput").value = "Ошибка загрузки";
-          renderReferralStats({});
+          if (!$("refLinkInput").value || $("refLinkInput").value === "—") {
+            $("refLinkInput").value = "Ошибка загрузки";
+          }
           return;
         }
 
@@ -673,9 +721,14 @@
 
         updateBalanceUI(json.profile.balance);
         renderReferralStats(json.referral || {});
+
+        if (refCode) {
+          clearStartParamsFromUrl();
+        }
       } catch {
-        $("refLinkInput").value = "Ошибка сети";
-        renderReferralStats({});
+        if (!$("refLinkInput").value || $("refLinkInput").value === "—") {
+          $("refLinkInput").value = "Ошибка сети";
+        }
       }
     }
 
@@ -716,9 +769,14 @@
         updateBalanceUI(newBalance);
         setClaimButtonState();
 
-        const cached = loadCachedProfile() || {};
-        cached.balance = newBalance;
-        localStorage.setItem("tg_profile", JSON.stringify(cached));
+        const cachedProfile = loadCachedProfile() || {};
+        cachedProfile.balance = newBalance;
+        localStorage.setItem("tg_profile", JSON.stringify(cachedProfile));
+
+        const cachedReferral = loadCachedReferral() || {};
+        cachedReferral.claimed_vc = currentClaimed;
+        cachedReferral.pending_vc = currentPending;
+        localStorage.setItem("tg_referral", JSON.stringify(cachedReferral));
 
         showToast(claimedVc > 0 ? `Зачислено ${formatVc(claimedVc)}` : "Нечего забирать");
       } catch {
