@@ -87,7 +87,6 @@
       align-items:center;
     }
 
-    /* ===== Верхний ряд ===== */
     .top-row{
       width:100%;
       max-width:520px;
@@ -230,7 +229,6 @@
       display:block;
     }
 
-    /* ===== Баннер ===== */
     .slider{
       width:100%;
       max-width:520px;
@@ -305,7 +303,6 @@
       transform: translateY(-.5px);
     }
 
-    /* ===== Карточки ===== */
     .actions{
       width:100%;
       max-width:520px;
@@ -374,7 +371,6 @@
       z-index:2;
     }
 
-    /* ===== Меню ===== */
     .menu-overlay{
       position:fixed;
       inset:0;
@@ -521,7 +517,6 @@
       flex:1;
     }
 
-    /* ===== Попапы ===== */
     .support-overlay,
     .channel-overlay{
       position:fixed;
@@ -986,6 +981,17 @@
       }
     }
 
+    function getRefCodeFromUrl() {
+      return (new URLSearchParams(window.location.search).get('ref') || '')
+        .trim()
+        .toUpperCase();
+    }
+
+    function clearRefCodeFromUrl() {
+      const cleanUrl = `${window.location.pathname}${window.location.hash || ''}`;
+      history.replaceState({}, '', cleanUrl);
+    }
+
     async function autoAuthTelegram() {
       const cached = loadCachedProfile();
       if (cached) applyProfile(cached);
@@ -1002,13 +1008,18 @@
       const initData = Telegram.WebApp.initData;
       if (!initData) return;
 
+      const refCode = getRefCodeFromUrl();
+
       balanceValueEl.textContent = '...';
 
       try {
         const res = await fetch(VERIFY_URL, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ initData })
+          body: JSON.stringify({
+            initData,
+            refCode
+          })
         });
 
         const json = await res.json().catch(() => ({}));
@@ -1020,6 +1031,14 @@
         }
 
         applyProfile(json.profile);
+
+        if (json.referral) {
+          localStorage.setItem('tg_referral', JSON.stringify(json.referral));
+        }
+
+        if (refCode) {
+          clearRefCodeFromUrl();
+        }
       } catch (err) {
         if (cached) applyProfile(cached);
         else balanceValueEl.textContent = '0 VC';
