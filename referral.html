@@ -63,8 +63,9 @@
       position:relative;
       height:100%;
       overflow:auto;
-      padding: calc(8px + var(--safe-top)) 16px calc(28px + var(--safe-bottom)) 16px;
+      padding: 0 16px calc(28px + var(--safe-bottom)) 16px;
       z-index:1;
+      overscroll-behavior: contain;
     }
 
     .content{
@@ -74,6 +75,23 @@
       display:flex;
       flex-direction:column;
       gap:14px;
+      position:relative;
+      z-index:1;
+    }
+
+    .sticky-top{
+      position:sticky;
+      top:0;
+      z-index:40;
+      padding-top: calc(8px + var(--safe-top));
+      padding-bottom:8px;
+      background:
+        linear-gradient(180deg,
+          rgba(2,6,23,.96) 0%,
+          rgba(2,6,23,.86) 72%,
+          rgba(2,6,23,0) 100%);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
     }
 
     .top-row{
@@ -425,22 +443,24 @@
   <div class="app">
     <div class="content">
 
-      <div class="top-row">
-        <button class="icon-btn" id="backBtn" aria-label="Назад">←</button>
+      <div class="sticky-top">
+        <div class="top-row">
+          <button class="icon-btn" id="backBtn" aria-label="Назад">←</button>
 
-        <div class="balance-mini" id="balanceChip" aria-label="Баланс">
-          <span class="bal-title">Баланс</span>
-          <div class="bal-amount" id="balanceValue">...</div>
+          <div class="balance-mini" id="balanceChip" aria-label="Баланс">
+            <span class="bal-title">Баланс</span>
+            <div class="bal-amount" id="balanceValue">...</div>
+          </div>
+
+          <button class="logo-btn" id="logoBtn" aria-label="Telegram канал">
+            <img
+              src="https://i.postimg.cc/qvL497mF/Picsart-26-02-27-02-02-37-502.png"
+              alt="Vezus"
+              loading="eager"
+              decoding="async"
+            >
+          </button>
         </div>
-
-        <button class="logo-btn" id="logoBtn" aria-label="Telegram канал">
-          <img
-            src="https://i.postimg.cc/qvL497mF/Picsart-26-02-27-02-02-37-502.png"
-            alt="Vezus"
-            loading="eager"
-            decoding="async"
-          >
-        </button>
       </div>
 
       <div class="card hero-card">
@@ -455,14 +475,6 @@
           <div class="input-row">
             <input class="ref-input" id="refLinkInput" readonly value="Загрузка...">
             <button class="btn btn-blue" id="copyLinkBtn">Ссылка</button>
-          </div>
-        </div>
-
-        <div class="field">
-          <div class="field-label">Твой код</div>
-          <div class="input-row">
-            <input class="ref-input" id="refCodeInput" readonly value="...">
-            <button class="btn btn-blue" id="copyCodeBtn">Код</button>
           </div>
         </div>
       </div>
@@ -504,6 +516,7 @@
   <script>
     const VERIFY_URL = "https://lazrfierfbhwlduqlvws.functions.supabase.co/verify-telegram";
     const CLAIM_REFERRAL_URL = "https://lazrfierfbhwlduqlvws.functions.supabase.co/claim-referral-rewards";
+    const BOT_USERNAME = "vezusgamebot";
 
     const FILES = {
       index: "index.html",
@@ -610,13 +623,9 @@
       $("invitedCount").textContent = String(invitedCount);
       $("claimedTotal").textContent = formatVc(currentClaimed);
       $("pendingValue").textContent = formatVc(currentPending);
-      $("refCodeInput").value = code || "—";
-
-      const base = new URL("index.html", window.location.href);
-      base.search = "";
 
       $("refLinkInput").value = code
-        ? `${base.href}?ref=${encodeURIComponent(code)}`
+        ? `https://t.me/${BOT_USERNAME}?startapp=${encodeURIComponent(code)}`
         : "—";
 
       setClaimButtonState();
@@ -638,44 +647,34 @@
       const initData = getTelegramInitData();
       if (!initData) {
         $("refLinkInput").value = "Открой страницу в Telegram";
-        $("refCodeInput").value = "—";
         renderReferralStats({});
         return;
       }
-
-      const refCodeFromUrl = (new URLSearchParams(window.location.search).get("ref") || "")
-        .trim()
-        .toUpperCase();
 
       try{
         const res = await fetch(VERIFY_URL, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            initData,
-            refCode: refCodeFromUrl
-          })
+          body: JSON.stringify({ initData })
         });
 
         const json = await res.json().catch(() => ({}));
 
         if (!res.ok || !json.ok || !json.profile) {
           $("refLinkInput").value = "Ошибка загрузки";
-          $("refCodeInput").value = "—";
           renderReferralStats({});
           return;
         }
 
         localStorage.setItem("tg_profile", JSON.stringify(json.profile));
+        if (json.referral) {
+          localStorage.setItem("tg_referral", JSON.stringify(json.referral));
+        }
+
         updateBalanceUI(json.profile.balance);
         renderReferralStats(json.referral || {});
-
-        if (refCodeFromUrl) {
-          history.replaceState({}, "", window.location.pathname);
-        }
       } catch {
         $("refLinkInput").value = "Ошибка сети";
-        $("refCodeInput").value = "—";
         renderReferralStats({});
       }
     }
@@ -731,7 +730,6 @@
     }
 
     $("copyLinkBtn").addEventListener("click", () => copyText($("refLinkInput").value));
-    $("copyCodeBtn").addEventListener("click", () => copyText($("refCodeInput").value));
     $("claimBtn").addEventListener("click", claimReferralRewards);
 
     $("backBtn").addEventListener("click", () => goTo(FILES.index));
