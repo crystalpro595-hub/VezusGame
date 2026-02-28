@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Games</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --text:#eaf1ff;
+      --muted:rgba(234,241,255,.72);
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+      --safe-top: env(safe-area-inset-top, 0px);
+
+      --glass: rgba(12, 14, 20, .78);
+      --stroke: rgba(255,255,255,.08);
+      --shadow: 0 18px 42px rgba(0,0,0,.48);
+      --shadow-soft: 0 12px 28px rgba(0,0,0,.34);
+
+      --radius:22px;
+    }
+
+    *{
+      box-sizing:border-box;
+      font-family:'Inter', sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html, body{
+      height:100%;
+      margin:0;
+      overflow:hidden;
+      color:var(--text);
+      background:#020617;
+    }
+
+    body{
+      background-image:url("https://i.postimg.cc/fbJT34yY/076E519D-F095-4957-88BF-5591DEB82533.png");
+      background-size:cover;
+      background-position:center;
+      background-repeat:no-repeat;
+    }
+
+    body::before{
+      content:"";
+      position:fixed;
+      inset:0;
+      background:
+        radial-gradient(900px 600px at 30% 10%, rgba(255,255,255,.05), transparent 60%),
+        linear-gradient(180deg, rgba(0,0,0,.40), rgba(0,0,0,.64));
+      pointer-events:none;
+      z-index:0;
+    }
+
+    .app{
+      position:relative;
+      height:100%;
+      overflow:auto;
+      padding: 0 16px calc(28px + var(--safe-bottom)) 16px;
+      z-index:1;
+      overscroll-behavior: contain;
+    }
+
+    .content{
+      width:100%;
+      max-width:520px;
+      margin:0 auto;
+      display:flex;
+      flex-direction:column;
+      gap:14px;
+      position:relative;
+      z-index:1;
+    }
+
+    .sticky-top{
+      position:sticky;
+      top:0;
+      z-index:40;
+      padding-top: calc(8px + var(--safe-top));
+      padding-bottom:8px;
+      background:
+        linear-gradient(180deg,
+          rgba(2,6,23,.96) 0%,
+          rgba(2,6,23,.86) 72%,
+          rgba(2,6,23,0) 100%);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+    }
+
+    .top-row{
+      width:100%;
+      display:grid;
+      grid-template-columns:40px minmax(0,1fr) 54px;
+      gap:8px;
+      align-items:center;
+    }
+
+    .icon-btn{
+      width:40px;
+      height:40px;
+      border:none;
+      border-radius:14px;
+      background: var(--glass);
+      border:1px solid var(--stroke);
+      box-shadow: var(--shadow-soft), inset 0 1px 0 rgba(255,255,255,.04);
+      display:grid;
+      place-items:center;
+      color:var(--text);
+      cursor:pointer;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      font-size:18px;
+      font-weight:900;
+      padding:0;
+    }
+
+    .icon-btn:active{ transform:scale(.98); }
+
+    .balance-mini{
+      width:100%;
+      min-width:0;
+      height:42px;
+      border-radius:999px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:8px;
+      padding:6px 7px 6px 12px;
+      position:relative;
+      overflow:hidden;
+      background: var(--glass);
+      border:1px solid var(--stroke);
+      box-shadow: var(--shadow), inset 0 1px 0 rgba(255,255,255,.04);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      cursor:pointer;
+    }
+
+    .balance-mini::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      background:
+        radial-gradient(180px 60px at 0% 0%, rgba(255,255,255,.05), transparent 55%),
+        radial-gradient(180px 60px at 100% 100%, rgba(255,255,255,.03), transparent 55%);
+      pointer-events:none;
+    }
+
+    .bal-title{
+      position:relative;
+      z-index:1;
+      font-size:12px;
+      font-weight:900;
+      color: rgba(234,241,255,.92);
+      white-space:nowrap;
+    }
+
+    .bal-amount{
+      position:relative;
+      z-index:1;
+      min-width:88px;
+      height:28px;
+      border:none;
+      border-radius:999px;
+      padding:0 10px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background: rgba(255,255,255,.08);
+      border:1px solid rgba(255,255,255,.08);
+      color: rgba(234,241,255,.98);
+      font-weight:900;
+      font-size:13px;
+      white-space:nowrap;
+    }
+
+    .logo-wrap{
+      width:54px;
+      height:54px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background:transparent;
+      border:none;
+      padding:0;
+      margin:0;
+    }
+
+    .logo-wrap img{
+      width:100%;
+      height:100%;
+      object-fit:contain;
+      display:block;
+    }
+
+    .hero-card{
+      border-radius:22px;
+      background: var(--glass);
+      border:1px solid var(--stroke);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      padding:16px;
+    }
+
+    .hero-title{
+      margin:0 0 6px 0;
+      font-size:20px;
+      font-weight:900;
+      letter-spacing:.2px;
+    }
+
+    .hero-sub{
+      margin:0;
+      font-size:13px;
+      line-height:1.35;
+      color:var(--muted);
+    }
+
+    .games-grid{
+      display:grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap:12px;
+      width:100%;
+    }
+
+    .game-card{
+      position:relative;
+      border:none;
+      cursor:pointer;
+      width:100%;
+      aspect-ratio: 1 / 1.18;
+      border-radius:22px;
+      overflow:hidden;
+      padding:0;
+      background:#0b102a;
+      box-shadow:
+        0 18px 38px rgba(0,0,0,.34),
+        inset 0 1px 0 rgba(255,255,255,.05);
+      border:1px solid rgba(255,255,255,.06);
+      transition: transform .18s ease, box-shadow .18s ease;
+    }
+
+    .game-card:active{
+      transform: scale(.985);
+    }
+
+    .game-img{
+      position:absolute;
+      inset:0;
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      object-position:center;
+      display:block;
+      transform: scale(1.03);
+      filter: saturate(1.02) contrast(1.02);
+    }
+
+    .game-card::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      z-index:1;
+      background:
+        linear-gradient(180deg, rgba(0,0,0,.08), rgba(0,0,0,.58)),
+        radial-gradient(120px 70px at 50% 100%, rgba(255,255,255,.04), transparent 70%);
+      pointer-events:none;
+    }
+
+    .game-label{
+      position:absolute;
+      left:0;
+      right:0;
+      bottom:0;
+      z-index:2;
+      padding:12px 8px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      text-align:center;
+      font-weight:900;
+      font-size:13px;
+      letter-spacing:.15px;
+      color: rgba(234,241,255,.96);
+      background: linear-gradient(180deg, rgba(0,0,0,0), rgba(0,0,0,.72));
+      text-shadow: 0 10px 18px rgba(0,0,0,.55);
+    }
+
+    .soon-note{
+      margin:0;
+      text-align:center;
+      font-size:12px;
+      color:var(--muted);
+      font-weight:800;
+      line-height:1.35;
+    }
+
+    @media (max-width: 360px){
+      .top-row{
+        grid-template-columns:36px minmax(0,1fr) 46px;
+        gap:6px;
+      }
+
+      .icon-btn{
+        width:36px;
+        height:36px;
+        border-radius:12px;
+        font-size:16px;
+      }
+
+      .logo-wrap{
+        width:46px;
+        height:46px;
+      }
+
+      .balance-mini{
+        height:38px;
+      }
+
+      .bal-amount{
+        min-width:74px;
+        height:24px;
+        font-size:12px;
+      }
+
+      .games-grid{
+        gap:10px;
+      }
+
+      .game-card{
+        border-radius:18px;
+      }
+
+      .game-label{
+        font-size:11px;
+        padding:10px 6px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce){
+      *{ transition:none !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <div class="content">
+
+      <div class="sticky-top">
+        <div class="top-row">
+          <button class="icon-btn" id="backBtn" aria-label="Назад">←</button>
+
+          <div class="balance-mini" id="balanceChip" aria-label="Баланс">
+            <span class="bal-title">Баланс</span>
+            <div class="bal-amount" id="balanceValue">...</div>
+          </div>
+
+          <div class="logo-wrap" aria-hidden="true">
+            <img
+              src="https://i.postimg.cc/qvL497mF/Picsart-26-02-27-02-02-37-502.png"
+              alt="Vezus"
+              loading="eager"
+              decoding="async"
+            >
+          </div>
+        </div>
+      </div>
+
+      <div class="hero-card">
+        <h1 class="hero-title">Games</h1>
+        <p class="hero-sub">Будущие игры. Пока здесь только карточки-заглушки, позже можно будет добавить переходы на отдельные страницы.</p>
+      </div>
+
+      <div class="games-grid">
+        <button class="game-card" id="coinflipBtn" type="button">
+          <img
+            class="game-img"
+            src="YOUR_COINFLIP_IMAGE.png"
+            alt="CoinFlip"
+            loading="lazy"
+            decoding="async"
+          >
+          <div class="game-label">CoinFlip</div>
+        </button>
+
+        <button class="game-card" id="plinkoBtn" type="button">
+          <img
+            class="game-img"
+            src="YOUR_PLINKO_IMAGE.png"
+            alt="Plinko"
+            loading="lazy"
+            decoding="async"
+          >
+          <div class="game-label">Plinko</div>
+        </button>
+
+        <button class="game-card" id="minesBtn" type="button">
+          <img
+            class="game-img"
+            src="YOUR_MINES_IMAGE.png"
+            alt="Mines"
+            loading="lazy"
+            decoding="async"
+          >
+          <div class="game-label">Mines</div>
+        </button>
+      </div>
+
+      <p class="soon-note">Нажми на карточку — пока что будет заглушка “Скоро”.</p>
+
+    </div>
+  </div>
+
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <script>
+    const VERIFY_URL = "https://lazrfierfbhwlduqlvws.functions.supabase.co/verify-telegram";
+
+    const FILES = {
+      index: "index.html",
+      wallet: "wallet.html"
+    };
+
+    const $ = (id) => document.getElementById(id);
+
+    function formatVc(value){
+      const n = Number(value ?? 0);
+      if (!Number.isFinite(n)) return "0 VC";
+      return Number.isInteger(n) ? `${n} VC` : `${n.toFixed(2)} VC`;
+    }
+
+    function goTo(file){
+      window.location.href = file;
+    }
+
+    function loadCachedProfile(){
+      try {
+        return JSON.parse(localStorage.getItem("tg_profile") || "null");
+      } catch {
+        return null;
+      }
+    }
+
+    async function autoAuthTelegram(){
+      const cached = loadCachedProfile();
+
+      if (cached?.balance != null) {
+        $("balanceValue").textContent = formatVc(cached.balance);
+      } else {
+        $("balanceValue").textContent = "0 VC";
+      }
+
+      if (!window.Telegram || !window.Telegram.WebApp) return;
+
+      try{
+        Telegram.WebApp.ready();
+        if (typeof Telegram.WebApp.expand === "function") Telegram.WebApp.expand();
+      } catch {}
+
+      const initData = Telegram.WebApp.initData;
+      if (!initData) return;
+
+      $("balanceValue").textContent = "...";
+
+      try{
+        const res = await fetch(VERIFY_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ initData })
+        });
+
+        const json = await res.json().catch(() => ({}));
+
+        if (!res.ok || !json.ok || !json.profile) {
+          $("balanceValue").textContent = cached?.balance != null ? formatVc(cached.balance) : "0 VC";
+          return;
+        }
+
+        localStorage.setItem("tg_profile", JSON.stringify(json.profile));
+        $("balanceValue").textContent = formatVc(json.profile.balance);
+      } catch {
+        $("balanceValue").textContent = cached?.balance != null ? formatVc(cached.balance) : "0 VC";
+      }
+    }
+
+    $("backBtn").addEventListener("click", () => goTo(FILES.index));
+    $("balanceChip").addEventListener("click", () => goTo(FILES.wallet));
+
+    $("coinflipBtn").addEventListener("click", () => alert("CoinFlip — скоро"));
+    $("plinkoBtn").addEventListener("click", () => alert("Plinko — скоро"));
+    $("minesBtn").addEventListener("click", () => alert("Mines — скоро"));
+
+    window.addEventListener("load", autoAuthTelegram);
+  </script>
+</body>
+</html>
