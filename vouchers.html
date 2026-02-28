@@ -460,7 +460,7 @@
   <script>
     const VERIFY_URL = "https://lazrfierfbhwlduqlvws.functions.supabase.co/verify-telegram";
     const REDEEM_URL = "https://lazrfierfbhwlduqlvws.functions.supabase.co/redeem-voucher";
-    const STATS_URL = "https://lazrfierfbhwlduqlvws.functions.supabase.co/get-voucher-stats";
+    const STATS_URL  = "https://lazrfierfbhwlduqlvws.functions.supabase.co/get-voucher-stats";
 
     const $ = (id) => document.getElementById(id);
 
@@ -609,7 +609,7 @@
 
         voucherInput.value = "";
         await loadVoucherStats();
-        showToast(json.message || `Начислено ${formatVc(json.reward_vc)}`);
+        showToast(`Начислено ${formatVc(json.reward_vc)}`);
       } catch(err){
         console.error("Redeem error:", err);
         showToast(err.message || "Не удалось активировать ваучер");
@@ -626,9 +626,7 @@
     });
 
     voucherInput.addEventListener("keydown", (e) => {
-      if (e.key === "Enter") {
-        redeemVoucher();
-      }
+      if (e.key === "Enter") redeemVoucher();
     });
 
     $("balanceChip").addEventListener("click", () => {
