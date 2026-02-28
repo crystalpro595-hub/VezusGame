@@ -23,16 +23,19 @@
       --safe-bottom: env(safe-area-inset-bottom, 0px);
       --safe-top: env(safe-area-inset-top, 0px);
 
-      --glass: rgba(12, 14, 20, .78);
+      --glass: rgba(12, 14, 20, .80);
       --stroke: rgba(255,255,255,.08);
       --shadow: 0 18px 42px rgba(0,0,0,.48);
       --shadow-soft: 0 12px 28px rgba(0,0,0,.34);
 
       --tg1:#2AABEE;
       --tg2:#229ED9;
+      --tg3:#53c5ff;
 
-      --gold-coin:url("https://i.postimg.cc/50wQKCZL/Picsart-26-02-28-14-51-00-987.png");
-      --silver-coin:url("https://i.postimg.cc/Rh46k0m4/Picsart-26-02-28-14-51-28-798.png");
+      --ok1:#22c55e;
+      --ok2:#16a34a;
+      --bad1:#ef4444;
+      --bad2:#dc2626;
     }
 
     *{
@@ -252,82 +255,137 @@
       text-shadow: 0 10px 18px rgba(0,0,0,.35);
     }
 
-    .coin-wrap{
+    .coin-stage{
+      position:relative;
       display:flex;
       justify-content:center;
       align-items:center;
-      padding:10px 0 6px;
+      padding:14px 0 10px;
+      min-height: 300px;
       perspective: 1400px;
-      min-height: 270px;
     }
 
-    .coin{
-      width:210px;
-      height:210px;
+    .coin-stage::before{
+      content:"";
+      position:absolute;
+      width:280px;
+      height:280px;
+      border-radius:50%;
+      background:
+        radial-gradient(circle, rgba(83,197,255,.10), rgba(255,255,255,0) 62%);
+      filter: blur(12px);
+      pointer-events:none;
+    }
+
+    .coin-shadow{
+      position:absolute;
+      bottom:30px;
+      width:165px;
+      height:26px;
+      border-radius:50%;
+      background: rgba(0,0,0,.35);
+      filter: blur(10px);
+      transform: scale(1);
+      transition: transform .18s linear, opacity .18s linear;
+      opacity:.72;
+    }
+
+    .coin-shell{
       position:relative;
+      width:230px;
+      height:230px;
       transform-style: preserve-3d;
-      transition: transform 1.8s cubic-bezier(.18,.9,.22,1);
-      filter: drop-shadow(0 24px 30px rgba(0,0,0,.42));
+      will-change: transform, filter;
+      filter: drop-shadow(0 28px 34px rgba(0,0,0,.42));
     }
 
-    .coin-side{
+    .coin-shell.is-flipping{
+      animation: coinJumpFlip 1.8s cubic-bezier(.18,.88,.22,1) both;
+    }
+
+    .coin-shell.flash-win{
+      animation: coinFlashWin .55s ease;
+    }
+
+    .coin-shell.flash-lose{
+      animation: coinFlashLose .55s ease;
+    }
+
+    .coin-frame{
       position:absolute;
       inset:0;
       border-radius:50%;
+      padding:8px;
+      background:
+        linear-gradient(135deg, rgba(255,255,255,.18), rgba(255,255,255,.04));
+      border:1px solid rgba(255,255,255,.10);
+      box-shadow:
+        inset 0 2px 0 rgba(255,255,255,.08),
+        inset 0 -10px 18px rgba(0,0,0,.16);
+    }
+
+    .coin-core{
+      position:relative;
+      width:100%;
+      height:100%;
+      border-radius:50%;
+      overflow:hidden;
+      background:
+        radial-gradient(circle at 30% 25%, rgba(255,255,255,.10), transparent 35%),
+        radial-gradient(circle at 70% 75%, rgba(0,0,0,.14), transparent 42%),
+        #111827;
+      border:3px solid rgba(255,255,255,.08);
       display:flex;
       align-items:center;
       justify-content:center;
-      backface-visibility: hidden;
-      -webkit-backface-visibility: hidden;
-      overflow:hidden;
-      border: 4px solid rgba(255,255,255,.12);
-      box-shadow:
-        inset 0 0 0 2px rgba(255,255,255,.08),
-        inset 0 10px 18px rgba(255,255,255,.05),
-        inset 0 -14px 24px rgba(0,0,0,.18);
-      background:#111827;
     }
 
-    .coin-side img{
-      width:112%;
-      height:112%;
+    .coin-face{
+      width:122%;
+      height:122%;
       object-fit:contain;
       object-position:center;
       display:block;
-      pointer-events:none;
       user-select:none;
-      transform-origin:center center;
-    }
-
-    .coin-side.silver{
-      transform: rotateY(0deg) translateZ(1px);
-    }
-
-    .coin-side.silver img{
-      transform: scale(1.02);
-    }
-
-    .coin-side.gold{
-      transform: rotateY(180deg) translateZ(1px);
-    }
-
-    .coin-side.gold img{
-      transform: rotateY(180deg) scale(1.02);
-    }
-
-    .coin-glow{
-      position:absolute;
-      left:50%;
-      top:50%;
-      width:260px;
-      height:260px;
-      transform:translate(-50%, -50%);
-      border-radius:50%;
-      background:
-        radial-gradient(circle, rgba(255,215,0,.14), rgba(255,255,255,0) 62%);
       pointer-events:none;
-      z-index:-1;
-      filter: blur(10px);
+      transform: translateZ(1px);
+      filter: drop-shadow(0 3px 4px rgba(0,0,0,.18));
+    }
+
+    @keyframes coinJumpFlip{
+      0%{
+        transform: translateY(0) rotateX(0deg) rotateY(0deg) rotateZ(0deg) scale(1);
+      }
+      12%{
+        transform: translateY(-12px) rotateX(220deg) rotateY(140deg) rotateZ(3deg) scale(1.02);
+      }
+      28%{
+        transform: translateY(-42px) rotateX(620deg) rotateY(420deg) rotateZ(-5deg) scale(1.05);
+      }
+      50%{
+        transform: translateY(-68px) rotateX(980deg) rotateY(760deg) rotateZ(0deg) scale(1.08);
+      }
+      72%{
+        transform: translateY(-28px) rotateX(1320deg) rotateY(1120deg) rotateZ(5deg) scale(1.04);
+      }
+      88%{
+        transform: translateY(-10px) rotateX(1540deg) rotateY(1320deg) rotateZ(-2deg) scale(1.02);
+      }
+      100%{
+        transform: translateY(0) rotateX(1680deg) rotateY(1440deg) rotateZ(0deg) scale(1);
+      }
+    }
+
+    @keyframes coinFlashWin{
+      0%{ filter: drop-shadow(0 28px 34px rgba(0,0,0,.42)); }
+      50%{ filter: drop-shadow(0 0 26px rgba(255,215,0,.48)) drop-shadow(0 28px 34px rgba(0,0,0,.42)); }
+      100%{ filter: drop-shadow(0 28px 34px rgba(0,0,0,.42)); }
+    }
+
+    @keyframes coinFlashLose{
+      0%{ filter: drop-shadow(0 28px 34px rgba(0,0,0,.42)); }
+      50%{ filter: drop-shadow(0 0 22px rgba(192,198,210,.38)) drop-shadow(0 28px 34px rgba(0,0,0,.42)); }
+      100%{ filter: drop-shadow(0 28px 34px rgba(0,0,0,.42)); }
     }
 
     .panel{
@@ -387,9 +445,15 @@
       font-size:13px;
       font-weight:900;
       cursor:pointer;
+      transition: transform .15s ease, background .15s ease, border-color .15s ease;
     }
 
     .quick-btn:active{ transform: scale(.98); }
+
+    .quick-btn:hover{
+      background: rgba(255,255,255,.09);
+      border-color: rgba(255,255,255,.12);
+    }
 
     .start-btn{
       width:100%;
@@ -425,7 +489,7 @@
 
     .choice-box.show{
       opacity:1;
-      max-height:180px;
+      max-height:220px;
       margin-top:4px;
     }
 
@@ -437,7 +501,7 @@
     }
 
     .choice-btn{
-      height:58px;
+      height:62px;
       border:none;
       border-radius:18px;
       cursor:pointer;
@@ -478,8 +542,8 @@
     }
 
     .choice-coin{
-      width:30px;
-      height:30px;
+      width:34px;
+      height:34px;
       border-radius:50%;
       object-fit:cover;
       display:block;
@@ -678,8 +742,8 @@
       justify-content:center;
       padding:18px;
       background:
-        radial-gradient(900px 600px at 30% 10%, rgba(42,171,238,.20), transparent 60%),
-        linear-gradient(180deg, #03101f, #061a30 55%, #082444);
+        radial-gradient(900px 600px at 30% 10%, rgba(42,171,238,.24), transparent 60%),
+        linear-gradient(180deg, #02111f, #08213c 55%, #0a2d52);
       transition: opacity .35s ease, visibility .35s ease;
     }
 
@@ -690,16 +754,16 @@
     }
 
     .loader-box{
-      width:min(420px, 100%);
-      border-radius:26px;
+      width:min(430px, 100%);
+      border-radius:28px;
       padding:22px 18px;
-      background: rgba(255,255,255,.06);
-      border:1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.08);
+      border:1px solid rgba(255,255,255,.12);
       box-shadow:
-        0 28px 70px rgba(0,0,0,.35),
+        0 30px 80px rgba(0,0,0,.38),
         inset 0 1px 0 rgba(255,255,255,.06);
-      backdrop-filter: blur(14px);
-      -webkit-backdrop-filter: blur(14px);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
       display:flex;
       flex-direction:column;
       align-items:center;
@@ -707,37 +771,64 @@
       text-align:center;
     }
 
-    .loader-ring{
-      width:64px;
-      height:64px;
+    .loader-chip{
+      height:28px;
+      border-radius:999px;
+      padding:0 12px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:8px;
+      background: rgba(255,255,255,.10);
+      border:1px solid rgba(255,255,255,.08);
+      font-size:11px;
+      font-weight:900;
+      letter-spacing:.15px;
+      color:#fff;
+    }
+
+    .loader-dot{
+      width:8px;
+      height:8px;
       border-radius:50%;
-      border:5px solid rgba(255,255,255,.12);
-      border-top-color:#53c5ff;
-      animation: spin 1s linear infinite;
-      box-shadow: 0 0 18px rgba(83,197,255,.20);
+      background:#8ad9ff;
+      box-shadow: 0 0 14px rgba(138,217,255,.55);
+      animation: pulseDot 1.1s ease-in-out infinite;
+    }
+
+    .loader-logo{
+      width:74px;
+      height:74px;
+      display:block;
+      object-fit:contain;
+      filter: drop-shadow(0 10px 16px rgba(0,0,0,.24));
+      animation: floatLogo 1.8s ease-in-out infinite;
     }
 
     .loader-title{
       margin:0;
-      font-size:18px;
+      font-size:19px;
       font-weight:900;
       color:#fff;
+      letter-spacing:.2px;
     }
 
     .loader-sub{
       margin:0;
       font-size:13px;
-      color:rgba(255,255,255,.82);
+      color:rgba(255,255,255,.84);
       font-weight:800;
+      line-height:1.35;
     }
 
     .loader-bar{
       width:100%;
-      height:10px;
+      height:12px;
       border-radius:999px;
       overflow:hidden;
-      background: rgba(255,255,255,.10);
-      border:1px solid rgba(255,255,255,.08);
+      background: rgba(255,255,255,.12);
+      border:1px solid rgba(255,255,255,.10);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.05);
     }
 
     .loader-fill{
@@ -747,15 +838,36 @@
       background: linear-gradient(90deg, #2AABEE, #53c5ff, #8ad9ff);
       animation: loadBar 4s linear forwards;
       box-shadow: 0 0 16px rgba(83,197,255,.35);
+      position:relative;
+      overflow:hidden;
     }
 
-    @keyframes spin{
-      to{ transform:rotate(360deg); }
+    .loader-fill::after{
+      content:"";
+      position:absolute;
+      inset:0;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,.35), transparent);
+      animation: shimmer 1s linear infinite;
     }
 
     @keyframes loadBar{
       from{ width:0; }
       to{ width:100%; }
+    }
+
+    @keyframes shimmer{
+      from{ transform: translateX(-100%); }
+      to{ transform: translateX(100%); }
+    }
+
+    @keyframes pulseDot{
+      0%,100%{ transform:scale(1); opacity:.9; }
+      50%{ transform:scale(1.22); opacity:1; }
+    }
+
+    @keyframes floatLogo{
+      0%,100%{ transform: translateY(0); }
+      50%{ transform: translateY(-6px); }
     }
 
     @media (max-width: 360px){
@@ -797,39 +909,65 @@
 
       .title{ font-size:18px; }
 
-      .coin{
-        width:178px;
-        height:178px;
+      .coin-stage{
+        min-height: 255px;
       }
 
-      .coin-wrap{
-        min-height:230px;
+      .coin-shell{
+        width:185px;
+        height:185px;
+      }
+
+      .coin-shadow{
+        width:138px;
+        height:22px;
       }
 
       .quick-grid{ gap:6px; }
       .quick-btn{ font-size:12px; }
       .amount-input{ font-size:15px; }
-      .choice-btn{ font-size:13px; height:52px; padding:0 8px; }
-      .choice-coin{ width:26px; height:26px; }
+      .choice-btn{ font-size:13px; height:56px; padding:0 8px; }
+      .choice-coin{ width:28px; height:28px; }
       .start-btn{ height:50px; font-size:14px; }
       .tg-btn{ height:48px; border-radius:15px; }
       .top-notice{ min-height:52px; font-size:12px; }
       .notice-icon{ width:28px; height:28px; font-size:14px; }
+
+      .loader-logo{
+        width:66px;
+        height:66px;
+      }
+
+      .loader-title{
+        font-size:17px;
+      }
     }
 
     @media (prefers-reduced-motion: reduce){
       *{ transition:none !important; animation:none !important; }
       .overlay.show .popup{ transform:none !important; }
       .loader-fill{ width:100% !important; }
+      .coin-shell.is-flipping{ animation:none !important; }
     }
   </style>
 </head>
 <body>
   <div class="preloader" id="preloader">
     <div class="loader-box">
-      <div class="loader-ring"></div>
-      <p class="loader-title">Загрузка игры</p>
-      <p class="loader-sub">CoinFlip запускается...</p>
+      <div class="loader-chip">
+        <span class="loader-dot"></span>
+        <span>Telegram Mini App</span>
+      </div>
+
+      <img
+        class="loader-logo"
+        src="https://i.postimg.cc/qvL497mF/Picsart-26-02-27-02-02-37-502.png"
+        alt="Vezus"
+      >
+
+      <p class="loader-title">CoinFlip</p>
+      <p class="loader-sub">Запуск игры и подготовка интерфейса…</p>
+
       <div class="loader-bar">
         <div class="loader-fill"></div>
       </div>
@@ -876,14 +1014,21 @@
       <div class="card hero-card">
         <h1 class="title">CoinFlip</h1>
 
-        <div class="coin-wrap">
-          <div class="coin-glow"></div>
-          <div class="coin" id="coin">
-            <div class="coin-side silver">
-              <img src="https://i.postimg.cc/Rh46k0m4/Picsart-26-02-28-14-51-28-798.png" alt="Решка">
-            </div>
-            <div class="coin-side gold">
-              <img src="https://i.postimg.cc/50wQKCZL/Picsart-26-02-28-14-51-00-987.png" alt="Орёл">
+        <div class="coin-stage">
+          <div class="coin-shadow" id="coinShadow"></div>
+
+          <div class="coin-shell" id="coinShell">
+            <div class="coin-frame">
+              <div class="coin-core">
+                <img
+                  class="coin-face"
+                  id="coinFace"
+                  src="https://i.postimg.cc/Rh46k0m4/Picsart-26-02-28-14-51-28-798.png"
+                  alt="Решка"
+                  loading="eager"
+                  decoding="async"
+                >
+              </div>
             </div>
           </div>
         </div>
@@ -909,6 +1054,7 @@
 
         <div class="choice-box" id="choiceBox">
           <div class="label">Выбери сторону</div>
+
           <div class="choice-grid">
             <button class="choice-btn gold" id="headsBtn" type="button">
               <span class="choice-inner">
@@ -941,6 +1087,8 @@
         <p class="rule-line">• Минимальная ставка: <b>10 VC</b></p>
         <p class="rule-line">• Нажми <b>«Начать»</b></p>
         <p class="rule-line">• Выбери: <b>Орёл</b> или <b>Решка</b></p>
+        <p class="rule-line">• <b>Орёл</b> — золотая монета</p>
+        <p class="rule-line">• <b>Решка</b> — серебряная монета</p>
         <p class="rule-line">• Шанс выигрыша: <b>35%</b></p>
         <p class="rule-line">• Если угадаешь — получишь <b>x2</b> от ставки</p>
       </div>
@@ -976,6 +1124,9 @@
     const MIN_BET = 10;
     const WIN_CHANCE = 0.35;
 
+    const GOLD_SRC = "https://i.postimg.cc/50wQKCZL/Picsart-26-02-28-14-51-00-987.png";
+    const SILVER_SRC = "https://i.postimg.cc/Rh46k0m4/Picsart-26-02-28-14-51-28-798.png";
+
     const FILES = {
       games: "games.html"
     };
@@ -985,8 +1136,11 @@
     let currentBalance = 0;
     let isFlipping = false;
     let choiceVisible = false;
-    let coinRotation = 0;
+    let currentFace = "silver";
     let noticeTimer = null;
+    let audioCtx = null;
+    let faceSwapTimer = null;
+    let finishFlipTimer = null;
 
     function formatVc(value){
       const n = Number(value ?? 0);
@@ -1031,6 +1185,20 @@
       const amount = Number(raw);
       if (!raw || !Number.isFinite(amount)) return 0;
       return Math.floor(amount);
+    }
+
+    function setCoinFace(side){
+      const coinFace = $("coinFace");
+
+      currentFace = side;
+
+      if (side === "gold") {
+        coinFace.src = GOLD_SRC;
+        coinFace.alt = "Орёл";
+      } else {
+        coinFace.src = SILVER_SRC;
+        coinFace.alt = "Решка";
+      }
     }
 
     function showNotice(text, type = "info"){
@@ -1120,6 +1288,93 @@
       updateStartButton();
     }
 
+    function getAudioCtx(){
+      try{
+        if (!audioCtx) {
+          const Ctx = window.AudioContext || window.webkitAudioContext;
+          if (!Ctx) return null;
+          audioCtx = new Ctx();
+        }
+
+        if (audioCtx.state === "suspended") {
+          audioCtx.resume().catch(() => {});
+        }
+
+        return audioCtx;
+      } catch {
+        return null;
+      }
+    }
+
+    function playTone(freq, duration, type = "sine", volume = 0.03, startAt = 0){
+      const ctx = getAudioCtx();
+      if (!ctx) return;
+
+      const start = ctx.currentTime + startAt;
+      const end = start + duration;
+
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+
+      osc.type = type;
+      osc.frequency.setValueAtTime(freq, start);
+
+      gain.gain.setValueAtTime(0.0001, start);
+      gain.gain.exponentialRampToValueAtTime(volume, start + 0.01);
+      gain.gain.exponentialRampToValueAtTime(0.0001, end);
+
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+
+      osc.start(start);
+      osc.stop(end + 0.02);
+    }
+
+    function playFlipSound(){
+      playTone(620, 0.06, "square", 0.025, 0.00);
+      playTone(760, 0.05, "square", 0.022, 0.08);
+      playTone(540, 0.06, "triangle", 0.020, 0.16);
+      playTone(820, 0.05, "triangle", 0.018, 0.24);
+    }
+
+    function playWinSound(){
+      playTone(700, 0.08, "triangle", 0.03, 0.00);
+      playTone(980, 0.10, "triangle", 0.03, 0.08);
+      playTone(1260, 0.12, "sine", 0.025, 0.18);
+    }
+
+    function playLoseSound(){
+      playTone(420, 0.10, "sawtooth", 0.025, 0.00);
+      playTone(290, 0.12, "sawtooth", 0.023, 0.10);
+    }
+
+    function animateCoinTo(resultSide){
+      const coinShell = $("coinShell");
+      const coinShadow = $("coinShadow");
+
+      if (faceSwapTimer) clearTimeout(faceSwapTimer);
+      if (finishFlipTimer) clearTimeout(finishFlipTimer);
+
+      coinShell.classList.remove("is-flipping", "flash-win", "flash-lose");
+      void coinShell.offsetWidth;
+
+      coinShadow.style.transform = "scale(0.78)";
+      coinShadow.style.opacity = "0.42";
+
+      coinShell.classList.add("is-flipping");
+      playFlipSound();
+
+      faceSwapTimer = setTimeout(() => {
+        setCoinFace(resultSide);
+      }, 860);
+
+      finishFlipTimer = setTimeout(() => {
+        coinShell.classList.remove("is-flipping");
+        coinShadow.style.transform = "scale(1)";
+        coinShadow.style.opacity = "0.72";
+      }, 1820);
+    }
+
     function startGame(){
       if (isFlipping) return;
 
@@ -1135,16 +1390,9 @@
         return;
       }
 
+      getAudioCtx();
       setChoiceVisible(true);
       showNotice("Выбери: Орёл или Решка", "info");
-    }
-
-    function flipCoin(resultSide){
-      const extraTurns = 6 + Math.floor(Math.random() * 3);
-      const currentTurns = Math.floor(coinRotation / 360);
-      const baseTurns = currentTurns + extraTurns;
-      coinRotation = (baseTurns * 360) + (resultSide === "gold" ? 180 : 0);
-      $("coin").style.transform = `rotateY(${coinRotation}deg)`;
     }
 
     function chooseSide(side){
@@ -1175,21 +1423,30 @@
       const playerWins = Math.random() < WIN_CHANCE;
       const resultSide = playerWins ? side : (side === "gold" ? "silver" : "gold");
 
-      flipCoin(resultSide);
+      animateCoinTo(resultSide);
 
       setTimeout(() => {
         const win = side === resultSide;
         const sideText = resultSide === "gold" ? "Орёл" : "Решка";
+        const coinShell = $("coinShell");
 
         if (win) {
           const prize = bet * 2;
           currentBalance += prize;
           updateBalanceUI();
           saveCachedBalance();
+          coinShell.classList.add("flash-win");
+          playWinSound();
           showNotice(`Выпал ${sideText}. Победа! +${formatVc(prize)}`, "win");
         } else {
+          coinShell.classList.add("flash-lose");
+          playLoseSound();
           showNotice(`Выпал ${sideText}. Проигрыш! -${formatVc(bet)}`, "lose");
         }
+
+        setTimeout(() => {
+          coinShell.classList.remove("flash-win", "flash-lose");
+        }, 560);
 
         isFlipping = false;
         updateStartButton();
@@ -1257,6 +1514,8 @@
     });
 
     window.addEventListener("load", () => {
+      setCoinFace("silver");
+
       setTimeout(() => {
         $("preloader").classList.add("hide");
       }, 4000);
