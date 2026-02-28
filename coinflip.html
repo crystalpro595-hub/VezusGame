@@ -256,7 +256,6 @@
       align-items:center;
       padding:12px 0 8px;
       min-height:300px;
-      perspective:1600px;
     }
 
     .coin-stage::before{
@@ -281,79 +280,69 @@
       filter: blur(11px);
       transform: scale(1);
       opacity:.62;
-      transition: transform .18s ease, opacity .18s ease;
     }
 
     .coin-shadow.is-flipping{
-      animation: shadowDepth .82s cubic-bezier(.22,.72,.25,1) both;
+      animation: shadowDepth .66s cubic-bezier(.22,.72,.25,1) both;
     }
 
     .coin-wrap{
       position:relative;
       width:246px;
       height:246px;
-      transform-style:preserve-3d;
+      display:flex;
+      align-items:center;
+      justify-content:center;
       will-change: transform;
+      transition: transform .14s ease;
     }
 
     .coin-wrap.is-flipping{
-      animation: coinDepth .82s cubic-bezier(.22,.72,.25,1) both;
+      animation: coinDepth .66s cubic-bezier(.22,.72,.25,1) both;
     }
 
     .coin-shell{
       position:relative;
       width:100%;
       height:100%;
-      transform-style: preserve-3d;
-      transform: rotateY(180deg);
-      will-change: transform;
+      border-radius:50%;
+      padding:8px;
+      background:
+        linear-gradient(135deg, rgba(255,255,255,.18), rgba(255,255,255,.04));
+      border:1px solid rgba(255,255,255,.10);
+      box-shadow:
+        inset 0 2px 0 rgba(255,255,255,.08),
+        inset 0 -8px 14px rgba(0,0,0,.14);
       filter: drop-shadow(0 20px 26px rgba(0,0,0,.34));
+      will-change: transform;
+    }
+
+    .coin-shell.is-flipping{
+      animation: coinFlip .66s cubic-bezier(.22,.72,.25,1) both;
     }
 
     .coin-shell.flash-win{
-      animation: coinFlashWin .30s ease;
+      animation: coinFlashWin .28s ease;
     }
 
     .coin-shell.flash-lose{
-      animation: coinFlashLose .30s ease;
+      animation: coinFlashLose .28s ease;
     }
 
-    .coin-side{
-      position:absolute;
-      inset:0;
+    .coin-core{
+      position:relative;
+      width:100%;
+      height:100%;
       border-radius:50%;
-      backface-visibility:hidden;
-      -webkit-backface-visibility:hidden;
       overflow:hidden;
-      border:7px solid rgba(255,255,255,.10);
-      box-shadow:
-        inset 0 2px 0 rgba(255,255,255,.10),
-        inset 0 -10px 18px rgba(0,0,0,.16),
-        0 0 0 1px rgba(255,255,255,.05);
       background:
-        radial-gradient(circle at 30% 22%, rgba(255,255,255,.14), transparent 32%),
-        radial-gradient(circle at 70% 78%, rgba(0,0,0,.14), transparent 34%),
-        rgba(255,255,255,.04);
+        radial-gradient(circle at 30% 25%, rgba(255,255,255,.10), transparent 35%),
+        radial-gradient(circle at 70% 75%, rgba(0,0,0,.14), transparent 42%),
+        #111827;
+      border:3px solid rgba(255,255,255,.08);
       display:flex;
       align-items:center;
       justify-content:center;
-    }
-
-    .coin-front{
-      transform: translateZ(7px);
-    }
-
-    .coin-back{
-      transform: rotateY(180deg) translateZ(7px);
-    }
-
-    .coin-edge{
-      position:absolute;
-      inset:6px;
-      border-radius:50%;
-      border:2px solid rgba(255,255,255,.06);
-      pointer-events:none;
-      z-index:2;
     }
 
     .coin-face{
@@ -365,18 +354,28 @@
       user-select:none;
       pointer-events:none;
       filter: drop-shadow(0 4px 6px rgba(0,0,0,.16));
+      transform: scaleX(1);
     }
 
     @keyframes coinDepth{
-      0%{ transform: translateZ(0) scale(1); }
-      50%{ transform: translateZ(46px) scale(1.085); }
-      100%{ transform: translateZ(0) scale(1); }
+      0%{ transform: scale(1); }
+      50%{ transform: scale(1.08); }
+      100%{ transform: scale(1); }
     }
 
     @keyframes shadowDepth{
       0%{ transform: scale(1); opacity:.62; }
-      50%{ transform: scale(.74); opacity:.24; }
+      50%{ transform: scale(.76); opacity:.24; }
       100%{ transform: scale(1); opacity:.62; }
+    }
+
+    @keyframes coinFlip{
+      0%{ transform: rotate(0deg) scaleX(1); }
+      20%{ transform: rotate(4deg) scaleX(.55); }
+      40%{ transform: rotate(8deg) scaleX(.12); }
+      60%{ transform: rotate(-6deg) scaleX(.12); }
+      80%{ transform: rotate(-3deg) scaleX(.55); }
+      100%{ transform: rotate(0deg) scaleX(1); }
     }
 
     @keyframes coinFlashWin{
@@ -405,51 +404,24 @@
       margin-bottom:10px;
     }
 
-    .bet-display{
+    .bet-input{
       width:100%;
       height:50px;
       border-radius:18px;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      background: rgba(255,255,255,.06);
       border:1px solid rgba(255,255,255,.08);
+      background: rgba(255,255,255,.06);
       color:#fff;
-      font-size:18px;
+      font-size:17px;
       font-weight:900;
+      padding:0 14px;
+      outline:none;
       box-shadow: inset 0 1px 0 rgba(255,255,255,.04);
-      letter-spacing:.2px;
+      text-align:center;
     }
 
-    .bet-select-grid{
-      display:grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap:8px;
-      margin-top:10px;
-    }
-
-    .bet-btn{
-      height:42px;
-      border:none;
-      border-radius:14px;
-      background: rgba(255,255,255,.06);
-      border:1px solid rgba(255,255,255,.08);
-      color: rgba(234,241,255,.94);
-      font-size:13px;
-      font-weight:900;
-      cursor:pointer;
-      transition: transform .15s ease, background .15s ease, border-color .15s ease, box-shadow .15s ease;
-    }
-
-    .bet-btn:active{
-      transform: scale(.98);
-    }
-
-    .bet-btn.active{
-      background: linear-gradient(180deg, rgba(42,171,238,.22), rgba(34,158,217,.22));
-      border-color: rgba(86,210,255,.26);
-      box-shadow: 0 10px 18px rgba(34,158,217,.12);
-      color:#fff;
+    .bet-input::placeholder{
+      color: rgba(234,241,255,.42);
+      font-weight:800;
     }
 
     .action-area{
@@ -796,7 +768,7 @@
       justify-content:center;
       gap:18px;
       background:
-        radial-gradient(1000px 700px at 50% 10%, rgba(86,210,255,.20), transparent 50%),
+        radial-gradient(1000px 700px at 50% 10%, rgba(86,210,255,.18), transparent 50%),
         linear-gradient(180deg, #03111f 0%, #07345a 48%, #0a6ea8 100%);
       transition: opacity .32s ease, visibility .32s ease;
     }
@@ -895,14 +867,9 @@
         height:18px;
       }
 
-      .bet-display{
+      .bet-input{
         height:46px;
-        font-size:16px;
-      }
-
-      .bet-btn{
-        height:38px;
-        font-size:12px;
+        font-size:15px;
       }
 
       .choice-btn{
@@ -1006,22 +973,10 @@
 
           <div class="coin-wrap" id="coinWrap">
             <div class="coin-shell" id="coinShell">
-              <div class="coin-side coin-front">
-                <span class="coin-edge"></span>
+              <div class="coin-core">
                 <img
                   class="coin-face"
-                  src="https://i.postimg.cc/50wQKCZL/Picsart-26-02-28-14-51-00-987.png"
-                  alt="Орёл"
-                  loading="eager"
-                  fetchpriority="high"
-                  decoding="async"
-                >
-              </div>
-
-              <div class="coin-side coin-back">
-                <span class="coin-edge"></span>
-                <img
-                  class="coin-face"
+                  id="coinFace"
                   src="https://i.postimg.cc/Rh46k0m4/Picsart-26-02-28-14-51-28-798.png"
                   alt="Решка"
                   loading="eager"
@@ -1036,17 +991,16 @@
       <div class="card panel">
         <div>
           <div class="label">Ставка</div>
-
-          <div class="bet-display" id="betDisplay">10 VC</div>
-
-          <div class="bet-select-grid" id="betGrid">
-            <button class="bet-btn active" type="button" data-bet="10">10</button>
-            <button class="bet-btn" type="button" data-bet="25">25</button>
-            <button class="bet-btn" type="button" data-bet="50">50</button>
-            <button class="bet-btn" type="button" data-bet="100">100</button>
-            <button class="bet-btn" type="button" data-bet="250">250</button>
-            <button class="bet-btn" type="button" data-bet="max">MAX</button>
-          </div>
+          <input
+            class="bet-input"
+            id="betInput"
+            type="number"
+            min="10"
+            step="1"
+            inputmode="numeric"
+            placeholder="Минимум 10"
+            value="10"
+          >
         </div>
 
         <div class="action-area">
@@ -1124,6 +1078,9 @@
     const MIN_BET = 10;
     const WIN_CHANCE = 0.35;
 
+    const GOLD_SRC = "https://i.postimg.cc/50wQKCZL/Picsart-26-02-28-14-51-00-987.png";
+    const SILVER_SRC = "https://i.postimg.cc/Rh46k0m4/Picsart-26-02-28-14-51-28-798.png";
+
     const FILES = {
       games: "games.html"
     };
@@ -1131,11 +1088,11 @@
     const $ = (id) => document.getElementById(id);
 
     let currentBalance = 0;
-    let currentBet = 10;
     let isFlipping = false;
     let choiceVisible = false;
     let noticeTimer = null;
-    let currentRotation = 180;
+    let swapTimer = null;
+    let finishTimer = null;
 
     function formatVc(value){
       const n = Number(value ?? 0);
@@ -1175,49 +1132,31 @@
       $("balanceValue").textContent = formatVc(currentBalance);
     }
 
-    function updateBetUI(){
-      $("betDisplay").textContent = formatVc(currentBet);
-
-      document.querySelectorAll(".bet-btn").forEach(btn => {
-        const value = btn.dataset.bet;
-        const isActive = value === "max"
-          ? btn.classList.contains("active") && btn.dataset.activeMode === "max"
-          : Number(value) === currentBet;
-
-        if (value !== "max") {
-          btn.classList.toggle("active", isActive);
-        }
-      });
+    function getBetAmount(){
+      const raw = $("betInput").value;
+      const amount = Number(raw);
+      if (!raw || !Number.isFinite(amount)) return 0;
+      return Math.floor(amount);
     }
 
-    function clearBetActive(){
-      document.querySelectorAll(".bet-btn").forEach(btn => {
-        btn.classList.remove("active");
-        btn.dataset.activeMode = "";
-      });
+    function updateStartButton(){
+      const btn = $("startBtn");
+      const bet = getBetAmount();
+      const valid = bet >= MIN_BET && bet <= currentBalance && !isFlipping;
+
+      btn.disabled = choiceVisible || !valid;
     }
 
-    function setBet(value, mode = "fixed"){
-      const next = Math.floor(Number(value) || 0);
-      if (next < MIN_BET) return;
+    function setCoinFace(side){
+      const coinFace = $("coinFace");
 
-      currentBet = next;
-      clearBetActive();
-
-      if (mode === "max") {
-        const maxBtn = document.querySelector('.bet-btn[data-bet="max"]');
-        if (maxBtn) {
-          maxBtn.classList.add("active");
-          maxBtn.dataset.activeMode = "max";
-        }
+      if (side === "gold") {
+        coinFace.src = GOLD_SRC;
+        coinFace.alt = "Орёл";
       } else {
-        const btn = document.querySelector(`.bet-btn[data-bet="${next}"]`);
-        if (btn) btn.classList.add("active");
+        coinFace.src = SILVER_SRC;
+        coinFace.alt = "Решка";
       }
-
-      if (choiceVisible) setChoiceVisible(false);
-      updateBetUI();
-      updateStartButton();
     }
 
     function showNotice(text, type = "info"){
@@ -1240,14 +1179,6 @@
       $("choiceBox").classList.toggle("show", choiceVisible);
       $("startWrap").classList.toggle("hide", choiceVisible);
       updateStartButton();
-    }
-
-    function updateStartButton(){
-      const btn = $("startBtn");
-      const valid = currentBet >= MIN_BET && currentBet <= currentBalance && !isFlipping;
-
-      btn.textContent = "Начать";
-      btn.disabled = choiceVisible || !valid;
     }
 
     async function autoAuthTelegram(){
@@ -1301,53 +1232,49 @@
       updateStartButton();
     }
 
-    function getTargetRotation(resultSide){
-      const extra = 7 * 360;
-      const desired = resultSide === "gold" ? 0 : 180;
-      const raw = currentRotation + extra;
-
-      let target = Math.floor(raw / 360) * 360 + desired;
-      if (target <= raw) target += 360;
-
-      return target;
-    }
-
     function animateCoinTo(resultSide){
       const coinWrap = $("coinWrap");
       const coinShell = $("coinShell");
       const coinShadow = $("coinShadow");
 
-      const target = getTargetRotation(resultSide);
+      if (swapTimer) clearTimeout(swapTimer);
+      if (finishTimer) clearTimeout(finishTimer);
 
       coinWrap.classList.remove("is-flipping");
+      coinShell.classList.remove("is-flipping");
       coinShadow.classList.remove("is-flipping");
+      coinShell.classList.remove("flash-win", "flash-lose");
 
       void coinWrap.offsetWidth;
+      void coinShell.offsetWidth;
       void coinShadow.offsetWidth;
 
       coinWrap.classList.add("is-flipping");
+      coinShell.classList.add("is-flipping");
       coinShadow.classList.add("is-flipping");
 
-      coinShell.style.transition = "transform .82s cubic-bezier(.22,.72,.25,1)";
-      coinShell.style.transform = `rotateY(${target}deg)`;
+      swapTimer = setTimeout(() => {
+        setCoinFace(resultSide);
+      }, 330);
 
-      currentRotation = target;
-
-      setTimeout(() => {
+      finishTimer = setTimeout(() => {
         coinWrap.classList.remove("is-flipping");
+        coinShell.classList.remove("is-flipping");
         coinShadow.classList.remove("is-flipping");
-      }, 840);
+      }, 680);
     }
 
     function startGame(){
       if (isFlipping) return;
 
-      if (currentBet < MIN_BET) {
+      const bet = getBetAmount();
+
+      if (bet < MIN_BET) {
         showNotice(`Минимум ${MIN_BET} VC`, "lose");
         return;
       }
 
-      if (currentBet > currentBalance) {
+      if (bet > currentBalance) {
         showNotice("Недостаточно средств", "lose");
         return;
       }
@@ -1359,13 +1286,15 @@
     function chooseSide(side){
       if (isFlipping) return;
 
-      if (currentBet < MIN_BET) {
+      const bet = getBetAmount();
+
+      if (bet < MIN_BET) {
         setChoiceVisible(false);
         showNotice(`Минимум ${MIN_BET} VC`, "lose");
         return;
       }
 
-      if (currentBet > currentBalance) {
+      if (bet > currentBalance) {
         setChoiceVisible(false);
         showNotice("Недостаточно средств", "lose");
         return;
@@ -1375,7 +1304,7 @@
       setChoiceVisible(false);
       updateStartButton();
 
-      currentBalance -= currentBet;
+      currentBalance -= bet;
       updateBalanceUI();
       saveCachedBalance();
 
@@ -1390,7 +1319,7 @@
         const coinShell = $("coinShell");
 
         if (win) {
-          const prize = currentBet * 2;
+          const prize = bet * 2;
           currentBalance += prize;
           updateBalanceUI();
           saveCachedBalance();
@@ -1398,16 +1327,16 @@
           showNotice(`Выпал ${sideText}. +${formatVc(prize)}`, "win");
         } else {
           coinShell.classList.add("flash-lose");
-          showNotice(`Выпал ${sideText}. -${formatVc(currentBet)}`, "lose");
+          showNotice(`Выпал ${sideText}. -${formatVc(bet)}`, "lose");
         }
 
         setTimeout(() => {
           coinShell.classList.remove("flash-win", "flash-lose");
-        }, 300);
+        }, 280);
 
         isFlipping = false;
         updateStartButton();
-      }, 860);
+      }, 700);
     }
 
     function openOverlay(id){
@@ -1443,24 +1372,9 @@
       openTelegramLinkSafe("https://t.me/vezuspubg");
     });
 
-    document.querySelectorAll(".bet-btn").forEach(btn => {
-      btn.addEventListener("click", () => {
-        if (isFlipping) return;
-
-        const value = btn.dataset.bet;
-
-        if (value === "max") {
-          const maxValue = Math.floor(currentBalance);
-          if (maxValue < MIN_BET) {
-            showNotice("Недостаточно средств", "lose");
-            return;
-          }
-          setBet(maxValue, "max");
-          return;
-        }
-
-        setBet(Number(value), "fixed");
-      });
+    $("betInput").addEventListener("input", () => {
+      if (choiceVisible) setChoiceVisible(false);
+      updateStartButton();
     });
 
     $("startBtn").addEventListener("click", startGame);
@@ -1475,8 +1389,7 @@
     });
 
     window.addEventListener("load", () => {
-      $("coinShell").style.transform = "rotateY(180deg)";
-      setBet(10, "fixed");
+      setCoinFace("silver");
 
       setTimeout(() => {
         $("preloader").classList.add("hide");
