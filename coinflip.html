@@ -11,6 +11,8 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
   <link rel="preload" as="image" href="https://i.postimg.cc/qvL497mF/Picsart-26-02-27-02-02-37-502.png">
+  <link rel="preload" as="image" href="https://i.postimg.cc/50wQKCZL/Picsart-26-02-28-14-51-00-987.png">
+  <link rel="preload" as="image" href="https://i.postimg.cc/Rh46k0m4/Picsart-26-02-28-14-51-28-798.png">
 
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
 
@@ -33,6 +35,9 @@
       --ok2:#16a34a;
       --bad1:#ef4444;
       --bad2:#dc2626;
+
+      --gold-coin:url("https://i.postimg.cc/50wQKCZL/Picsart-26-02-28-14-51-00-987.png");
+      --silver-coin:url("https://i.postimg.cc/Rh46k0m4/Picsart-26-02-28-14-51-28-798.png");
     }
 
     *{
@@ -280,42 +285,28 @@
       backface-visibility: hidden;
       -webkit-backface-visibility: hidden;
       overflow:hidden;
-      border: 5px solid rgba(255,255,255,.16);
+      border: 4px solid rgba(255,255,255,.12);
       box-shadow:
-        inset 0 0 0 2px rgba(255,255,255,.10),
-        inset 0 10px 18px rgba(255,255,255,.08),
-        inset 0 -14px 24px rgba(0,0,0,.20);
+        inset 0 0 0 2px rgba(255,255,255,.08),
+        inset 0 10px 18px rgba(255,255,255,.05),
+        inset 0 -14px 24px rgba(0,0,0,.18);
+      background:#111827;
     }
 
-    .coin-side::before{
-      content:"";
-      position:absolute;
-      inset:0;
-      background:
-        radial-gradient(circle at 35% 30%, rgba(255,255,255,.32), transparent 26%),
-        radial-gradient(circle at 70% 72%, rgba(255,255,255,.10), transparent 22%);
+    .coin-side img{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      display:block;
       pointer-events:none;
-    }
-
-    .coin-side span{
-      position:relative;
-      z-index:1;
-      font-size:20px;
-      font-weight:900;
-      letter-spacing:.8px;
-      text-shadow: 0 4px 12px rgba(0,0,0,.28);
+      user-select:none;
     }
 
     .coin-side.silver{
-      background:
-        radial-gradient(circle at 30% 30%, #ffffff 0%, #dce5f0 22%, #aeb8c6 48%, #838e9b 72%, #6e7884 100%);
-      color:#eef5ff;
+      transform: rotateY(0deg);
     }
 
     .coin-side.gold{
-      background:
-        radial-gradient(circle at 30% 30%, #fff2a8 0%, #ffd85b 22%, #f0b524 46%, #d28c0e 72%, #ac6f07 100%);
-      color:#fff9d8;
       transform: rotateY(180deg);
     }
 
@@ -429,7 +420,7 @@
 
     .choice-box.show{
       opacity:1;
-      max-height:160px;
+      max-height:180px;
       margin-top:4px;
     }
 
@@ -441,7 +432,7 @@
     }
 
     .choice-btn{
-      height:54px;
+      height:58px;
       border:none;
       border-radius:18px;
       cursor:pointer;
@@ -456,6 +447,7 @@
         0 14px 24px rgba(0,0,0,.18),
         inset 0 1px 0 rgba(255,255,255,.06);
       transition: transform .16s ease, box-shadow .16s ease;
+      padding:0 12px;
     }
 
     .choice-btn:active{ transform: scale(.985); }
@@ -470,6 +462,25 @@
       background:
         linear-gradient(180deg, rgba(225,233,245,.30), rgba(135,146,160,.20)),
         rgba(255,255,255,.06);
+    }
+
+    .choice-inner{
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:10px;
+      width:100%;
+    }
+
+    .choice-coin{
+      width:30px;
+      height:30px;
+      border-radius:50%;
+      object-fit:cover;
+      display:block;
+      border:1px solid rgba(255,255,255,.18);
+      box-shadow: 0 4px 10px rgba(0,0,0,.18);
+      flex:0 0 auto;
     }
 
     .top-notice{
@@ -503,18 +514,15 @@
     }
 
     .top-notice.win{
-      background:
-        linear-gradient(180deg, rgba(34,197,94,.92), rgba(22,163,74,.92));
+      background: linear-gradient(180deg, rgba(34,197,94,.92), rgba(22,163,74,.92));
     }
 
     .top-notice.lose{
-      background:
-        linear-gradient(180deg, rgba(239,68,68,.92), rgba(220,38,38,.92));
+      background: linear-gradient(180deg, rgba(239,68,68,.92), rgba(220,38,38,.92));
     }
 
     .top-notice.info{
-      background:
-        linear-gradient(180deg, rgba(42,171,238,.92), rgba(34,158,217,.92));
+      background: linear-gradient(180deg, rgba(42,171,238,.92), rgba(34,158,217,.92));
     }
 
     .notice-icon{
@@ -787,7 +795,8 @@
       .quick-grid{ gap:6px; }
       .quick-btn{ font-size:12px; }
       .amount-input{ font-size:15px; }
-      .choice-btn{ font-size:13px; height:50px; }
+      .choice-btn{ font-size:13px; height:52px; padding:0 8px; }
+      .choice-coin{ width:26px; height:26px; }
       .start-btn{ height:50px; font-size:14px; }
       .tg-btn{ height:48px; border-radius:15px; }
       .top-notice{ min-height:52px; font-size:12px; }
@@ -856,8 +865,12 @@
         <div class="coin-wrap">
           <div class="coin-glow"></div>
           <div class="coin" id="coin">
-            <div class="coin-side silver"><span>РЕШКА</span></div>
-            <div class="coin-side gold"><span>ОРЁЛ</span></div>
+            <div class="coin-side silver">
+              <img src="https://i.postimg.cc/Rh46k0m4/Picsart-26-02-28-14-51-28-798.png" alt="Решка">
+            </div>
+            <div class="coin-side gold">
+              <img src="https://i.postimg.cc/50wQKCZL/Picsart-26-02-28-14-51-00-987.png" alt="Орёл">
+            </div>
           </div>
         </div>
       </div>
@@ -883,8 +896,19 @@
         <div class="choice-box" id="choiceBox">
           <div class="label">Выбери сторону</div>
           <div class="choice-grid">
-            <button class="choice-btn gold" id="headsBtn" type="button">Орёл</button>
-            <button class="choice-btn silver" id="tailsBtn" type="button">Решка</button>
+            <button class="choice-btn gold" id="headsBtn" type="button">
+              <span class="choice-inner">
+                <img class="choice-coin" src="https://i.postimg.cc/50wQKCZL/Picsart-26-02-28-14-51-00-987.png" alt="">
+                <span>Орёл</span>
+              </span>
+            </button>
+
+            <button class="choice-btn silver" id="tailsBtn" type="button">
+              <span class="choice-inner">
+                <img class="choice-coin" src="https://i.postimg.cc/Rh46k0m4/Picsart-26-02-28-14-51-28-798.png" alt="">
+                <span>Решка</span>
+              </span>
+            </button>
           </div>
         </div>
       </div>
@@ -935,6 +959,7 @@
   <script>
     const VERIFY_URL = "https://lazrfierfbhwlduqlvws.functions.supabase.co/verify-telegram";
     const MIN_BET = 10;
+    const WIN_CHANCE = 0.35; // 35% выигрыш, 65% проигрыш
 
     const FILES = {
       games: "games.html"
@@ -1000,7 +1025,6 @@
 
       box.classList.remove("win", "lose", "info");
       box.classList.add(type);
-
       box.classList.add("show");
 
       if (noticeTimer) clearTimeout(noticeTimer);
@@ -1133,21 +1157,23 @@
       updateBalanceUI();
       saveCachedBalance();
 
-      const resultSide = Math.random() < 0.5 ? "gold" : "silver";
+      const playerWins = Math.random() < WIN_CHANCE;
+      const resultSide = playerWins ? side : (side === "gold" ? "silver" : "gold");
+
       flipCoin(resultSide);
 
       setTimeout(() => {
         const win = side === resultSide;
+        const sideText = resultSide === "gold" ? "Орёл" : "Решка";
 
         if (win) {
           const prize = bet * 2;
           currentBalance += prize;
           updateBalanceUI();
           saveCachedBalance();
-
-          showNotice(`Победа! Ты выиграл ${formatVc(prize)}`, "win");
+          showNotice(`Выпал ${sideText}. Победа! +${formatVc(prize)}`, "win");
         } else {
-          showNotice(`Проигрыш! Списано ${formatVc(bet)}`, "lose");
+          showNotice(`Выпал ${sideText}. Проигрыш! -${formatVc(bet)}`, "lose");
         }
 
         isFlipping = false;
@@ -1192,6 +1218,7 @@
       btn.addEventListener("click", () => {
         if (isFlipping) return;
         $("betInput").value = btn.getAttribute("data-bet");
+        if (choiceVisible) setChoiceVisible(false);
         updateStartButton();
       });
     });
