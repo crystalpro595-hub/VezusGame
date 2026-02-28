@@ -1346,7 +1346,7 @@
           body: JSON.stringify({
             initData,
             betVc: bet,
-            choice
+            choice: side
           })
         });
 
@@ -1398,7 +1398,8 @@
           updateButtons();
         }, 720);
 
-      } catch {
+      } catch (err){
+        console.error("PLAY ERROR:", err);
         isFlipping = false;
         updateButtons();
         showNotice("Ошибка сети", "lose");
