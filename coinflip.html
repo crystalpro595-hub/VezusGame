@@ -1,0 +1,1023 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>CoinFlip</title>
+
+  <link rel="preconnect" href="https://i.postimg.cc" crossorigin>
+  <link rel="dns-prefetch" href="https://i.postimg.cc">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  <link rel="preload" as="image" href="https://i.postimg.cc/qvL497mF/Picsart-26-02-27-02-02-37-502.png">
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --text:#eaf1ff;
+      --muted:rgba(234,241,255,.72);
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+      --safe-top: env(safe-area-inset-top, 0px);
+
+      --glass: rgba(12, 14, 20, .78);
+      --stroke: rgba(255,255,255,.08);
+      --shadow: 0 18px 42px rgba(0,0,0,.48);
+      --shadow-soft: 0 12px 28px rgba(0,0,0,.34);
+
+      --tg1:#2AABEE;
+      --tg2:#229ED9;
+
+      /* На будущее: сюда можно будет подставить свои картинки монеты */
+      --coin-silver-img: none;
+      --coin-gold-img: none;
+    }
+
+    *{
+      box-sizing:border-box;
+      font-family:'Inter', sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html, body{
+      height:100%;
+      margin:0;
+      overflow:hidden;
+      color:var(--text);
+      background:#020617;
+    }
+
+    body{
+      background-image:url("https://i.postimg.cc/fbJT34yY/076E519D-F095-4957-88BF-5591DEB82533.png");
+      background-size:cover;
+      background-position:center;
+      background-repeat:no-repeat;
+    }
+
+    body::before{
+      content:"";
+      position:fixed;
+      inset:0;
+      background:
+        radial-gradient(900px 600px at 30% 10%, rgba(255,255,255,.05), transparent 60%),
+        linear-gradient(180deg, rgba(0,0,0,.40), rgba(0,0,0,.64));
+      pointer-events:none;
+      z-index:0;
+    }
+
+    .app{
+      position:relative;
+      height:100%;
+      overflow:auto;
+      padding:0 16px calc(28px + var(--safe-bottom)) 16px;
+      z-index:1;
+      overscroll-behavior: contain;
+    }
+
+    .content{
+      width:100%;
+      max-width:520px;
+      margin:0 auto;
+      display:flex;
+      flex-direction:column;
+      gap:14px;
+      position:relative;
+      z-index:1;
+    }
+
+    .sticky-top{
+      position:sticky;
+      top:0;
+      z-index:40;
+      padding-top: calc(8px + var(--safe-top));
+      padding-bottom:8px;
+      background:
+        linear-gradient(180deg,
+          rgba(2,6,23,.96) 0%,
+          rgba(2,6,23,.86) 72%,
+          rgba(2,6,23,0) 100%);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+    }
+
+    .top-row{
+      width:100%;
+      display:grid;
+      grid-template-columns:40px minmax(0,1fr) 54px;
+      gap:8px;
+      align-items:center;
+    }
+
+    .icon-btn{
+      width:40px;
+      height:40px;
+      border:none;
+      border-radius:14px;
+      background: var(--glass);
+      border:1px solid var(--stroke);
+      box-shadow: var(--shadow-soft), inset 0 1px 0 rgba(255,255,255,.04);
+      display:grid;
+      place-items:center;
+      color:var(--text);
+      cursor:pointer;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      font-size:18px;
+      font-weight:900;
+      padding:0;
+    }
+
+    .icon-btn:active{ transform:scale(.98); }
+
+    .balance-mini{
+      width:100%;
+      min-width:0;
+      height:42px;
+      border-radius:999px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:8px;
+      padding:6px 7px 6px 12px;
+      position:relative;
+      overflow:hidden;
+      background: var(--glass);
+      border:1px solid var(--stroke);
+      box-shadow: var(--shadow), inset 0 1px 0 rgba(255,255,255,.04);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+
+    .balance-mini::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      background:
+        radial-gradient(180px 60px at 0% 0%, rgba(255,255,255,.05), transparent 55%),
+        radial-gradient(180px 60px at 100% 100%, rgba(255,255,255,.03), transparent 55%);
+      pointer-events:none;
+    }
+
+    .bal-title{
+      position:relative;
+      z-index:1;
+      font-size:12px;
+      font-weight:900;
+      color: rgba(234,241,255,.92);
+      white-space:nowrap;
+    }
+
+    .bal-amount{
+      position:relative;
+      z-index:1;
+      min-width:88px;
+      height:28px;
+      border:none;
+      border-radius:999px;
+      padding:0 10px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background: rgba(255,255,255,.08);
+      border:1px solid rgba(255,255,255,.08);
+      color: rgba(234,241,255,.98);
+      font-weight:900;
+      font-size:13px;
+      white-space:nowrap;
+      cursor:default;
+      pointer-events:none;
+    }
+
+    .logo-btn{
+      width:54px;
+      height:54px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background:transparent;
+      border:none;
+      padding:0;
+      margin:0;
+      cursor:pointer;
+    }
+
+    .logo-btn:active{ transform:scale(.98); }
+
+    .logo-btn img{
+      width:100%;
+      height:100%;
+      object-fit:contain;
+      display:block;
+    }
+
+    .card{
+      border-radius:24px;
+      background: var(--glass);
+      border:1px solid var(--stroke);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      overflow:hidden;
+    }
+
+    .hero-card{
+      padding:16px;
+      display:flex;
+      flex-direction:column;
+      gap:14px;
+    }
+
+    .title{
+      margin:0;
+      font-size:20px;
+      font-weight:900;
+      letter-spacing:.2px;
+      text-shadow: 0 10px 18px rgba(0,0,0,.35);
+    }
+
+    .sub{
+      margin:0;
+      font-size:13px;
+      line-height:1.35;
+      color:var(--muted);
+    }
+
+    .coin-wrap{
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      padding:8px 0 4px;
+      perspective: 1200px;
+      min-height: 230px;
+    }
+
+    .coin{
+      width:160px;
+      height:160px;
+      position:relative;
+      transform-style: preserve-3d;
+      transition: transform 1.8s cubic-bezier(.18,.9,.22,1);
+      filter: drop-shadow(0 20px 26px rgba(0,0,0,.38));
+    }
+
+    .coin-side{
+      position:absolute;
+      inset:0;
+      border-radius:50%;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+      overflow:hidden;
+      border: 5px solid rgba(255,255,255,.16);
+      box-shadow:
+        inset 0 0 0 2px rgba(255,255,255,.10),
+        inset 0 10px 18px rgba(255,255,255,.08),
+        inset 0 -14px 24px rgba(0,0,0,.20);
+    }
+
+    .coin-side::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      background:
+        radial-gradient(circle at 35% 30%, rgba(255,255,255,.32), transparent 26%),
+        radial-gradient(circle at 70% 72%, rgba(255,255,255,.10), transparent 22%);
+      pointer-events:none;
+    }
+
+    .coin-side span{
+      position:relative;
+      z-index:1;
+      font-size:18px;
+      font-weight:900;
+      letter-spacing:.8px;
+      text-shadow: 0 4px 12px rgba(0,0,0,.28);
+    }
+
+    .coin-side.silver{
+      background-image:
+        var(--coin-silver-img),
+        radial-gradient(circle at 30% 30%, #ffffff 0%, #dce5f0 22%, #aeb8c6 48%, #838e9b 72%, #6e7884 100%);
+      background-size: cover, cover;
+      background-position: center, center;
+      color:#eef5ff;
+    }
+
+    .coin-side.gold{
+      background-image:
+        var(--coin-gold-img),
+        radial-gradient(circle at 30% 30%, #fff2a8 0%, #ffd85b 22%, #f0b524 46%, #d28c0e 72%, #ac6f07 100%);
+      background-size: cover, cover;
+      background-position: center, center;
+      color:#fff9d8;
+      transform: rotateY(180deg);
+    }
+
+    .coin-glow{
+      position:absolute;
+      left:50%;
+      top:50%;
+      width:210px;
+      height:210px;
+      transform:translate(-50%, -50%);
+      border-radius:50%;
+      background:
+        radial-gradient(circle, rgba(255,215,0,.12), rgba(255,255,255,0) 62%);
+      pointer-events:none;
+      z-index:-1;
+      filter: blur(8px);
+    }
+
+    .panel{
+      padding:16px;
+      display:flex;
+      flex-direction:column;
+      gap:14px;
+    }
+
+    .row-head{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+    }
+
+    .label{
+      font-size:13px;
+      font-weight:900;
+      color: rgba(234,241,255,.94);
+    }
+
+    .small-note{
+      font-size:12px;
+      font-weight:800;
+      color: var(--muted);
+      text-align:right;
+    }
+
+    .amount-box{
+      display:flex;
+      gap:10px;
+      align-items:center;
+    }
+
+    .amount-input{
+      flex:1;
+      min-width:0;
+      height:48px;
+      border-radius:16px;
+      border:1px solid rgba(255,255,255,.08);
+      background: rgba(255,255,255,.06);
+      color: rgba(234,241,255,.96);
+      padding:0 14px;
+      outline:none;
+      font-size:16px;
+      font-weight:900;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.04);
+    }
+
+    .amount-input::placeholder{
+      color: rgba(234,241,255,.42);
+      font-weight:800;
+    }
+
+    .currency-pill{
+      min-width:78px;
+      height:48px;
+      border-radius:16px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:14px;
+      font-weight:900;
+      color: rgba(234,241,255,.96);
+      background: rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.08);
+    }
+
+    .quick-grid{
+      display:grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap:8px;
+    }
+
+    .quick-btn{
+      height:40px;
+      border:none;
+      border-radius:14px;
+      background: rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.08);
+      color: rgba(234,241,255,.94);
+      font-size:13px;
+      font-weight:900;
+      cursor:pointer;
+    }
+
+    .quick-btn:active{ transform: scale(.98); }
+
+    .side-grid{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:10px;
+    }
+
+    .side-btn{
+      height:52px;
+      border:none;
+      border-radius:18px;
+      cursor:pointer;
+      position:relative;
+      overflow:hidden;
+      color:#fff;
+      font-size:14px;
+      font-weight:900;
+      letter-spacing:.2px;
+      border:1px solid rgba(255,255,255,.08);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.06);
+      transition: transform .16s ease, box-shadow .16s ease, border-color .16s ease;
+    }
+
+    .side-btn:active{ transform: scale(.985); }
+
+    .side-btn.silver{
+      background:
+        linear-gradient(180deg, rgba(225,233,245,.28), rgba(135,146,160,.18)),
+        rgba(255,255,255,.06);
+    }
+
+    .side-btn.gold{
+      background:
+        linear-gradient(180deg, rgba(255,216,91,.26), rgba(210,140,14,.18)),
+        rgba(255,255,255,.06);
+    }
+
+    .side-btn.active{
+      border-color: rgba(255,255,255,.18);
+      box-shadow:
+        0 14px 28px rgba(0,0,0,.22),
+        inset 0 1px 0 rgba(255,255,255,.08),
+        0 0 0 1px rgba(255,255,255,.05);
+    }
+
+    .play-btn{
+      width:100%;
+      height:54px;
+      border:none;
+      border-radius:18px;
+      cursor:pointer;
+      background: linear-gradient(180deg, var(--tg1), var(--tg2));
+      color:#fff;
+      font-size:15px;
+      font-weight:900;
+      letter-spacing:.2px;
+      box-shadow: 0 18px 34px rgba(34,158,217,.28);
+      transition: transform .16s ease, opacity .16s ease, box-shadow .16s ease;
+    }
+
+    .play-btn:active{ transform: scale(.985); }
+
+    .play-btn:disabled{
+      opacity:.55;
+      cursor:not-allowed;
+      box-shadow:none;
+      transform:none !important;
+    }
+
+    .result-card{
+      padding:16px;
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+    }
+
+    .result-title{
+      margin:0;
+      font-size:13px;
+      font-weight:900;
+      color:var(--muted);
+    }
+
+    .result-text{
+      margin:0;
+      font-size:16px;
+      font-weight:900;
+      line-height:1.3;
+      color:#fff;
+      min-height: 42px;
+    }
+
+    .result-text.win{ color:#9ff5b9; }
+    .result-text.lose{ color:#ffc5c5; }
+
+    .channel-overlay{
+      position:fixed;
+      inset:0;
+      background: rgba(0,0,0,.72);
+      opacity:0;
+      pointer-events:none;
+      transition: opacity .22s ease;
+      z-index:260;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:18px;
+    }
+
+    .channel-overlay.show{
+      opacity:1;
+      pointer-events:auto;
+    }
+
+    .channel-card{
+      width:min(440px, 100%);
+      border-radius:24px;
+      overflow:hidden;
+      background: rgba(14,16,24,.94);
+      border: 1px solid rgba(255,255,255,.08);
+      box-shadow: 0 34px 90px rgba(0,0,0,.62);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      position:relative;
+      transform: translateY(12px) scale(.98);
+      opacity:.95;
+      transition: transform .22s ease, opacity .22s ease;
+    }
+
+    .channel-overlay.show .channel-card{
+      transform: translateY(0) scale(1);
+      opacity:1;
+    }
+
+    .channel-head{
+      padding:16px 16px 10px 16px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      background: rgba(255,255,255,.03);
+      border-bottom: 1px solid rgba(255,255,255,.06);
+    }
+
+    .channel-title{
+      font-weight:900;
+      letter-spacing:.25px;
+      font-size:14px;
+      color: rgba(234,241,255,.95);
+    }
+
+    .channel-x{
+      width:38px;
+      height:38px;
+      border-radius:14px;
+      border:1px solid rgba(255,255,255,.08);
+      background: rgba(255,255,255,.05);
+      color: rgba(234,241,255,.92);
+      cursor:pointer;
+      display:grid;
+      place-items:center;
+      box-shadow: 0 12px 28px rgba(0,0,0,.32);
+      padding:0;
+    }
+
+    .channel-x:active{ transform: scale(.98); }
+
+    .channel-body{
+      padding:14px 16px 16px 16px;
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+    }
+
+    .channel-text{
+      margin:0;
+      font-size:13px;
+      line-height:1.35;
+      color: rgba(234,241,255,.84);
+    }
+
+    .tg-btn{
+      border:none;
+      cursor:pointer;
+      width:100%;
+      height:50px;
+      border-radius:16px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:10px;
+      background: linear-gradient(180deg, var(--tg1), var(--tg2));
+      box-shadow:
+        0 18px 40px rgba(34,158,217,.28),
+        inset 0 1px 0 rgba(255,255,255,.14);
+      color:#fff;
+      font-weight:900;
+      letter-spacing:.2px;
+      font-size:14px;
+    }
+
+    .tg-btn:active{ transform: scale(.99); }
+
+    .tg-ico{
+      width:22px;
+      height:22px;
+      display:block;
+      filter: drop-shadow(0 8px 14px rgba(0,0,0,.18));
+    }
+
+    @media (max-width: 360px){
+      .top-row{
+        grid-template-columns:36px minmax(0,1fr) 46px;
+        gap:6px;
+      }
+
+      .icon-btn{
+        width:36px;
+        height:36px;
+        border-radius:12px;
+        font-size:16px;
+      }
+
+      .logo-btn{
+        width:46px;
+        height:46px;
+      }
+
+      .balance-mini{
+        height:38px;
+      }
+
+      .bal-amount{
+        min-width:74px;
+        height:24px;
+        font-size:12px;
+      }
+
+      .title{ font-size:18px; }
+      .coin{ width:136px; height:136px; }
+      .quick-grid{ gap:6px; }
+      .quick-btn{ font-size:12px; }
+      .amount-input{ font-size:15px; }
+      .currency-pill{ min-width:70px; font-size:13px; }
+      .side-btn{ font-size:13px; height:48px; }
+      .play-btn{ height:50px; font-size:14px; }
+      .tg-btn{ height:48px; border-radius:15px; }
+    }
+
+    @media (prefers-reduced-motion: reduce){
+      *{ transition:none !important; }
+      .channel-overlay.show .channel-card{ transform:none !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <div class="content">
+
+      <div class="sticky-top">
+        <div class="top-row">
+          <button class="icon-btn" id="backBtn" aria-label="Назад">←</button>
+
+          <div class="balance-mini" aria-label="Баланс">
+            <span class="bal-title">Баланс</span>
+            <div class="bal-amount" id="balanceValue">...</div>
+          </div>
+
+          <button class="logo-btn" id="logoBtn" aria-label="Открыть Telegram канал">
+            <img
+              src="https://i.postimg.cc/qvL497mF/Picsart-26-02-27-02-02-37-502.png"
+              alt="Vezus"
+              loading="eager"
+              fetchpriority="high"
+              decoding="async"
+            >
+          </button>
+        </div>
+      </div>
+
+      <div class="card hero-card">
+        <h1 class="title">CoinFlip</h1>
+        <p class="sub">Выбери ставку, выбери сторону монеты и попробуй угадать. При победе получаешь <b>x2</b>.</p>
+
+        <div class="coin-wrap">
+          <div class="coin-glow"></div>
+          <div class="coin" id="coin">
+            <div class="coin-side silver"><span>SILVER</span></div>
+            <div class="coin-side gold"><span>GOLD</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card panel">
+        <div>
+          <div class="row-head">
+            <div class="label">Ставка</div>
+            <div class="small-note">Минимум 1 VC</div>
+          </div>
+
+          <div class="amount-box" style="margin-top:10px;">
+            <input class="amount-input" id="betInput" type="number" min="1" step="1" inputmode="numeric" placeholder="Введите ставку">
+            <div class="currency-pill">VC</div>
+          </div>
+
+          <div class="quick-grid" style="margin-top:10px;">
+            <button class="quick-btn" type="button" data-bet="10">10</button>
+            <button class="quick-btn" type="button" data-bet="50">50</button>
+            <button class="quick-btn" type="button" data-bet="100">100</button>
+            <button class="quick-btn" type="button" data-bet="500">500</button>
+          </div>
+        </div>
+
+        <div>
+          <div class="label">Выбор стороны</div>
+
+          <div class="side-grid" style="margin-top:10px;">
+            <button class="side-btn silver" id="silverBtn" type="button">Серебряная</button>
+            <button class="side-btn gold" id="goldBtn" type="button">Золотая</button>
+          </div>
+        </div>
+
+        <button class="play-btn" id="playBtn" type="button" disabled>Подбросить монету</button>
+      </div>
+
+      <div class="card result-card">
+        <p class="result-title">Результат</p>
+        <p class="result-text" id="resultText">Сделай ставку и выбери сторону монеты.</p>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="channel-overlay" id="channelOverlay" aria-hidden="true">
+    <div class="channel-card" role="dialog" aria-modal="true" aria-label="Telegram канал">
+      <div class="channel-head">
+        <div class="channel-title">Наш Telegram канал</div>
+        <button class="channel-x" id="channelClose" aria-label="Закрыть">✕</button>
+      </div>
+
+      <div class="channel-body">
+        <p class="channel-text">
+          Нажми кнопку ниже — откроется наш Telegram канал:
+          <b>@vezuspubg</b>
+        </p>
+
+        <button class="tg-btn" id="goChannel" aria-label="Перейти в Telegram канал">
+          <svg class="tg-ico" viewBox="0 0 240 240" aria-hidden="true">
+            <path fill="#fff" d="M120 0C53.7 0 0 53.7 0 120s53.7 120 120 120 120-53.7 120-120S186.3 0 120 0zm58.7 82.3l-19.7 92.8c-1.5 6.6-5.4 8.2-10.9 5.1l-30.2-22.3-14.6 14c-1.6 1.6-3 3-6.1 3l2.2-31.6 57.5-52c2.5-2.2-.5-3.4-3.9-1.2l-71 44.7-30.6-9.6c-6.6-2.1-6.7-6.6 1.4-9.7l119.6-46.1c5.5-2 10.3 1.3 8.8 9.9z"/>
+          </svg>
+          Перейти в Telegram канал
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <script>
+    const VERIFY_URL = "https://lazrfierfbhwlduqlvws.functions.supabase.co/verify-telegram";
+
+    const FILES = {
+      games: "games.html"
+    };
+
+    const $ = (id) => document.getElementById(id);
+
+    let currentBalance = 0;
+    let selectedSide = "";
+    let isFlipping = false;
+    let coinRotation = 0;
+
+    function formatVc(value){
+      const n = Number(value ?? 0);
+      if (!Number.isFinite(n)) return "0 VC";
+      return Number.isInteger(n) ? `${n} VC` : `${n.toFixed(2)} VC`;
+    }
+
+    function goTo(file){
+      window.location.href = file;
+    }
+
+    function openTelegramLinkSafe(url){
+      if (window.Telegram && window.Telegram.WebApp && typeof window.Telegram.WebApp.openTelegramLink === "function") {
+        window.Telegram.WebApp.openTelegramLink(url);
+        return;
+      }
+      window.open(url, "_blank", "noopener");
+    }
+
+    function loadCachedProfile(){
+      try {
+        return JSON.parse(localStorage.getItem("tg_profile") || "null");
+      } catch {
+        return null;
+      }
+    }
+
+    function saveCachedBalance(){
+      try {
+        const cached = loadCachedProfile() || {};
+        cached.balance = currentBalance;
+        localStorage.setItem("tg_profile", JSON.stringify(cached));
+      } catch {}
+    }
+
+    function updateBalanceUI(){
+      $("balanceValue").textContent = formatVc(currentBalance);
+    }
+
+    function setResult(text, type = ""){
+      const el = $("resultText");
+      el.textContent = text;
+      el.classList.remove("win", "lose");
+      if (type) el.classList.add(type);
+    }
+
+    function getBetAmount(){
+      const raw = $("betInput").value;
+      const amount = Number(raw);
+      if (!raw || !Number.isFinite(amount)) return 0;
+      return amount;
+    }
+
+    function updateSideButtons(){
+      $("silverBtn").classList.toggle("active", selectedSide === "silver");
+      $("goldBtn").classList.toggle("active", selectedSide === "gold");
+    }
+
+    function validateGame(){
+      const amount = getBetAmount();
+      const validAmount = amount >= 1 && amount <= currentBalance;
+      const ready = validAmount && !!selectedSide && !isFlipping;
+      $("playBtn").disabled = !ready;
+      return ready;
+    }
+
+    async function autoAuthTelegram(){
+      const cached = loadCachedProfile();
+
+      if (cached?.balance != null) {
+        currentBalance = Number(cached.balance) || 0;
+      } else {
+        currentBalance = 0;
+      }
+      updateBalanceUI();
+
+      if (!window.Telegram || !window.Telegram.WebApp) {
+        validateGame();
+        return;
+      }
+
+      try{
+        Telegram.WebApp.ready();
+        if (typeof Telegram.WebApp.expand === "function") Telegram.WebApp.expand();
+      } catch {}
+
+      const initData = Telegram.WebApp.initData;
+      if (!initData) {
+        validateGame();
+        return;
+      }
+
+      $("balanceValue").textContent = "...";
+
+      try{
+        const res = await fetch(VERIFY_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ initData })
+        });
+
+        const json = await res.json().catch(() => ({}));
+
+        if (res.ok && json.ok && json.profile) {
+          currentBalance = Number(json.profile.balance) || 0;
+          localStorage.setItem("tg_profile", JSON.stringify(json.profile));
+        } else {
+          currentBalance = cached?.balance != null ? (Number(cached.balance) || 0) : 0;
+        }
+      } catch {
+        currentBalance = cached?.balance != null ? (Number(cached.balance) || 0) : 0;
+      }
+
+      updateBalanceUI();
+      validateGame();
+    }
+
+    function chooseSide(side){
+      if (isFlipping) return;
+      selectedSide = side;
+      updateSideButtons();
+      validateGame();
+    }
+
+    function setBet(value){
+      if (isFlipping) return;
+      $("betInput").value = value;
+      validateGame();
+    }
+
+    function flipCoin(resultSide){
+      const extraTurns = 6 + Math.floor(Math.random() * 3);
+      const currentTurns = Math.floor(coinRotation / 360);
+      const baseTurns = currentTurns + extraTurns;
+      coinRotation = (baseTurns * 360) + (resultSide === "gold" ? 180 : 0);
+      $("coin").style.transform = `rotateY(${coinRotation}deg)`;
+    }
+
+    function playRound(){
+      if (isFlipping) return;
+      if (!validateGame()) return;
+
+      const amount = getBetAmount();
+      if (amount < 1) return;
+
+      if (amount > currentBalance) {
+        setResult("Недостаточно средств для этой ставки.", "lose");
+        return;
+      }
+
+      isFlipping = true;
+      validateGame();
+
+      currentBalance -= amount;
+      updateBalanceUI();
+      saveCachedBalance();
+
+      setResult("Монета подбрасывается...", "");
+
+      const resultSide = Math.random() < 0.5 ? "silver" : "gold";
+      flipCoin(resultSide);
+
+      setTimeout(() => {
+        const win = selectedSide === resultSide;
+
+        if (win) {
+          currentBalance += amount * 2;
+          updateBalanceUI();
+          saveCachedBalance();
+          const sideText = resultSide === "silver" ? "серебряная" : "золотая";
+          setResult(`Выпала ${sideText}. Ты выиграл ${formatVc(amount * 2)}!`, "win");
+        } else {
+          const sideText = resultSide === "silver" ? "серебряная" : "золотая";
+          setResult(`Выпала ${sideText}. Ставка ${formatVc(amount)} проиграна.`, "lose");
+        }
+
+        isFlipping = false;
+        validateGame();
+      }, 1850);
+    }
+
+    const channelOverlay = $("channelOverlay");
+
+    function openChannel(){
+      channelOverlay.classList.add("show");
+      channelOverlay.setAttribute("aria-hidden", "false");
+      document.body.style.overflow = "hidden";
+    }
+
+    function closeChannel(){
+      channelOverlay.classList.remove("show");
+      channelOverlay.setAttribute("aria-hidden", "true");
+      document.body.style.overflow = "";
+    }
+
+    $("backBtn").addEventListener("click", () => goTo(FILES.games));
+    $("logoBtn").addEventListener("click", openChannel);
+    $("channelClose").addEventListener("click", closeChannel);
+
+    channelOverlay.addEventListener("click", (e) => {
+      if (e.target === channelOverlay) closeChannel();
+    });
+
+    $("goChannel").addEventListener("click", () => {
+      openTelegramLinkSafe("https://t.me/vezuspubg");
+    });
+
+    $("silverBtn").addEventListener("click", () => chooseSide("silver"));
+    $("goldBtn").addEventListener("click", () => chooseSide("gold"));
+
+    document.querySelectorAll(".quick-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        setBet(btn.getAttribute("data-bet"));
+      });
+    });
+
+    $("betInput").addEventListener("input", () => {
+      if (Number($("betInput").value) < 0) $("betInput").value = "";
+      validateGame();
+    });
+
+    $("playBtn").addEventListener("click", playRound);
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") closeChannel();
+    });
+
+    window.addEventListener("load", () => {
+      updateSideButtons();
+      autoAuthTelegram();
+    });
+  </script>
+</body>
+</html>
