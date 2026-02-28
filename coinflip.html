@@ -31,11 +31,6 @@
       --tg1:#2AABEE;
       --tg2:#229ED9;
       --tg3:#53c5ff;
-
-      --ok1:#22c55e;
-      --ok2:#16a34a;
-      --bad1:#ef4444;
-      --bad2:#dc2626;
     }
 
     *{
@@ -283,18 +278,18 @@
 
     .coin-shadow{
       position:absolute;
-      bottom:30px;
-      width:165px;
-      height:26px;
+      bottom:34px;
+      width:164px;
+      height:22px;
       border-radius:50%;
-      background: rgba(0,0,0,.35);
+      background: rgba(0,0,0,.34);
       filter: blur(10px);
       transform: scale(1);
-      opacity:.72;
+      opacity:.68;
     }
 
     .coin-shadow.is-flipping{
-      animation: shadowPulse 1.8s cubic-bezier(.18,.88,.22,1) both;
+      animation: shadowDepth 1.62s cubic-bezier(.2,.9,.2,1) both;
     }
 
     .coin-shell{
@@ -303,19 +298,19 @@
       height:230px;
       transform-style: preserve-3d;
       will-change: transform, filter;
-      filter: drop-shadow(0 28px 34px rgba(0,0,0,.42));
+      filter: drop-shadow(0 24px 30px rgba(0,0,0,.38));
     }
 
     .coin-shell.is-flipping{
-      animation: coinJumpFlip 1.8s cubic-bezier(.18,.88,.22,1) both;
+      animation: coinDepthSpin 1.62s cubic-bezier(.2,.9,.2,1) both;
     }
 
     .coin-shell.flash-win{
-      animation: coinFlashWin .55s ease;
+      animation: coinFlashWin .42s ease;
     }
 
     .coin-shell.flash-lose{
-      animation: coinFlashLose .55s ease;
+      animation: coinFlashLose .42s ease;
     }
 
     .coin-frame{
@@ -359,56 +354,65 @@
       filter: drop-shadow(0 3px 4px rgba(0,0,0,.18));
     }
 
-    @keyframes coinJumpFlip{
+    @keyframes coinDepthSpin{
       0%{
-        transform: translate3d(0,0,0) rotateX(0deg) rotateY(0deg) rotateZ(0deg) scale(1);
+        transform: translate3d(0,0,0) rotateY(0deg) rotateZ(0deg) scale(1);
       }
-      16%{
-        transform: translate3d(0,-12px,12px) rotateX(240deg) rotateY(170deg) rotateZ(3deg) scale(1.03);
+      22%{
+        transform: translate3d(0,0,18px) rotateY(420deg) rotateZ(1.4deg) scale(1.04);
       }
-      34%{
-        transform: translate3d(0,-42px,34px) rotateX(720deg) rotateY(520deg) rotateZ(-4deg) scale(1.07);
-      }
-      52%{
-        transform: translate3d(0,-70px,62px) rotateX(1100deg) rotateY(860deg) rotateZ(0deg) scale(1.12);
+      48%{
+        transform: translate3d(0,0,42px) rotateY(980deg) rotateZ(-1.2deg) scale(1.10);
       }
       74%{
-        transform: translate3d(0,-28px,26px) rotateX(1450deg) rotateY(1180deg) rotateZ(4deg) scale(1.06);
+        transform: translate3d(0,0,18px) rotateY(1540deg) rotateZ(.8deg) scale(1.04);
       }
       100%{
-        transform: translate3d(0,0,0) rotateX(1680deg) rotateY(1440deg) rotateZ(0deg) scale(1);
+        transform: translate3d(0,0,0) rotateY(1980deg) rotateZ(0deg) scale(1);
       }
     }
 
-    @keyframes shadowPulse{
+    @keyframes shadowDepth{
       0%{
         transform: scale(1);
-        opacity:.72;
+        opacity:.68;
       }
-      35%{
+      48%{
         transform: scale(.72);
-        opacity:.34;
-      }
-      55%{
-        transform: scale(.62);
-        opacity:.24;
+        opacity:.28;
       }
       100%{
         transform: scale(1);
-        opacity:.72;
+        opacity:.68;
       }
     }
 
     @keyframes coinFlashWin{
-      0%{ filter: drop-shadow(0 28px 34px rgba(0,0,0,.42)); }
-      50%{ filter: drop-shadow(0 0 26px rgba(255,215,0,.48)) drop-shadow(0 28px 34px rgba(0,0,0,.42)); }
-      100%{ filter: drop-shadow(0 28px 34px rgba(0,0,0,.42)); }
+      0%{
+        filter: drop-shadow(0 24px 30px rgba(0,0,0,.38));
+      }
+      50%{
+        filter:
+          drop-shadow(0 0 16px rgba(255,215,0,.24))
+          drop-shadow(0 24px 30px rgba(0,0,0,.38));
+      }
+      100%{
+        filter: drop-shadow(0 24px 30px rgba(0,0,0,.38));
+      }
     }
 
     @keyframes coinFlashLose{
-      0%{ filter: drop-shadow(0 28px 34px rgba(0,0,0,.42)); }
-      50%{ filter: drop-shadow(0 0 22px rgba(192,198,210,.38)) drop-shadow(0 28px 34px rgba(0,0,0,.42)); }
-      100%{ filter: drop-shadow(0 28px 34px rgba(0,0,0,.42)); }
+      0%{
+        filter: drop-shadow(0 24px 30px rgba(0,0,0,.38));
+      }
+      50%{
+        filter:
+          drop-shadow(0 0 14px rgba(192,198,210,.20))
+          drop-shadow(0 24px 30px rgba(0,0,0,.38));
+      }
+      100%{
+        filter: drop-shadow(0 24px 30px rgba(0,0,0,.38));
+      }
     }
 
     .panel{
@@ -629,59 +633,85 @@
       position:fixed;
       left:50%;
       top: calc(10px + var(--safe-top));
-      transform: translateX(-50%) translateY(-18px);
-      width:min(520px, calc(100% - 24px));
-      min-height:56px;
-      border-radius:18px;
-      padding:12px 14px;
+      transform: translateX(-50%) translateY(-14px) scale(.97);
+      width:min(430px, calc(100% - 28px));
+      min-height:48px;
+      border-radius:16px;
+      padding:10px 12px;
       display:flex;
       align-items:center;
-      gap:12px;
+      gap:10px;
       color:#fff;
-      font-size:13px;
+      font-size:12.5px;
       font-weight:900;
-      box-shadow:0 18px 40px rgba(0,0,0,.35);
+      box-shadow:0 14px 28px rgba(0,0,0,.28);
       opacity:0;
       pointer-events:none;
-      transition: opacity .25s ease, transform .25s ease;
+      transition: opacity .24s ease, transform .24s ease, box-shadow .24s ease;
       z-index:500;
       border:1px solid rgba(255,255,255,.10);
       backdrop-filter: blur(10px);
       -webkit-backdrop-filter: blur(10px);
+      overflow:hidden;
+    }
+
+    .top-notice::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,.12), transparent);
+      transform: translateX(-100%);
+      pointer-events:none;
     }
 
     .top-notice.show{
       opacity:1;
-      transform: translateX(-50%) translateY(0);
+      transform: translateX(-50%) translateY(0) scale(1);
+    }
+
+    .top-notice.show::before{
+      animation: noticeShine .55s ease;
     }
 
     .top-notice.win{
       background: linear-gradient(180deg, rgba(34,197,94,.92), rgba(22,163,74,.92));
+      box-shadow:0 14px 26px rgba(22,163,74,.18);
     }
 
     .top-notice.lose{
       background: linear-gradient(180deg, rgba(239,68,68,.92), rgba(220,38,38,.92));
+      box-shadow:0 14px 26px rgba(220,38,38,.16);
     }
 
     .top-notice.info{
       background: linear-gradient(180deg, rgba(42,171,238,.92), rgba(34,158,217,.92));
+      box-shadow:0 14px 26px rgba(34,158,217,.16);
     }
 
     .notice-icon{
-      width:32px;
-      height:32px;
-      border-radius:12px;
+      width:28px;
+      height:28px;
+      border-radius:10px;
       display:grid;
       place-items:center;
       background: rgba(255,255,255,.14);
       flex:0 0 auto;
-      font-size:16px;
+      font-size:14px;
+      position:relative;
+      z-index:1;
     }
 
     .notice-text{
       flex:1;
       min-width:0;
-      line-height:1.25;
+      line-height:1.2;
+      position:relative;
+      z-index:1;
+    }
+
+    @keyframes noticeShine{
+      from{ transform: translateX(-100%); }
+      to{ transform: translateX(100%); }
     }
 
     .overlay{
@@ -996,8 +1026,8 @@
       }
 
       .coin-shadow{
-        width:140px;
-        height:22px;
+        width:138px;
+        height:20px;
       }
 
       .quick-grid{ gap:6px; }
@@ -1007,8 +1037,16 @@
       .choice-coin{ width:28px; height:28px; }
       .start-btn{ height:50px; font-size:14px; }
       .tg-btn{ height:48px; border-radius:15px; }
-      .top-notice{ min-height:52px; font-size:12px; }
-      .notice-icon{ width:28px; height:28px; font-size:14px; }
+      .top-notice{
+        min-height:44px;
+        font-size:12px;
+        width:min(400px, calc(100% - 24px));
+      }
+      .notice-icon{
+        width:26px;
+        height:26px;
+        font-size:13px;
+      }
 
       .loader-logo{
         width:66px;
@@ -1294,7 +1332,7 @@
       if (noticeTimer) clearTimeout(noticeTimer);
       noticeTimer = setTimeout(() => {
         box.classList.remove("show");
-      }, 2600);
+      }, 2300);
     }
 
     function setChoiceVisible(show){
@@ -1382,7 +1420,7 @@
       }
     }
 
-    function playTone(freq, duration, type = "sine", volume = 0.03, startAt = 0){
+    function playTone(freq, duration, type = "sine", volume = 0.02, startAt = 0){
       const ctx = getAudioCtx();
       if (!ctx) return;
 
@@ -1396,7 +1434,7 @@
       osc.frequency.setValueAtTime(freq, start);
 
       gain.gain.setValueAtTime(0.0001, start);
-      gain.gain.exponentialRampToValueAtTime(volume, start + 0.01);
+      gain.gain.exponentialRampToValueAtTime(volume, start + 0.008);
       gain.gain.exponentialRampToValueAtTime(0.0001, end);
 
       osc.connect(gain);
@@ -1406,7 +1444,7 @@
       osc.stop(end + 0.02);
     }
 
-    function playSweep(fromFreq, toFreq, duration, type = "triangle", volume = 0.012, startAt = 0){
+    function playSweep(fromFreq, toFreq, duration, type = "triangle", volume = 0.008, startAt = 0){
       const ctx = getAudioCtx();
       if (!ctx) return;
 
@@ -1418,10 +1456,10 @@
 
       osc.type = type;
       osc.frequency.setValueAtTime(fromFreq, start);
-      osc.frequency.exponentialRampToValueAtTime(Math.max(40, toFreq), end);
+      osc.frequency.exponentialRampToValueAtTime(Math.max(30, toFreq), end);
 
       gain.gain.setValueAtTime(0.0001, start);
-      gain.gain.exponentialRampToValueAtTime(volume, start + 0.01);
+      gain.gain.exponentialRampToValueAtTime(volume, start + 0.012);
       gain.gain.exponentialRampToValueAtTime(0.0001, end);
 
       osc.connect(gain);
@@ -1432,33 +1470,34 @@
     }
 
     function playFlipSequenceSound(){
-      playSweep(260, 120, 0.34, "triangle", 0.010, 0.00);
+      playSweep(920, 220, 0.56, "sawtooth", 0.008, 0.00);
+      playSweep(640, 150, 0.62, "triangle", 0.006, 0.05);
 
-      const hits = [980, 860, 930, 780, 900, 740, 820, 700];
-      hits.forEach((freq, i) => {
-        playTone(freq, 0.040, "square", 0.010, 0.08 + (i * 0.11));
+      const ticks = [1180, 1080, 980, 900, 820, 760, 700, 650];
+      ticks.forEach((freq, i) => {
+        playTone(freq, 0.028, "square", 0.006, 0.14 + (i * 0.08));
       });
     }
 
     function playLandClick(side){
       if (side === "gold") {
-        playTone(1180, 0.05, "square", 0.018, 0.00);
-        playTone(860, 0.07, "triangle", 0.015, 0.04);
+        playTone(980, 0.040, "square", 0.012, 0.00);
+        playTone(720, 0.055, "triangle", 0.010, 0.03);
       } else {
-        playTone(760, 0.05, "square", 0.017, 0.00);
-        playTone(520, 0.07, "triangle", 0.014, 0.04);
+        playTone(760, 0.040, "square", 0.011, 0.00);
+        playTone(520, 0.055, "triangle", 0.009, 0.03);
       }
     }
 
     function playWinSound(){
-      playTone(700, 0.08, "triangle", 0.03, 0.00);
-      playTone(980, 0.10, "triangle", 0.03, 0.08);
-      playTone(1260, 0.12, "sine", 0.025, 0.18);
+      playTone(640, 0.055, "triangle", 0.018, 0.00);
+      playTone(900, 0.070, "triangle", 0.018, 0.06);
+      playTone(1180, 0.085, "sine", 0.015, 0.14);
     }
 
     function playLoseSound(){
-      playTone(420, 0.10, "sawtooth", 0.025, 0.00);
-      playTone(290, 0.12, "sawtooth", 0.023, 0.10);
+      playTone(360, 0.070, "sawtooth", 0.016, 0.00);
+      playTone(250, 0.090, "sawtooth", 0.014, 0.08);
     }
 
     function animateCoinTo(resultSide){
@@ -1482,12 +1521,12 @@
       faceSwapTimer = setTimeout(() => {
         setCoinFace(resultSide);
         playLandClick(resultSide);
-      }, 900);
+      }, 780);
 
       finishFlipTimer = setTimeout(() => {
         coinShell.classList.remove("is-flipping");
         coinShadow.classList.remove("is-flipping");
-      }, 1820);
+      }, 1630);
     }
 
     function startGame(){
@@ -1496,7 +1535,7 @@
       const bet = getBetAmount();
 
       if (bet < MIN_BET) {
-        showNotice(`Минимальная ставка ${MIN_BET} VC`, "lose");
+        showNotice(`Минимум ${MIN_BET} VC`, "lose");
         return;
       }
 
@@ -1517,7 +1556,7 @@
 
       if (bet < MIN_BET) {
         setChoiceVisible(false);
-        showNotice(`Минимальная ставка ${MIN_BET} VC`, "lose");
+        showNotice(`Минимум ${MIN_BET} VC`, "lose");
         return;
       }
 
@@ -1552,20 +1591,20 @@
           saveCachedBalance();
           coinShell.classList.add("flash-win");
           playWinSound();
-          showNotice(`Выпал ${sideText}. Победа! +${formatVc(prize)}`, "win");
+          showNotice(`Выпал ${sideText}. +${formatVc(prize)}`, "win");
         } else {
           coinShell.classList.add("flash-lose");
           playLoseSound();
-          showNotice(`Выпал ${sideText}. Проигрыш! -${formatVc(bet)}`, "lose");
+          showNotice(`Выпал ${sideText}. -${formatVc(bet)}`, "lose");
         }
 
         setTimeout(() => {
           coinShell.classList.remove("flash-win", "flash-lose");
-        }, 560);
+        }, 430);
 
         isFlipping = false;
         updateStartButton();
-      }, 1850);
+      }, 1660);
     }
 
     function openOverlay(id){
