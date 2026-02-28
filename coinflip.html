@@ -30,7 +30,7 @@
 
       --tg1:#2AABEE;
       --tg2:#229ED9;
-      --tg3:#53c5ff;
+      --tg3:#56d2ff;
     }
 
     *{
@@ -65,6 +65,8 @@
       z-index:0;
     }
 
+    *::-webkit-scrollbar{ display:none; }
+
     .app{
       position:relative;
       height:100%;
@@ -72,6 +74,7 @@
       padding:0 16px calc(28px + var(--safe-bottom)) 16px;
       z-index:1;
       overscroll-behavior: contain;
+      scrollbar-width:none;
     }
 
     .content{
@@ -240,18 +243,10 @@
     }
 
     .hero-card{
-      padding:16px;
+      padding:14px 16px 12px;
       display:flex;
       flex-direction:column;
-      gap:14px;
-    }
-
-    .title{
-      margin:0;
-      font-size:20px;
-      font-weight:900;
-      letter-spacing:.2px;
-      text-shadow: 0 10px 18px rgba(0,0,0,.35);
+      gap:12px;
     }
 
     .coin-stage{
@@ -259,142 +254,140 @@
       display:flex;
       justify-content:center;
       align-items:center;
-      padding:14px 0 10px;
+      padding:12px 0 8px;
       min-height:300px;
-      perspective:1400px;
+      perspective:1600px;
     }
 
     .coin-stage::before{
       content:"";
       position:absolute;
-      width:290px;
-      height:290px;
+      width:300px;
+      height:300px;
       border-radius:50%;
       background:
-        radial-gradient(circle, rgba(83,197,255,.10), rgba(255,255,255,0) 62%);
+        radial-gradient(circle, rgba(86,210,255,.10), rgba(255,255,255,0) 62%);
       filter: blur(12px);
       pointer-events:none;
     }
 
     .coin-shadow{
       position:absolute;
-      bottom:36px;
-      width:168px;
-      height:20px;
+      bottom:34px;
+      width:170px;
+      height:22px;
       border-radius:50%;
       background: rgba(0,0,0,.30);
-      filter: blur(10px);
+      filter: blur(11px);
       transform: scale(1);
       opacity:.62;
       transition: transform .18s ease, opacity .18s ease;
     }
 
     .coin-shadow.is-flipping{
-      animation: shadowSmooth .96s cubic-bezier(.22,.72,.25,1) both;
+      animation: shadowDepth .82s cubic-bezier(.22,.72,.25,1) both;
+    }
+
+    .coin-wrap{
+      position:relative;
+      width:246px;
+      height:246px;
+      transform-style:preserve-3d;
+      will-change: transform;
+    }
+
+    .coin-wrap.is-flipping{
+      animation: coinDepth .82s cubic-bezier(.22,.72,.25,1) both;
     }
 
     .coin-shell{
       position:relative;
-      width:238px;
-      height:238px;
+      width:100%;
+      height:100%;
       transform-style: preserve-3d;
-      will-change: transform, filter;
+      transform: rotateY(180deg);
+      will-change: transform;
       filter: drop-shadow(0 20px 26px rgba(0,0,0,.34));
-      transition: transform .16s ease;
-    }
-
-    .coin-shell.is-flipping{
-      animation: coinSmoothSpin .96s cubic-bezier(.22,.72,.25,1) both;
     }
 
     .coin-shell.flash-win{
-      animation: coinFlashWin .34s ease;
+      animation: coinFlashWin .30s ease;
     }
 
     .coin-shell.flash-lose{
-      animation: coinFlashLose .34s ease;
+      animation: coinFlashLose .30s ease;
     }
 
-    .coin-frame{
+    .coin-side{
       position:absolute;
       inset:0;
       border-radius:50%;
-      padding:8px;
-      background:
-        linear-gradient(135deg, rgba(255,255,255,.18), rgba(255,255,255,.04));
-      border:1px solid rgba(255,255,255,.10);
-      box-shadow:
-        inset 0 2px 0 rgba(255,255,255,.08),
-        inset 0 -8px 14px rgba(0,0,0,.14);
-    }
-
-    .coin-core{
-      position:relative;
-      width:100%;
-      height:100%;
-      border-radius:50%;
+      backface-visibility:hidden;
+      -webkit-backface-visibility:hidden;
       overflow:hidden;
+      border:7px solid rgba(255,255,255,.10);
+      box-shadow:
+        inset 0 2px 0 rgba(255,255,255,.10),
+        inset 0 -10px 18px rgba(0,0,0,.16),
+        0 0 0 1px rgba(255,255,255,.05);
       background:
-        radial-gradient(circle at 30% 25%, rgba(255,255,255,.10), transparent 35%),
-        radial-gradient(circle at 70% 75%, rgba(0,0,0,.14), transparent 42%),
-        #111827;
-      border:3px solid rgba(255,255,255,.08);
+        radial-gradient(circle at 30% 22%, rgba(255,255,255,.14), transparent 32%),
+        radial-gradient(circle at 70% 78%, rgba(0,0,0,.14), transparent 34%),
+        rgba(255,255,255,.04);
       display:flex;
       align-items:center;
       justify-content:center;
     }
 
+    .coin-front{
+      transform: translateZ(7px);
+    }
+
+    .coin-back{
+      transform: rotateY(180deg) translateZ(7px);
+    }
+
+    .coin-edge{
+      position:absolute;
+      inset:6px;
+      border-radius:50%;
+      border:2px solid rgba(255,255,255,.06);
+      pointer-events:none;
+      z-index:2;
+    }
+
     .coin-face{
-      width:124%;
-      height:124%;
+      width:126%;
+      height:126%;
       object-fit:contain;
       object-position:center;
       display:block;
       user-select:none;
       pointer-events:none;
-      transform: translateZ(1px);
-      filter: drop-shadow(0 3px 4px rgba(0,0,0,.16));
+      filter: drop-shadow(0 4px 6px rgba(0,0,0,.16));
     }
 
-    @keyframes coinSmoothSpin{
-      0%{
-        transform: translate3d(0,0,0) rotateY(0deg) scale(1);
-      }
-      30%{
-        transform: translate3d(0,0,26px) rotateY(420deg) scale(1.06);
-      }
-      60%{
-        transform: translate3d(0,0,34px) rotateY(760deg) scale(1.10);
-      }
-      100%{
-        transform: translate3d(0,0,0) rotateY(1080deg) scale(1);
-      }
+    @keyframes coinDepth{
+      0%{ transform: translateZ(0) scale(1); }
+      50%{ transform: translateZ(46px) scale(1.085); }
+      100%{ transform: translateZ(0) scale(1); }
     }
 
-    @keyframes shadowSmooth{
-      0%{
-        transform: scale(1);
-        opacity:.62;
-      }
-      55%{
-        transform: scale(.78);
-        opacity:.24;
-      }
-      100%{
-        transform: scale(1);
-        opacity:.62;
-      }
+    @keyframes shadowDepth{
+      0%{ transform: scale(1); opacity:.62; }
+      50%{ transform: scale(.74); opacity:.24; }
+      100%{ transform: scale(1); opacity:.62; }
     }
 
     @keyframes coinFlashWin{
       0%{ filter: drop-shadow(0 20px 26px rgba(0,0,0,.34)); }
-      50%{ filter: drop-shadow(0 0 12px rgba(255,215,0,.20)) drop-shadow(0 20px 26px rgba(0,0,0,.34)); }
+      50%{ filter: drop-shadow(0 0 12px rgba(255,215,0,.22)) drop-shadow(0 20px 26px rgba(0,0,0,.34)); }
       100%{ filter: drop-shadow(0 20px 26px rgba(0,0,0,.34)); }
     }
 
     @keyframes coinFlashLose{
       0%{ filter: drop-shadow(0 20px 26px rgba(0,0,0,.34)); }
-      50%{ filter: drop-shadow(0 0 10px rgba(192,198,210,.18)) drop-shadow(0 20px 26px rgba(0,0,0,.34)); }
+      50%{ filter: drop-shadow(0 0 10px rgba(208,216,229,.18)) drop-shadow(0 20px 26px rgba(0,0,0,.34)); }
       100%{ filter: drop-shadow(0 20px 26px rgba(0,0,0,.34)); }
     }
 
@@ -412,41 +405,31 @@
       margin-bottom:10px;
     }
 
-    .amount-box{
+    .bet-display{
+      width:100%;
+      height:50px;
+      border-radius:18px;
       display:flex;
-      gap:10px;
       align-items:center;
-    }
-
-    .amount-input{
-      flex:1;
-      min-width:0;
-      height:48px;
-      border-radius:16px;
-      border:1px solid rgba(255,255,255,.08);
+      justify-content:center;
       background: rgba(255,255,255,.06);
-      color: rgba(234,241,255,.96);
-      padding:0 14px;
-      outline:none;
-      font-size:16px;
+      border:1px solid rgba(255,255,255,.08);
+      color:#fff;
+      font-size:18px;
       font-weight:900;
       box-shadow: inset 0 1px 0 rgba(255,255,255,.04);
+      letter-spacing:.2px;
     }
 
-    .amount-input::placeholder{
-      color: rgba(234,241,255,.42);
-      font-weight:800;
-    }
-
-    .quick-grid{
+    .bet-select-grid{
       display:grid;
-      grid-template-columns: repeat(4, 1fr);
+      grid-template-columns: repeat(3, 1fr);
       gap:8px;
       margin-top:10px;
     }
 
-    .quick-btn{
-      height:40px;
+    .bet-btn{
+      height:42px;
       border:none;
       border-radius:14px;
       background: rgba(255,255,255,.06);
@@ -455,16 +438,18 @@
       font-size:13px;
       font-weight:900;
       cursor:pointer;
-      transition: transform .15s ease, background .15s ease, border-color .15s ease;
+      transition: transform .15s ease, background .15s ease, border-color .15s ease, box-shadow .15s ease;
     }
 
-    .quick-btn:active{
+    .bet-btn:active{
       transform: scale(.98);
     }
 
-    .quick-btn:hover{
-      background: rgba(255,255,255,.09);
-      border-color: rgba(255,255,255,.12);
+    .bet-btn.active{
+      background: linear-gradient(180deg, rgba(42,171,238,.22), rgba(34,158,217,.22));
+      border-color: rgba(86,210,255,.26);
+      box-shadow: 0 10px 18px rgba(34,158,217,.12);
+      color:#fff;
     }
 
     .action-area{
@@ -538,7 +523,7 @@
 
     .choice-grid{
       display:grid;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns:1fr 1fr;
       gap:10px;
       margin-top:10px;
     }
@@ -801,7 +786,6 @@
       filter: drop-shadow(0 8px 14px rgba(0,0,0,.18));
     }
 
-    /* preload */
     .preloader{
       position:fixed;
       inset:0;
@@ -810,10 +794,10 @@
       flex-direction:column;
       align-items:center;
       justify-content:center;
-      gap:16px;
+      gap:18px;
       background:
-        radial-gradient(900px 600px at 50% 20%, rgba(255,255,255,.30), transparent 55%),
-        linear-gradient(180deg, #d9f3ff 0%, #9ee3ff 42%, #5ac6ff 100%);
+        radial-gradient(1000px 700px at 50% 10%, rgba(86,210,255,.20), transparent 50%),
+        linear-gradient(180deg, #03111f 0%, #07345a 48%, #0a6ea8 100%);
       transition: opacity .32s ease, visibility .32s ease;
     }
 
@@ -824,46 +808,29 @@
     }
 
     .pre-logo{
-      width:86px;
-      height:86px;
+      width:90px;
+      height:90px;
       object-fit:contain;
       display:block;
-      filter: drop-shadow(0 16px 24px rgba(0,66,112,.18));
+      filter: drop-shadow(0 14px 24px rgba(0,0,0,.22));
       animation: preLogoFloat .95s ease-in-out infinite;
     }
 
-    .pre-title{
-      margin:0;
-      font-size:22px;
-      font-weight:900;
-      letter-spacing:.2px;
-      color:#0b2540;
-      text-shadow: 0 2px 10px rgba(255,255,255,.30);
-    }
-
-    .pre-sub{
-      margin:0;
-      font-size:13px;
-      font-weight:900;
-      color:rgba(11,37,64,.72);
-      letter-spacing:.14px;
-    }
-
     .pre-bar{
-      width:min(180px, 60vw);
+      width:min(190px, 62vw);
       height:8px;
       border-radius:999px;
       overflow:hidden;
-      background: rgba(255,255,255,.42);
-      box-shadow: inset 0 1px 2px rgba(0,0,0,.08);
+      background: rgba(255,255,255,.20);
+      box-shadow: inset 0 1px 2px rgba(0,0,0,.10);
     }
 
     .pre-fill{
       width:0;
       height:100%;
       border-radius:999px;
-      background: linear-gradient(90deg, #1e96d8, #2AABEE, #6ad6ff);
-      box-shadow: 0 0 14px rgba(42,171,238,.22);
+      background: linear-gradient(90deg, #1e96d8, #2AABEE, #68dcff);
+      box-shadow: 0 0 14px rgba(42,171,238,.26);
       animation: preLoad 4s linear forwards;
     }
 
@@ -914,29 +881,50 @@
         font-size:12px;
       }
 
-      .title{ font-size:18px; }
-
       .coin-stage{
         min-height:260px;
       }
 
-      .coin-shell{
-        width:194px;
-        height:194px;
+      .coin-wrap{
+        width:204px;
+        height:204px;
       }
 
       .coin-shadow{
-        width:140px;
+        width:144px;
         height:18px;
       }
 
-      .quick-grid{ gap:6px; }
-      .quick-btn{ font-size:12px; }
-      .amount-input{ font-size:15px; }
-      .choice-btn{ font-size:13px; height:56px; padding:0 8px; }
-      .choice-coin{ width:28px; height:28px; }
-      .start-btn{ height:50px; font-size:14px; }
-      .tg-btn{ height:48px; border-radius:15px; }
+      .bet-display{
+        height:46px;
+        font-size:16px;
+      }
+
+      .bet-btn{
+        height:38px;
+        font-size:12px;
+      }
+
+      .choice-btn{
+        font-size:13px;
+        height:56px;
+        padding:0 8px;
+      }
+
+      .choice-coin{
+        width:28px;
+        height:28px;
+      }
+
+      .start-btn{
+        height:50px;
+        font-size:14px;
+      }
+
+      .tg-btn{
+        height:48px;
+        border-radius:15px;
+      }
 
       .top-notice{
         min-height:44px;
@@ -951,12 +939,8 @@
       }
 
       .pre-logo{
-        width:74px;
-        height:74px;
-      }
-
-      .pre-title{
-        font-size:19px;
+        width:76px;
+        height:76px;
       }
     }
 
@@ -964,8 +948,6 @@
       *{ transition:none !important; animation:none !important; }
       .overlay.show .popup{ transform:none !important; }
       .pre-fill{ width:100% !important; }
-      .coin-shell.is-flipping{ animation:none !important; }
-      .coin-shadow.is-flipping{ animation:none !important; }
     }
   </style>
 </head>
@@ -976,8 +958,6 @@
       src="https://i.postimg.cc/qvL497mF/Picsart-26-02-27-02-02-37-502.png"
       alt="Vezus"
     >
-    <p class="pre-title">CoinFlip</p>
-    <p class="pre-sub">Загрузка...</p>
     <div class="pre-bar">
       <div class="pre-fill"></div>
     </div>
@@ -1021,17 +1001,27 @@
       </div>
 
       <div class="card hero-card">
-        <h1 class="title">CoinFlip</h1>
-
         <div class="coin-stage">
           <div class="coin-shadow" id="coinShadow"></div>
 
-          <div class="coin-shell" id="coinShell">
-            <div class="coin-frame">
-              <div class="coin-core">
+          <div class="coin-wrap" id="coinWrap">
+            <div class="coin-shell" id="coinShell">
+              <div class="coin-side coin-front">
+                <span class="coin-edge"></span>
                 <img
                   class="coin-face"
-                  id="coinFace"
+                  src="https://i.postimg.cc/50wQKCZL/Picsart-26-02-28-14-51-00-987.png"
+                  alt="Орёл"
+                  loading="eager"
+                  fetchpriority="high"
+                  decoding="async"
+                >
+              </div>
+
+              <div class="coin-side coin-back">
+                <span class="coin-edge"></span>
+                <img
+                  class="coin-face"
                   src="https://i.postimg.cc/Rh46k0m4/Picsart-26-02-28-14-51-28-798.png"
                   alt="Решка"
                   loading="eager"
@@ -1047,15 +1037,15 @@
         <div>
           <div class="label">Ставка</div>
 
-          <div class="amount-box">
-            <input class="amount-input" id="betInput" type="number" min="10" step="1" inputmode="numeric" placeholder="Минимум 10">
-          </div>
+          <div class="bet-display" id="betDisplay">10 VC</div>
 
-          <div class="quick-grid">
-            <button class="quick-btn" type="button" data-bet="10">10</button>
-            <button class="quick-btn" type="button" data-bet="50">50</button>
-            <button class="quick-btn" type="button" data-bet="100">100</button>
-            <button class="quick-btn" type="button" data-bet="500">500</button>
+          <div class="bet-select-grid" id="betGrid">
+            <button class="bet-btn active" type="button" data-bet="10">10</button>
+            <button class="bet-btn" type="button" data-bet="25">25</button>
+            <button class="bet-btn" type="button" data-bet="50">50</button>
+            <button class="bet-btn" type="button" data-bet="100">100</button>
+            <button class="bet-btn" type="button" data-bet="250">250</button>
+            <button class="bet-btn" type="button" data-bet="max">MAX</button>
           </div>
         </div>
 
@@ -1100,7 +1090,7 @@
         <p class="rule-line">• Минимальная ставка: <b>10 VC</b></p>
         <p class="rule-line">• Нажми <b>«Начать»</b></p>
         <p class="rule-line">• Выбери сторону монеты</p>
-        <p class="rule-line">• Если угадаешь — получишь <b>x2</b> от ставки</p>
+        <p class="rule-line">• При удаче получаешь <b>x2</b> от ставки</p>
       </div>
     </div>
   </div>
@@ -1134,9 +1124,6 @@
     const MIN_BET = 10;
     const WIN_CHANCE = 0.35;
 
-    const GOLD_SRC = "https://i.postimg.cc/50wQKCZL/Picsart-26-02-28-14-51-00-987.png";
-    const SILVER_SRC = "https://i.postimg.cc/Rh46k0m4/Picsart-26-02-28-14-51-28-798.png";
-
     const FILES = {
       games: "games.html"
     };
@@ -1144,11 +1131,11 @@
     const $ = (id) => document.getElementById(id);
 
     let currentBalance = 0;
+    let currentBet = 10;
     let isFlipping = false;
     let choiceVisible = false;
     let noticeTimer = null;
-    let faceSwapTimer = null;
-    let finishFlipTimer = null;
+    let currentRotation = 180;
 
     function formatVc(value){
       const n = Number(value ?? 0);
@@ -1188,23 +1175,49 @@
       $("balanceValue").textContent = formatVc(currentBalance);
     }
 
-    function getBetAmount(){
-      const raw = $("betInput").value;
-      const amount = Number(raw);
-      if (!raw || !Number.isFinite(amount)) return 0;
-      return Math.floor(amount);
+    function updateBetUI(){
+      $("betDisplay").textContent = formatVc(currentBet);
+
+      document.querySelectorAll(".bet-btn").forEach(btn => {
+        const value = btn.dataset.bet;
+        const isActive = value === "max"
+          ? btn.classList.contains("active") && btn.dataset.activeMode === "max"
+          : Number(value) === currentBet;
+
+        if (value !== "max") {
+          btn.classList.toggle("active", isActive);
+        }
+      });
     }
 
-    function setCoinFace(side){
-      const coinFace = $("coinFace");
+    function clearBetActive(){
+      document.querySelectorAll(".bet-btn").forEach(btn => {
+        btn.classList.remove("active");
+        btn.dataset.activeMode = "";
+      });
+    }
 
-      if (side === "gold") {
-        coinFace.src = GOLD_SRC;
-        coinFace.alt = "Орёл";
+    function setBet(value, mode = "fixed"){
+      const next = Math.floor(Number(value) || 0);
+      if (next < MIN_BET) return;
+
+      currentBet = next;
+      clearBetActive();
+
+      if (mode === "max") {
+        const maxBtn = document.querySelector('.bet-btn[data-bet="max"]');
+        if (maxBtn) {
+          maxBtn.classList.add("active");
+          maxBtn.dataset.activeMode = "max";
+        }
       } else {
-        coinFace.src = SILVER_SRC;
-        coinFace.alt = "Решка";
+        const btn = document.querySelector(`.bet-btn[data-bet="${next}"]`);
+        if (btn) btn.classList.add("active");
       }
+
+      if (choiceVisible) setChoiceVisible(false);
+      updateBetUI();
+      updateStartButton();
     }
 
     function showNotice(text, type = "info"){
@@ -1231,8 +1244,7 @@
 
     function updateStartButton(){
       const btn = $("startBtn");
-      const bet = getBetAmount();
-      const valid = bet >= MIN_BET && bet <= currentBalance && !isFlipping;
+      const valid = currentBet >= MIN_BET && currentBet <= currentBalance && !isFlipping;
 
       btn.textContent = "Начать";
       btn.disabled = choiceVisible || !valid;
@@ -1289,43 +1301,53 @@
       updateStartButton();
     }
 
+    function getTargetRotation(resultSide){
+      const extra = 7 * 360;
+      const desired = resultSide === "gold" ? 0 : 180;
+      const raw = currentRotation + extra;
+
+      let target = Math.floor(raw / 360) * 360 + desired;
+      if (target <= raw) target += 360;
+
+      return target;
+    }
+
     function animateCoinTo(resultSide){
+      const coinWrap = $("coinWrap");
       const coinShell = $("coinShell");
       const coinShadow = $("coinShadow");
 
-      if (faceSwapTimer) clearTimeout(faceSwapTimer);
-      if (finishFlipTimer) clearTimeout(finishFlipTimer);
+      const target = getTargetRotation(resultSide);
 
-      coinShell.classList.remove("is-flipping", "flash-win", "flash-lose");
+      coinWrap.classList.remove("is-flipping");
       coinShadow.classList.remove("is-flipping");
 
-      void coinShell.offsetWidth;
+      void coinWrap.offsetWidth;
       void coinShadow.offsetWidth;
 
-      coinShell.classList.add("is-flipping");
+      coinWrap.classList.add("is-flipping");
       coinShadow.classList.add("is-flipping");
 
-      faceSwapTimer = setTimeout(() => {
-        setCoinFace(resultSide);
-      }, 470);
+      coinShell.style.transition = "transform .82s cubic-bezier(.22,.72,.25,1)";
+      coinShell.style.transform = `rotateY(${target}deg)`;
 
-      finishFlipTimer = setTimeout(() => {
-        coinShell.classList.remove("is-flipping");
+      currentRotation = target;
+
+      setTimeout(() => {
+        coinWrap.classList.remove("is-flipping");
         coinShadow.classList.remove("is-flipping");
-      }, 980);
+      }, 840);
     }
 
     function startGame(){
       if (isFlipping) return;
 
-      const bet = getBetAmount();
-
-      if (bet < MIN_BET) {
+      if (currentBet < MIN_BET) {
         showNotice(`Минимум ${MIN_BET} VC`, "lose");
         return;
       }
 
-      if (bet > currentBalance) {
+      if (currentBet > currentBalance) {
         showNotice("Недостаточно средств", "lose");
         return;
       }
@@ -1337,15 +1359,13 @@
     function chooseSide(side){
       if (isFlipping) return;
 
-      const bet = getBetAmount();
-
-      if (bet < MIN_BET) {
+      if (currentBet < MIN_BET) {
         setChoiceVisible(false);
         showNotice(`Минимум ${MIN_BET} VC`, "lose");
         return;
       }
 
-      if (bet > currentBalance) {
+      if (currentBet > currentBalance) {
         setChoiceVisible(false);
         showNotice("Недостаточно средств", "lose");
         return;
@@ -1355,7 +1375,7 @@
       setChoiceVisible(false);
       updateStartButton();
 
-      currentBalance -= bet;
+      currentBalance -= currentBet;
       updateBalanceUI();
       saveCachedBalance();
 
@@ -1370,7 +1390,7 @@
         const coinShell = $("coinShell");
 
         if (win) {
-          const prize = bet * 2;
+          const prize = currentBet * 2;
           currentBalance += prize;
           updateBalanceUI();
           saveCachedBalance();
@@ -1378,16 +1398,16 @@
           showNotice(`Выпал ${sideText}. +${formatVc(prize)}`, "win");
         } else {
           coinShell.classList.add("flash-lose");
-          showNotice(`Выпал ${sideText}. -${formatVc(bet)}`, "lose");
+          showNotice(`Выпал ${sideText}. -${formatVc(currentBet)}`, "lose");
         }
 
         setTimeout(() => {
           coinShell.classList.remove("flash-win", "flash-lose");
-        }, 340);
+        }, 300);
 
         isFlipping = false;
         updateStartButton();
-      }, 1000);
+      }, 860);
     }
 
     function openOverlay(id){
@@ -1423,20 +1443,24 @@
       openTelegramLinkSafe("https://t.me/vezuspubg");
     });
 
-    document.querySelectorAll(".quick-btn").forEach(btn => {
+    document.querySelectorAll(".bet-btn").forEach(btn => {
       btn.addEventListener("click", () => {
         if (isFlipping) return;
-        $("betInput").value = btn.getAttribute("data-bet");
-        if (choiceVisible) setChoiceVisible(false);
-        updateStartButton();
-      });
-    });
 
-    $("betInput").addEventListener("input", () => {
-      const value = Number($("betInput").value);
-      if (value < 0) $("betInput").value = "";
-      if (choiceVisible) setChoiceVisible(false);
-      updateStartButton();
+        const value = btn.dataset.bet;
+
+        if (value === "max") {
+          const maxValue = Math.floor(currentBalance);
+          if (maxValue < MIN_BET) {
+            showNotice("Недостаточно средств", "lose");
+            return;
+          }
+          setBet(maxValue, "max");
+          return;
+        }
+
+        setBet(Number(value), "fixed");
+      });
     });
 
     $("startBtn").addEventListener("click", startGame);
@@ -1451,7 +1475,8 @@
     });
 
     window.addEventListener("load", () => {
-      setCoinFace("silver");
+      $("coinShell").style.transform = "rotateY(180deg)";
+      setBet(10, "fixed");
 
       setTimeout(() => {
         $("preloader").classList.add("hide");
