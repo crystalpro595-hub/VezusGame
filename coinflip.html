@@ -19,7 +19,6 @@
   <style>
     :root{
       --text:#eaf1ff;
-      --muted:rgba(234,241,255,.72);
       --safe-bottom: env(safe-area-inset-bottom, 0px);
       --safe-top: env(safe-area-inset-top, 0px);
 
@@ -32,6 +31,8 @@
       --tg2:#229ED9;
       --green1:#22c55e;
       --green2:#16a34a;
+      --red1:#ef4444;
+      --red2:#dc2626;
     }
 
     *{
@@ -250,15 +251,15 @@
       display:flex;
       justify-content:center;
       align-items:center;
-      min-height:238px;
-      padding:8px 0 2px;
+      min-height:248px;
+      padding:8px 0 4px;
     }
 
     .coin-stage::before{
       content:"";
       position:absolute;
-      width:220px;
-      height:220px;
+      width:250px;
+      height:250px;
       border-radius:50%;
       background: radial-gradient(circle, rgba(42,171,238,.12), transparent 62%);
       filter: blur(12px);
@@ -267,8 +268,8 @@
 
     .coin-shadow{
       position:absolute;
-      bottom:28px;
-      width:142px;
+      bottom:30px;
+      width:148px;
       height:18px;
       border-radius:50%;
       background: rgba(0,0,0,.30);
@@ -279,13 +280,13 @@
     }
 
     .coin-shadow.is-flipping{
-      animation: shadowPulse .54s linear both;
+      animation: shadowPulse .68s linear both;
     }
 
     .coin-wrap{
       position:relative;
-      width:192px;
-      height:192px;
+      width:208px;
+      height:208px;
       display:flex;
       align-items:center;
       justify-content:center;
@@ -294,14 +295,14 @@
     }
 
     .coin-wrap.is-flipping{
-      animation: coinDepth .54s linear both;
+      animation: coinDepth .68s linear both;
     }
 
     .coin-shell{
       width:100%;
       height:100%;
       border-radius:50%;
-      padding:7px;
+      padding:8px;
       background: linear-gradient(135deg, rgba(255,255,255,.18), rgba(255,255,255,.04));
       border:1px solid rgba(255,255,255,.10);
       box-shadow:
@@ -312,7 +313,7 @@
     }
 
     .coin-shell.is-flipping{
-      animation: coinFlip .54s linear both;
+      animation: coinFlip .68s linear both;
     }
 
     .coin-shell.flash-win{
@@ -618,22 +619,22 @@
       flex:0 0 auto;
     }
 
-    .top-notice{
+    .bottom-notice{
       position:fixed;
       left:50%;
-      top: calc(10px + var(--safe-top));
-      transform: translateX(-50%) translateY(-12px) scale(.98);
+      bottom: calc(16px + var(--safe-bottom));
+      transform: translateX(-50%) translateY(16px) scale(.98);
       width:min(390px, calc(100% - 28px));
-      min-height:44px;
-      border-radius:15px;
-      padding:9px 12px;
+      min-height:46px;
+      border-radius:16px;
+      padding:10px 12px;
       display:flex;
       align-items:center;
       gap:10px;
       color:#fff;
       font-size:12px;
       font-weight:900;
-      box-shadow:0 12px 24px rgba(0,0,0,.24);
+      box-shadow:0 14px 26px rgba(0,0,0,.24);
       opacity:0;
       pointer-events:none;
       transition: opacity .18s ease, transform .18s ease;
@@ -644,20 +645,20 @@
       overflow:hidden;
     }
 
-    .top-notice.show{
+    .bottom-notice.show{
       opacity:1;
       transform: translateX(-50%) translateY(0) scale(1);
     }
 
-    .top-notice.win{
+    .bottom-notice.win{
       background: linear-gradient(180deg, rgba(34,197,94,.92), rgba(22,163,74,.92));
     }
 
-    .top-notice.lose{
+    .bottom-notice.lose{
       background: linear-gradient(180deg, rgba(239,68,68,.92), rgba(220,38,38,.92));
     }
 
-    .top-notice.info{
+    .bottom-notice.info{
       background: linear-gradient(180deg, rgba(42,171,238,.92), rgba(34,158,217,.92));
     }
 
@@ -868,11 +869,11 @@
 
       .bal-amount{ min-width:74px; height:24px; font-size:12px; }
 
-      .coin-stage{ min-height:210px; }
+      .coin-stage{ min-height:222px; }
 
-      .coin-wrap{ width:168px; height:168px; }
+      .coin-wrap{ width:182px; height:182px; }
 
-      .coin-shadow{ width:126px; height:16px; }
+      .coin-shadow{ width:130px; height:16px; }
 
       .bet-row{ grid-template-columns:minmax(0,1fr) 44px; }
 
@@ -909,7 +910,7 @@
     <div class="pre-bar"><div class="pre-fill"></div></div>
   </div>
 
-  <div class="top-notice info" id="topNotice" aria-live="polite">
+  <div class="bottom-notice info" id="bottomNotice" aria-live="polite">
     <div class="notice-icon" id="noticeIcon">ℹ</div>
     <div class="notice-text" id="noticeText">Сообщение</div>
   </div>
@@ -1070,8 +1071,8 @@
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <script>
     const VERIFY_URL = "https://lazrfierfbhwlduqlvws.functions.supabase.co/verify-telegram";
+    const PLAY_URL = "https://lazrfierfbhwlduqlvws.functions.supabase.co/play-coinflip";
     const MIN_BET = 10;
-    const WIN_CHANCE = 0.35;
 
     const GOLD_SRC = "https://i.postimg.cc/50wQKCZL/Picsart-26-02-28-14-51-00-987.png";
     const SILVER_SRC = "https://i.postimg.cc/Rh46k0m4/Picsart-26-02-28-14-51-28-798.png";
@@ -1084,6 +1085,7 @@
 
     let currentBalance = 0;
     let pendingWin = 0;
+    let pendingBalanceAfterClaim = null;
     let isFlipping = false;
     let choiceVisible = false;
     let quickVisible = false;
@@ -1125,6 +1127,17 @@
       } catch {}
     }
 
+    function getTelegramInitData(){
+      if (!window.Telegram || !window.Telegram.WebApp) return "";
+
+      try{
+        Telegram.WebApp.ready();
+        if (typeof Telegram.WebApp.expand === "function") Telegram.WebApp.expand();
+      } catch {}
+
+      return Telegram.WebApp.initData || "";
+    }
+
     function updateBalanceUI(){
       $("balanceValue").textContent = formatVc(currentBalance);
     }
@@ -1137,7 +1150,7 @@
     }
 
     function showNotice(text, type = "info"){
-      const box = $("topNotice");
+      const box = $("bottomNotice");
       $("noticeText").textContent = text;
       $("noticeIcon").textContent = type === "win" ? "✓" : type === "lose" ? "✕" : "ℹ";
 
@@ -1211,17 +1224,7 @@
       }
       updateBalanceUI();
 
-      if (!window.Telegram || !window.Telegram.WebApp) {
-        updateButtons();
-        return;
-      }
-
-      try{
-        Telegram.WebApp.ready();
-        if (typeof Telegram.WebApp.expand === "function") Telegram.WebApp.expand();
-      } catch {}
-
-      const initData = Telegram.WebApp.initData;
+      const initData = getTelegramInitData();
       if (!initData) {
         updateButtons();
         return;
@@ -1275,13 +1278,13 @@
 
       swapTimer = setTimeout(() => {
         setCoinFace(resultSide);
-      }, 270);
+      }, 340);
 
       finishTimer = setTimeout(() => {
         coinWrap.classList.remove("is-flipping");
         coinShell.classList.remove("is-flipping");
         coinShadow.classList.remove("is-flipping");
-      }, 560);
+      }, 700);
     }
 
     function startGame(){
@@ -1306,10 +1309,9 @@
 
       setQuickVisible(false);
       setChoiceVisible(true);
-      showNotice("Выбери: Орёл или Решка", "info");
     }
 
-    function chooseSide(side){
+    async function chooseSide(side){
       if (isFlipping || pendingWin > 0) return;
 
       const bet = getBetAmount();
@@ -1326,54 +1328,96 @@
         return;
       }
 
+      const initData = getTelegramInitData();
+      if (!initData) {
+        setChoiceVisible(false);
+        showNotice("Открой игру в Telegram", "lose");
+        return;
+      }
+
       isFlipping = true;
       setChoiceVisible(false);
       updateButtons();
 
-      currentBalance -= bet;
-      updateBalanceUI();
-      saveCachedBalance();
+      try{
+        const res = await fetch(PLAY_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            initData,
+            betVc: bet,
+            choice
+          })
+        });
 
-      const playerWins = Math.random() < WIN_CHANCE;
-      const resultSide = playerWins ? side : (side === "gold" ? "silver" : "gold");
+        const json = await res.json().catch(() => ({}));
 
-      animateCoinTo(resultSide);
+        if (!res.ok || !json.ok) {
+          isFlipping = false;
+          updateButtons();
+          showNotice(json.error || "Ошибка игры", "lose");
+          return;
+        }
 
-      setTimeout(() => {
-        const win = side === resultSide;
+        const didWin = !!json.did_win;
+        const resultSide = json.result_side === "gold" ? "gold" : "silver";
+        const payoutVc = Number(json.payout_vc || 0);
+        const serverBalance = Number(json.current_balance || 0);
         const sideText = resultSide === "gold" ? "Орёл" : "Решка";
         const coinShell = $("coinShell");
 
-        if (win) {
-          pendingWin = bet * 2;
-          coinShell.classList.add("flash-win");
-          setClaimVisible(true);
-          showNotice(`Выпал ${sideText}. Выигрыш ${formatVc(pendingWin)}`, "win");
-        } else {
-          pendingWin = 0;
-          coinShell.classList.add("flash-lose");
-          setClaimVisible(false);
-          showNotice(`Выпал ${sideText}. -${formatVc(bet)}`, "lose");
-        }
+        animateCoinTo(resultSide);
 
         setTimeout(() => {
-          coinShell.classList.remove("flash-win", "flash-lose");
-        }, 240);
+          if (didWin) {
+            pendingWin = payoutVc;
+            pendingBalanceAfterClaim = serverBalance;
 
+            coinShell.classList.add("flash-win");
+            setClaimVisible(true);
+
+            showNotice(`Выпал ${sideText}. Выигрыш ${formatVc(pendingWin)}`, "win");
+          } else {
+            pendingWin = 0;
+            pendingBalanceAfterClaim = null;
+            currentBalance = serverBalance;
+            updateBalanceUI();
+            saveCachedBalance();
+
+            coinShell.classList.add("flash-lose");
+            setClaimVisible(false);
+
+            showNotice(`Выпал ${sideText}. -${formatVc(bet)}`, "lose");
+          }
+
+          setTimeout(() => {
+            coinShell.classList.remove("flash-win", "flash-lose");
+          }, 240);
+
+          isFlipping = false;
+          updateButtons();
+        }, 720);
+
+      } catch {
         isFlipping = false;
         updateButtons();
-      }, 600);
+        showNotice("Ошибка сети", "lose");
+      }
     }
 
     function claimWin(){
       if (pendingWin <= 0 || isFlipping) return;
 
-      currentBalance += pendingWin;
-      updateBalanceUI();
-      saveCachedBalance();
+      if (pendingBalanceAfterClaim != null) {
+        currentBalance = Number(pendingBalanceAfterClaim) || currentBalance;
+        updateBalanceUI();
+        saveCachedBalance();
+      }
 
       showNotice(`Забрано ${formatVc(pendingWin)}`, "win");
+
       pendingWin = 0;
+      pendingBalanceAfterClaim = null;
       setClaimVisible(false);
       updateButtons();
     }
