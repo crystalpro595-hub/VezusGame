@@ -30,7 +30,8 @@
 
       --tg1:#2AABEE;
       --tg2:#229ED9;
-      --tg3:#56d2ff;
+      --green1:#22c55e;
+      --green2:#16a34a;
     }
 
     *{
@@ -221,9 +222,7 @@
       cursor:pointer;
     }
 
-    .logo-btn:active{
-      transform:scale(.98);
-    }
+    .logo-btn:active{ transform:scale(.98); }
 
     .logo-btn img{
       width:100%;
@@ -243,10 +242,7 @@
     }
 
     .hero-card{
-      padding:14px 16px 12px;
-      display:flex;
-      flex-direction:column;
-      gap:12px;
+      padding:12px 14px 10px;
     }
 
     .coin-stage{
@@ -254,83 +250,80 @@
       display:flex;
       justify-content:center;
       align-items:center;
-      padding:12px 0 8px;
-      min-height:300px;
+      min-height:238px;
+      padding:8px 0 2px;
     }
 
     .coin-stage::before{
       content:"";
       position:absolute;
-      width:300px;
-      height:300px;
+      width:220px;
+      height:220px;
       border-radius:50%;
-      background:
-        radial-gradient(circle, rgba(86,210,255,.10), rgba(255,255,255,0) 62%);
+      background: radial-gradient(circle, rgba(42,171,238,.12), transparent 62%);
       filter: blur(12px);
       pointer-events:none;
     }
 
     .coin-shadow{
       position:absolute;
-      bottom:34px;
-      width:170px;
-      height:22px;
+      bottom:28px;
+      width:142px;
+      height:18px;
       border-radius:50%;
       background: rgba(0,0,0,.30);
-      filter: blur(11px);
+      filter: blur(10px);
       transform: scale(1);
       opacity:.62;
+      transition: transform .08s linear;
     }
 
     .coin-shadow.is-flipping{
-      animation: shadowDepth .66s cubic-bezier(.22,.72,.25,1) both;
+      animation: shadowPulse .54s linear both;
     }
 
     .coin-wrap{
       position:relative;
-      width:246px;
-      height:246px;
+      width:192px;
+      height:192px;
       display:flex;
       align-items:center;
       justify-content:center;
+      transition: transform .1s linear;
       will-change: transform;
-      transition: transform .14s ease;
     }
 
     .coin-wrap.is-flipping{
-      animation: coinDepth .66s cubic-bezier(.22,.72,.25,1) both;
+      animation: coinDepth .54s linear both;
     }
 
     .coin-shell{
-      position:relative;
       width:100%;
       height:100%;
       border-radius:50%;
-      padding:8px;
-      background:
-        linear-gradient(135deg, rgba(255,255,255,.18), rgba(255,255,255,.04));
+      padding:7px;
+      background: linear-gradient(135deg, rgba(255,255,255,.18), rgba(255,255,255,.04));
       border:1px solid rgba(255,255,255,.10);
       box-shadow:
         inset 0 2px 0 rgba(255,255,255,.08),
-        inset 0 -8px 14px rgba(0,0,0,.14);
-      filter: drop-shadow(0 20px 26px rgba(0,0,0,.34));
+        inset 0 -8px 14px rgba(0,0,0,.14),
+        0 16px 24px rgba(0,0,0,.28);
       will-change: transform;
     }
 
     .coin-shell.is-flipping{
-      animation: coinFlip .66s cubic-bezier(.22,.72,.25,1) both;
+      animation: coinFlip .54s linear both;
     }
 
     .coin-shell.flash-win{
-      animation: coinFlashWin .28s ease;
+      animation: flashWin .24s ease;
     }
 
     .coin-shell.flash-lose{
-      animation: coinFlashLose .28s ease;
+      animation: flashLose .24s ease;
     }
 
     .coin-core{
-      position:relative;
       width:100%;
       height:100%;
       border-radius:50%;
@@ -346,48 +339,53 @@
     }
 
     .coin-face{
-      width:126%;
-      height:126%;
+      width:124%;
+      height:124%;
       object-fit:contain;
       object-position:center;
       display:block;
       user-select:none;
       pointer-events:none;
-      filter: drop-shadow(0 4px 6px rgba(0,0,0,.16));
       transform: scaleX(1);
+      filter: drop-shadow(0 4px 6px rgba(0,0,0,.16));
     }
 
     @keyframes coinDepth{
       0%{ transform: scale(1); }
-      50%{ transform: scale(1.08); }
+      30%{ transform: scale(1.06); }
+      65%{ transform: scale(1.08); }
       100%{ transform: scale(1); }
     }
 
-    @keyframes shadowDepth{
+    @keyframes shadowPulse{
       0%{ transform: scale(1); opacity:.62; }
-      50%{ transform: scale(.76); opacity:.24; }
+      30%{ transform: scale(.82); opacity:.32; }
+      65%{ transform: scale(.74); opacity:.26; }
       100%{ transform: scale(1); opacity:.62; }
     }
 
     @keyframes coinFlip{
-      0%{ transform: rotate(0deg) scaleX(1); }
-      20%{ transform: rotate(4deg) scaleX(.55); }
-      40%{ transform: rotate(8deg) scaleX(.12); }
-      60%{ transform: rotate(-6deg) scaleX(.12); }
-      80%{ transform: rotate(-3deg) scaleX(.55); }
-      100%{ transform: rotate(0deg) scaleX(1); }
+      0%   { transform: rotate(0deg)   scaleX(1); }
+      12%  { transform: rotate(2deg)   scaleX(.88); }
+      24%  { transform: rotate(5deg)   scaleX(.52); }
+      36%  { transform: rotate(8deg)   scaleX(.18); }
+      50%  { transform: rotate(0deg)   scaleX(.04); }
+      64%  { transform: rotate(-8deg)  scaleX(.18); }
+      76%  { transform: rotate(-5deg)  scaleX(.52); }
+      88%  { transform: rotate(-2deg)  scaleX(.88); }
+      100% { transform: rotate(0deg)   scaleX(1); }
     }
 
-    @keyframes coinFlashWin{
-      0%{ filter: drop-shadow(0 20px 26px rgba(0,0,0,.34)); }
-      50%{ filter: drop-shadow(0 0 12px rgba(255,215,0,.22)) drop-shadow(0 20px 26px rgba(0,0,0,.34)); }
-      100%{ filter: drop-shadow(0 20px 26px rgba(0,0,0,.34)); }
+    @keyframes flashWin{
+      0%{ box-shadow: inset 0 2px 0 rgba(255,255,255,.08), inset 0 -8px 14px rgba(0,0,0,.14), 0 16px 24px rgba(0,0,0,.28); }
+      50%{ box-shadow: inset 0 2px 0 rgba(255,255,255,.08), inset 0 -8px 14px rgba(0,0,0,.14), 0 0 16px rgba(34,197,94,.28), 0 16px 24px rgba(0,0,0,.28); }
+      100%{ box-shadow: inset 0 2px 0 rgba(255,255,255,.08), inset 0 -8px 14px rgba(0,0,0,.14), 0 16px 24px rgba(0,0,0,.28); }
     }
 
-    @keyframes coinFlashLose{
-      0%{ filter: drop-shadow(0 20px 26px rgba(0,0,0,.34)); }
-      50%{ filter: drop-shadow(0 0 10px rgba(208,216,229,.18)) drop-shadow(0 20px 26px rgba(0,0,0,.34)); }
-      100%{ filter: drop-shadow(0 20px 26px rgba(0,0,0,.34)); }
+    @keyframes flashLose{
+      0%{ box-shadow: inset 0 2px 0 rgba(255,255,255,.08), inset 0 -8px 14px rgba(0,0,0,.14), 0 16px 24px rgba(0,0,0,.28); }
+      50%{ box-shadow: inset 0 2px 0 rgba(255,255,255,.08), inset 0 -8px 14px rgba(0,0,0,.14), 0 0 14px rgba(239,68,68,.18), 0 16px 24px rgba(0,0,0,.28); }
+      100%{ box-shadow: inset 0 2px 0 rgba(255,255,255,.08), inset 0 -8px 14px rgba(0,0,0,.14), 0 16px 24px rgba(0,0,0,.28); }
     }
 
     .panel{
@@ -402,6 +400,13 @@
       font-weight:900;
       color: rgba(234,241,255,.94);
       margin-bottom:10px;
+    }
+
+    .bet-row{
+      display:grid;
+      grid-template-columns:minmax(0,1fr) 48px;
+      gap:8px;
+      align-items:center;
     }
 
     .bet-input{
@@ -424,25 +429,70 @@
       font-weight:800;
     }
 
+    .bet-toggle{
+      width:48px;
+      height:50px;
+      border:none;
+      border-radius:18px;
+      cursor:pointer;
+      background: rgba(255,255,255,.08);
+      border:1px solid rgba(255,255,255,.08);
+      color:#fff;
+      font-size:20px;
+      font-weight:900;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.04);
+    }
+
+    .bet-toggle:active{ transform:scale(.98); }
+
+    .quick-bets{
+      display:grid;
+      grid-template-columns:repeat(5, minmax(0,1fr));
+      gap:8px;
+      max-height:0;
+      opacity:0;
+      overflow:hidden;
+      margin-top:0;
+      transition:max-height .2s ease, opacity .2s ease, margin .2s ease;
+    }
+
+    .quick-bets.show{
+      max-height:80px;
+      opacity:1;
+      margin-top:10px;
+    }
+
+    .quick-btn{
+      height:38px;
+      border:none;
+      border-radius:14px;
+      cursor:pointer;
+      background: rgba(255,255,255,.08);
+      border:1px solid rgba(255,255,255,.08);
+      color:#fff;
+      font-size:12px;
+      font-weight:900;
+    }
+
+    .quick-btn:active{ transform:scale(.98); }
+
     .action-area{
       display:flex;
       flex-direction:column;
       gap:12px;
     }
 
-    .start-wrap{
+    .start-wrap,
+    .claim-wrap{
       max-height:64px;
       opacity:1;
       transform:translateY(0) scale(1);
-      transition:
-        max-height .24s ease,
-        opacity .20s ease,
-        transform .20s ease,
-        margin .20s ease;
+      transition:max-height .22s ease, opacity .18s ease, transform .18s ease, margin .18s ease;
       overflow:hidden;
     }
 
-    .start-wrap.hide{
+    .start-wrap.hide,
+    .claim-wrap.hide{
       max-height:0;
       opacity:0;
       transform:translateY(-6px) scale(.985);
@@ -450,26 +500,37 @@
       pointer-events:none;
     }
 
-    .start-btn{
+    .start-btn,
+    .claim-btn{
       width:100%;
       height:54px;
       border:none;
       border-radius:18px;
       cursor:pointer;
-      background: linear-gradient(180deg, var(--tg1), var(--tg2));
       color:#fff;
       font-size:15px;
       font-weight:900;
       letter-spacing:.2px;
-      box-shadow: 0 18px 34px rgba(34,158,217,.28);
       transition: transform .16s ease, opacity .16s ease, box-shadow .16s ease;
     }
 
-    .start-btn:active{
+    .start-btn{
+      background: linear-gradient(180deg, var(--tg1), var(--tg2));
+      box-shadow: 0 18px 34px rgba(34,158,217,.28);
+    }
+
+    .claim-btn{
+      background: linear-gradient(180deg, var(--green1), var(--green2));
+      box-shadow: 0 18px 34px rgba(34,197,94,.24);
+    }
+
+    .start-btn:active,
+    .claim-btn:active{
       transform: scale(.985);
     }
 
-    .start-btn:disabled{
+    .start-btn:disabled,
+    .claim-btn:disabled{
       opacity:.55;
       cursor:not-allowed;
       box-shadow:none;
@@ -480,10 +541,7 @@
       opacity:0;
       max-height:0;
       overflow:hidden;
-      transition:
-        opacity .22s ease,
-        max-height .22s ease,
-        margin .22s ease;
+      transition: opacity .22s ease, max-height .22s ease, margin .22s ease;
       margin-top:0;
     }
 
@@ -517,38 +575,29 @@
         inset 0 1px 0 rgba(255,255,255,.06);
       padding:0 12px;
       opacity:0;
-      transition:
-        transform .24s cubic-bezier(.22,.72,.25,1),
-        box-shadow .16s ease,
-        opacity .18s ease;
+      transition: transform .22s ease, box-shadow .16s ease, opacity .16s ease;
     }
 
     .choice-btn.gold{
       background:
         linear-gradient(180deg, rgba(255,216,91,.34), rgba(210,140,14,.22)),
         rgba(255,255,255,.06);
-      transform: translateX(-18px) scale(.98);
+      transform: translateX(-16px) scale(.98);
     }
 
     .choice-btn.silver{
       background:
         linear-gradient(180deg, rgba(225,233,245,.30), rgba(135,146,160,.20)),
         rgba(255,255,255,.06);
-      transform: translateX(18px) scale(.98);
+      transform: translateX(16px) scale(.98);
     }
 
     .choice-box.show .choice-btn{
       opacity:1;
-    }
-
-    .choice-box.show .choice-btn.gold,
-    .choice-box.show .choice-btn.silver{
       transform: translateX(0) scale(1);
     }
 
-    .choice-btn:active{
-      transform: scale(.985);
-    }
+    .choice-btn:active{ transform:scale(.985); }
 
     .choice-inner{
       display:flex;
@@ -574,8 +623,8 @@
       left:50%;
       top: calc(10px + var(--safe-top));
       transform: translateX(-50%) translateY(-12px) scale(.98);
-      width:min(410px, calc(100% - 28px));
-      min-height:46px;
+      width:min(390px, calc(100% - 28px));
+      min-height:44px;
       border-radius:15px;
       padding:9px 12px;
       display:flex;
@@ -587,7 +636,7 @@
       box-shadow:0 12px 24px rgba(0,0,0,.24);
       opacity:0;
       pointer-events:none;
-      transition: opacity .20s ease, transform .20s ease, box-shadow .20s ease;
+      transition: opacity .18s ease, transform .18s ease;
       z-index:500;
       border:1px solid rgba(255,255,255,.10);
       backdrop-filter: blur(10px);
@@ -602,28 +651,25 @@
 
     .top-notice.win{
       background: linear-gradient(180deg, rgba(34,197,94,.92), rgba(22,163,74,.92));
-      box-shadow:0 12px 22px rgba(22,163,74,.16);
     }
 
     .top-notice.lose{
       background: linear-gradient(180deg, rgba(239,68,68,.92), rgba(220,38,38,.92));
-      box-shadow:0 12px 22px rgba(220,38,38,.14);
     }
 
     .top-notice.info{
       background: linear-gradient(180deg, rgba(42,171,238,.92), rgba(34,158,217,.92));
-      box-shadow:0 12px 22px rgba(34,158,217,.14);
     }
 
     .notice-icon{
-      width:26px;
-      height:26px;
+      width:24px;
+      height:24px;
       border-radius:9px;
       display:grid;
       place-items:center;
       background: rgba(255,255,255,.14);
       flex:0 0 auto;
-      font-size:13px;
+      font-size:12px;
     }
 
     .notice-text{
@@ -702,9 +748,7 @@
       padding:0;
     }
 
-    .popup-x:active{
-      transform: scale(.98);
-    }
+    .popup-x:active{ transform: scale(.98); }
 
     .popup-body{
       padding:14px 16px 16px 16px;
@@ -713,18 +757,12 @@
       gap:12px;
     }
 
-    .popup-text{
-      margin:0;
-      font-size:13px;
-      line-height:1.42;
-      color: rgba(234,241,255,.84);
-    }
-
+    .popup-text,
     .rule-line{
       margin:0;
       font-size:13px;
       line-height:1.42;
-      color: rgba(234,241,255,.92);
+      color: rgba(234,241,255,.88);
     }
 
     .tg-btn{
@@ -747,9 +785,7 @@
       font-size:14px;
     }
 
-    .tg-btn:active{
-      transform: scale(.99);
-    }
+    .tg-btn:active{ transform: scale(.99); }
 
     .tg-ico{
       width:22px;
@@ -766,10 +802,10 @@
       flex-direction:column;
       align-items:center;
       justify-content:center;
-      gap:18px;
+      gap:16px;
       background:
         radial-gradient(1000px 700px at 50% 10%, rgba(86,210,255,.18), transparent 50%),
-        linear-gradient(180deg, #03111f 0%, #07345a 48%, #0a6ea8 100%);
+        linear-gradient(180deg, #03111f 0%, #06345a 48%, #0a6ea8 100%);
       transition: opacity .32s ease, visibility .32s ease;
     }
 
@@ -780,8 +816,8 @@
     }
 
     .pre-logo{
-      width:90px;
-      height:90px;
+      width:88px;
+      height:88px;
       object-fit:contain;
       display:block;
       filter: drop-shadow(0 14px 24px rgba(0,0,0,.22));
@@ -817,98 +853,47 @@
     }
 
     @media (max-width: 360px){
-      .top-row{
-        grid-template-columns:36px minmax(0,1fr) 36px 46px;
-        gap:6px;
-      }
+      .top-row{ grid-template-columns:36px minmax(0,1fr) 36px 46px; gap:6px; }
 
       .icon-btn,
-      .rule-btn{
-        width:36px;
-        height:36px;
-        border-radius:12px;
-      }
+      .rule-btn{ width:36px; height:36px; border-radius:12px; }
 
-      .icon-btn{
-        font-size:16px;
-      }
+      .icon-btn{ font-size:16px; }
 
-      .rule-btn svg{
-        width:17px;
-        height:17px;
-      }
+      .rule-btn svg{ width:17px; height:17px; }
 
-      .logo-btn{
-        width:46px;
-        height:46px;
-      }
+      .logo-btn{ width:46px; height:46px; }
 
-      .balance-mini{
-        height:38px;
-      }
+      .balance-mini{ height:38px; }
 
-      .bal-amount{
-        min-width:74px;
-        height:24px;
-        font-size:12px;
-      }
+      .bal-amount{ min-width:74px; height:24px; font-size:12px; }
 
-      .coin-stage{
-        min-height:260px;
-      }
+      .coin-stage{ min-height:210px; }
 
-      .coin-wrap{
-        width:204px;
-        height:204px;
-      }
+      .coin-wrap{ width:168px; height:168px; }
 
-      .coin-shadow{
-        width:144px;
-        height:18px;
-      }
+      .coin-shadow{ width:126px; height:16px; }
 
-      .bet-input{
-        height:46px;
-        font-size:15px;
-      }
+      .bet-row{ grid-template-columns:minmax(0,1fr) 44px; }
 
-      .choice-btn{
-        font-size:13px;
-        height:56px;
-        padding:0 8px;
-      }
+      .bet-input{ height:46px; font-size:15px; }
 
-      .choice-coin{
-        width:28px;
-        height:28px;
-      }
+      .bet-toggle{ width:44px; height:46px; border-radius:16px; }
 
-      .start-btn{
-        height:50px;
-        font-size:14px;
-      }
+      .quick-bets{ grid-template-columns:repeat(3, minmax(0,1fr)); }
 
-      .tg-btn{
-        height:48px;
-        border-radius:15px;
-      }
+      .quick-btn{ height:36px; }
 
-      .top-notice{
-        min-height:44px;
-        font-size:11.5px;
-        width:min(390px, calc(100% - 24px));
-      }
+      .choice-btn{ font-size:13px; height:56px; padding:0 8px; }
 
-      .notice-icon{
-        width:24px;
-        height:24px;
-        font-size:12px;
-      }
+      .choice-coin{ width:28px; height:28px; }
 
-      .pre-logo{
-        width:76px;
-        height:76px;
-      }
+      .start-btn,
+      .claim-btn{ height:50px; font-size:14px; }
+
+      .tg-btn{ height:48px; border-radius:15px; }
+
+      .pre-logo{ width:76px; height:76px; }
     }
 
     @media (prefers-reduced-motion: reduce){
@@ -920,14 +905,8 @@
 </head>
 <body>
   <div class="preloader" id="preloader">
-    <img
-      class="pre-logo"
-      src="https://i.postimg.cc/qvL497mF/Picsart-26-02-27-02-02-37-502.png"
-      alt="Vezus"
-    >
-    <div class="pre-bar">
-      <div class="pre-fill"></div>
-    </div>
+    <img class="pre-logo" src="https://i.postimg.cc/qvL497mF/Picsart-26-02-27-02-02-37-502.png" alt="Vezus">
+    <div class="pre-bar"><div class="pre-fill"></div></div>
   </div>
 
   <div class="top-notice info" id="topNotice" aria-live="polite">
@@ -991,21 +970,37 @@
       <div class="card panel">
         <div>
           <div class="label">Ставка</div>
-          <input
-            class="bet-input"
-            id="betInput"
-            type="number"
-            min="10"
-            step="1"
-            inputmode="numeric"
-            placeholder="Минимум 10"
-            value="10"
-          >
+
+          <div class="bet-row">
+            <input
+              class="bet-input"
+              id="betInput"
+              type="number"
+              min="10"
+              step="1"
+              inputmode="numeric"
+              placeholder="Минимум 10"
+              value="10"
+            >
+            <button class="bet-toggle" id="betToggleBtn" type="button">+</button>
+          </div>
+
+          <div class="quick-bets" id="quickBets">
+            <button class="quick-btn" data-bet="10" type="button">10</button>
+            <button class="quick-btn" data-bet="25" type="button">25</button>
+            <button class="quick-btn" data-bet="50" type="button">50</button>
+            <button class="quick-btn" data-bet="100" type="button">100</button>
+            <button class="quick-btn" data-bet="250" type="button">250</button>
+          </div>
         </div>
 
         <div class="action-area">
           <div class="start-wrap" id="startWrap">
-            <button class="start-btn" id="startBtn" type="button">Начать</button>
+            <button class="start-btn" id="startBtn" type="button">Играть</button>
+          </div>
+
+          <div class="claim-wrap hide" id="claimWrap">
+            <button class="claim-btn" id="claimBtn" type="button">Забрать</button>
           </div>
 
           <div class="choice-box" id="choiceBox">
@@ -1042,9 +1037,9 @@
 
       <div class="popup-body">
         <p class="rule-line">• Минимальная ставка: <b>10 VC</b></p>
-        <p class="rule-line">• Нажми <b>«Начать»</b></p>
+        <p class="rule-line">• Нажми <b>«Играть»</b></p>
         <p class="rule-line">• Выбери сторону монеты</p>
-        <p class="rule-line">• При удаче получаешь <b>x2</b> от ставки</p>
+        <p class="rule-line">• При победе появится кнопка <b>«Забрать»</b></p>
       </div>
     </div>
   </div>
@@ -1088,8 +1083,10 @@
     const $ = (id) => document.getElementById(id);
 
     let currentBalance = 0;
+    let pendingWin = 0;
     let isFlipping = false;
     let choiceVisible = false;
+    let quickVisible = false;
     let noticeTimer = null;
     let swapTimer = null;
     let finishTimer = null;
@@ -1139,26 +1136,6 @@
       return Math.floor(amount);
     }
 
-    function updateStartButton(){
-      const btn = $("startBtn");
-      const bet = getBetAmount();
-      const valid = bet >= MIN_BET && bet <= currentBalance && !isFlipping;
-
-      btn.disabled = choiceVisible || !valid;
-    }
-
-    function setCoinFace(side){
-      const coinFace = $("coinFace");
-
-      if (side === "gold") {
-        coinFace.src = GOLD_SRC;
-        coinFace.alt = "Орёл";
-      } else {
-        coinFace.src = SILVER_SRC;
-        coinFace.alt = "Решка";
-      }
-    }
-
     function showNotice(text, type = "info"){
       const box = $("topNotice");
       $("noticeText").textContent = text;
@@ -1171,14 +1148,57 @@
       if (noticeTimer) clearTimeout(noticeTimer);
       noticeTimer = setTimeout(() => {
         box.classList.remove("show");
-      }, 2100);
+      }, 1900);
+    }
+
+    function setCoinFace(side){
+      const coinFace = $("coinFace");
+      if (side === "gold") {
+        coinFace.src = GOLD_SRC;
+        coinFace.alt = "Орёл";
+      } else {
+        coinFace.src = SILVER_SRC;
+        coinFace.alt = "Решка";
+      }
+    }
+
+    function setQuickVisible(show){
+      quickVisible = !!show;
+      $("quickBets").classList.toggle("show", quickVisible);
+      $("betToggleBtn").textContent = quickVisible ? "−" : "+";
     }
 
     function setChoiceVisible(show){
       choiceVisible = !!show;
       $("choiceBox").classList.toggle("show", choiceVisible);
-      $("startWrap").classList.toggle("hide", choiceVisible);
-      updateStartButton();
+      $("startWrap").classList.toggle("hide", choiceVisible || pendingWin > 0);
+      updateButtons();
+    }
+
+    function setClaimVisible(show){
+      $("claimWrap").classList.toggle("hide", !show);
+      $("startWrap").classList.toggle("hide", show || choiceVisible);
+      updateButtons();
+    }
+
+    function updateClaimButton(){
+      $("claimBtn").textContent = pendingWin > 0
+        ? `Забрать ${formatVc(pendingWin)}`
+        : "Забрать";
+    }
+
+    function updateButtons(){
+      const bet = getBetAmount();
+      const canStart =
+        !isFlipping &&
+        !choiceVisible &&
+        pendingWin <= 0 &&
+        bet >= MIN_BET &&
+        bet <= currentBalance;
+
+      $("startBtn").disabled = !canStart;
+      $("claimBtn").disabled = isFlipping || pendingWin <= 0;
+      updateClaimButton();
     }
 
     async function autoAuthTelegram(){
@@ -1192,7 +1212,7 @@
       updateBalanceUI();
 
       if (!window.Telegram || !window.Telegram.WebApp) {
-        updateStartButton();
+        updateButtons();
         return;
       }
 
@@ -1203,7 +1223,7 @@
 
       const initData = Telegram.WebApp.initData;
       if (!initData) {
-        updateStartButton();
+        updateButtons();
         return;
       }
 
@@ -1229,7 +1249,7 @@
       }
 
       updateBalanceUI();
-      updateStartButton();
+      updateButtons();
     }
 
     function animateCoinTo(resultSide){
@@ -1255,17 +1275,22 @@
 
       swapTimer = setTimeout(() => {
         setCoinFace(resultSide);
-      }, 330);
+      }, 270);
 
       finishTimer = setTimeout(() => {
         coinWrap.classList.remove("is-flipping");
         coinShell.classList.remove("is-flipping");
         coinShadow.classList.remove("is-flipping");
-      }, 680);
+      }, 560);
     }
 
     function startGame(){
       if (isFlipping) return;
+
+      if (pendingWin > 0) {
+        showNotice("Сначала забери выигрыш", "info");
+        return;
+      }
 
       const bet = getBetAmount();
 
@@ -1279,12 +1304,13 @@
         return;
       }
 
+      setQuickVisible(false);
       setChoiceVisible(true);
       showNotice("Выбери: Орёл или Решка", "info");
     }
 
     function chooseSide(side){
-      if (isFlipping) return;
+      if (isFlipping || pendingWin > 0) return;
 
       const bet = getBetAmount();
 
@@ -1302,7 +1328,7 @@
 
       isFlipping = true;
       setChoiceVisible(false);
-      updateStartButton();
+      updateButtons();
 
       currentBalance -= bet;
       updateBalanceUI();
@@ -1319,24 +1345,37 @@
         const coinShell = $("coinShell");
 
         if (win) {
-          const prize = bet * 2;
-          currentBalance += prize;
-          updateBalanceUI();
-          saveCachedBalance();
+          pendingWin = bet * 2;
           coinShell.classList.add("flash-win");
-          showNotice(`Выпал ${sideText}. +${formatVc(prize)}`, "win");
+          setClaimVisible(true);
+          showNotice(`Выпал ${sideText}. Выигрыш ${formatVc(pendingWin)}`, "win");
         } else {
+          pendingWin = 0;
           coinShell.classList.add("flash-lose");
+          setClaimVisible(false);
           showNotice(`Выпал ${sideText}. -${formatVc(bet)}`, "lose");
         }
 
         setTimeout(() => {
           coinShell.classList.remove("flash-win", "flash-lose");
-        }, 280);
+        }, 240);
 
         isFlipping = false;
-        updateStartButton();
-      }, 700);
+        updateButtons();
+      }, 600);
+    }
+
+    function claimWin(){
+      if (pendingWin <= 0 || isFlipping) return;
+
+      currentBalance += pendingWin;
+      updateBalanceUI();
+      saveCachedBalance();
+
+      showNotice(`Забрано ${formatVc(pendingWin)}`, "win");
+      pendingWin = 0;
+      setClaimVisible(false);
+      updateButtons();
     }
 
     function openOverlay(id){
@@ -1372,12 +1411,27 @@
       openTelegramLinkSafe("https://t.me/vezuspubg");
     });
 
+    $("betToggleBtn").addEventListener("click", () => {
+      setQuickVisible(!quickVisible);
+    });
+
+    document.querySelectorAll(".quick-btn").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const value = btn.getAttribute("data-bet");
+        if (!value) return;
+        $("betInput").value = value;
+        setQuickVisible(false);
+        updateButtons();
+      });
+    });
+
     $("betInput").addEventListener("input", () => {
       if (choiceVisible) setChoiceVisible(false);
-      updateStartButton();
+      updateButtons();
     });
 
     $("startBtn").addEventListener("click", startGame);
+    $("claimBtn").addEventListener("click", claimWin);
     $("headsBtn").addEventListener("click", () => chooseSide("gold"));
     $("tailsBtn").addEventListener("click", () => chooseSide("silver"));
 
@@ -1390,13 +1444,14 @@
 
     window.addEventListener("load", () => {
       setCoinFace("silver");
+      updateClaimButton();
+      updateButtons();
 
       setTimeout(() => {
         $("preloader").classList.add("hide");
       }, 4000);
 
       autoAuthTelegram();
-      updateStartButton();
     });
   </script>
 </body>
