@@ -439,12 +439,20 @@
       background: rgba(255,255,255,.08);
       border:1px solid rgba(255,255,255,.08);
       color:#fff;
-      font-size:20px;
-      font-weight:900;
+      display:grid;
+      place-items:center;
       box-shadow: inset 0 1px 0 rgba(255,255,255,.04);
+      padding:0;
     }
 
     .bet-toggle:active{ transform:scale(.98); }
+
+    .bet-toggle svg{
+      width:22px;
+      height:22px;
+      display:block;
+      filter: drop-shadow(0 3px 6px rgba(0,0,0,.18));
+    }
 
     .quick-bets{
       display:grid;
@@ -800,13 +808,12 @@
       inset:0;
       z-index:999;
       display:flex;
-      flex-direction:column;
       align-items:center;
       justify-content:center;
-      gap:16px;
       background:
-        radial-gradient(1000px 700px at 50% 10%, rgba(86,210,255,.18), transparent 50%),
-        linear-gradient(180deg, #03111f 0%, #06345a 48%, #0a6ea8 100%);
+        radial-gradient(900px 520px at 50% 18%, rgba(91,226,255,.22), transparent 48%),
+        radial-gradient(700px 400px at 50% 65%, rgba(42,171,238,.18), transparent 52%),
+        linear-gradient(180deg, #020816 0%, #062140 52%, #063a67 100%);
       transition: opacity .32s ease, visibility .32s ease;
     }
 
@@ -817,40 +824,17 @@
     }
 
     .pre-logo{
-      width:88px;
-      height:88px;
+      width:92px;
+      height:92px;
       object-fit:contain;
       display:block;
-      filter: drop-shadow(0 14px 24px rgba(0,0,0,.22));
-      animation: preLogoFloat .95s ease-in-out infinite;
-    }
-
-    .pre-bar{
-      width:min(190px, 62vw);
-      height:8px;
-      border-radius:999px;
-      overflow:hidden;
-      background: rgba(255,255,255,.20);
-      box-shadow: inset 0 1px 2px rgba(0,0,0,.10);
-    }
-
-    .pre-fill{
-      width:0;
-      height:100%;
-      border-radius:999px;
-      background: linear-gradient(90deg, #1e96d8, #2AABEE, #68dcff);
-      box-shadow: 0 0 14px rgba(42,171,238,.26);
-      animation: preLoad 4s linear forwards;
+      filter: drop-shadow(0 14px 28px rgba(0,0,0,.28));
+      animation: preLogoFloat .9s ease-in-out infinite;
     }
 
     @keyframes preLogoFloat{
       0%,100%{ transform: translateY(0) scale(1); }
-      50%{ transform: translateY(-7px) scale(1.02); }
-    }
-
-    @keyframes preLoad{
-      from{ width:0; }
-      to{ width:100%; }
+      50%{ transform: translateY(-9px) scale(1.03); }
     }
 
     @media (max-width: 360px){
@@ -881,6 +865,8 @@
 
       .bet-toggle{ width:44px; height:46px; border-radius:16px; }
 
+      .bet-toggle svg{ width:20px; height:20px; }
+
       .quick-bets{ grid-template-columns:repeat(3, minmax(0,1fr)); }
 
       .quick-btn{ height:36px; }
@@ -894,20 +880,18 @@
 
       .tg-btn{ height:48px; border-radius:15px; }
 
-      .pre-logo{ width:76px; height:76px; }
+      .pre-logo{ width:78px; height:78px; }
     }
 
     @media (prefers-reduced-motion: reduce){
       *{ transition:none !important; animation:none !important; }
       .overlay.show .popup{ transform:none !important; }
-      .pre-fill{ width:100% !important; }
     }
   </style>
 </head>
 <body>
   <div class="preloader" id="preloader">
     <img class="pre-logo" src="https://i.postimg.cc/qvL497mF/Picsart-26-02-27-02-02-37-502.png" alt="Vezus">
-    <div class="pre-bar"><div class="pre-fill"></div></div>
   </div>
 
   <div class="bottom-notice info" id="bottomNotice" aria-live="polite">
@@ -983,7 +967,21 @@
               placeholder="Минимум 10"
               value="10"
             >
-            <button class="bet-toggle" id="betToggleBtn" type="button">+</button>
+
+            <button class="bet-toggle" id="betToggleBtn" type="button" aria-label="Быстрые ставки">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <defs>
+                  <linearGradient id="coinGrad" x1="0" y1="0" x2="1" y2="1">
+                    <stop offset="0%" stop-color="#ffe27a"/>
+                    <stop offset="55%" stop-color="#f8c83c"/>
+                    <stop offset="100%" stop-color="#c98a10"/>
+                  </linearGradient>
+                </defs>
+                <circle cx="12" cy="12" r="8.5" fill="url(#coinGrad)" stroke="rgba(255,255,255,.45)" stroke-width="1.3"/>
+                <circle cx="12" cy="12" r="5.2" fill="none" stroke="rgba(255,255,255,.35)" stroke-width="1"/>
+                <path d="M12 6.5v11" stroke="rgba(80,44,0,.55)" stroke-width="1.3" stroke-linecap="round"/>
+              </svg>
+            </button>
           </div>
 
           <div class="quick-bets" id="quickBets">
@@ -1093,6 +1091,8 @@
     let swapTimer = null;
     let finishTimer = null;
 
+    let audioCtx = null;
+
     function formatVc(value){
       const n = Number(value ?? 0);
       if (!Number.isFinite(n)) return "0 VC";
@@ -1164,6 +1164,62 @@
       }, 1900);
     }
 
+    function ensureAudio(){
+      try{
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        if (!AudioCtx) return null;
+
+        if (!audioCtx) {
+          audioCtx = new AudioCtx();
+        }
+
+        if (audioCtx.state === "suspended") {
+          audioCtx.resume().catch(() => {});
+        }
+
+        return audioCtx;
+      } catch {
+        return null;
+      }
+    }
+
+    function playTone(freq, type, startTime, duration, volume){
+      if (!audioCtx) return;
+
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+
+      osc.type = type;
+      osc.frequency.setValueAtTime(freq, startTime);
+
+      gain.gain.setValueAtTime(0.0001, startTime);
+      gain.gain.exponentialRampToValueAtTime(volume, startTime + 0.02);
+      gain.gain.exponentialRampToValueAtTime(0.0001, startTime + duration);
+
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+
+      osc.start(startTime);
+      osc.stop(startTime + duration + 0.02);
+    }
+
+    function playWinSound(){
+      if (!ensureAudio()) return;
+      const now = audioCtx.currentTime + 0.01;
+
+      playTone(620, "triangle", now, 0.12, 0.045);
+      playTone(820, "triangle", now + 0.08, 0.12, 0.04);
+      playTone(1040, "sine", now + 0.16, 0.18, 0.035);
+    }
+
+    function playLoseSound(){
+      if (!ensureAudio()) return;
+      const now = audioCtx.currentTime + 0.01;
+
+      playTone(320, "sawtooth", now, 0.12, 0.035);
+      playTone(210, "triangle", now + 0.08, 0.16, 0.03);
+    }
+
     function setCoinFace(side){
       const coinFace = $("coinFace");
       if (side === "gold") {
@@ -1178,7 +1234,6 @@
     function setQuickVisible(show){
       quickVisible = !!show;
       $("quickBets").classList.toggle("show", quickVisible);
-      $("betToggleBtn").textContent = quickVisible ? "−" : "+";
     }
 
     function setChoiceVisible(show){
@@ -1289,6 +1344,7 @@
 
     function startGame(){
       if (isFlipping) return;
+      ensureAudio();
 
       if (pendingWin > 0) {
         showNotice("Сначала забери выигрыш", "info");
@@ -1313,6 +1369,7 @@
 
     async function chooseSide(side){
       if (isFlipping || pendingWin > 0) return;
+      ensureAudio();
 
       const bet = getBetAmount();
 
@@ -1375,6 +1432,7 @@
 
             coinShell.classList.add("flash-win");
             setClaimVisible(true);
+            playWinSound();
 
             showNotice(`Выпал ${sideText}. Выигрыш ${formatVc(pendingWin)}`, "win");
           } else {
@@ -1386,6 +1444,7 @@
 
             coinShell.classList.add("flash-lose");
             setClaimVisible(false);
+            playLoseSound();
 
             showNotice(`Выпал ${sideText}. -${formatVc(bet)}`, "lose");
           }
@@ -1398,8 +1457,7 @@
           updateButtons();
         }, 720);
 
-      } catch (err){
-        console.error("PLAY ERROR:", err);
+      } catch {
         isFlipping = false;
         updateButtons();
         showNotice("Ошибка сети", "lose");
@@ -1494,7 +1552,7 @@
 
       setTimeout(() => {
         $("preloader").classList.add("hide");
-      }, 4000);
+      }, 1400);
 
       autoAuthTelegram();
     });
