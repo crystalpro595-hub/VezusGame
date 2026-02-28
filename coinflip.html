@@ -137,7 +137,9 @@
     }
 
     .icon-btn:active,
-    .rule-btn:active{ transform:scale(.98); }
+    .rule-btn:active{
+      transform:scale(.98);
+    }
 
     .rule-btn svg{
       width:19px;
@@ -221,7 +223,9 @@
       cursor:pointer;
     }
 
-    .logo-btn:active{ transform:scale(.98); }
+    .logo-btn:active{
+      transform:scale(.98);
+    }
 
     .logo-btn img{
       width:100%;
@@ -261,8 +265,8 @@
       justify-content:center;
       align-items:center;
       padding:14px 0 10px;
-      min-height: 300px;
-      perspective: 1400px;
+      min-height:300px;
+      perspective:1400px;
     }
 
     .coin-stage::before{
@@ -286,8 +290,11 @@
       background: rgba(0,0,0,.35);
       filter: blur(10px);
       transform: scale(1);
-      transition: transform .18s linear, opacity .18s linear;
       opacity:.72;
+    }
+
+    .coin-shadow.is-flipping{
+      animation: shadowPulse 1.8s cubic-bezier(.18,.88,.22,1) both;
     }
 
     .coin-shell{
@@ -354,25 +361,41 @@
 
     @keyframes coinJumpFlip{
       0%{
-        transform: translateY(0) rotateX(0deg) rotateY(0deg) rotateZ(0deg) scale(1);
+        transform: translate3d(0,0,0) rotateX(0deg) rotateY(0deg) rotateZ(0deg) scale(1);
       }
-      12%{
-        transform: translateY(-12px) rotateX(220deg) rotateY(140deg) rotateZ(3deg) scale(1.02);
+      16%{
+        transform: translate3d(0,-12px,12px) rotateX(240deg) rotateY(170deg) rotateZ(3deg) scale(1.03);
       }
-      28%{
-        transform: translateY(-42px) rotateX(620deg) rotateY(420deg) rotateZ(-5deg) scale(1.05);
+      34%{
+        transform: translate3d(0,-42px,34px) rotateX(720deg) rotateY(520deg) rotateZ(-4deg) scale(1.07);
       }
-      50%{
-        transform: translateY(-68px) rotateX(980deg) rotateY(760deg) rotateZ(0deg) scale(1.08);
+      52%{
+        transform: translate3d(0,-70px,62px) rotateX(1100deg) rotateY(860deg) rotateZ(0deg) scale(1.12);
       }
-      72%{
-        transform: translateY(-28px) rotateX(1320deg) rotateY(1120deg) rotateZ(5deg) scale(1.04);
-      }
-      88%{
-        transform: translateY(-10px) rotateX(1540deg) rotateY(1320deg) rotateZ(-2deg) scale(1.02);
+      74%{
+        transform: translate3d(0,-28px,26px) rotateX(1450deg) rotateY(1180deg) rotateZ(4deg) scale(1.06);
       }
       100%{
-        transform: translateY(0) rotateX(1680deg) rotateY(1440deg) rotateZ(0deg) scale(1);
+        transform: translate3d(0,0,0) rotateX(1680deg) rotateY(1440deg) rotateZ(0deg) scale(1);
+      }
+    }
+
+    @keyframes shadowPulse{
+      0%{
+        transform: scale(1);
+        opacity:.72;
+      }
+      35%{
+        transform: scale(.72);
+        opacity:.34;
+      }
+      55%{
+        transform: scale(.62);
+        opacity:.24;
+      }
+      100%{
+        transform: scale(1);
+        opacity:.72;
       }
     }
 
@@ -448,11 +471,39 @@
       transition: transform .15s ease, background .15s ease, border-color .15s ease;
     }
 
-    .quick-btn:active{ transform: scale(.98); }
+    .quick-btn:active{
+      transform: scale(.98);
+    }
 
     .quick-btn:hover{
       background: rgba(255,255,255,.09);
       border-color: rgba(255,255,255,.12);
+    }
+
+    .action-area{
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+    }
+
+    .start-wrap{
+      max-height:64px;
+      opacity:1;
+      transform:translateY(0) scale(1);
+      transition:
+        max-height .28s ease,
+        opacity .22s ease,
+        transform .22s ease,
+        margin .22s ease;
+      overflow:hidden;
+    }
+
+    .start-wrap.hide{
+      max-height:0;
+      opacity:0;
+      transform:translateY(-8px) scale(.98);
+      margin:0;
+      pointer-events:none;
     }
 
     .start-btn{
@@ -470,7 +521,9 @@
       transition: transform .16s ease, opacity .16s ease, box-shadow .16s ease;
     }
 
-    .start-btn:active{ transform: scale(.985); }
+    .start-btn:active{
+      transform: scale(.985);
+    }
 
     .start-btn:disabled{
       opacity:.55;
@@ -483,7 +536,10 @@
       opacity:0;
       max-height:0;
       overflow:hidden;
-      transition: opacity .25s ease, max-height .25s ease, margin .25s ease;
+      transition:
+        opacity .25s ease,
+        max-height .25s ease,
+        margin .25s ease;
       margin-top:0;
     }
 
@@ -515,22 +571,39 @@
       box-shadow:
         0 14px 24px rgba(0,0,0,.18),
         inset 0 1px 0 rgba(255,255,255,.06);
-      transition: transform .16s ease, box-shadow .16s ease;
       padding:0 12px;
+      opacity:0;
+      transition:
+        transform .30s cubic-bezier(.2,.9,.2,1),
+        box-shadow .16s ease,
+        opacity .22s ease;
     }
-
-    .choice-btn:active{ transform: scale(.985); }
 
     .choice-btn.gold{
       background:
         linear-gradient(180deg, rgba(255,216,91,.34), rgba(210,140,14,.22)),
         rgba(255,255,255,.06);
+      transform: translateX(-26px) scale(.96);
     }
 
     .choice-btn.silver{
       background:
         linear-gradient(180deg, rgba(225,233,245,.30), rgba(135,146,160,.20)),
         rgba(255,255,255,.06);
+      transform: translateX(26px) scale(.96);
+    }
+
+    .choice-box.show .choice-btn{
+      opacity:1;
+    }
+
+    .choice-box.show .choice-btn.gold,
+    .choice-box.show .choice-btn.silver{
+      transform: translateX(0) scale(1);
+    }
+
+    .choice-btn:active{
+      transform: scale(.985);
     }
 
     .choice-inner{
@@ -681,7 +754,9 @@
       padding:0;
     }
 
-    .popup-x:active{ transform: scale(.98); }
+    .popup-x:active{
+      transform: scale(.98);
+    }
 
     .popup-body{
       padding:14px 16px 16px 16px;
@@ -724,7 +799,9 @@
       font-size:14px;
     }
 
-    .tg-btn:active{ transform: scale(.99); }
+    .tg-btn:active{
+      transform: scale(.99);
+    }
 
     .tg-ico{
       width:22px;
@@ -910,16 +987,16 @@
       .title{ font-size:18px; }
 
       .coin-stage{
-        min-height: 255px;
+        min-height:255px;
       }
 
       .coin-shell{
-        width:185px;
-        height:185px;
+        width:190px;
+        height:190px;
       }
 
       .coin-shadow{
-        width:138px;
+        width:140px;
         height:22px;
       }
 
@@ -948,6 +1025,7 @@
       .overlay.show .popup{ transform:none !important; }
       .loader-fill{ width:100% !important; }
       .coin-shell.is-flipping{ animation:none !important; }
+      .coin-shadow.is-flipping{ animation:none !important; }
     }
   </style>
 </head>
@@ -1050,25 +1128,29 @@
           </div>
         </div>
 
-        <button class="start-btn" id="startBtn" type="button">Начать</button>
+        <div class="action-area">
+          <div class="start-wrap" id="startWrap">
+            <button class="start-btn" id="startBtn" type="button">Начать</button>
+          </div>
 
-        <div class="choice-box" id="choiceBox">
-          <div class="label">Выбери сторону</div>
+          <div class="choice-box" id="choiceBox">
+            <div class="label">Выбери сторону</div>
 
-          <div class="choice-grid">
-            <button class="choice-btn gold" id="headsBtn" type="button">
-              <span class="choice-inner">
-                <img class="choice-coin" src="https://i.postimg.cc/50wQKCZL/Picsart-26-02-28-14-51-00-987.png" alt="">
-                <span>Орёл</span>
-              </span>
-            </button>
+            <div class="choice-grid">
+              <button class="choice-btn gold" id="headsBtn" type="button">
+                <span class="choice-inner">
+                  <img class="choice-coin" src="https://i.postimg.cc/50wQKCZL/Picsart-26-02-28-14-51-00-987.png" alt="">
+                  <span>Орёл</span>
+                </span>
+              </button>
 
-            <button class="choice-btn silver" id="tailsBtn" type="button">
-              <span class="choice-inner">
-                <img class="choice-coin" src="https://i.postimg.cc/Rh46k0m4/Picsart-26-02-28-14-51-28-798.png" alt="">
-                <span>Решка</span>
-              </span>
-            </button>
+              <button class="choice-btn silver" id="tailsBtn" type="button">
+                <span class="choice-inner">
+                  <img class="choice-coin" src="https://i.postimg.cc/Rh46k0m4/Picsart-26-02-28-14-51-28-798.png" alt="">
+                  <span>Решка</span>
+                </span>
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -1189,7 +1271,6 @@
 
     function setCoinFace(side){
       const coinFace = $("coinFace");
-
       currentFace = side;
 
       if (side === "gold") {
@@ -1219,6 +1300,7 @@
     function setChoiceVisible(show){
       choiceVisible = !!show;
       $("choiceBox").classList.toggle("show", choiceVisible);
+      $("startWrap").classList.toggle("hide", choiceVisible);
       updateStartButton();
     }
 
@@ -1227,14 +1309,8 @@
       const bet = getBetAmount();
       const valid = bet >= MIN_BET && bet <= currentBalance && !isFlipping;
 
-      if (choiceVisible) {
-        btn.textContent = "Выбери сторону ниже";
-        btn.disabled = true;
-        return;
-      }
-
       btn.textContent = "Начать";
-      btn.disabled = !valid;
+      btn.disabled = choiceVisible || !valid;
     }
 
     async function autoAuthTelegram(){
@@ -1330,11 +1406,48 @@
       osc.stop(end + 0.02);
     }
 
-    function playFlipSound(){
-      playTone(620, 0.06, "square", 0.025, 0.00);
-      playTone(760, 0.05, "square", 0.022, 0.08);
-      playTone(540, 0.06, "triangle", 0.020, 0.16);
-      playTone(820, 0.05, "triangle", 0.018, 0.24);
+    function playSweep(fromFreq, toFreq, duration, type = "triangle", volume = 0.012, startAt = 0){
+      const ctx = getAudioCtx();
+      if (!ctx) return;
+
+      const start = ctx.currentTime + startAt;
+      const end = start + duration;
+
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+
+      osc.type = type;
+      osc.frequency.setValueAtTime(fromFreq, start);
+      osc.frequency.exponentialRampToValueAtTime(Math.max(40, toFreq), end);
+
+      gain.gain.setValueAtTime(0.0001, start);
+      gain.gain.exponentialRampToValueAtTime(volume, start + 0.01);
+      gain.gain.exponentialRampToValueAtTime(0.0001, end);
+
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+
+      osc.start(start);
+      osc.stop(end + 0.02);
+    }
+
+    function playFlipSequenceSound(){
+      playSweep(260, 120, 0.34, "triangle", 0.010, 0.00);
+
+      const hits = [980, 860, 930, 780, 900, 740, 820, 700];
+      hits.forEach((freq, i) => {
+        playTone(freq, 0.040, "square", 0.010, 0.08 + (i * 0.11));
+      });
+    }
+
+    function playLandClick(side){
+      if (side === "gold") {
+        playTone(1180, 0.05, "square", 0.018, 0.00);
+        playTone(860, 0.07, "triangle", 0.015, 0.04);
+      } else {
+        playTone(760, 0.05, "square", 0.017, 0.00);
+        playTone(520, 0.07, "triangle", 0.014, 0.04);
+      }
     }
 
     function playWinSound(){
@@ -1356,22 +1469,24 @@
       if (finishFlipTimer) clearTimeout(finishFlipTimer);
 
       coinShell.classList.remove("is-flipping", "flash-win", "flash-lose");
-      void coinShell.offsetWidth;
+      coinShadow.classList.remove("is-flipping");
 
-      coinShadow.style.transform = "scale(0.78)";
-      coinShadow.style.opacity = "0.42";
+      void coinShell.offsetWidth;
+      void coinShadow.offsetWidth;
 
       coinShell.classList.add("is-flipping");
-      playFlipSound();
+      coinShadow.classList.add("is-flipping");
+
+      playFlipSequenceSound();
 
       faceSwapTimer = setTimeout(() => {
         setCoinFace(resultSide);
-      }, 860);
+        playLandClick(resultSide);
+      }, 900);
 
       finishFlipTimer = setTimeout(() => {
         coinShell.classList.remove("is-flipping");
-        coinShadow.style.transform = "scale(1)";
-        coinShadow.style.opacity = "0.72";
+        coinShadow.classList.remove("is-flipping");
       }, 1820);
     }
 
