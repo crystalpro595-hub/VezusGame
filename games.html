@@ -5,8 +5,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Games</title>
 
+  <link rel="preconnect" href="https://i.postimg.cc" crossorigin>
+  <link rel="dns-prefetch" href="https://i.postimg.cc">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  <link rel="preload" as="image" href="https://i.postimg.cc/qvL497mF/Picsart-26-02-27-02-02-37-502.png">
+  <link rel="preload" as="image" href="https://i.postimg.cc/QNYsBFLc/Picsart-26-02-28-13-23-04-101.jpg">
+
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
 
   <style>
@@ -138,7 +144,6 @@
       box-shadow: var(--shadow), inset 0 1px 0 rgba(255,255,255,.04);
       backdrop-filter: blur(10px);
       -webkit-backdrop-filter: blur(10px);
-      cursor:pointer;
     }
 
     .balance-mini::before{
@@ -158,6 +163,7 @@
       font-weight:900;
       color: rgba(234,241,255,.92);
       white-space:nowrap;
+      pointer-events:none;
     }
 
     .bal-amount{
@@ -177,7 +183,10 @@
       font-weight:900;
       font-size:13px;
       white-space:nowrap;
+      cursor:pointer;
     }
+
+    .bal-amount:active{ transform: scale(.98); }
 
     .logo-btn{
       width:54px;
@@ -221,14 +230,6 @@
       width:100%;
     }
 
-    .game-item{
-      display:flex;
-      flex-direction:column;
-      gap:8px;
-      align-items:center;
-      min-width:0;
-    }
-
     .game-card{
       position:relative;
       border:none;
@@ -258,7 +259,7 @@
       object-fit:cover;
       object-position:center;
       display:block;
-      transform: scale(1.03);
+      transform: scale(1.02);
       filter: saturate(1.02) contrast(1.02);
     }
 
@@ -268,22 +269,9 @@
       inset:0;
       z-index:1;
       background:
-        linear-gradient(180deg, rgba(0,0,0,.06), rgba(0,0,0,.28)),
+        linear-gradient(180deg, rgba(0,0,0,.06), rgba(0,0,0,.22)),
         radial-gradient(120px 70px at 50% 100%, rgba(255,255,255,.04), transparent 70%);
       pointer-events:none;
-    }
-
-    .game-name{
-      width:100%;
-      text-align:center;
-      font-weight:900;
-      font-size:13px;
-      letter-spacing:.12px;
-      color: rgba(234,241,255,.96);
-      text-shadow: 0 8px 14px rgba(0,0,0,.35);
-      white-space:nowrap;
-      overflow:hidden;
-      text-overflow:ellipsis;
     }
 
     .channel-overlay{
@@ -437,10 +425,6 @@
         border-radius:18px;
       }
 
-      .game-name{
-        font-size:11px;
-      }
-
       .section-title{
         font-size:15px;
       }
@@ -465,9 +449,9 @@
         <div class="top-row">
           <button class="icon-btn" id="backBtn" aria-label="Назад">←</button>
 
-          <div class="balance-mini" id="balanceChip" aria-label="Баланс">
+          <div class="balance-mini" aria-label="Баланс">
             <span class="bal-title">Баланс</span>
-            <div class="bal-amount" id="balanceValue">...</div>
+            <button class="bal-amount" id="balanceValue" aria-label="Открыть кошелёк">...</button>
           </div>
 
           <button class="logo-btn" id="logoBtn" aria-label="Открыть Telegram канал">
@@ -475,6 +459,7 @@
               src="https://i.postimg.cc/qvL497mF/Picsart-26-02-27-02-02-37-502.png"
               alt="Vezus"
               loading="eager"
+              fetchpriority="high"
               decoding="async"
             >
           </button>
@@ -486,44 +471,68 @@
       </div>
 
       <div class="games-grid">
-        <div class="game-item">
-          <button class="game-card" id="coinflipBtn" type="button">
-            <img
-              class="game-img"
-              src="https://i.postimg.cc/RVRnj12F/Picsart-26-02-28-13-49-40-994.jpg"
-              alt="CoinFlip"
-              loading="lazy"
-              decoding="async"
-            >
-          </button>
-          <div class="game-name">CoinFlip</div>
-        </div>
+        <button class="game-card" id="coinflipBtn" type="button" aria-label="CoinFlip">
+          <img
+            class="game-img"
+            src="https://i.postimg.cc/QNYsBFLc/Picsart-26-02-28-13-23-04-101.jpg"
+            alt="CoinFlip"
+            loading="eager"
+            fetchpriority="high"
+            decoding="async"
+          >
+        </button>
 
-        <div class="game-item">
-          <button class="game-card" id="plinkoBtn" type="button">
-            <img
-              class="game-img"
-              src="YOUR_PLINKO_IMAGE.png"
-              alt="Plinko"
-              loading="lazy"
-              decoding="async"
-            >
-          </button>
-          <div class="game-name">Plinko</div>
-        </div>
+        <button class="game-card" id="plinkoBtn" type="button" aria-label="Plinko">
+          <img
+            class="game-img"
+            src="YOUR_PLINKO_IMAGE.png"
+            alt="Plinko"
+            loading="eager"
+            fetchpriority="high"
+            decoding="async"
+          >
+        </button>
 
-        <div class="game-item">
-          <button class="game-card" id="minesBtn" type="button">
-            <img
-              class="game-img"
-              src="https://i.postimg.cc/j2tGmrJC/Picsart-26-02-28-13-41-04-020.jpg"
-              alt="Mines"
-              loading="lazy"
-              decoding="async"
-            >
-          </button>
-          <div class="game-name">Mines</div>
-        </div>
+        <button class="game-card" id="minesBtn" type="button" aria-label="Mines">
+          <img
+            class="game-img"
+            src="YOUR_MINES_IMAGE.png"
+            alt="Mines"
+            loading="eager"
+            fetchpriority="high"
+            decoding="async"
+          >
+        </button>
+
+        <button class="game-card" id="futureGame1Btn" type="button" aria-label="Future Game 1">
+          <img
+            class="game-img"
+            src="YOUR_FUTURE_GAME_1.png"
+            alt="Future Game 1"
+            loading="lazy"
+            decoding="async"
+          >
+        </button>
+
+        <button class="game-card" id="futureGame2Btn" type="button" aria-label="Future Game 2">
+          <img
+            class="game-img"
+            src="YOUR_FUTURE_GAME_2.png"
+            alt="Future Game 2"
+            loading="lazy"
+            decoding="async"
+          >
+        </button>
+
+        <button class="game-card" id="futureGame3Btn" type="button" aria-label="Future Game 3">
+          <img
+            class="game-img"
+            src="YOUR_FUTURE_GAME_3.png"
+            alt="Future Game 3"
+            loading="lazy"
+            decoding="async"
+          >
+        </button>
       </div>
 
     </div>
@@ -558,7 +567,8 @@
 
     const FILES = {
       index: "index.html",
-      wallet: "wallet.html"
+      wallet: "wallet.html",
+      coinflip: "coinflip.html"
     };
 
     const $ = (id) => document.getElementById(id);
@@ -591,11 +601,12 @@
 
     async function autoAuthTelegram(){
       const cached = loadCachedProfile();
+      const balanceBtn = $("balanceValue");
 
       if (cached?.balance != null) {
-        $("balanceValue").textContent = formatVc(cached.balance);
+        balanceBtn.textContent = formatVc(cached.balance);
       } else {
-        $("balanceValue").textContent = "0 VC";
+        balanceBtn.textContent = "0 VC";
       }
 
       if (!window.Telegram || !window.Telegram.WebApp) return;
@@ -608,7 +619,7 @@
       const initData = Telegram.WebApp.initData;
       if (!initData) return;
 
-      $("balanceValue").textContent = "...";
+      balanceBtn.textContent = "...";
 
       try{
         const res = await fetch(VERIFY_URL, {
@@ -620,14 +631,14 @@
         const json = await res.json().catch(() => ({}));
 
         if (!res.ok || !json.ok || !json.profile) {
-          $("balanceValue").textContent = cached?.balance != null ? formatVc(cached.balance) : "0 VC";
+          balanceBtn.textContent = cached?.balance != null ? formatVc(cached.balance) : "0 VC";
           return;
         }
 
         localStorage.setItem("tg_profile", JSON.stringify(json.profile));
-        $("balanceValue").textContent = formatVc(json.profile.balance);
+        balanceBtn.textContent = formatVc(json.profile.balance);
       } catch {
-        $("balanceValue").textContent = cached?.balance != null ? formatVc(cached.balance) : "0 VC";
+        balanceBtn.textContent = cached?.balance != null ? formatVc(cached.balance) : "0 VC";
       }
     }
 
@@ -648,7 +659,7 @@
     }
 
     $("backBtn").addEventListener("click", () => goTo(FILES.index));
-    $("balanceChip").addEventListener("click", () => goTo(FILES.wallet));
+    $("balanceValue").addEventListener("click", () => goTo(FILES.wallet));
     $("logoBtn").addEventListener("click", openChannel);
 
     channelClose.addEventListener("click", closeChannel);
@@ -661,9 +672,13 @@
       openTelegramLinkSafe("https://t.me/vezuspubg");
     });
 
-    $("coinflipBtn").addEventListener("click", () => alert("CoinFlip — скоро"));
+    $("coinflipBtn").addEventListener("click", () => goTo(FILES.coinflip));
     $("plinkoBtn").addEventListener("click", () => alert("Plinko — скоро"));
     $("minesBtn").addEventListener("click", () => alert("Mines — скоро"));
+
+    $("futureGame1Btn").addEventListener("click", () => alert("Скоро"));
+    $("futureGame2Btn").addEventListener("click", () => alert("Скоро"));
+    $("futureGame3Btn").addEventListener("click", () => alert("Скоро"));
 
     document.addEventListener("keydown", (e) => {
       if (e.key === "Escape") closeChannel();
