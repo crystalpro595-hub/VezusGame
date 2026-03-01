@@ -17,7 +17,6 @@
   <style>
     :root{
       --text:#eaf1ff;
-      --muted:rgba(234,241,255,.72);
       --safe-bottom: env(safe-area-inset-bottom, 0px);
       --safe-top: env(safe-area-inset-top, 0px);
 
@@ -32,15 +31,17 @@
       --green2:#16a34a;
       --red1:#ef4444;
       --red2:#dc2626;
+      --amber1:#f59e0b;
+      --amber2:#d97706;
     }
 
     *{
       box-sizing:border-box;
-      font-family:'Inter',sans-serif;
-      -webkit-tap-highlight-color:transparent;
+      font-family:'Inter', sans-serif;
+      -webkit-tap-highlight-color: transparent;
     }
 
-    html,body{
+    html, body{
       height:100%;
       margin:0;
       overflow:hidden;
@@ -60,7 +61,7 @@
       position:fixed;
       inset:0;
       background:
-        radial-gradient(900px 600px at 30% 10%, rgba(42,171,238,.10), transparent 60%),
+        radial-gradient(900px 600px at 30% 10%, rgba(255,255,255,.05), transparent 60%),
         linear-gradient(180deg, rgba(0,0,0,.40), rgba(0,0,0,.64));
       pointer-events:none;
       z-index:0;
@@ -74,7 +75,7 @@
       overflow:auto;
       padding:0 16px calc(28px + var(--safe-bottom)) 16px;
       z-index:1;
-      overscroll-behavior:contain;
+      overscroll-behavior: contain;
       scrollbar-width:none;
     }
 
@@ -93,15 +94,12 @@
       position:sticky;
       top:0;
       z-index:40;
-      padding-top:calc(8px + var(--safe-top));
+      padding-top: calc(8px + var(--safe-top));
       padding-bottom:8px;
       background:
-        linear-gradient(180deg,
-          rgba(2,6,23,.96) 0%,
-          rgba(2,6,23,.86) 72%,
-          rgba(2,6,23,0) 100%);
-      backdrop-filter:blur(6px);
-      -webkit-backdrop-filter:blur(6px);
+        linear-gradient(180deg, rgba(2,6,23,.96) 0%, rgba(2,6,23,.86) 72%, rgba(2,6,23,0) 100%);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
     }
 
     .top-row{
@@ -112,20 +110,21 @@
       align-items:center;
     }
 
-    .icon-btn,.rule-btn{
+    .icon-btn,
+    .speed-btn{
       width:40px;
       height:40px;
       border:none;
       border-radius:14px;
-      background:var(--glass);
+      background: var(--glass);
       border:1px solid var(--stroke);
-      box-shadow:var(--shadow-soft), inset 0 1px 0 rgba(255,255,255,.04);
+      box-shadow: var(--shadow-soft), inset 0 1px 0 rgba(255,255,255,.04);
       display:grid;
       place-items:center;
       color:var(--text);
       cursor:pointer;
-      backdrop-filter:blur(10px);
-      -webkit-backdrop-filter:blur(10px);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
       padding:0;
     }
 
@@ -134,20 +133,16 @@
       font-weight:900;
     }
 
-    .icon-btn:active,.rule-btn:active,.logo-btn:active,.speed-btn:active,.bet-toggle:active,
-    .quick-btn:active,.ball-btn:active,.play-btn:active,.claim-btn:active,.popup-x:active,.tg-btn:active{
-      transform:scale(.98);
+    .speed-btn{
+      font-size:13px;
+      font-weight:900;
+      letter-spacing:.3px;
     }
 
-    .rule-btn svg{
-      width:19px;
-      height:19px;
-      stroke:rgba(234,241,255,.92);
-      fill:none;
-      stroke-width:2;
-      stroke-linecap:round;
-      stroke-linejoin:round;
-      display:block;
+    .icon-btn:active,
+    .speed-btn:active,
+    .logo-btn:active{
+      transform:scale(.98);
     }
 
     .balance-mini{
@@ -162,11 +157,11 @@
       padding:6px 7px 6px 12px;
       position:relative;
       overflow:hidden;
-      background:var(--glass);
+      background: var(--glass);
       border:1px solid var(--stroke);
-      box-shadow:var(--shadow), inset 0 1px 0 rgba(255,255,255,.04);
-      backdrop-filter:blur(10px);
-      -webkit-backdrop-filter:blur(10px);
+      box-shadow: var(--shadow), inset 0 1px 0 rgba(255,255,255,.04);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
     }
 
     .balance-mini::before{
@@ -184,7 +179,7 @@
       z-index:1;
       font-size:12px;
       font-weight:900;
-      color:rgba(234,241,255,.92);
+      color: rgba(234,241,255,.92);
       white-space:nowrap;
     }
 
@@ -199,9 +194,9 @@
       display:flex;
       align-items:center;
       justify-content:center;
-      background:rgba(255,255,255,.08);
+      background: rgba(255,255,255,.08);
       border:1px solid rgba(255,255,255,.08);
-      color:rgba(234,241,255,.98);
+      color: rgba(234,241,255,.98);
       font-weight:900;
       font-size:13px;
       white-space:nowrap;
@@ -217,6 +212,7 @@
       background:transparent;
       border:none;
       padding:0;
+      margin:0;
       cursor:pointer;
     }
 
@@ -227,155 +223,208 @@
       display:block;
     }
 
-    .speed-row{
-      display:flex;
-      justify-content:flex-end;
-      margin-top:-2px;
-    }
-
-    .speed-btn{
-      height:34px;
-      min-width:74px;
-      border:none;
-      border-radius:14px;
-      padding:0 12px;
-      cursor:pointer;
-      color:#fff;
-      font-size:12px;
-      font-weight:900;
-      background:rgba(255,255,255,.07);
-      border:1px solid rgba(255,255,255,.08);
-      box-shadow:var(--shadow-soft), inset 0 1px 0 rgba(255,255,255,.04);
-      backdrop-filter:blur(10px);
-      -webkit-backdrop-filter:blur(10px);
-    }
-
     .card{
       border-radius:24px;
-      background:var(--glass);
+      background: var(--glass);
       border:1px solid var(--stroke);
-      box-shadow:var(--shadow);
-      backdrop-filter:blur(10px);
-      -webkit-backdrop-filter:blur(10px);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
       overflow:hidden;
-      position:relative;
     }
 
-    .card::before{
-      content:"";
-      position:absolute;
-      inset:0;
-      background:
-        radial-gradient(360px 120px at 0% 0%, rgba(255,255,255,.04), transparent 60%),
-        radial-gradient(320px 120px at 100% 100%, rgba(255,255,255,.025), transparent 60%);
-      pointer-events:none;
+    .board-card{
+      padding:12px;
     }
 
     .board-wrap{
       position:relative;
-      padding:12px 12px 10px;
-    }
-
-    .board-head{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:10px;
-      margin-bottom:10px;
-      position:relative;
-      z-index:1;
-    }
-
-    .board-title{
-      margin:0;
-      font-size:15px;
-      font-weight:900;
-      color:#fff;
-    }
-
-    .mini-note{
-      font-size:11px;
-      font-weight:800;
-      color:var(--muted);
-    }
-
-    .canvas-shell{
-      position:relative;
       width:100%;
-      height:420px;
+      display:flex;
+      justify-content:center;
+      padding-top:4px;
+    }
+
+    .board{
+      position:relative;
+      width:300px;
+      height:286px;
       border-radius:22px;
-      overflow:hidden;
       background:
-        linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.015)),
-        rgba(7,10,18,.72);
+        linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02)),
+        rgba(255,255,255,.03);
       border:1px solid rgba(255,255,255,.06);
       box-shadow:
-        inset 0 1px 0 rgba(255,255,255,.04),
-        0 18px 34px rgba(0,0,0,.24);
+        inset 0 1px 0 rgba(255,255,255,.03),
+        0 18px 34px rgba(0,0,0,.22);
+      overflow:hidden;
     }
 
-    canvas{
-      width:100%;
-      height:100%;
-      display:block;
+    .board::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      background:
+        radial-gradient(280px 140px at 50% 0%, rgba(42,171,238,.08), transparent 60%),
+        linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,0));
+      pointer-events:none;
     }
 
-    .controls{
-      padding:14px;
+    .rail{
+      position:absolute;
+      top:18px;
+      bottom:58px;
+      width:4px;
+      border-radius:999px;
+      background: linear-gradient(180deg, rgba(255,255,255,.22), rgba(255,255,255,.06));
+      box-shadow: inset 0 0 6px rgba(255,255,255,.08);
+      opacity:.85;
+    }
+
+    .rail.left{ left:12px; }
+    .rail.right{ right:12px; }
+
+    .peg{
+      position:absolute;
+      width:10px;
+      height:10px;
+      border-radius:50%;
+      background:
+        radial-gradient(circle at 35% 30%, rgba(255,255,255,.95), rgba(215,226,245,.88) 42%, rgba(130,145,170,.95) 100%);
+      box-shadow:
+        0 0 0 2px rgba(255,255,255,.04),
+        0 2px 8px rgba(0,0,0,.18);
+      transform:translate(-50%, -50%);
+      z-index:2;
+    }
+
+    .ball{
+      position:absolute;
+      left:150px;
+      top:18px;
+      width:16px;
+      height:16px;
+      border-radius:50%;
+      background:
+        radial-gradient(circle at 30% 30%, #ffffff 0%, #b8ecff 28%, #46c6ff 62%, #0b74a6 100%);
+      box-shadow:
+        inset 0 1px 2px rgba(255,255,255,.45),
+        0 4px 12px rgba(42,171,238,.28);
+      transform:translate(-50%, -50%);
+      z-index:5;
+      will-change: left, top;
+    }
+
+    .ball.hidden{
+      opacity:0;
+    }
+
+    .buckets{
+      position:absolute;
+      left:16px;
+      right:16px;
+      bottom:12px;
+      display:grid;
+      grid-template-columns:repeat(9, minmax(0,1fr));
+      gap:5px;
+      z-index:3;
+    }
+
+    .bucket{
+      height:34px;
+      border-radius:12px;
       display:flex;
-      flex-direction:column;
-      gap:12px;
+      align-items:center;
+      justify-content:center;
+      text-align:center;
+      font-size:11px;
+      font-weight:900;
+      color:#fff;
+      border:1px solid rgba(255,255,255,.08);
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.05),
+        0 8px 14px rgba(0,0,0,.16);
+      transition: transform .16s ease, box-shadow .16s ease, filter .16s ease;
     }
 
-    .play-row{
-      display:flex;
-      flex-direction:column;
-      gap:10px;
+    .bucket.low{
+      background: linear-gradient(180deg, rgba(239,68,68,.92), rgba(220,38,38,.92));
     }
 
-    .play-btn,.claim-btn{
+    .bucket.mid{
+      background: linear-gradient(180deg, rgba(245,158,11,.92), rgba(217,119,6,.92));
+    }
+
+    .bucket.good{
+      background: linear-gradient(180deg, rgba(34,197,94,.92), rgba(22,163,74,.92));
+    }
+
+    .bucket.top{
+      background: linear-gradient(180deg, rgba(42,171,238,.96), rgba(34,158,217,.96));
+    }
+
+    .bucket.hit{
+      transform: translateY(-4px) scale(1.06);
+      box-shadow:
+        0 0 0 2px rgba(255,255,255,.10),
+        0 0 18px rgba(255,255,255,.20),
+        0 12px 18px rgba(0,0,0,.18);
+      filter: brightness(1.12);
+    }
+
+    .main-action{
+      padding:0 12px 12px;
+    }
+
+    .play-btn,
+    .claim-btn{
       width:100%;
       height:52px;
       border:none;
       border-radius:18px;
       cursor:pointer;
       color:#fff;
-      font-size:14px;
+      font-size:15px;
       font-weight:900;
       letter-spacing:.2px;
-      transition:transform .16s ease, opacity .16s ease, box-shadow .16s ease;
+      transition: transform .16s ease, opacity .16s ease, box-shadow .16s ease;
     }
 
     .play-btn{
-      background:linear-gradient(180deg, var(--tg1), var(--tg2));
-      box-shadow:0 18px 34px rgba(34,158,217,.28);
+      background: linear-gradient(180deg, var(--tg1), var(--tg2));
+      box-shadow: 0 18px 34px rgba(34,158,217,.28);
     }
 
     .claim-btn{
-      background:linear-gradient(180deg, var(--green1), var(--green2));
-      box-shadow:0 18px 34px rgba(34,197,94,.24);
+      background: linear-gradient(180deg, var(--green1), var(--green2));
+      box-shadow: 0 18px 34px rgba(34,197,94,.24);
     }
 
-    .play-btn:disabled,.claim-btn:disabled{
+    .play-btn:active,
+    .claim-btn:active{
+      transform:scale(.985);
+    }
+
+    .play-btn:disabled,
+    .claim-btn:disabled{
       opacity:.55;
       cursor:not-allowed;
       box-shadow:none;
       transform:none !important;
     }
 
-    .claim-btn[hidden]{ display:none; }
+    .panel{
+      padding:14px;
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+    }
 
     .label{
       font-size:12px;
       font-weight:900;
-      color:rgba(234,241,255,.94);
-      margin-bottom:8px;
-    }
-
-    .bet-block{
-      display:flex;
-      flex-direction:column;
-      gap:10px;
+      color: rgba(234,241,255,.90);
+      margin:0 0 8px;
     }
 
     .bet-row{
@@ -388,20 +437,20 @@
     .bet-input{
       width:100%;
       height:48px;
-      border-radius:18px;
+      border-radius:16px;
       border:1px solid rgba(255,255,255,.08);
-      background:rgba(255,255,255,.06);
+      background: rgba(255,255,255,.06);
       color:#fff;
       font-size:16px;
       font-weight:900;
       padding:0 14px;
       outline:none;
-      box-shadow:inset 0 1px 0 rgba(255,255,255,.04);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.04);
       text-align:center;
     }
 
     .bet-input::placeholder{
-      color:rgba(234,241,255,.42);
+      color: rgba(234,241,255,.42);
       font-weight:800;
     }
 
@@ -409,28 +458,24 @@
       width:48px;
       height:48px;
       border:none;
-      border-radius:18px;
+      border-radius:16px;
       cursor:pointer;
-      background:rgba(255,255,255,.08);
+      background: rgba(255,255,255,.08);
       border:1px solid rgba(255,255,255,.08);
       color:#fff;
-      box-shadow:inset 0 1px 0 rgba(255,255,255,.04);
       display:grid;
       place-items:center;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.04);
       padding:0;
     }
 
     .bet-toggle svg{
       width:22px;
       height:22px;
-      fill:none;
-      stroke:#fff;
-      stroke-width:1.9;
-      stroke-linecap:round;
-      stroke-linejoin:round;
       display:block;
-      opacity:.95;
     }
+
+    .bet-toggle:active{ transform:scale(.98); }
 
     .quick-bets{
       display:grid;
@@ -439,58 +484,61 @@
       max-height:0;
       opacity:0;
       overflow:hidden;
-      transition:max-height .2s ease, opacity .2s ease, margin .2s ease;
       margin-top:0;
+      transition:max-height .2s ease, opacity .2s ease, margin .2s ease;
     }
 
     .quick-bets.show{
       max-height:80px;
       opacity:1;
-      margin-top:2px;
+      margin-top:8px;
     }
 
     .quick-btn{
       height:36px;
       border:none;
-      border-radius:14px;
+      border-radius:13px;
       cursor:pointer;
-      background:rgba(255,255,255,.08);
+      background: rgba(255,255,255,.08);
       border:1px solid rgba(255,255,255,.08);
       color:#fff;
       font-size:12px;
       font-weight:900;
     }
 
-    .balls-row{
+    .quick-btn:active{ transform:scale(.98); }
+
+    .ball-counts{
       display:grid;
       grid-template-columns:repeat(3, minmax(0,1fr));
       gap:8px;
     }
 
-    .ball-btn{
-      height:42px;
+    .count-btn{
+      height:40px;
       border:none;
-      border-radius:16px;
+      border-radius:14px;
       cursor:pointer;
+      background: rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.08);
       color:#fff;
       font-size:12px;
       font-weight:900;
-      background:rgba(255,255,255,.06);
-      border:1px solid rgba(255,255,255,.08);
-      box-shadow:inset 0 1px 0 rgba(255,255,255,.04);
+      transition: transform .16s ease, background .16s ease, box-shadow .16s ease;
     }
 
-    .ball-btn.active{
-      background:linear-gradient(180deg, rgba(42,171,238,.32), rgba(34,158,217,.26));
-      border-color:rgba(42,171,238,.28);
-      box-shadow:0 10px 20px rgba(34,158,217,.18), inset 0 1px 0 rgba(255,255,255,.05);
+    .count-btn.active{
+      background: linear-gradient(180deg, rgba(42,171,238,.92), rgba(34,158,217,.92));
+      box-shadow: 0 12px 20px rgba(34,158,217,.20);
     }
+
+    .count-btn:active{ transform:scale(.98); }
 
     .bottom-notice{
       position:fixed;
       left:50%;
-      bottom:calc(16px + var(--safe-bottom));
-      transform:translateX(-50%) translateY(16px) scale(.98);
+      bottom: calc(16px + var(--safe-bottom));
+      transform: translateX(-50%) translateY(16px) scale(.98);
       width:min(390px, calc(100% - 28px));
       min-height:46px;
       border-radius:16px;
@@ -504,28 +552,29 @@
       box-shadow:0 14px 26px rgba(0,0,0,.24);
       opacity:0;
       pointer-events:none;
-      transition:opacity .18s ease, transform .18s ease;
+      transition: opacity .18s ease, transform .18s ease;
       z-index:500;
       border:1px solid rgba(255,255,255,.10);
-      backdrop-filter:blur(10px);
-      -webkit-backdrop-filter:blur(10px);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      overflow:hidden;
     }
 
     .bottom-notice.show{
       opacity:1;
-      transform:translateX(-50%) translateY(0) scale(1);
+      transform: translateX(-50%) translateY(0) scale(1);
     }
 
     .bottom-notice.win{
-      background:linear-gradient(180deg, rgba(34,197,94,.92), rgba(22,163,74,.92));
+      background: linear-gradient(180deg, rgba(34,197,94,.92), rgba(22,163,74,.92));
     }
 
     .bottom-notice.lose{
-      background:linear-gradient(180deg, rgba(239,68,68,.92), rgba(220,38,38,.92));
+      background: linear-gradient(180deg, rgba(239,68,68,.92), rgba(220,38,38,.92));
     }
 
     .bottom-notice.info{
-      background:linear-gradient(180deg, rgba(42,171,238,.92), rgba(34,158,217,.92));
+      background: linear-gradient(180deg, rgba(42,171,238,.92), rgba(34,158,217,.92));
     }
 
     .notice-icon{
@@ -534,7 +583,7 @@
       border-radius:9px;
       display:grid;
       place-items:center;
-      background:rgba(255,255,255,.14);
+      background: rgba(255,255,255,.14);
       flex:0 0 auto;
       font-size:12px;
     }
@@ -548,10 +597,10 @@
     .overlay{
       position:fixed;
       inset:0;
-      background:rgba(0,0,0,.72);
+      background: rgba(0,0,0,.72);
       opacity:0;
       pointer-events:none;
-      transition:opacity .22s ease;
+      transition: opacity .22s ease;
       z-index:260;
       display:flex;
       align-items:center;
@@ -568,37 +617,37 @@
       width:min(440px, 100%);
       border-radius:24px;
       overflow:hidden;
-      background:rgba(14,16,24,.94);
-      border:1px solid rgba(255,255,255,.08);
-      box-shadow:0 34px 90px rgba(0,0,0,.62);
-      backdrop-filter:blur(14px);
-      -webkit-backdrop-filter:blur(14px);
+      background: rgba(14,16,24,.94);
+      border: 1px solid rgba(255,255,255,.08);
+      box-shadow: 0 34px 90px rgba(0,0,0,.62);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
       position:relative;
-      transform:translateY(12px) scale(.98);
+      transform: translateY(12px) scale(.98);
       opacity:.95;
-      transition:transform .22s ease, opacity .22s ease;
+      transition: transform .22s ease, opacity .22s ease;
     }
 
     .overlay.show .popup{
-      transform:translateY(0) scale(1);
+      transform: translateY(0) scale(1);
       opacity:1;
     }
 
     .popup-head{
-      padding:16px 16px 10px;
+      padding:16px 16px 10px 16px;
       display:flex;
       align-items:center;
       justify-content:space-between;
       gap:10px;
-      background:rgba(255,255,255,.03);
-      border-bottom:1px solid rgba(255,255,255,.06);
+      background: rgba(255,255,255,.03);
+      border-bottom: 1px solid rgba(255,255,255,.06);
     }
 
     .popup-title{
       font-weight:900;
       letter-spacing:.25px;
       font-size:14px;
-      color:rgba(234,241,255,.95);
+      color: rgba(234,241,255,.95);
     }
 
     .popup-x{
@@ -606,27 +655,30 @@
       height:38px;
       border-radius:14px;
       border:1px solid rgba(255,255,255,.08);
-      background:rgba(255,255,255,.05);
-      color:rgba(234,241,255,.92);
+      background: rgba(255,255,255,.05);
+      color: rgba(234,241,255,.92);
       cursor:pointer;
       display:grid;
       place-items:center;
-      box-shadow:0 12px 28px rgba(0,0,0,.32);
+      box-shadow: 0 12px 28px rgba(0,0,0,.32);
       padding:0;
     }
 
+    .popup-x:active{ transform: scale(.98); }
+
     .popup-body{
-      padding:14px 16px 16px;
+      padding:14px 16px 16px 16px;
       display:flex;
       flex-direction:column;
       gap:12px;
     }
 
-    .popup-text,.rule-line{
+    .popup-text,
+    .rule-line{
       margin:0;
       font-size:13px;
       line-height:1.42;
-      color:rgba(234,241,255,.88);
+      color: rgba(234,241,255,.88);
     }
 
     .tg-btn{
@@ -639,7 +691,7 @@
       align-items:center;
       justify-content:center;
       gap:10px;
-      background:linear-gradient(180deg, var(--tg1), var(--tg2));
+      background: linear-gradient(180deg, var(--tg1), var(--tg2));
       box-shadow:
         0 18px 40px rgba(34,158,217,.28),
         inset 0 1px 0 rgba(255,255,255,.14);
@@ -649,11 +701,13 @@
       font-size:14px;
     }
 
+    .tg-btn:active{ transform: scale(.99); }
+
     .tg-ico{
       width:22px;
       height:22px;
       display:block;
-      filter:drop-shadow(0 8px 14px rgba(0,0,0,.18));
+      filter: drop-shadow(0 8px 14px rgba(0,0,0,.18));
     }
 
     .preloader{
@@ -664,9 +718,9 @@
       align-items:center;
       justify-content:center;
       background:
-        radial-gradient(900px 620px at 50% 20%, rgba(42,171,238,.30), transparent 52%),
-        linear-gradient(180deg, #03101d 0%, #063253 52%, #0a6ca3 100%);
-      transition:opacity .32s ease, visibility .32s ease;
+        radial-gradient(900px 600px at 50% 10%, rgba(60,180,255,.20), transparent 46%),
+        linear-gradient(180deg, #041322 0%, #062b4a 48%, #0b507d 100%);
+      transition: opacity .32s ease, visibility .32s ease;
     }
 
     .preloader.hide{
@@ -676,37 +730,45 @@
     }
 
     .pre-logo{
-      width:90px;
-      height:90px;
+      width:88px;
+      height:88px;
       object-fit:contain;
       display:block;
-      filter:drop-shadow(0 14px 24px rgba(0,0,0,.22));
-      animation:preLogoFloat .95s ease-in-out infinite;
+      filter: drop-shadow(0 14px 24px rgba(0,0,0,.22));
+      animation: preLogoFloat .95s ease-in-out infinite;
     }
 
     @keyframes preLogoFloat{
-      0%,100%{ transform:translateY(0) scale(1); }
-      50%{ transform:translateY(-8px) scale(1.03); }
+      0%,100%{ transform: translateY(0) scale(1); }
+      50%{ transform: translateY(-7px) scale(1.02); }
     }
 
-    @media (max-width:360px){
+    @media (max-width: 360px){
       .top-row{ grid-template-columns:36px minmax(0,1fr) 36px 46px; gap:6px; }
-      .icon-btn,.rule-btn{ width:36px; height:36px; border-radius:12px; }
+
+      .icon-btn,
+      .speed-btn{ width:36px; height:36px; border-radius:12px; }
+
       .icon-btn{ font-size:16px; }
-      .rule-btn svg{ width:17px; height:17px; }
+      .speed-btn{ font-size:12px; }
+
       .logo-btn{ width:46px; height:46px; }
       .balance-mini{ height:38px; }
       .bal-amount{ min-width:74px; height:24px; font-size:12px; }
-      .speed-btn{ height:32px; min-width:66px; font-size:11px; }
-      .canvas-shell{ height:360px; }
+
+      .board{ width:280px; height:270px; }
+      .ball{ width:14px; height:14px; }
+
+      .buckets{ left:14px; right:14px; gap:4px; }
+      .bucket{ font-size:10px; height:32px; }
+
       .bet-row{ grid-template-columns:minmax(0,1fr) 44px; }
-      .bet-input{ height:46px; font-size:15px; }
-      .bet-toggle{ width:44px; height:46px; border-radius:16px; }
-      .quick-bets{ grid-template-columns:repeat(3, minmax(0,1fr)); }
-      .quick-btn{ height:34px; }
-      .ball-btn{ height:40px; font-size:11px; }
-      .play-btn,.claim-btn{ height:50px; font-size:13px; }
-      .tg-btn{ height:48px; border-radius:15px; }
+      .bet-input{ height:44px; font-size:15px; }
+      .bet-toggle{ width:44px; height:44px; }
+
+      .play-btn, .claim-btn{ height:48px; font-size:14px; }
+      .count-btn{ height:38px; }
+
       .pre-logo{ width:76px; height:76px; }
     }
 
@@ -735,16 +797,10 @@
 
           <div class="balance-mini" aria-label="Баланс">
             <span class="bal-title">Баланс</span>
-            <div class="bal-amount" id="balanceValue">...</div>
+            <div class="bal-amount" id="balanceValue">0 VC</div>
           </div>
 
-          <button class="rule-btn" id="rulesBtn" aria-label="Правила">
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-              <path d="M9 9a3 3 0 1 1 5.2 2.1c-.9.9-1.7 1.5-1.7 2.9"></path>
-              <path d="M12 17h.01"></path>
-              <circle cx="12" cy="12" r="9"></circle>
-            </svg>
-          </button>
+          <button class="speed-btn" id="speedBtn" aria-label="Скорость">››</button>
 
           <button class="logo-btn" id="logoBtn" aria-label="Открыть Telegram канал">
             <img
@@ -756,31 +812,27 @@
             >
           </button>
         </div>
+      </div>
 
-        <div class="speed-row">
-          <button class="speed-btn" id="speedBtn" type="button">››</button>
+      <div class="card board-card">
+        <div class="board-wrap">
+          <div class="board" id="board">
+            <div class="rail left"></div>
+            <div class="rail right"></div>
+            <div class="ball hidden" id="ball"></div>
+            <div class="buckets" id="buckets"></div>
+          </div>
         </div>
       </div>
 
-      <div class="card board-wrap">
-        <div class="board-head">
-          <h1 class="board-title">Plinko</h1>
-          <div class="mini-note">Выбери ставку и число шаров</div>
-        </div>
-
-        <div class="canvas-shell">
-          <canvas id="plinkoCanvas"></canvas>
-        </div>
+      <div class="main-action">
+        <button class="play-btn" id="playBtn" type="button">Играть</button>
+        <button class="claim-btn" id="claimBtn" type="button" style="display:none;">Забрать</button>
       </div>
 
-      <div class="card controls">
-        <div class="play-row">
-          <button class="play-btn" id="playBtn" type="button">Играть</button>
-          <button class="claim-btn" id="claimBtn" type="button" hidden>Забрать</button>
-        </div>
-
-        <div class="bet-block">
-          <div class="label">Ставка за 1 шар</div>
+      <div class="card panel">
+        <div>
+          <p class="label">Ставка</p>
 
           <div class="bet-row">
             <input
@@ -794,12 +846,17 @@
               value="10"
             >
 
-            <button class="bet-toggle" id="betToggleBtn" type="button" aria-label="Быстрый выбор">
-              <svg viewBox="0 0 24 24" aria-hidden="true">
-                <circle cx="12" cy="12" r="8.2"></circle>
-                <path d="M12 6.8v10.4"></path>
-                <path d="M8.9 9.2c.5-1.2 1.7-2 3.1-2s2.6.8 3.1 2"></path>
-                <path d="M8.9 14.8c.5 1.2 1.7 2 3.1 2s2.6-.8 3.1-2"></path>
+            <button class="bet-toggle" id="betToggleBtn" type="button" aria-label="Быстрая ставка">
+              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <circle cx="12" cy="12" r="8.5" fill="url(#g1)" stroke="rgba(255,255,255,.24)" />
+                <circle cx="12" cy="12" r="5.2" fill="rgba(255,255,255,.14)" />
+                <defs>
+                  <linearGradient id="g1" x1="4" y1="4" x2="20" y2="20">
+                    <stop offset="0" stop-color="#FCD34D"/>
+                    <stop offset="0.55" stop-color="#F59E0B"/>
+                    <stop offset="1" stop-color="#D97706"/>
+                  </linearGradient>
+                </defs>
               </svg>
             </button>
           </div>
@@ -814,31 +871,15 @@
         </div>
 
         <div>
-          <div class="label">Количество шаров</div>
-          <div class="balls-row">
-            <button class="ball-btn active" data-balls="1" type="button">1 шар</button>
-            <button class="ball-btn" data-balls="2" type="button">2 шара</button>
-            <button class="ball-btn" data-balls="3" type="button">3 шара</button>
+          <p class="label">Шарики</p>
+          <div class="ball-counts">
+            <button class="count-btn active" data-count="1" type="button">1 шар</button>
+            <button class="count-btn" data-count="2" type="button">2 шара</button>
+            <button class="count-btn" data-count="3" type="button">3 шара</button>
           </div>
         </div>
       </div>
 
-    </div>
-  </div>
-
-  <div class="overlay" id="rulesOverlay" aria-hidden="true">
-    <div class="popup" role="dialog" aria-modal="true" aria-label="Правила">
-      <div class="popup-head">
-        <div class="popup-title">Правила игры</div>
-        <button class="popup-x" id="rulesClose" aria-label="Закрыть">✕</button>
-      </div>
-
-      <div class="popup-body">
-        <p class="rule-line">• Минимальная ставка: <b>10 VC</b></p>
-        <p class="rule-line">• Нажми <b>«Играть»</b></p>
-        <p class="rule-line">• Шары падают в ячейки с множителями</p>
-        <p class="rule-line">• Если есть выигрыш — появится кнопка <b>«Забрать»</b></p>
-      </div>
     </div>
   </div>
 
@@ -868,44 +909,39 @@
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <script>
     const VERIFY_URL = "https://lazrfierfbhwlduqlvws.functions.supabase.co/verify-telegram";
-    const PLAY_URL   = "https://lazrfierfbhwlduqlvws.functions.supabase.co/play-plinko";
     const MIN_BET = 10;
 
-    const FILES = { games: "games.html" };
+    const FILES = {
+      games: "games.html"
+    };
 
-    const SLOT_MULTIPLIERS = [0.3, 0.5, 0.7, 1, 1.2, 1.5, 5, 10, 5, 1.5, 1.2, 1, 0.7, 0.5, 0.3];
-    const SLOT_COUNT = SLOT_MULTIPLIERS.length;
-    const PEG_ROWS = SLOT_COUNT - 1;
+    const MULTIPLIERS = [10, 5, 1.8, 1.2, 0.2, 1.2, 1.8, 5, 10];
+    const WEIGHTS =     [0.005,0.015,0.06,0.15,0.54,0.15,0.06,0.015,0.005];
 
     const SPEEDS = [
-      { label: "›", value: 0.75 },
-      { label: "››", value: 1 },
-      { label: "›››", value: 1.3 }
+      { label: "›",   segment: 165 },
+      { label: "››",  segment: 118 },
+      { label: "›››", segment: 86  }
     ];
+
+    const PEG_ROWS = 8;
+    const BOARD_W = 300;
+    const BOARD_H = 286;
+    const BOARD_CENTER_X = 150;
+    const BOARD_TOP_Y = 30;
+    const ROW_GAP = 23;
+    const BUCKET_GAP = 28;
+    const BUCKET_Y = 230;
 
     const $ = (id) => document.getElementById(id);
 
     let currentBalance = 0;
     let pendingWin = 0;
-    let pendingBalanceAfterClaim = null;
-    let pendingBalls = 0;
-    let selectedBallCount = 1;
-    let speedIndex = 1;
-    let quickVisible = false;
     let isPlaying = false;
+    let quickVisible = false;
+    let selectedBalls = 1;
+    let speedIndex = 1;
     let noticeTimer = null;
-
-    const canvas = $("plinkoCanvas");
-    const ctx = canvas.getContext("2d");
-
-    let dpr = 1;
-    let board = null;
-    let pegMap = [];
-    let slotRects = [];
-    let slotEffects = new Array(SLOT_COUNT).fill(0);
-    let activeBalls = [];
-    let rafId = null;
-    let lastTime = 0;
 
     function formatVc(value){
       const n = Number(value ?? 0);
@@ -926,9 +962,9 @@
     }
 
     function loadCachedProfile(){
-      try{
+      try {
         return JSON.parse(localStorage.getItem("tg_profile") || "null");
-      }catch{
+      } catch {
         return null;
       }
     }
@@ -938,7 +974,7 @@
         const cached = loadCachedProfile() || {};
         cached.balance = currentBalance;
         localStorage.setItem("tg_profile", JSON.stringify(cached));
-      }catch{}
+      } catch {}
     }
 
     function getTelegramInitData(){
@@ -946,7 +982,7 @@
       try{
         Telegram.WebApp.ready();
         if (typeof Telegram.WebApp.expand === "function") Telegram.WebApp.expand();
-      }catch{}
+      } catch {}
       return Telegram.WebApp.initData || "";
     }
 
@@ -958,15 +994,15 @@
       const box = $("bottomNotice");
       $("noticeText").textContent = text;
       $("noticeIcon").textContent = type === "win" ? "✓" : type === "lose" ? "✕" : "ℹ";
-      box.classList.remove("win","lose","info");
-      box.classList.add(type,"show");
-      if (noticeTimer) clearTimeout(noticeTimer);
-      noticeTimer = setTimeout(() => box.classList.remove("show"), 1900);
-    }
 
-    function setQuickVisible(show){
-      quickVisible = !!show;
-      $("quickBets").classList.toggle("show", quickVisible);
+      box.classList.remove("win", "lose", "info");
+      box.classList.add(type);
+      box.classList.add("show");
+
+      if (noticeTimer) clearTimeout(noticeTimer);
+      noticeTimer = setTimeout(() => {
+        box.classList.remove("show");
+      }, 1900);
     }
 
     function getBetAmount(){
@@ -976,28 +1012,34 @@
       return Math.floor(amount);
     }
 
-    function updateClaimButton(){
-      $("claimBtn").textContent = pendingWin > 0 ? `Забрать ${formatVc(pendingWin)}` : "Забрать";
-      $("claimBtn").hidden = pendingWin <= 0;
+    function setQuickVisible(show){
+      quickVisible = !!show;
+      $("quickBets").classList.toggle("show", quickVisible);
     }
 
     function updateButtons(){
-      const bet = getBetAmount();
-      const canPlay = !isPlaying && pendingWin <= 0 && bet >= MIN_BET && (bet * selectedBallCount) <= currentBalance;
-      $("playBtn").disabled = !canPlay;
-      $("claimBtn").disabled = isPlaying || pendingWin <= 0;
-      updateClaimButton();
-      $("speedBtn").textContent = SPEEDS[speedIndex].label;
+      const totalStake = getBetAmount() * selectedBalls;
+      const canPlay =
+        !isPlaying &&
+        pendingWin <= 0 &&
+        getBetAmount() >= MIN_BET &&
+        totalStake <= currentBalance;
 
-      document.querySelectorAll(".ball-btn").forEach((btn) => {
-        const val = Number(btn.getAttribute("data-balls") || 1);
-        btn.classList.toggle("active", val === selectedBallCount);
-      });
+      $("playBtn").disabled = !canPlay;
+      $("claimBtn").disabled = pendingWin <= 0 || isPlaying;
+      $("claimBtn").textContent = pendingWin > 0
+        ? `Забрать ${formatVc(pendingWin)}`
+        : "Забрать";
     }
 
     async function autoAuthTelegram(){
       const cached = loadCachedProfile();
-      currentBalance = cached?.balance != null ? (Number(cached.balance) || 0) : 0;
+
+      if (cached?.balance != null) {
+        currentBalance = Number(cached.balance) || 0;
+      } else {
+        currentBalance = 0;
+      }
       updateBalanceUI();
 
       const initData = getTelegramInitData();
@@ -1010,8 +1052,8 @@
 
       try{
         const res = await fetch(VERIFY_URL, {
-          method:"POST",
-          headers:{ "Content-Type":"application/json" },
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ initData })
         });
 
@@ -1023,7 +1065,7 @@
         } else {
           currentBalance = cached?.balance != null ? (Number(cached.balance) || 0) : 0;
         }
-      }catch{
+      } catch {
         currentBalance = cached?.balance != null ? (Number(cached.balance) || 0) : 0;
       }
 
@@ -1031,480 +1073,234 @@
       updateButtons();
     }
 
-    function resizeCanvas(){
-      const rect = canvas.getBoundingClientRect();
-      dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
-      canvas.width = Math.round(rect.width * dpr);
-      canvas.height = Math.round(rect.height * dpr);
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      buildBoard(rect.width, rect.height);
-    }
+    function createBoard(){
+      const board = $("board");
 
-    function buildBoard(width, height){
-      const sidePad = 22;
-      const topPad = 34;
-      const slotH = 44;
-      const playBottom = height - slotH - 28;
-      const rowGap = (playBottom - topPad) / PEG_ROWS;
-      const pegSpacing = (width - sidePad * 2) / PEG_ROWS;
-      const pegRadius = Math.max(5.2, Math.min(6.2, width / 86));
-      const ballRadius = Math.max(7.2, Math.min(8.6, width / 56));
+      document.querySelectorAll(".peg").forEach(el => el.remove());
 
-      board = {
-        width, height, sidePad, topPad, playBottom,
-        rowGap, pegSpacing, pegRadius, ballRadius, slotH
-      };
+      for (let row = 0; row < PEG_ROWS; row++) {
+        const pegsInRow = row + 1;
+        const rowWidth = row * BUCKET_GAP;
+        const startX = BOARD_CENTER_X - rowWidth / 2;
 
-      pegMap = [];
-      slotRects = [];
-      slotEffects = new Array(SLOT_COUNT).fill(0);
-
-      for (let r = 0; r < PEG_ROWS; r++) {
-        const count = r + 1;
-        const y = topPad + rowGap * r;
-        const startX = width / 2 - ((count - 1) * pegSpacing) / 2;
-        const row = [];
-        for (let c = 0; c < count; c++) {
-          row.push({ x: startX + c * pegSpacing, y });
-        }
-        pegMap.push(row);
-      }
-
-      const slotW = (width - sidePad * 2) / SLOT_COUNT;
-      for (let i = 0; i < SLOT_COUNT; i++) {
-        slotRects.push({
-          x: sidePad + i * slotW,
-          y: height - slotH - 12,
-          w: slotW,
-          h: slotH,
-          mult: SLOT_MULTIPLIERS[i]
-        });
-      }
-    }
-
-    function lerp(a, b, t){
-      return a + (b - a) * t;
-    }
-
-    function createBall(targetIndex){
-      return {
-        x: board.width / 2 + (Math.random() * 6 - 3),
-        y: 18,
-        vx: (Math.random() * 2 - 1) * 18,
-        vy: 0,
-        r: board.ballRadius,
-        targetIndex,
-        path: null,
-        state: "falling",
-        settleTimer: 0,
-        dropDelay: 0
-      };
-    }
-
-    function multiplierColor(mult){
-      if (mult >= 10) return { a:"#f97316", b:"#ea580c" };
-      if (mult >= 5)  return { a:"#f59e0b", b:"#d97706" };
-      if (mult >= 1.5) return { a:"#22c55e", b:"#16a34a" };
-      if (mult >= 1)  return { a:"#2AABEE", b:"#1d8ac3" };
-      if (mult >= .7) return { a:"#8b5cf6", b:"#7c3aed" };
-      return { a:"#ef4444", b:"#dc2626" };
-    }
-
-    function drawRoundedRect(x, y, w, h, r){
-      const rr = Math.min(r, w / 2, h / 2);
-      ctx.beginPath();
-      ctx.moveTo(x + rr, y);
-      ctx.arcTo(x + w, y, x + w, y + h, rr);
-      ctx.arcTo(x + w, y + h, x, y + h, rr);
-      ctx.arcTo(x, y + h, x, y, rr);
-      ctx.arcTo(x, y, x + w, y, rr);
-      ctx.closePath();
-    }
-
-    function drawBoard(){
-      if (!board) return;
-
-      ctx.clearRect(0, 0, board.width, board.height);
-
-      const fieldX = board.sidePad - 12;
-      const fieldY = 16;
-      const fieldW = board.width - fieldX * 2;
-      const fieldH = board.playBottom - fieldY + 16;
-
-      drawRoundedRect(fieldX, fieldY, fieldW, fieldH, 18);
-      const fieldGrad = ctx.createLinearGradient(0, fieldY, 0, fieldY + fieldH);
-      fieldGrad.addColorStop(0, "rgba(255,255,255,.03)");
-      fieldGrad.addColorStop(1, "rgba(255,255,255,.01)");
-      ctx.fillStyle = fieldGrad;
-      ctx.fill();
-      ctx.lineWidth = 1;
-      ctx.strokeStyle = "rgba(255,255,255,.05)";
-      ctx.stroke();
-
-      ctx.save();
-      ctx.strokeStyle = "rgba(255,255,255,.06)";
-      ctx.lineWidth = 2.4;
-      ctx.beginPath();
-      ctx.moveTo(board.width / 2, 8);
-      ctx.lineTo(fieldX + 34, board.topPad);
-      ctx.moveTo(board.width / 2, 8);
-      ctx.lineTo(fieldX + fieldW - 34, board.topPad);
-      ctx.stroke();
-
-      ctx.beginPath();
-      ctx.moveTo(fieldX + 7, board.topPad + 2);
-      ctx.lineTo(fieldX + 7, board.playBottom + 8);
-      ctx.moveTo(fieldX + fieldW - 7, board.topPad + 2);
-      ctx.lineTo(fieldX + fieldW - 7, board.playBottom + 8);
-      ctx.stroke();
-      ctx.restore();
-
-      for (let r = 0; r < pegMap.length; r++) {
-        const row = pegMap[r];
-        for (let i = 0; i < row.length; i++) {
-          const peg = row[i];
-
-          const glow = ctx.createRadialGradient(peg.x, peg.y, 0, peg.x, peg.y, board.pegRadius * 3.6);
-          glow.addColorStop(0, "rgba(42,171,238,.16)");
-          glow.addColorStop(1, "rgba(42,171,238,0)");
-          ctx.fillStyle = glow;
-          ctx.beginPath();
-          ctx.arc(peg.x, peg.y, board.pegRadius * 3.6, 0, Math.PI * 2);
-          ctx.fill();
-
-          const pegGrad = ctx.createLinearGradient(peg.x, peg.y - board.pegRadius, peg.x, peg.y + board.pegRadius);
-          pegGrad.addColorStop(0, "#eff6ff");
-          pegGrad.addColorStop(.48, "#cbd5e1");
-          pegGrad.addColorStop(1, "#7c8da3");
-          ctx.fillStyle = pegGrad;
-          ctx.beginPath();
-          ctx.arc(peg.x, peg.y, board.pegRadius, 0, Math.PI * 2);
-          ctx.fill();
-          ctx.lineWidth = 1;
-          ctx.strokeStyle = "rgba(255,255,255,.16)";
-          ctx.stroke();
+        for (let i = 0; i < pegsInRow; i++) {
+          const peg = document.createElement("div");
+          peg.className = "peg";
+          peg.style.left = `${startX + i * BUCKET_GAP}px`;
+          peg.style.top = `${BOARD_TOP_Y + row * ROW_GAP}px`;
+          board.appendChild(peg);
         }
       }
 
-      for (let i = 0; i < slotRects.length; i++) {
-        const slot = slotRects[i];
-        const colors = multiplierColor(slot.mult);
-        const fx = slotEffects[i] || 0;
-        const scale = 1 + fx * .08;
-        const dw = slot.w * .88 * scale;
-        const dh = slot.h * .78 * scale;
-        const dx = slot.x + (slot.w - dw) / 2;
-        const dy = slot.y + (slot.h - dh) / 2 - fx * 2;
+      const buckets = $("buckets");
+      buckets.innerHTML = "";
 
-        if (fx > .01) {
-          const glow = ctx.createRadialGradient(slot.x + slot.w/2, slot.y + slot.h/2, 0, slot.x + slot.w/2, slot.y + slot.h/2, slot.w * .9);
-          glow.addColorStop(0, `rgba(255,255,255,${.16 * fx})`);
-          glow.addColorStop(.45, `rgba(42,171,238,${.18 * fx})`);
-          glow.addColorStop(1, "rgba(42,171,238,0)");
-          ctx.fillStyle = glow;
-          ctx.beginPath();
-          ctx.arc(slot.x + slot.w/2, slot.y + slot.h/2, slot.w * .82, 0, Math.PI * 2);
-          ctx.fill();
-        }
+      MULTIPLIERS.forEach((m, i) => {
+        const el = document.createElement("div");
+        let cls = "low";
 
-        drawRoundedRect(dx, dy, dw, dh, 12);
-        const grad = ctx.createLinearGradient(0, dy, 0, dy + dh);
-        grad.addColorStop(0, colors.a);
-        grad.addColorStop(1, colors.b);
-        ctx.fillStyle = grad;
-        ctx.fill();
-        ctx.lineWidth = 1;
-        ctx.strokeStyle = "rgba(255,255,255,.12)";
-        ctx.stroke();
+        if (m >= 10) cls = "top";
+        else if (m >= 5) cls = "good";
+        else if (m >= 1) cls = "mid";
 
-        ctx.fillStyle = "rgba(255,255,255,.14)";
-        drawRoundedRect(dx + 2, dy + 2, dw - 4, Math.max(8, dh * .28), 10);
-        ctx.fill();
-
-        ctx.fillStyle = "#fff";
-        ctx.font = `900 ${slot.mult >= 10 ? 15 : slot.mult >= 5 ? 14 : 13}px Inter, sans-serif`;
-        ctx.textAlign = "center";
-        ctx.textBaseline = "middle";
-        ctx.shadowColor = "rgba(0,0,0,.22)";
-        ctx.shadowBlur = 8;
-        ctx.fillText(`${slot.mult}x`, slot.x + slot.w/2, slot.y + slot.h/2 + 1 - fx * 1.5);
-        ctx.shadowBlur = 0;
-      }
-
-      for (const ball of activeBalls) {
-        const glow = ctx.createRadialGradient(ball.x, ball.y, 0, ball.x, ball.y, ball.r * 3.2);
-        glow.addColorStop(0, "rgba(103,232,249,.28)");
-        glow.addColorStop(1, "rgba(103,232,249,0)");
-        ctx.fillStyle = glow;
-        ctx.beginPath();
-        ctx.arc(ball.x, ball.y, ball.r * 3.2, 0, Math.PI * 2);
-        ctx.fill();
-
-        const ballGrad = ctx.createLinearGradient(ball.x - ball.r, ball.y - ball.r, ball.x + ball.r, ball.y + ball.r);
-        ballGrad.addColorStop(0, "#f8fafc");
-        ballGrad.addColorStop(.48, "#dbeafe");
-        ballGrad.addColorStop(1, "#60a5fa");
-        ctx.fillStyle = ballGrad;
-        ctx.beginPath();
-        ctx.arc(ball.x, ball.y, ball.r, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.lineWidth = 1;
-        ctx.strokeStyle = "rgba(255,255,255,.24)";
-        ctx.stroke();
-
-        ctx.fillStyle = "rgba(255,255,255,.5)";
-        ctx.beginPath();
-        ctx.arc(ball.x - ball.r * .26, ball.y - ball.r * .28, Math.max(1.4, ball.r * .22), 0, Math.PI * 2);
-        ctx.fill();
-      }
+        el.className = `bucket ${cls}`;
+        el.textContent = `${m}x`;
+        el.dataset.index = String(i);
+        buckets.appendChild(el);
+      });
     }
 
-    function createTargetPath(targetIndex){
-      const path = [];
-      let col = 0;
-      const stepsRight = Math.max(0, Math.min(PEG_ROWS, targetIndex));
-      const rights = new Set();
+    function chooseBucketIndex(){
+      let r = Math.random();
+      let acc = 0;
 
-      if (stepsRight > 0) {
-        const picks = [];
-        while (picks.length < stepsRight) {
-          const n = Math.floor(Math.random() * PEG_ROWS);
-          if (!picks.includes(n)) picks.push(n);
-        }
-        picks.sort((a,b) => a - b).forEach(v => rights.add(v));
+      for (let i = 0; i < WEIGHTS.length; i++) {
+        acc += WEIGHTS[i];
+        if (r <= acc) return i;
       }
-
-      for (let r = 0; r < PEG_ROWS; r++) {
-        const peg = pegMap[r][col];
-        const goRight = rights.has(r);
-        path.push({
-          pegX: peg.x,
-          pegY: peg.y,
-          dir: goRight ? 1 : -1,
-          hit: false
-        });
-        if (goRight) col++;
-      }
-
-      return path;
+      return 4;
     }
 
-    function dropBatch(){
-      const bet = getBetAmount();
-      const totalBet = bet * selectedBallCount;
-      const initData = getTelegramInitData();
+    function shuffle(arr){
+      const a = [...arr];
+      for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+      }
+      return a;
+    }
 
+    function buildPathForBucket(bucketIndex){
+      const finalOffset = (bucketIndex - 4) * 2;
+      const plusCount = (PEG_ROWS + finalOffset) / 2;
+
+      let dirs = [
+        ...new Array(plusCount).fill(1),
+        ...new Array(PEG_ROWS - plusCount).fill(-1)
+      ];
+
+      dirs = shuffle(dirs);
+
+      let offset = 0;
+      const points = [{ x: BOARD_CENTER_X, y: 18 }];
+
+      for (let row = 0; row < PEG_ROWS; row++) {
+        const dir = dirs[row];
+        const nextOffset = offset + dir;
+        const rowY = BOARD_TOP_Y + row * ROW_GAP;
+
+        const pegX = BOARD_CENTER_X + ((offset + nextOffset) / 2) * (BUCKET_GAP / 2);
+        const bounceX = BOARD_CENTER_X + nextOffset * (BUCKET_GAP / 2);
+
+        points.push({ x: pegX,   y: rowY - 3 });
+        points.push({ x: bounceX, y: rowY + 13 });
+
+        offset = nextOffset;
+      }
+
+      const bucketX = BOARD_CENTER_X + (bucketIndex - 4) * BUCKET_GAP;
+      points.push({ x: bucketX, y: BUCKET_Y - 10 });
+      points.push({ x: bucketX, y: BUCKET_Y + 2 });
+
+      return points;
+    }
+
+    function ease(t){
+      return t < 0.5
+        ? 2 * t * t
+        : 1 - Math.pow(-2 * t + 2, 2) / 2;
+    }
+
+    function animateBallPath(points){
+      const ball = $("ball");
+      const perSegment = SPEEDS[speedIndex].segment;
+
+      ball.classList.remove("hidden");
+
+      return new Promise((resolve) => {
+        let segment = 0;
+
+        function runSegment(){
+          if (segment >= points.length - 1) {
+            resolve();
+            return;
+          }
+
+          const start = points[segment];
+          const end = points[segment + 1];
+          const startTime = performance.now();
+
+          function frame(now){
+            const raw = (now - startTime) / perSegment;
+            const t = raw > 1 ? 1 : raw;
+            const k = ease(t);
+
+            const x = start.x + (end.x - start.x) * k;
+            const y = start.y + (end.y - start.y) * k;
+
+            ball.style.left = `${x}px`;
+            ball.style.top = `${y}px`;
+
+            if (t < 1) {
+              requestAnimationFrame(frame);
+            } else {
+              segment++;
+              runSegment();
+            }
+          }
+
+          requestAnimationFrame(frame);
+        }
+
+        runSegment();
+      });
+    }
+
+    function highlightBucket(index){
+      const el = document.querySelector(`.bucket[data-index="${index}"]`);
+      if (!el) return;
+      el.classList.add("hit");
+      setTimeout(() => el.classList.remove("hit"), 280);
+    }
+
+    async function playRound(){
       if (isPlaying) return;
-
       if (pendingWin > 0) {
         showNotice("Сначала забери выигрыш", "info");
         return;
       }
+
+      const bet = getBetAmount();
+      const totalStake = bet * selectedBalls;
 
       if (bet < MIN_BET) {
         showNotice(`Минимум ${MIN_BET} VC`, "lose");
         return;
       }
 
-      if (totalBet > currentBalance) {
+      if (totalStake > currentBalance) {
         showNotice("Недостаточно средств", "lose");
         return;
       }
 
-      if (!initData) {
-        showNotice("Открой игру в Telegram", "lose");
-        return;
-      }
-
-      setQuickVisible(false);
       isPlaying = true;
+      setQuickVisible(false);
       updateButtons();
 
-      fetch(PLAY_URL, {
-        method:"POST",
-        headers:{ "Content-Type":"application/json" },
-        body: JSON.stringify({
-          initData,
-          betVc: bet,
-          ballCount: selectedBallCount
-        })
-      })
-      .then((res) => res.json().catch(() => ({})).then((json) => ({ ok: res.ok, json })))
-      .then(({ ok, json }) => {
-        if (!ok || !json.ok) {
-          isPlaying = false;
-          updateButtons();
-          showNotice(json.error || "Ошибка игры", "lose");
-          return;
-        }
+      currentBalance -= totalStake;
+      updateBalanceUI();
+      saveCachedBalance();
 
-        const resultIndexes = Array.isArray(json.result_indexes)
-          ? json.result_indexes.slice(0, selectedBallCount)
-          : [];
+      let totalWin = 0;
 
-        while (resultIndexes.length < selectedBallCount) {
-          resultIndexes.push(Math.floor(SLOT_COUNT / 2));
-        }
+      for (let i = 0; i < selectedBalls; i++) {
+        const bucketIndex = chooseBucketIndex();
+        const mult = MULTIPLIERS[bucketIndex];
+        const payout = Math.floor(bet * mult);
+        const path = buildPathForBucket(bucketIndex);
 
+        await animateBallPath(path);
+        highlightBucket(bucketIndex);
+
+        totalWin += payout;
+
+        await new Promise(r => setTimeout(r, 140));
+      }
+
+      if (totalWin > 0) {
+        pendingWin = totalWin;
+        $("playBtn").style.display = "none";
+        $("claimBtn").style.display = "block";
+        showNotice(`Выигрыш ${formatVc(totalWin)}`, "win");
+      } else {
         pendingWin = 0;
-        pendingBalls = selectedBallCount;
-        pendingBalanceAfterClaim = Number(json.current_balance_if_claimed || json.current_balance || 0);
-
-        resultIndexes.forEach((idx, i) => {
-          const safeIdx = Math.max(0, Math.min(SLOT_COUNT - 1, Number(idx) || 0));
-          const ball = createBall(safeIdx);
-          ball.path = createTargetPath(safeIdx);
-          ball.dropDelay = i * 220;
-          activeBalls.push(ball);
-        });
-
-        const payout = Number(json.payout_vc || 0);
-        if (payout <= 0) pendingBalanceAfterClaim = null;
-      })
-      .catch(() => {
-        isPlaying = false;
-        updateButtons();
-        showNotice("Ошибка сети", "lose");
-      });
-    }
-
-    function resolveBallToSlot(ball){
-      const idx = Math.max(0, Math.min(SLOT_COUNT - 1, ball.targetIndex));
-      const slot = slotRects[idx];
-
-      ball.state = "settled";
-      ball.x = slot.x + slot.w / 2;
-      ball.y = slot.y + slot.h * .46;
-      ball.vx = 0;
-      ball.vy = 0;
-      ball.settleTimer = .24;
-
-      slotEffects[idx] = 1;
-
-      const add = Math.max(0, getBetAmount() * Math.max(0, SLOT_MULTIPLIERS[idx] - 1));
-      pendingWin += add;
-    }
-
-    function physicsStep(dt){
-      if (!board) return;
-
-      const step = Math.min(.024, dt);
-      const gravity = 1480 * SPEEDS[speedIndex].value;
-
-      for (let i = 0; i < slotEffects.length; i++) {
-        slotEffects[i] = Math.max(0, slotEffects[i] - step * 3.1);
+        $("playBtn").style.display = "block";
+        $("claimBtn").style.display = "none";
+        showNotice(`-${formatVc(totalStake)}`, "lose");
       }
 
-      for (let i = activeBalls.length - 1; i >= 0; i--) {
-        const ball = activeBalls[i];
-
-        if (ball.dropDelay > 0) {
-          ball.dropDelay -= step;
-          continue;
-        }
-
-        if (ball.state === "settled") {
-          ball.settleTimer -= step;
-          if (ball.settleTimer <= 0) activeBalls.splice(i, 1);
-          continue;
-        }
-
-        ball.vy += gravity * step;
-        ball.x += ball.vx * step;
-        ball.y += ball.vy * step;
-
-        const leftWall = board.sidePad - 2 + ball.r;
-        const rightWall = board.width - board.sidePad + 2 - ball.r;
-
-        if (ball.x < leftWall) {
-          ball.x = leftWall;
-          ball.vx = Math.abs(ball.vx) * .82;
-        }
-
-        if (ball.x > rightWall) {
-          ball.x = rightWall;
-          ball.vx = -Math.abs(ball.vx) * .82;
-        }
-
-        if (!ball.path) ball.path = createTargetPath(ball.targetIndex);
-
-        for (let p = 0; p < ball.path.length; p++) {
-          const peg = ball.path[p];
-          if (peg.hit) continue;
-
-          const dx = ball.x - peg.pegX;
-          const dy = ball.y - peg.pegY;
-          const dist = Math.hypot(dx, dy);
-          const minDist = ball.r + board.pegRadius + .5;
-
-          if (dist <= minDist && dy >= -ball.r * .45) {
-            peg.hit = true;
-
-            const nx = dist === 0 ? peg.dir : dx / dist;
-            const ny = dist === 0 ? -.2 : dy / dist;
-            const targetVX = peg.dir * (86 + Math.random() * 24) * SPEEDS[speedIndex].value;
-
-            ball.x = peg.pegX + nx * minDist;
-            ball.y = peg.pegY + ny * minDist;
-            ball.vx = lerp(ball.vx, targetVX, .92);
-            ball.vy = Math.max(170 * SPEEDS[speedIndex].value, Math.abs(ball.vy) * .48);
-            break;
-          }
-        }
-
-        if (ball.y >= board.playBottom - 8) {
-          resolveBallToSlot(ball);
-        }
-      }
-
-      if (isPlaying && pendingBalls > 0 && activeBalls.length === 0) {
-        const totalBet = getBetAmount() * selectedBallCount;
-        const didWin = pendingWin > 0;
-
-        isPlaying = false;
-
-        if (didWin) {
-          showNotice(`Выигрыш ${formatVc(pendingWin)}`, "win");
-        } else {
-          currentBalance = Math.max(0, currentBalance - totalBet);
-          updateBalanceUI();
-          saveCachedBalance();
-          pendingBalls = 0;
-          showNotice(`-${formatVc(totalBet)}`, "lose");
-        }
-
-        updateButtons();
-      }
-    }
-
-    function tick(ts){
-      if (!lastTime) lastTime = ts;
-      const dt = Math.min(.03, (ts - lastTime) / 1000);
-      lastTime = ts;
-
-      physicsStep(dt);
-      drawBoard();
-
-      rafId = requestAnimationFrame(tick);
+      isPlaying = false;
+      updateButtons();
     }
 
     function claimWin(){
       if (pendingWin <= 0 || isPlaying) return;
 
-      if (pendingBalanceAfterClaim != null) {
-        currentBalance = Number(pendingBalanceAfterClaim) || currentBalance;
-      } else {
-        currentBalance += pendingWin;
-      }
-
+      currentBalance += pendingWin;
       updateBalanceUI();
       saveCachedBalance();
+
       showNotice(`Забрано ${formatVc(pendingWin)}`, "win");
 
       pendingWin = 0;
-      pendingBalanceAfterClaim = null;
-      pendingBalls = 0;
+      $("playBtn").style.display = "block";
+      $("claimBtn").style.display = "none";
       updateButtons();
+    }
+
+    function cycleSpeed(){
+      speedIndex = (speedIndex + 1) % SPEEDS.length;
+      $("speedBtn").textContent = SPEEDS[speedIndex].label;
     }
 
     function openOverlay(id){
@@ -1523,27 +1319,14 @@
 
     $("backBtn").addEventListener("click", () => goTo(FILES.games));
     $("logoBtn").addEventListener("click", () => openOverlay("channelOverlay"));
-    $("rulesBtn").addEventListener("click", () => openOverlay("rulesOverlay"));
-
     $("channelClose").addEventListener("click", () => closeOverlay("channelOverlay"));
-    $("rulesClose").addEventListener("click", () => closeOverlay("rulesOverlay"));
+    $("goChannel").addEventListener("click", () => openTelegramLinkSafe("https://t.me/vezuspubg"));
 
     $("channelOverlay").addEventListener("click", (e) => {
       if (e.target === $("channelOverlay")) closeOverlay("channelOverlay");
     });
 
-    $("rulesOverlay").addEventListener("click", (e) => {
-      if (e.target === $("rulesOverlay")) closeOverlay("rulesOverlay");
-    });
-
-    $("goChannel").addEventListener("click", () => {
-      openTelegramLinkSafe("https://t.me/vezuspubg");
-    });
-
-    $("speedBtn").addEventListener("click", () => {
-      speedIndex = (speedIndex + 1) % SPEEDS.length;
-      updateButtons();
-    });
+    $("speedBtn").addEventListener("click", cycleSpeed);
 
     $("betToggleBtn").addEventListener("click", () => {
       setQuickVisible(!quickVisible);
@@ -1551,47 +1334,43 @@
 
     document.querySelectorAll(".quick-btn").forEach((btn) => {
       btn.addEventListener("click", () => {
-        const value = btn.getAttribute("data-bet");
-        if (!value) return;
-        $("betInput").value = value;
+        $("betInput").value = btn.dataset.bet || "10";
         setQuickVisible(false);
         updateButtons();
       });
     });
 
-    $("betInput").addEventListener("input", updateButtons);
+    $("betInput").addEventListener("input", () => {
+      updateButtons();
+    });
 
-    document.querySelectorAll(".ball-btn").forEach((btn) => {
+    document.querySelectorAll(".count-btn").forEach((btn) => {
       btn.addEventListener("click", () => {
-        const count = Number(btn.getAttribute("data-balls") || 1);
-        selectedBallCount = Math.max(1, Math.min(3, count));
+        document.querySelectorAll(".count-btn").forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        selectedBalls = Number(btn.dataset.count || 1);
         updateButtons();
       });
     });
 
-    $("playBtn").addEventListener("click", dropBatch);
+    $("playBtn").addEventListener("click", playRound);
     $("claimBtn").addEventListener("click", claimWin);
 
     document.addEventListener("keydown", (e) => {
-      if (e.key === "Escape") {
-        closeOverlay("channelOverlay");
-        closeOverlay("rulesOverlay");
-      }
+      if (e.key === "Escape") closeOverlay("channelOverlay");
     });
 
-    window.addEventListener("resize", resizeCanvas);
-
     window.addEventListener("load", () => {
-      resizeCanvas();
+      createBoard();
+      $("speedBtn").textContent = SPEEDS[speedIndex].label;
+      $("claimBtn").style.display = "none";
       updateButtons();
-      autoAuthTelegram();
 
       setTimeout(() => {
         $("preloader").classList.add("hide");
-      }, 4000);
+      }, 2200);
 
-      if (rafId) cancelAnimationFrame(rafId);
-      rafId = requestAnimationFrame(tick);
+      autoAuthTelegram();
     });
   </script>
 </body>
