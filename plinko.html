@@ -236,8 +236,8 @@
 
     .board{
       position:relative;
-      width:300px;
-      height:286px;
+      width:320px;
+      height:320px;
       border-radius:22px;
       background:
         linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02)),
@@ -262,8 +262,8 @@
 
     .rail{
       position:absolute;
-      top:18px;
-      bottom:58px;
+      top:20px;
+      bottom:62px;
       width:4px;
       border-radius:999px;
       background: linear-gradient(180deg, rgba(255,255,255,.22), rgba(255,255,255,.06));
@@ -272,8 +272,8 @@
       z-index:1;
     }
 
-    .rail.left{ left:14px; }
-    .rail.right{ right:14px; }
+    .rail.left{ left:16px; }
+    .rail.right{ right:16px; }
 
     .peg{
       position:absolute;
@@ -292,10 +292,10 @@
     .slot-divider{
       position:absolute;
       width:2px;
-      height:20px;
+      height:22px;
       border-radius:999px;
       background: linear-gradient(180deg, rgba(255,255,255,.16), rgba(255,255,255,.04));
-      bottom:44px;
+      bottom:46px;
       transform:translateX(-50%);
       z-index:4;
       opacity:.75;
@@ -344,18 +344,18 @@
 
     .buckets{
       position:absolute;
-      left:16px;
-      right:16px;
+      left:18px;
+      right:18px;
       bottom:12px;
       display:grid;
       grid-template-columns:repeat(9, minmax(0,1fr));
-      gap:5px;
+      gap:0;
       z-index:5;
     }
 
     .bucket{
       height:34px;
-      border-radius:12px;
+      border-radius:10px;
       display:flex;
       align-items:center;
       justify-content:center;
@@ -778,10 +778,8 @@
       .logo-btn{ width:46px; height:46px; }
       .balance-mini{ height:38px; }
       .bal-amount{ min-width:74px; height:24px; font-size:12px; }
-      .board{ width:280px; height:270px; }
       .ball{ width:14px; height:14px; }
       .trail{ width:7px; height:7px; }
-      .buckets{ left:14px; right:14px; gap:4px; }
       .bucket{ font-size:10px; height:32px; }
       .bet-row{ grid-template-columns:minmax(0,1fr) 44px; }
       .bet-input{ height:44px; font-size:15px; }
@@ -940,19 +938,18 @@
 
     const MULTIPLIERS = [0.2, 0.4, 5, 10, 2, 10, 5, 0.4, 0.2];
 
-    // Реально может лететь во все ячейки.
-    // 5x и 10x редкие, но не невозможные.
+    // 0.2 / 0.4 / 2 чаще, 5 / 10 заметно реже
     // Сумма = 1.00
     const TARGET_WEIGHTS = [
-      0.13,  // 0.2
+      0.17,  // 0.2
       0.18,  // 0.4
-      0.08,  // 5
-      0.025, // 10
+      0.05,  // 5
+      0.015, // 10
       0.17,  // 2
-      0.025, // 10
-      0.08,  // 5
+      0.015, // 10
+      0.05,  // 5
       0.18,  // 0.4
-      0.13   // 0.2
+      0.17   // 0.2
     ];
 
     const SPEEDS = [
@@ -961,34 +958,34 @@
       { label: "›››", scale: 1.16 }
     ];
 
-    const BOARD_W = 300;
-    const BOARD_H = 286;
+    const BOARD_W = 320;
+    const BOARD_H = 320;
 
     const PEG_ROWS = 8;
-    const PEG_GAP_X = 32;
-    const PEG_GAP_Y = 24;
-    const PEG_START_Y = 36;
+    const PEG_GAP_X = 33;
+    const PEG_GAP_Y = 26;
+    const PEG_START_Y = 44;
 
     const BALL_R = 8;
     const PEG_COLLISION_R = 3.8;
     const SLOT_DIVIDER_HALF = 1.2;
 
-    const WALL_LEFT = 14;
-    const WALL_RIGHT = BOARD_W - 14;
+    const WALL_LEFT = 16;
+    const WALL_RIGHT = BOARD_W - 16;
     const BOARD_CENTER_X = BOARD_W / 2;
 
-    const BUCKET_LEFT = 16;
-    const BUCKET_RIGHT = BOARD_W - 16;
+    const BUCKET_LEFT = 18;
+    const BUCKET_RIGHT = BOARD_W - 18;
     const BUCKET_COUNT = 9;
     const SLOT_W = (BUCKET_RIGHT - BUCKET_LEFT) / BUCKET_COUNT;
 
-    const SLOT_GUIDE_Y = 222;
-    const SLOT_FLOOR_Y = 236;
+    const SLOT_GUIDE_Y = 248;
+    const SLOT_FLOOR_Y = 270;
 
     const GRAVITY = 0.195;
     const AIR_X = 0.9978;
     const AIR_Y = 0.9964;
-    const MAX_VY = 4.8;
+    const MAX_VY = 4.9;
     const PEG_BOUNCE = 0.26;
     const WALL_BOUNCE = 0.20;
     const FLOOR_BOUNCE = 0.12;
@@ -1277,7 +1274,6 @@
       }, 140);
     }
 
-    // ГЛАВНОЕ: теперь фиксируем шар по ФАКТИЧЕСКОЙ ячейке, а не по targetIndex
     function finalizeBall(ball, bucketIndex){
       const realBucket = clamp(bucketIndex, 0, BUCKET_COUNT - 1);
 
@@ -1296,7 +1292,6 @@
       queueBallRemove(ball);
     }
 
-    // Фиксация идёт по текущему X шара
     function settleBall(ball, force = false){
       const liveBucket = getBucketIndex(ball.x);
       const centerX = bucketCenter(liveBucket);
@@ -1306,7 +1301,6 @@
         return;
       }
 
-      // мягко доводим в центр ТЕКУЩЕЙ ячейки
       ball.x += (centerX - ball.x) * 0.18;
       ball.vx *= 0.78;
 
@@ -1330,7 +1324,7 @@
     }
 
     function createBallState(i){
-      const spread = (i - (selectedBalls - 1) / 2) * 10;
+      const spread = (i - (selectedBalls - 1) / 2) * 12;
       const startX = clamp(
         BOARD_CENTER_X + spread + (Math.random() - 0.5) * 4,
         WALL_LEFT + BALL_R + 2,
@@ -1343,7 +1337,7 @@
         el: createBall(startX),
         x: startX,
         y: 18,
-        vx: (Math.random() - 0.5) * 0.03,
+        vx: (Math.random() - 0.5) * 0.025,
         vy: 0.02 + Math.random() * 0.03,
         targetIndex,
         route: buildDirectionsForBucket(targetIndex),
@@ -1392,21 +1386,19 @@
               ball.vy += GRAVITY * step;
               ball.vy = Math.min(ball.vy, MAX_VY);
 
-              // лёгкий возврат к центру только наверху
-              if (ball.y < 100) {
-                ball.vx += (BOARD_CENTER_X - ball.x) * 0.000035 * step;
+              if (ball.y < 110) {
+                ball.vx += (BOARD_CENTER_X - ball.x) * 0.00003 * step;
               }
 
-              // маршрут направляет шар в выбранную зону, но не ломает реальную физику
-              if (ball.y > 88) {
-                ball.vx += clamp((targetX - ball.x) * 0.00006, -0.010, 0.010) * step;
+              if (ball.y > 96) {
+                ball.vx += clamp((targetX - ball.x) * 0.00007, -0.011, 0.011) * step;
               }
 
-              if (ball.y > 150) {
-                ball.vx += clamp((targetX - ball.x) * 0.00012, -0.016, 0.016) * step;
+              if (ball.y > 170) {
+                ball.vx += clamp((targetX - ball.x) * 0.00014, -0.018, 0.018) * step;
               }
 
-              ball.vx += Math.sin((now + ball.phase) * 0.0024) * 0.0006 * step;
+              ball.vx += Math.sin((now + ball.phase) * 0.0024) * 0.00055 * step;
 
               ball.x += ball.vx * step;
               ball.y += ball.vy * step;
@@ -1457,13 +1449,13 @@
                   ball.lastRowHit = peg.row;
 
                   const dir = ball.route[peg.row] || 0;
-                  ball.vx += dir * (0.026 + Math.random() * 0.010);
-                  ball.vx += (Math.random() - 0.5) * 0.006;
+                  ball.vx += dir * (0.024 + Math.random() * 0.010);
+                  ball.vx += (Math.random() - 0.5) * 0.005;
                 } else {
-                  ball.vx += (Math.random() - 0.5) * 0.0025;
+                  ball.vx += (Math.random() - 0.5) * 0.002;
                 }
 
-                ball.vx = clamp(ball.vx, -0.95, 0.95);
+                ball.vx = clamp(ball.vx, -0.90, 0.90);
 
                 if (ny < -0.08) {
                   ball.vy *= 0.989;
@@ -1491,11 +1483,9 @@
                   }
                 }
 
-                // Внизу чуть-чуть помогаем дойти до цели, но финальный приз всё равно по РЕАЛЬНОЙ ячейке
-                ball.vx += clamp((targetX - ball.x) * 0.0008, -0.030, 0.030) * step;
+                ball.vx += clamp((targetX - ball.x) * 0.0010, -0.036, 0.036) * step;
                 ball.vx *= 0.992;
 
-                // если долго внизу — фиксируем по фактической позиции
                 if (ball.slotFrames > 24) {
                   settleBall(ball, true);
                   continue;
@@ -1519,7 +1509,7 @@
               }
 
               if (
-                ball.y > 64 &&
+                ball.y > 70 &&
                 ball.y < SLOT_GUIDE_Y &&
                 Math.abs(ball.vx) < 0.009 &&
                 Math.abs(ball.vy) < 0.14
@@ -1528,7 +1518,7 @@
 
                 if (ball.idleFrames > 6) {
                   const pushDir = Math.sign(targetX - ball.x) || (Math.random() < 0.5 ? -1 : 1);
-                  ball.vx += pushDir * (0.022 + Math.random() * 0.010);
+                  ball.vx += pushDir * (0.020 + Math.random() * 0.010);
                   ball.vy += 0.04;
                   ball.idleFrames = 0;
                 }
@@ -1543,7 +1533,6 @@
               }
             }
 
-            // столкновения шаров
             for (let i = 0; i < ballStates.length; i++) {
               const a = ballStates[i];
               if (a.settled) continue;
@@ -1642,7 +1631,6 @@
 
       const bucketIndexes = await simulateBalls(ballStates);
 
-      // Выплата идёт по РЕАЛЬНОЙ ячейке
       const totalWin = bucketIndexes.reduce((sum, idx) => {
         const safeIdx = clamp(Number(idx) || 0, 0, MULTIPLIERS.length - 1);
         return sum + Math.floor(bet * MULTIPLIERS[safeIdx]);
