@@ -570,7 +570,8 @@
     const FILES = {
       index: "index.html",
       wallet: "wallet.html",
-      coinflip: "coinflip.html"
+      coinflip: "coinflip.html",
+      plinko: "plinko.html"
     };
 
     const $ = (id) => document.getElementById(id);
@@ -675,7 +676,7 @@
     });
 
     $("coinflipBtn").addEventListener("click", () => goTo(FILES.coinflip));
-    $("plinkoBtn").addEventListener("click", () => alert("Plinko — скоро"));
+    $("plinkoBtn").addEventListener("click", () => goTo(FILES.plinko));
     $("minesBtn").addEventListener("click", () => alert("Mines — скоро"));
 
     $("futureGame1Btn").addEventListener("click", () => alert("Скоро"));
