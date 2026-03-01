@@ -17,6 +17,7 @@
   <style>
     :root{
       --text:#eaf1ff;
+      --muted:rgba(234,241,255,.72);
       --safe-bottom: env(safe-area-inset-bottom, 0px);
       --safe-top: env(safe-area-inset-top, 0px);
 
@@ -27,12 +28,13 @@
 
       --tg1:#2AABEE;
       --tg2:#229ED9;
+
       --green1:#22c55e;
       --green2:#16a34a;
       --red1:#ef4444;
       --red2:#dc2626;
-      --gold1:#ffd75b;
-      --gold2:#d28c0e;
+      --amber1:#f59e0b;
+      --amber2:#d97706;
     }
 
     *{
@@ -41,12 +43,15 @@
       -webkit-tap-highlight-color: transparent;
     }
 
+    *::-webkit-scrollbar{ display:none; }
+
     html, body{
       height:100%;
       margin:0;
       overflow:hidden;
       color:var(--text);
       background:#020617;
+      scrollbar-width:none;
     }
 
     body{
@@ -60,14 +65,12 @@
       content:"";
       position:fixed;
       inset:0;
-      background:
-        radial-gradient(1000px 700px at 30% 8%, rgba(42,171,238,.10), transparent 58%),
-        linear-gradient(180deg, rgba(0,0,0,.40), rgba(0,0,0,.66));
       pointer-events:none;
       z-index:0;
+      background:
+        radial-gradient(1000px 700px at 30% 10%, rgba(42,171,238,.08), transparent 55%),
+        linear-gradient(180deg, rgba(0,0,0,.42), rgba(0,0,0,.66));
     }
-
-    *::-webkit-scrollbar{ display:none; }
 
     .app{
       position:relative;
@@ -108,12 +111,13 @@
     .top-row{
       width:100%;
       display:grid;
-      grid-template-columns:40px minmax(0,1fr) 54px;
+      grid-template-columns:40px minmax(0,1fr) 40px 54px;
       gap:8px;
       align-items:center;
     }
 
-    .icon-btn{
+    .icon-btn,
+    .rule-btn{
       width:40px;
       height:40px;
       border:none;
@@ -127,12 +131,30 @@
       cursor:pointer;
       backdrop-filter: blur(10px);
       -webkit-backdrop-filter: blur(10px);
-      font-size:18px;
-      font-weight:900;
       padding:0;
     }
 
-    .icon-btn:active{ transform:scale(.98); }
+    .icon-btn{
+      font-size:18px;
+      font-weight:900;
+    }
+
+    .icon-btn:active,
+    .rule-btn:active,
+    .logo-btn:active{
+      transform:scale(.98);
+    }
+
+    .rule-btn svg{
+      width:18px;
+      height:18px;
+      stroke: rgba(234,241,255,.92);
+      fill:none;
+      stroke-width:2;
+      stroke-linecap:round;
+      stroke-linejoin:round;
+      display:block;
+    }
 
     .balance-mini{
       width:100%;
@@ -157,10 +179,10 @@
       content:"";
       position:absolute;
       inset:0;
+      pointer-events:none;
       background:
         radial-gradient(180px 60px at 0% 0%, rgba(255,255,255,.05), transparent 55%),
         radial-gradient(180px 60px at 100% 100%, rgba(255,255,255,.03), transparent 55%);
-      pointer-events:none;
     }
 
     .bal-title{
@@ -170,6 +192,7 @@
       font-weight:900;
       color: rgba(234,241,255,.92);
       white-space:nowrap;
+      pointer-events:none;
     }
 
     .bal-amount{
@@ -205,8 +228,6 @@
       cursor:pointer;
     }
 
-    .logo-btn:active{ transform:scale(.98); }
-
     .logo-btn img{
       width:100%;
       height:100%;
@@ -219,165 +240,35 @@
       background: var(--glass);
       border:1px solid var(--stroke);
       box-shadow: var(--shadow);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
       overflow:hidden;
     }
 
     .board-card{
-      padding:12px;
+      padding:14px;
     }
 
     .board-wrap{
       position:relative;
       width:100%;
-      height:430px;
+      aspect-ratio: 1 / 1.28;
       border-radius:22px;
       overflow:hidden;
       background:
-        radial-gradient(320px 220px at 50% 0%, rgba(42,171,238,.12), transparent 60%),
-        linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.01)),
-        rgba(7, 10, 18, .82);
-      border:1px solid rgba(255,255,255,.05);
+        radial-gradient(520px 260px at 50% 0%, rgba(42,171,238,.10), transparent 60%),
+        linear-gradient(180deg, rgba(255,255,255,.025), rgba(255,255,255,.01));
+      border:1px solid rgba(255,255,255,.06);
       box-shadow:
         inset 0 1px 0 rgba(255,255,255,.03),
-        inset 0 -14px 30px rgba(0,0,0,.18);
+        0 18px 36px rgba(0,0,0,.20);
     }
 
-    .board-wrap::before{
-      content:"";
-      position:absolute;
-      inset:0;
-      background:
-        linear-gradient(90deg, transparent 49%, rgba(255,255,255,.02) 50%, transparent 51%),
-        linear-gradient(180deg, transparent 49%, rgba(255,255,255,.015) 50%, transparent 51%);
-      background-size: 20px 20px;
-      opacity:.25;
-      pointer-events:none;
+    canvas{
+      width:100%;
+      height:100%;
+      display:block;
     }
-
-    .peg-layer,
-    .bin-layer{
-      position:absolute;
-      inset:0;
-    }
-
-    .peg{
-      position:absolute;
-      width:12px;
-      height:12px;
-      border-radius:50%;
-      background:
-        radial-gradient(circle at 35% 35%, rgba(255,255,255,.95), rgba(220,232,255,.75) 32%, rgba(129,155,196,.26) 72%, rgba(129,155,196,0) 100%);
-      border:1px solid rgba(255,255,255,.16);
-      box-shadow:
-        0 0 0 3px rgba(42,171,238,.05),
-        0 0 10px rgba(42,171,238,.16),
-        inset 0 1px 0 rgba(255,255,255,.35);
-      transform: translate(-50%, -50%);
-      pointer-events:none;
-    }
-
-    .peg::after{
-      content:"";
-      position:absolute;
-      inset:2px;
-      border-radius:50%;
-      border:1px solid rgba(255,255,255,.12);
-      opacity:.5;
-    }
-
-    .ball{
-      position:absolute;
-      left:0;
-      top:0;
-      width:26px;
-      height:26px;
-      border-radius:50%;
-      background:
-        radial-gradient(circle at 30% 28%, rgba(255,255,255,.95), rgba(206,241,255,.92) 24%, rgba(83,186,255,.92) 58%, rgba(20,74,137,.96) 100%);
-      border:1px solid rgba(255,255,255,.22);
-      box-shadow:
-        inset 0 2px 2px rgba(255,255,255,.25),
-        0 0 12px rgba(42,171,238,.26),
-        0 8px 18px rgba(0,0,0,.22);
-      transform: translate(0,0);
-      will-change: transform;
-      z-index:5;
-    }
-
-    .ball::after{
-      content:"";
-      position:absolute;
-      width:9px;
-      height:9px;
-      border-radius:50%;
-      background: rgba(255,255,255,.8);
-      top:4px;
-      left:5px;
-      filter: blur(.4px);
-      opacity:.85;
-    }
-
-    .ball-shadow{
-      position:absolute;
-      left:0;
-      top:0;
-      width:34px;
-      height:12px;
-      border-radius:50%;
-      background: rgba(0,0,0,.25);
-      filter: blur(8px);
-      pointer-events:none;
-      z-index:2;
-      transform: translate(0,0);
-      will-change: transform, opacity, width;
-    }
-
-    .bin-row{
-      position:absolute;
-      left:8px;
-      right:8px;
-      bottom:8px;
-      display:grid;
-      grid-template-columns: repeat(9, minmax(0,1fr));
-      gap:6px;
-      z-index:3;
-      pointer-events:none;
-    }
-
-    .bin{
-      height:52px;
-      border-radius:16px 16px 14px 14px;
-      display:flex;
-      align-items:flex-end;
-      justify-content:center;
-      padding-bottom:8px;
-      font-size:12px;
-      font-weight:900;
-      color:#fff;
-      border:1px solid rgba(255,255,255,.08);
-      box-shadow:
-        inset 0 1px 0 rgba(255,255,255,.05),
-        0 10px 18px rgba(0,0,0,.12);
-      transition: transform .18s ease, box-shadow .18s ease, opacity .18s ease;
-      opacity:.92;
-    }
-
-    .bin.active{
-      transform: translateY(-4px) scale(1.03);
-      box-shadow:
-        inset 0 1px 0 rgba(255,255,255,.08),
-        0 0 16px rgba(255,215,91,.22),
-        0 16px 24px rgba(0,0,0,.16);
-      opacity:1;
-    }
-
-    .m-0{ background: linear-gradient(180deg, rgba(239,68,68,.96), rgba(185,28,28,.96)); }
-    .m-1{ background: linear-gradient(180deg, rgba(249,115,22,.96), rgba(194,65,12,.96)); }
-    .m-2{ background: linear-gradient(180deg, rgba(245,158,11,.96), rgba(180,83,9,.96)); }
-    .m-3{ background: linear-gradient(180deg, rgba(59,130,246,.96), rgba(29,78,216,.96)); }
-    .m-4{ background: linear-gradient(180deg, rgba(99,102,241,.96), rgba(67,56,202,.96)); }
 
     .panel{
       padding:16px;
@@ -390,13 +281,6 @@
       font-size:13px;
       font-weight:900;
       color: rgba(234,241,255,.94);
-      margin-bottom:10px;
-    }
-
-    .bet-row{
-      display:grid;
-      grid-template-columns:minmax(0,1fr);
-      gap:10px;
     }
 
     .bet-input{
@@ -423,6 +307,7 @@
       display:grid;
       grid-template-columns:repeat(5, minmax(0,1fr));
       gap:8px;
+      margin-top:10px;
     }
 
     .quick-btn{
@@ -435,12 +320,35 @@
       color:#fff;
       font-size:12px;
       font-weight:900;
-      box-shadow: inset 0 1px 0 rgba(255,255,255,.03);
     }
 
     .quick-btn:active{ transform:scale(.98); }
 
-    .btn{
+    .action-slot{
+      position:relative;
+      min-height:54px;
+    }
+
+    .play-wrap,
+    .claim-wrap{
+      position:relative;
+      max-height:64px;
+      opacity:1;
+      transform:translateY(0) scale(1);
+      transition:max-height .22s ease, opacity .18s ease, transform .18s ease;
+      overflow:hidden;
+    }
+
+    .play-wrap.hide,
+    .claim-wrap.hide{
+      max-height:0;
+      opacity:0;
+      transform:translateY(-6px) scale(.985);
+      pointer-events:none;
+    }
+
+    .play-btn,
+    .claim-btn{
       width:100%;
       height:54px;
       border:none;
@@ -453,8 +361,6 @@
       transition: transform .16s ease, opacity .16s ease, box-shadow .16s ease;
     }
 
-    .btn:active{ transform: scale(.985); }
-
     .play-btn{
       background: linear-gradient(180deg, var(--tg1), var(--tg2));
       box-shadow: 0 18px 34px rgba(34,158,217,.28);
@@ -465,35 +371,48 @@
       box-shadow: 0 18px 34px rgba(34,197,94,.24);
     }
 
-    .btn:disabled{
+    .play-btn:active,
+    .claim-btn:active{ transform:scale(.985); }
+
+    .play-btn:disabled,
+    .claim-btn:disabled{
       opacity:.55;
       cursor:not-allowed;
       box-shadow:none;
       transform:none !important;
     }
 
-    .claim-wrap{
-      max-height:64px;
-      opacity:1;
-      transform:translateY(0) scale(1);
-      transition:max-height .22s ease, opacity .18s ease, transform .18s ease, margin .18s ease;
-      overflow:hidden;
+    .multis{
+      display:grid;
+      grid-template-columns:repeat(9, minmax(0,1fr));
+      gap:6px;
     }
 
-    .claim-wrap.hide{
-      max-height:0;
-      opacity:0;
-      transform:translateY(-6px) scale(.985);
-      margin:0;
-      pointer-events:none;
+    .multi-chip{
+      min-height:40px;
+      border-radius:14px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      text-align:center;
+      font-size:11px;
+      font-weight:900;
+      color:#fff;
+      border:1px solid rgba(255,255,255,.08);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.04);
+      padding:4px 2px;
     }
 
-    .helper{
-      margin-top:-4px;
-      font-size:12px;
-      font-weight:800;
-      color: rgba(234,241,255,.66);
-      line-height:1.35;
+    .m-low{
+      background: linear-gradient(180deg, rgba(239,68,68,.24), rgba(220,38,38,.18));
+    }
+
+    .m-mid{
+      background: linear-gradient(180deg, rgba(245,158,11,.24), rgba(217,119,6,.18));
+    }
+
+    .m-high{
+      background: linear-gradient(180deg, rgba(34,197,94,.24), rgba(22,163,74,.18));
     }
 
     .bottom-notice{
@@ -672,24 +591,97 @@
       filter: drop-shadow(0 8px 14px rgba(0,0,0,.18));
     }
 
+    .preloader{
+      position:fixed;
+      inset:0;
+      z-index:999;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background:
+        radial-gradient(950px 700px at 50% 10%, rgba(86,210,255,.14), transparent 50%),
+        linear-gradient(180deg, #03111f 0%, #05294d 55%, #0977b0 100%);
+      transition: opacity .34s ease, visibility .34s ease;
+    }
+
+    .preloader.hide{
+      opacity:0;
+      visibility:hidden;
+      pointer-events:none;
+    }
+
+    .pre-logo{
+      width:90px;
+      height:90px;
+      object-fit:contain;
+      display:block;
+      filter: drop-shadow(0 16px 28px rgba(0,0,0,.26));
+      animation: preLogoFloat .95s ease-in-out infinite;
+    }
+
+    @keyframes preLogoFloat{
+      0%,100%{ transform: translateY(0) scale(1); }
+      50%{ transform: translateY(-8px) scale(1.03); }
+    }
+
     @media (max-width: 360px){
-      .top-row{ grid-template-columns:36px minmax(0,1fr) 46px; gap:6px; }
+      .top-row{
+        grid-template-columns:36px minmax(0,1fr) 36px 46px;
+        gap:6px;
+      }
 
-      .icon-btn{ width:36px; height:36px; border-radius:12px; font-size:16px; }
+      .icon-btn,
+      .rule-btn{
+        width:36px;
+        height:36px;
+        border-radius:12px;
+      }
 
-      .logo-btn{ width:46px; height:46px; }
+      .icon-btn{ font-size:16px; }
 
-      .balance-mini{ height:38px; }
+      .logo-btn{
+        width:46px;
+        height:46px;
+      }
 
-      .bal-amount{ min-width:74px; height:24px; font-size:12px; }
+      .balance-mini{
+        height:38px;
+      }
 
-      .board-wrap{ height:390px; }
+      .bal-amount{
+        min-width:74px;
+        height:24px;
+        font-size:12px;
+      }
 
-      .quick-bets{ grid-template-columns:repeat(3, minmax(0,1fr)); }
+      .quick-bets{
+        grid-template-columns:repeat(3, minmax(0,1fr));
+      }
 
-      .btn{ height:50px; font-size:14px; }
+      .quick-btn{
+        height:36px;
+      }
 
-      .tg-btn{ height:48px; border-radius:15px; }
+      .play-btn,
+      .claim-btn{
+        height:50px;
+        font-size:14px;
+      }
+
+      .multi-chip{
+        min-height:36px;
+        font-size:10px;
+      }
+
+      .tg-btn{
+        height:48px;
+        border-radius:15px;
+      }
+
+      .pre-logo{
+        width:76px;
+        height:76px;
+      }
     }
 
     @media (prefers-reduced-motion: reduce){
@@ -699,6 +691,17 @@
   </style>
 </head>
 <body>
+  <div class="preloader" id="preloader">
+    <img
+      class="pre-logo"
+      src="https://i.postimg.cc/qvL497mF/Picsart-26-02-27-02-02-37-502.png"
+      alt="Vezus"
+      loading="eager"
+      fetchpriority="high"
+      decoding="async"
+    >
+  </div>
+
   <div class="bottom-notice info" id="bottomNotice" aria-live="polite">
     <div class="notice-icon" id="noticeIcon">ℹ</div>
     <div class="notice-text" id="noticeText">Сообщение</div>
@@ -716,6 +719,14 @@
             <div class="bal-amount" id="balanceValue">...</div>
           </div>
 
+          <button class="rule-btn" id="rulesBtn" aria-label="Правила">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M9 9a3 3 0 1 1 5.2 2.1c-.9.9-1.7 1.5-1.7 2.9"></path>
+              <path d="M12 17h.01"></path>
+              <circle cx="12" cy="12" r="9"></circle>
+            </svg>
+          </button>
+
           <button class="logo-btn" id="logoBtn" aria-label="Открыть Telegram канал">
             <img
               src="https://i.postimg.cc/qvL497mF/Picsart-26-02-27-02-02-37-502.png"
@@ -729,32 +740,24 @@
       </div>
 
       <div class="card board-card">
-        <div class="board-wrap" id="boardField">
-          <div class="peg-layer" id="pegLayer"></div>
-          <div class="ball-shadow" id="ballShadow"></div>
-          <div class="ball" id="ball"></div>
-          <div class="bin-layer">
-            <div class="bin-row" id="binRow"></div>
-          </div>
+        <div class="board-wrap">
+          <canvas id="plinkoCanvas"></canvas>
         </div>
       </div>
 
       <div class="card panel">
         <div>
           <div class="label">Ставка</div>
-
-          <div class="bet-row">
-            <input
-              class="bet-input"
-              id="betInput"
-              type="number"
-              min="10"
-              step="1"
-              inputmode="numeric"
-              placeholder="Минимум 10"
-              value="10"
-            >
-          </div>
+          <input
+            class="bet-input"
+            id="betInput"
+            type="number"
+            min="10"
+            step="1"
+            inputmode="numeric"
+            placeholder="Минимум 10"
+            value="10"
+          >
 
           <div class="quick-bets">
             <button class="quick-btn" data-bet="10" type="button">10</button>
@@ -765,17 +768,38 @@
           </div>
         </div>
 
-        <button class="btn play-btn" id="playBtn" type="button">Играть</button>
+        <div class="action-slot">
+          <div class="play-wrap" id="playWrap">
+            <button class="play-btn" id="playBtn" type="button">Играть</button>
+          </div>
 
-        <div class="claim-wrap hide" id="claimWrap">
-          <button class="btn claim-btn" id="claimBtn" type="button">Забрать</button>
+          <div class="claim-wrap hide" id="claimWrap">
+            <button class="claim-btn" id="claimBtn" type="button">Забрать</button>
+          </div>
         </div>
 
-        <div class="helper">
-          Чем дальше к краям — тем выше множитель, но попасть туда сложнее.
+        <div>
+          <div class="label">Умножители</div>
+          <div class="multis" id="multisRow"></div>
         </div>
       </div>
 
+    </div>
+  </div>
+
+  <div class="overlay" id="rulesOverlay" aria-hidden="true">
+    <div class="popup" role="dialog" aria-modal="true" aria-label="Правила">
+      <div class="popup-head">
+        <div class="popup-title">Правила игры</div>
+        <button class="popup-x" id="rulesClose" aria-label="Закрыть">✕</button>
+      </div>
+
+      <div class="popup-body">
+        <p class="rule-line">• Минимальная ставка: <b>10 VC</b></p>
+        <p class="rule-line">• Нажми <b>«Играть»</b></p>
+        <p class="rule-line">• Шарик падает в один из слотов</p>
+        <p class="rule-line">• Если выпал выигрыш — появится <b>«Забрать»</b></p>
+      </div>
     </div>
   </div>
 
@@ -805,36 +829,59 @@
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <script>
     const VERIFY_URL = "https://lazrfierfbhwlduqlvws.functions.supabase.co/verify-telegram";
-    const MIN_BET = 10;
-
     const FILES = {
       games: "games.html"
     };
 
-    const ROWS = 8;
-    const BINS = ROWS + 1;
+    const MIN_BET = 10;
 
-    // EV ~ 0.90 при 8 рядах (дом в плюсе)
-    const MULTIPLIERS = [5.0, 2.4, 1.4, 0.8, 0.2, 0.8, 1.4, 2.4, 5.0];
+    // Умножители: визуально побольше, но средняя математика всё ещё в плюс для проекта
+    const MULTIPLIERS = [0.2, 0.4, 0.7, 0.95, 1.2, 0.95, 0.7, 0.4, 0.2];
 
     const $ = (id) => document.getElementById(id);
 
     let currentBalance = 0;
-    let pendingWin = 0;
     let isDropping = false;
+    let pendingWin = 0;
     let noticeTimer = null;
-    let animationFrame = null;
-    let boardModel = null;
-    let activeBinIndex = -1;
+
+    // Canvas state
+    const canvas = $("plinkoCanvas");
+    const ctx = canvas.getContext("2d");
+
+    let dpr = Math.max(1, window.devicePixelRatio || 1);
+    let boardW = 0;
+    let boardH = 0;
+
+    const ROWS = 8;
+    let pegGapX = 0;
+    let rowGapY = 0;
+    let topY = 0;
+    let centerX = 0;
+    let startY = 0;
+    let bottomY = 0;
+    let binTopY = 0;
+
+    let pegs = [];
+    let bins = [];
+
+    let ball = {
+      active: false,
+      x: 0,
+      y: 0,
+      r: 9,
+      t: 0,
+      duration: 0,
+      path: [],
+      resultBin: -1,
+      multiplier: 0,
+      bet: 0
+    };
 
     function formatVc(value){
       const n = Number(value ?? 0);
       if (!Number.isFinite(n)) return "0 VC";
       return Number.isInteger(n) ? `${n} VC` : `${n.toFixed(2)} VC`;
-    }
-
-    function formatMultiplier(value){
-      return `${Number(value).toFixed(value % 1 === 0 ? 0 : 1)}x`;
     }
 
     function goTo(file){
@@ -850,7 +897,7 @@
     }
 
     function loadCachedProfile(){
-      try {
+      try{
         return JSON.parse(localStorage.getItem("tg_profile") || "null");
       } catch {
         return null;
@@ -880,67 +927,16 @@
       $("balanceValue").textContent = formatVc(currentBalance);
     }
 
-    function getBetAmount(){
-      const raw = $("betInput").value;
-      const amount = Number(raw);
-      if (!raw || !Number.isFinite(amount)) return 0;
-      return Math.floor(amount);
-    }
-
-    function setClaimVisible(show){
-      $("claimWrap").classList.toggle("hide", !show);
-      updateButtons();
-    }
-
-    function updateClaimButton(){
-      $("claimBtn").textContent = pendingWin > 0
-        ? `Забрать ${formatVc(pendingWin)}`
-        : "Забрать";
-    }
-
-    function updateButtons(){
-      const bet = getBetAmount();
-      const canPlay =
-        !isDropping &&
-        pendingWin <= 0 &&
-        bet >= MIN_BET &&
-        bet <= currentBalance;
-
-      $("playBtn").disabled = !canPlay;
-      $("claimBtn").disabled = isDropping || pendingWin <= 0;
-      updateClaimButton();
-    }
-
-    function showNotice(text, type = "info"){
-      const box = $("bottomNotice");
-      $("noticeText").textContent = text;
-      $("noticeIcon").textContent = type === "win" ? "✓" : type === "lose" ? "✕" : "ℹ";
-
-      box.classList.remove("win", "lose", "info");
-      box.classList.add(type);
-      box.classList.add("show");
-
-      if (noticeTimer) clearTimeout(noticeTimer);
-      noticeTimer = setTimeout(() => {
-        box.classList.remove("show");
-      }, 2000);
-    }
-
     async function autoAuthTelegram(){
       const cached = loadCachedProfile();
 
-      if (cached?.balance != null) {
-        currentBalance = Number(cached.balance) || 0;
-      } else {
-        currentBalance = 0;
-      }
+      if (cached?.balance != null) currentBalance = Number(cached.balance) || 0;
+      else currentBalance = 0;
+
       updateBalanceUI();
 
       const initData = getTelegramInitData();
-      if (!initData) {
-        updateButtons();
-        return;
-      }
+      if (!initData) return;
 
       $("balanceValue").textContent = "...";
 
@@ -967,228 +963,482 @@
       updateButtons();
     }
 
-    function clearActiveBin(){
-      if (activeBinIndex >= 0) {
-        const prev = document.querySelector(`.bin[data-bin="${activeBinIndex}"]`);
-        if (prev) prev.classList.remove("active");
-      }
-      activeBinIndex = -1;
+    function showNotice(text, type = "info"){
+      const box = $("bottomNotice");
+      $("noticeText").textContent = text;
+      $("noticeIcon").textContent = type === "win" ? "✓" : type === "lose" ? "✕" : "ℹ";
+
+      box.classList.remove("win", "lose", "info");
+      box.classList.add(type);
+      box.classList.add("show");
+
+      if (noticeTimer) clearTimeout(noticeTimer);
+      noticeTimer = setTimeout(() => {
+        box.classList.remove("show");
+      }, 2200);
     }
 
-    function setActiveBin(index){
-      clearActiveBin();
-      activeBinIndex = index;
-      const el = document.querySelector(`.bin[data-bin="${index}"]`);
-      if (el) el.classList.add("active");
+    function openOverlay(id){
+      const el = $(id);
+      el.classList.add("show");
+      el.setAttribute("aria-hidden", "false");
+      document.body.style.overflow = "hidden";
     }
 
-    function setBallPosition(x, y){
-      const ball = $("ball");
-      const shadow = $("ballShadow");
-
-      ball.style.transform = `translate(${x - 13}px, ${y - 13}px)`;
-
-      const shadowY = boardModel.binY - 14;
-      const dist = Math.max(0, Math.min(1, (y - 18) / (shadowY - 18)));
-      const scale = 0.72 + dist * 0.44;
-      const opacity = 0.18 + dist * 0.18;
-
-      shadow.style.opacity = opacity.toFixed(3);
-      shadow.style.transform = `translate(${x - 17}px, ${shadowY}px) scale(${scale})`;
+    function closeOverlay(id){
+      const el = $(id);
+      el.classList.remove("show");
+      el.setAttribute("aria-hidden", "true");
+      document.body.style.overflow = "";
     }
 
-    function buildBoard(){
-      const board = $("boardField");
-      const pegLayer = $("pegLayer");
-      const binRow = $("binRow");
+    function buildMultipliersRow(){
+      const row = $("multisRow");
+      row.innerHTML = "";
 
-      pegLayer.innerHTML = "";
-      binRow.innerHTML = "";
+      MULTIPLIERS.forEach((m) => {
+        const chip = document.createElement("div");
+        chip.className = "multi-chip " + (m >= 1 ? "m-high" : (m >= 0.7 ? "m-mid" : "m-low"));
+        chip.textContent = `${m}x`;
+        row.appendChild(chip);
+      });
+    }
 
-      const rect = board.getBoundingClientRect();
-      const width = rect.width;
-      const height = rect.height;
+    function resizeCanvas(){
+      const rect = canvas.getBoundingClientRect();
+      dpr = Math.max(1, window.devicePixelRatio || 1);
 
-      const sidePad = 24;
-      const topY = 42;
-      const pegGap = (width - sidePad * 2) / ROWS;
-      const rowGap = 34;
-      const binY = height - 66;
+      canvas.width = Math.round(rect.width * dpr);
+      canvas.height = Math.round(rect.height * dpr);
 
-      const rows = [];
+      boardW = rect.width;
+      boardH = rect.height;
 
-      for (let r = 0; r < ROWS; r++) {
-        const count = r + 1;
-        const rowWidth = r * pegGap;
-        const startX = width / 2 - rowWidth / 2;
-        const y = topY + r * rowGap;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
-        rows[r] = [];
+      centerX = boardW / 2;
+      topY = 54;
+      startY = 24;
+      rowGapY = (boardH - 190) / (ROWS + 1);
+      pegGapX = Math.min(42, (boardW - 86) / (ROWS + 1));
+      bottomY = boardH - 36;
+      binTopY = boardH - 70;
+
+      pegs = [];
+      bins = [];
+
+      for (let row = 0; row < ROWS; row++) {
+        const count = row + 1;
+        const rowWidth = (count - 1) * pegGapX;
+        const startX = centerX - rowWidth / 2;
+        const y = topY + row * rowGapY;
 
         for (let i = 0; i < count; i++) {
-          const x = startX + i * pegGap;
-
-          const peg = document.createElement("div");
-          peg.className = "peg";
-          peg.style.left = `${x}px`;
-          peg.style.top = `${y}px`;
-
-          pegLayer.appendChild(peg);
-          rows[r][i] = { x, y };
-        }
-      }
-
-      const binCenters = [];
-
-      for (let i = 0; i < BINS; i++) {
-        const bin = document.createElement("div");
-        const colorClass = i === 0 || i === BINS - 1
-          ? "m-0"
-          : i === 1 || i === BINS - 2
-          ? "m-1"
-          : i === 2 || i === BINS - 3
-          ? "m-2"
-          : i === 3 || i === BINS - 4
-          ? "m-3"
-          : "m-4";
-
-        bin.className = `bin ${colorClass}`;
-        bin.dataset.bin = String(i);
-        bin.textContent = formatMultiplier(MULTIPLIERS[i]);
-        binRow.appendChild(bin);
-      }
-
-      // после рендера считаем центры
-      requestAnimationFrame(() => {
-        const bins = [...binRow.children];
-        bins.forEach((bin, i) => {
-          const b = bin.getBoundingClientRect();
-          const parent = board.getBoundingClientRect();
-          binCenters[i] = {
-            x: b.left - parent.left + b.width / 2,
-            y: b.top - parent.top
-          };
-        });
-
-        boardModel = {
-          width,
-          height,
-          sidePad,
-          topY,
-          pegGap,
-          rowGap,
-          rows,
-          binCenters,
-          binY
-        };
-
-        clearActiveBin();
-        setBallPosition(width / 2, 18);
-      });
-    }
-
-    function randomDirections(){
-      const dirs = [];
-      for (let i = 0; i < ROWS; i++) {
-        dirs.push(Math.random() < 0.5 ? 0 : 1);
-      }
-      return dirs;
-    }
-
-    function makePath(dirs){
-      const points = [];
-      const startX = boardModel.width / 2;
-      points.push({ x: startX, y: 18 });
-
-      let pegIndex = 0;
-
-      for (let r = 0; r < ROWS; r++) {
-        const peg = boardModel.rows[r][pegIndex];
-        const dir = dirs[r];
-
-        points.push({ x: peg.x, y: peg.y - 10 });
-
-        const exitX = peg.x + (dir ? 18 : -18);
-        const exitY = peg.y + 18;
-        points.push({ x: exitX, y: exitY });
-
-        if (dir) pegIndex++;
-      }
-
-      const binCenter = boardModel.binCenters[pegIndex] || { x: boardModel.width / 2, y: boardModel.binY };
-      points.push({ x: binCenter.x, y: binCenter.y - 14 });
-
-      return { points, binIndex: pegIndex };
-    }
-
-    function easeInOutCubic(t){
-      return t < 0.5
-        ? 4 * t * t * t
-        : 1 - Math.pow(-2 * t + 2, 3) / 2;
-    }
-
-    function animateDrop(points){
-      return new Promise((resolve) => {
-        const segments = [];
-
-        for (let i = 0; i < points.length - 1; i++) {
-          const from = points[i];
-          const to = points[i + 1];
-          const isLast = i === points.length - 2;
-
-          segments.push({
-            from,
-            to,
-            duration: isLast ? 180 : 105
+          pegs.push({
+            x: startX + i * pegGapX,
+            y
           });
         }
+      }
 
-        let segIndex = 0;
-        let segStart = 0;
+      const binCount = MULTIPLIERS.length;
+      const binGap = 4;
+      const totalGap = (binCount - 1) * binGap;
+      const usableW = boardW - 24;
+      const binW = (usableW - totalGap) / binCount;
+      const startX = 12;
 
-        function frame(ts){
-          if (!segStart) segStart = ts;
+      for (let i = 0; i < binCount; i++) {
+        bins.push({
+          x: startX + i * (binW + binGap),
+          y: binTopY,
+          w: binW,
+          h: 58,
+          m: MULTIPLIERS[i]
+        });
+      }
 
-          const seg = segments[segIndex];
-          const elapsed = ts - segStart;
-          const raw = Math.min(1, elapsed / seg.duration);
-          const t = easeInOutCubic(raw);
+      drawBoard();
+    }
 
-          const x = seg.from.x + (seg.to.x - seg.from.x) * t;
-          let y = seg.from.y + (seg.to.y - seg.from.y) * t;
+    function drawPeg(x, y){
+      // внешний glow
+      const glow = ctx.createRadialGradient(x, y, 0, x, y, 10);
+      glow.addColorStop(0, "rgba(86,210,255,.20)");
+      glow.addColorStop(.55, "rgba(86,210,255,.08)");
+      glow.addColorStop(1, "rgba(86,210,255,0)");
+      ctx.fillStyle = glow;
+      ctx.beginPath();
+      ctx.arc(x, y, 10, 0, Math.PI * 2);
+      ctx.fill();
 
-          // небольшой реалистичный "удар" о штырь
-          const bounce = Math.sin(raw * Math.PI) * 4;
-          if (segIndex < segments.length - 1) {
-            y -= bounce;
-          }
+      // корпус штыря
+      const grd = ctx.createLinearGradient(x, y - 4, x, y + 4);
+      grd.addColorStop(0, "rgba(235,245,255,.95)");
+      grd.addColorStop(.5, "rgba(165,184,204,.95)");
+      grd.addColorStop(1, "rgba(92,108,126,.95)");
+      ctx.fillStyle = grd;
+      ctx.beginPath();
+      ctx.arc(x, y, 4.8, 0, Math.PI * 2);
+      ctx.fill();
 
-          setBallPosition(x, y);
+      // блик
+      ctx.fillStyle = "rgba(255,255,255,.65)";
+      ctx.beginPath();
+      ctx.arc(x - 1.2, y - 1.4, 1.2, 0, Math.PI * 2);
+      ctx.fill();
+    }
 
-          if (raw >= 1) {
-            segIndex++;
-            segStart = ts;
+    function drawBin(bin, index){
+      const radius = 12;
 
-            if (segIndex >= segments.length) {
-              animationFrame = null;
-              resolve();
-              return;
-            }
-          }
+      ctx.save();
 
-          animationFrame = requestAnimationFrame(frame);
+      const colorClass = bin.m >= 1 ? "high" : (bin.m >= 0.7 ? "mid" : "low");
+      let topColor = "rgba(239,68,68,.22)";
+      let bottomColor = "rgba(220,38,38,.14)";
+
+      if (colorClass === "mid") {
+        topColor = "rgba(245,158,11,.22)";
+        bottomColor = "rgba(217,119,6,.14)";
+      }
+
+      if (colorClass === "high") {
+        topColor = "rgba(34,197,94,.22)";
+        bottomColor = "rgba(22,163,74,.14)";
+      }
+
+      const grd = ctx.createLinearGradient(0, bin.y, 0, bin.y + bin.h);
+      grd.addColorStop(0, topColor);
+      grd.addColorStop(1, bottomColor);
+
+      roundRect(ctx, bin.x, bin.y, bin.w, bin.h, radius);
+      ctx.fillStyle = grd;
+      ctx.fill();
+
+      ctx.strokeStyle = "rgba(255,255,255,.08)";
+      ctx.lineWidth = 1;
+      ctx.stroke();
+
+      ctx.fillStyle = "rgba(255,255,255,.95)";
+      ctx.font = "900 12px Inter";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillText(`${bin.m}x`, bin.x + bin.w / 2, bin.y + bin.h / 2);
+
+      // лёгкое свечение сверху
+      ctx.fillStyle = "rgba(255,255,255,.06)";
+      roundRect(ctx, bin.x + 1, bin.y + 1, bin.w - 2, 10, 10);
+      ctx.fill();
+
+      ctx.restore();
+    }
+
+    function roundRect(ctx, x, y, w, h, r){
+      const rr = Math.min(r, w / 2, h / 2);
+      ctx.beginPath();
+      ctx.moveTo(x + rr, y);
+      ctx.arcTo(x + w, y, x + w, y + h, rr);
+      ctx.arcTo(x + w, y + h, x, y + h, rr);
+      ctx.arcTo(x, y + h, x, y, rr);
+      ctx.arcTo(x, y, x + w, y, rr);
+      ctx.closePath();
+    }
+
+    function drawBall(x, y, scale = 1){
+      const r = ball.r * scale;
+
+      // тень
+      const shadowW = Math.max(16, 26 + ((y - startY) / (boardH - startY)) * 34);
+      const shadowA = Math.max(.08, .22 - ((boardH - y) / boardH) * .10);
+      ctx.fillStyle = `rgba(0,0,0,${shadowA})`;
+      ctx.beginPath();
+      ctx.ellipse(x, binTopY + 40, shadowW * .6, 8, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      // glow
+      const glow = ctx.createRadialGradient(x, y, 0, x, y, r * 2.2);
+      glow.addColorStop(0, "rgba(86,210,255,.28)");
+      glow.addColorStop(.55, "rgba(42,171,238,.14)");
+      glow.addColorStop(1, "rgba(42,171,238,0)");
+      ctx.fillStyle = glow;
+      ctx.beginPath();
+      ctx.arc(x, y, r * 2.2, 0, Math.PI * 2);
+      ctx.fill();
+
+      // шар
+      const grd = ctx.createRadialGradient(x - r * .35, y - r * .4, r * .2, x, y, r);
+      grd.addColorStop(0, "rgba(255,255,255,.96)");
+      grd.addColorStop(.28, "rgba(193,236,255,.96)");
+      grd.addColorStop(.62, "rgba(42,171,238,.98)");
+      grd.addColorStop(1, "rgba(16,88,150,.98)");
+      ctx.fillStyle = grd;
+      ctx.beginPath();
+      ctx.arc(x, y, r, 0, Math.PI * 2);
+      ctx.fill();
+
+      // блик
+      ctx.fillStyle = "rgba(255,255,255,.50)";
+      ctx.beginPath();
+      ctx.arc(x - r * .28, y - r * .35, r * .20, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    function drawBoard(){
+      ctx.clearRect(0, 0, boardW, boardH);
+
+      // лёгкая внутренняя подсветка
+      const bg = ctx.createLinearGradient(0, 0, 0, boardH);
+      bg.addColorStop(0, "rgba(255,255,255,.02)");
+      bg.addColorStop(1, "rgba(255,255,255,.005)");
+      ctx.fillStyle = bg;
+      ctx.fillRect(0, 0, boardW, boardH);
+
+      // декоративные линии
+      ctx.strokeStyle = "rgba(255,255,255,.03)";
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(centerX, 14);
+      ctx.lineTo(centerX, topY - 10);
+      ctx.stroke();
+
+      // штыри
+      pegs.forEach(p => drawPeg(p.x, p.y));
+
+      // слоты
+      bins.forEach((bin, i) => drawBin(bin, i));
+
+      if (ball.active) {
+        const progress = Math.min(1, ball.t / ball.duration);
+        const point = getPathPoint(ball.path, progress);
+        const scale = 1 + Math.sin(progress * Math.PI) * 0.04;
+        drawBall(point.x, point.y, scale);
+      }
+    }
+
+    function getBetAmount(){
+      const raw = $("betInput").value;
+      const amount = Number(raw);
+      if (!raw || !Number.isFinite(amount)) return 0;
+      return Math.floor(amount);
+    }
+
+    function updateClaimButton(){
+      $("claimBtn").textContent = pendingWin > 0
+        ? `Забрать ${formatVc(pendingWin)}`
+        : "Забрать";
+    }
+
+    function updateButtons(){
+      const bet = getBetAmount();
+      $("playBtn").disabled = isDropping || pendingWin > 0 || bet < MIN_BET || bet > currentBalance;
+      $("claimBtn").disabled = isDropping || pendingWin <= 0;
+      updateClaimButton();
+    }
+
+    function showPlayButton(){
+      $("playWrap").classList.remove("hide");
+      $("claimWrap").classList.add("hide");
+    }
+
+    function showClaimButton(){
+      $("playWrap").classList.add("hide");
+      $("claimWrap").classList.remove("hide");
+    }
+
+    function createPathForDrop(binIndex){
+      const decisions = [];
+      let rights = 0;
+
+      while (rights < binIndex) {
+        decisions.push(1);
+        rights++;
+      }
+      while (decisions.length < ROWS) {
+        decisions.push(0);
+      }
+
+      // перемешиваем
+      for (let i = decisions.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [decisions[i], decisions[j]] = [decisions[j], decisions[i]];
+      }
+
+      const anchors = [];
+      let currentX = centerX;
+      let currentY = startY;
+
+      anchors.push({ x: currentX, y: currentY });
+
+      for (let row = 0; row < ROWS; row++) {
+        const dir = decisions[row] === 1 ? 1 : -1;
+        const contactY = topY + row * rowGapY - 4;
+        const nextX = currentX + dir * (pegGapX / 2);
+        const nextY = topY + row * rowGapY + rowGapY * 0.48;
+
+        anchors.push({
+          x: currentX + dir * (pegGapX * 0.16),
+          y: contactY
+        });
+
+        anchors.push({
+          x: nextX + dir * 2.4,
+          y: nextY
+        });
+
+        currentX = nextX;
+        currentY = nextY;
+      }
+
+      const targetBin = bins[binIndex];
+      const finalX = targetBin.x + targetBin.w / 2;
+      const finalY = targetBin.y + 18;
+
+      anchors.push({
+        x: currentX + (finalX - currentX) * 0.55,
+        y: finalY - 28
+      });
+
+      anchors.push({
+        x: finalX,
+        y: finalY
+      });
+
+      return sampleSpline(anchors, 16);
+    }
+
+    function sampleSpline(points, stepsPerSeg = 12){
+      if (points.length < 2) return points.slice();
+
+      const result = [];
+
+      for (let i = 0; i < points.length - 1; i++) {
+        const p0 = points[Math.max(0, i - 1)];
+        const p1 = points[i];
+        const p2 = points[i + 1];
+        const p3 = points[Math.min(points.length - 1, i + 2)];
+
+        for (let step = 0; step < stepsPerSeg; step++) {
+          const t = step / stepsPerSeg;
+          const t2 = t * t;
+          const t3 = t2 * t;
+
+          const x = 0.5 * (
+            (2 * p1.x) +
+            (-p0.x + p2.x) * t +
+            (2*p0.x - 5*p1.x + 4*p2.x - p3.x) * t2 +
+            (-p0.x + 3*p1.x - 3*p2.x + p3.x) * t3
+          );
+
+          const y = 0.5 * (
+            (2 * p1.y) +
+            (-p0.y + p2.y) * t +
+            (2*p0.y - 5*p1.y + 4*p2.y - p3.y) * t2 +
+            (-p0.y + 3*p1.y - 3*p2.y + p3.y) * t3
+          );
+
+          result.push({ x, y });
+        }
+      }
+
+      result.push(points[points.length - 1]);
+      return result;
+    }
+
+    function getPathPoint(path, progress){
+      if (!path.length) return { x: centerX, y: startY };
+
+      const p = Math.max(0, Math.min(1, progress));
+      const last = path.length - 1;
+      const pos = p * last;
+      const i = Math.floor(pos);
+
+      if (i >= last) return path[last];
+
+      const frac = pos - i;
+      const a = path[i];
+      const b = path[i + 1];
+
+      return {
+        x: a.x + (b.x - a.x) * frac,
+        y: a.y + (b.y - a.y) * frac
+      };
+    }
+
+    function chooseBinIndex(){
+      let rights = 0;
+      for (let i = 0; i < ROWS; i++) {
+        if (Math.random() < 0.5) rights++;
+      }
+      return rights; // 0..8
+    }
+
+    function settleLossOrPartial(binIndex, bet){
+      const multi = MULTIPLIERS[binIndex];
+      const payout = Math.floor(bet * multi);
+
+      if (payout > 0) {
+        currentBalance += payout;
+        updateBalanceUI();
+        saveCachedBalance();
+      }
+
+      if (multi >= 1) {
+        pendingWin = payout;
+        showClaimButton();
+        showNotice(`Выигрыш ${formatVc(pendingWin)} • ${multi}x`, "win");
+      } else {
+        pendingWin = 0;
+        showPlayButton();
+
+        if (payout > 0) {
+          showNotice(`Выпало ${multi}x • возвращено ${formatVc(payout)}`, "lose");
+        } else {
+          showNotice(`Выпало ${multi}x • без возврата`, "lose");
+        }
+      }
+
+      updateButtons();
+    }
+
+    function animateDrop(binIndex, bet){
+      ball.active = true;
+      ball.resultBin = binIndex;
+      ball.multiplier = MULTIPLIERS[binIndex];
+      ball.bet = bet;
+      ball.path = createPathForDrop(binIndex);
+      ball.t = 0;
+      ball.duration = 1450 + Math.random() * 140;
+
+      const start = performance.now();
+
+      function frame(now){
+        if (!ball.active) return;
+
+        const elapsed = now - start;
+        ball.t = elapsed;
+
+        drawBoard();
+
+        if (elapsed < ball.duration) {
+          requestAnimationFrame(frame);
+          return;
         }
 
-        if (animationFrame) cancelAnimationFrame(animationFrame);
-        animationFrame = requestAnimationFrame(frame);
-      });
+        ball.t = ball.duration;
+        drawBoard();
+
+        ball.active = false;
+        isDropping = false;
+
+        settleLossOrPartial(binIndex, bet);
+        drawBoard();
+      }
+
+      requestAnimationFrame(frame);
     }
 
-    function calcPayout(bet, multiplier){
-      return Math.max(0, Math.round(bet * multiplier));
-    }
-
-    async function playPlinko(){
+    function playPlinko(){
       if (isDropping) return;
 
       if (pendingWin > 0) {
@@ -1208,91 +1458,54 @@
         return;
       }
 
-      if (!boardModel) return;
-
-      isDropping = true;
-      updateButtons();
-      clearActiveBin();
-
       // сразу списываем ставку
       currentBalance -= bet;
       updateBalanceUI();
       saveCachedBalance();
 
-      const dirs = randomDirections();
-      const { points, binIndex } = makePath(dirs);
-      const multiplier = MULTIPLIERS[binIndex];
-      const payout = calcPayout(bet, multiplier);
-
-      await animateDrop(points);
-      setActiveBin(binIndex);
-
-      const isWin = multiplier > 1;
-
-      if (isWin) {
-        pendingWin = payout;
-        setClaimVisible(true);
-        showNotice(`Выигрыш ${formatVc(payout)} • ${formatMultiplier(multiplier)}`, "win");
-      } else {
-        pendingWin = 0;
-
-        if (payout > 0) {
-          currentBalance += payout;
-          updateBalanceUI();
-          saveCachedBalance();
-        }
-
-        setClaimVisible(false);
-
-        if (payout > 0) {
-          showNotice(`Выпало ${formatMultiplier(multiplier)} • возвращено ${formatVc(payout)}`, "lose");
-        } else {
-          showNotice(`Выпало ${formatMultiplier(multiplier)} • проигрыш`, "lose");
-        }
-      }
-
-      isDropping = false;
+      isDropping = true;
       updateButtons();
+
+      const binIndex = chooseBinIndex();
+      animateDrop(binIndex, bet);
     }
 
     function claimWin(){
       if (pendingWin <= 0 || isDropping) return;
 
-      currentBalance += pendingWin;
-      updateBalanceUI();
-      saveCachedBalance();
-
+      // выигрыш уже подготовлен, теперь подтверждаем окончательное зачисление
       showNotice(`Забрано ${formatVc(pendingWin)}`, "win");
 
       pendingWin = 0;
-      setClaimVisible(false);
+      showPlayButton();
       updateButtons();
     }
 
-    function openOverlay(id){
-      const el = $(id);
-      el.classList.add("show");
-      el.setAttribute("aria-hidden", "false");
-      document.body.style.overflow = "hidden";
-    }
-
-    function closeOverlay(id){
-      const el = $(id);
-      el.classList.remove("show");
-      el.setAttribute("aria-hidden", "true");
-      document.body.style.overflow = "";
-    }
-
+    // events
     $("backBtn").addEventListener("click", () => goTo(FILES.games));
     $("logoBtn").addEventListener("click", () => openOverlay("channelOverlay"));
+    $("rulesBtn").addEventListener("click", () => openOverlay("rulesOverlay"));
 
     $("channelClose").addEventListener("click", () => closeOverlay("channelOverlay"));
+    $("rulesClose").addEventListener("click", () => closeOverlay("rulesOverlay"));
+
     $("channelOverlay").addEventListener("click", (e) => {
       if (e.target === $("channelOverlay")) closeOverlay("channelOverlay");
     });
 
+    $("rulesOverlay").addEventListener("click", (e) => {
+      if (e.target === $("rulesOverlay")) closeOverlay("rulesOverlay");
+    });
+
     $("goChannel").addEventListener("click", () => {
       openTelegramLinkSafe("https://t.me/vezuspubg");
+    });
+
+    $("playBtn").addEventListener("click", playPlinko);
+    $("claimBtn").addEventListener("click", claimWin);
+
+    $("betInput").addEventListener("input", () => {
+      updateButtons();
     });
 
     document.querySelectorAll(".quick-btn").forEach((btn) => {
@@ -1304,26 +1517,25 @@
       });
     });
 
-    $("betInput").addEventListener("input", updateButtons);
-    $("playBtn").addEventListener("click", playPlinko);
-    $("claimBtn").addEventListener("click", claimWin);
-
     document.addEventListener("keydown", (e) => {
-      if (e.key === "Escape") closeOverlay("channelOverlay");
+      if (e.key === "Escape") {
+        closeOverlay("channelOverlay");
+        closeOverlay("rulesOverlay");
+      }
     });
 
-    let resizeTimer = null;
-    window.addEventListener("resize", () => {
-      clearTimeout(resizeTimer);
-      resizeTimer = setTimeout(() => {
-        buildBoard();
-      }, 80);
-    });
+    window.addEventListener("resize", resizeCanvas);
 
     window.addEventListener("load", async () => {
-      buildBoard();
-      setClaimVisible(false);
+      buildMultipliersRow();
+      resizeCanvas();
+      showPlayButton();
       updateButtons();
+
+      setTimeout(() => {
+        $("preloader").classList.add("hide");
+      }, 1600);
+
       await autoAuthTelegram();
     });
   </script>
