@@ -9,8 +9,8 @@
   <link rel="dns-prefetch" href="https://i.postimg.cc">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-
   <link rel="preload" as="image" href="https://i.postimg.cc/qvL497mF/Picsart-26-02-27-02-02-37-502.png">
+
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
 
   <style>
@@ -19,7 +19,7 @@
       --safe-bottom: env(safe-area-inset-bottom, 0px);
       --safe-top: env(safe-area-inset-top, 0px);
 
-      --glass: rgba(12, 14, 20, .80);
+      --glass: rgba(12, 14, 20, .82);
       --stroke: rgba(255,255,255,.08);
       --shadow: 0 18px 42px rgba(0,0,0,.48);
       --shadow-soft: 0 12px 28px rgba(0,0,0,.34);
@@ -30,8 +30,6 @@
       --green2:#16a34a;
       --red1:#ef4444;
       --red2:#dc2626;
-      --yellow1:#ffd95c;
-      --yellow2:#c98a00;
     }
 
     *{
@@ -113,7 +111,7 @@
     }
 
     .icon-btn,
-    .rule-btn{
+    .speed-btn{
       width:40px;
       height:40px;
       border:none;
@@ -135,20 +133,15 @@
       font-weight:900;
     }
 
-    .icon-btn:active,
-    .rule-btn:active{
-      transform:scale(.98);
+    .speed-btn{
+      font-size:11px;
+      font-weight:900;
+      letter-spacing:.2px;
     }
 
-    .rule-btn svg{
-      width:18px;
-      height:18px;
-      stroke: rgba(234,241,255,.92);
-      fill:none;
-      stroke-width:2;
-      stroke-linecap:round;
-      stroke-linejoin:round;
-      display:block;
+    .icon-btn:active,
+    .speed-btn:active{
+      transform:scale(.98);
     }
 
     .balance-mini{
@@ -258,27 +251,25 @@
     }
 
     .board-card{
-      padding:14px 14px 10px;
+      padding:14px 14px 12px;
     }
 
     .board-wrap{
       display:flex;
       justify-content:center;
       align-items:center;
-      padding:2px 0 0;
     }
 
     .board-stage{
       position:relative;
-      width:280px;
+      width:min(100%, 310px);
       height:360px;
-      max-width:100%;
       overflow:hidden;
       border-radius:22px;
       background:
         radial-gradient(circle at 50% 0%, rgba(42,171,238,.10), transparent 40%),
         linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.015)),
-        rgba(4, 10, 22, .72);
+        rgba(4, 10, 22, .74);
       border:1px solid rgba(255,255,255,.05);
       box-shadow:
         inset 0 1px 0 rgba(255,255,255,.03),
@@ -287,16 +278,17 @@
 
     .board-glow{
       position:absolute;
-      inset:auto 50% 18px 50%;
-      width:210px;
-      height:110px;
+      inset:auto 50% 16px 50%;
+      width:200px;
+      height:100px;
       transform:translateX(-50%);
       background: radial-gradient(circle, rgba(42,171,238,.10), transparent 70%);
       filter: blur(18px);
       pointer-events:none;
     }
 
-    .pegs-layer{
+    .pegs-layer,
+    .bins-layer{
       position:absolute;
       inset:0;
       pointer-events:none;
@@ -306,9 +298,8 @@
       position:absolute;
       width:10px;
       height:10px;
-      margin-left:-5px;
-      margin-top:-5px;
       border-radius:50%;
+      transform:translate(-50%, -50%);
       background:
         radial-gradient(circle at 32% 28%, rgba(255,255,255,.95), rgba(210,228,255,.72) 35%, rgba(116,148,190,.48) 60%, rgba(28,42,70,.18) 100%);
       border:1px solid rgba(255,255,255,.18);
@@ -318,20 +309,10 @@
         inset 0 -1px 2px rgba(0,0,0,.16);
     }
 
-    .bins-layer{
-      position:absolute;
-      left:0;
-      right:0;
-      bottom:8px;
-      height:58px;
-      pointer-events:none;
-    }
-
     .bin{
       position:absolute;
-      bottom:0;
-      width:24px;
-      margin-left:-12px;
+      bottom:8px;
+      transform:translateX(-50%);
       height:48px;
       border-radius:12px 12px 14px 14px;
       display:flex;
@@ -351,11 +332,12 @@
         0 8px 16px rgba(0,0,0,.16);
       transition: transform .18s ease, box-shadow .18s ease, filter .18s ease;
       text-shadow: 0 2px 8px rgba(0,0,0,.25);
+      user-select:none;
     }
 
     .bin.hot{
       background:
-        linear-gradient(180deg, rgba(255,217,92,.24), rgba(201,138,0,.16)),
+        linear-gradient(180deg, rgba(255,216,91,.24), rgba(210,140,14,.16)),
         rgba(255,255,255,.04);
       color:#fff8d0;
     }
@@ -367,18 +349,18 @@
     }
 
     .bin.hit{
-      transform: translateY(-5px) scale(1.08);
+      transform:translateX(-50%) translateY(-5px) scale(1.08);
       box-shadow:
         0 0 16px rgba(42,171,238,.18),
         inset 0 1px 0 rgba(255,255,255,.08),
         0 12px 20px rgba(0,0,0,.20);
-      filter: brightness(1.14);
+      filter:brightness(1.14);
     }
 
     .ball{
       position:absolute;
       left:50%;
-      top:20px;
+      top:26px;
       width:18px;
       height:18px;
       margin-left:-9px;
@@ -391,10 +373,10 @@
         0 0 12px rgba(42,171,238,.16),
         0 8px 14px rgba(0,0,0,.16),
         inset 0 1px 0 rgba(255,255,255,.55);
-      transform: translate(-50%, -50%);
+      transform:translate(-50%, -50%);
       opacity:0;
-      will-change: transform, opacity;
       z-index:5;
+      will-change:left, top, transform, opacity;
     }
 
     .action-card,
@@ -716,8 +698,7 @@
       gap:12px;
     }
 
-    .popup-text,
-    .rule-line{
+    .popup-text{
       margin:0;
       font-size:13px;
       line-height:1.42;
@@ -788,41 +769,17 @@
 
     @media (max-width: 360px){
       .top-row{ grid-template-columns:36px minmax(0,1fr) 36px 46px; gap:6px; }
-
-      .icon-btn,
-      .rule-btn{ width:36px; height:36px; border-radius:12px; }
-
+      .icon-btn, .speed-btn{ width:36px; height:36px; border-radius:12px; }
       .icon-btn{ font-size:16px; }
-
-      .rule-btn svg{ width:17px; height:17px; }
-
+      .speed-btn{ font-size:10px; }
       .logo-btn{ width:46px; height:46px; }
-
       .balance-mini{ height:38px; }
-
       .bal-amount{ min-width:74px; height:24px; font-size:12px; }
-
-      .board-stage{
-        width:252px;
-        height:330px;
-      }
-
-      .mode-grid{
-        grid-template-columns:1fr;
-      }
-
-      .quick-bets{
-        grid-template-columns:repeat(3, minmax(0,1fr));
-      }
-
-      .play-btn,
-      .claim-btn{
-        height:50px;
-        font-size:14px;
-      }
-
+      .board-stage{ height:330px; }
+      .mode-grid{ grid-template-columns:1fr; }
+      .quick-bets{ grid-template-columns:repeat(3, minmax(0,1fr)); }
+      .play-btn, .claim-btn{ height:50px; font-size:14px; }
       .pre-logo{ width:76px; height:76px; }
-
       .tg-btn{ height:48px; border-radius:15px; }
     }
 
@@ -854,13 +811,7 @@
             <div class="bal-amount" id="balanceValue">...</div>
           </div>
 
-          <button class="rule-btn" id="rulesBtn" aria-label="Правила">
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-              <path d="M9 9a3 3 0 1 1 5.2 2.1c-.9.9-1.7 1.5-1.7 2.9"></path>
-              <path d="M12 17h.01"></path>
-              <circle cx="12" cy="12" r="9"></circle>
-            </svg>
-          </button>
+          <button class="speed-btn" id="speedBtn" aria-label="Сменить скорость">MED</button>
 
           <button class="logo-btn" id="logoBtn" aria-label="Открыть Telegram канал">
             <img
@@ -896,15 +847,6 @@
       </div>
 
       <div class="card control-card">
-        <div>
-          <div class="section-label">Скорость падения</div>
-          <div class="mode-grid" id="speedGrid">
-            <button class="pill-btn" data-speed="slow" type="button">Медленный</button>
-            <button class="pill-btn active" data-speed="medium" type="button">Средний</button>
-            <button class="pill-btn" data-speed="fast" type="button">Быстрый</button>
-          </div>
-        </div>
-
         <div>
           <div class="section-label">Ставка за 1 шар</div>
 
@@ -951,23 +893,6 @@
     </div>
   </div>
 
-  <div class="overlay" id="rulesOverlay" aria-hidden="true">
-    <div class="popup" role="dialog" aria-modal="true" aria-label="Правила">
-      <div class="popup-head">
-        <div class="popup-title">Правила игры</div>
-        <button class="popup-x" id="rulesClose" aria-label="Закрыть">✕</button>
-      </div>
-
-      <div class="popup-body">
-        <p class="rule-line">• Выбери скорость падения</p>
-        <p class="rule-line">• Укажи ставку за 1 шар</p>
-        <p class="rule-line">• Выбери: 1, 2 или 3 шара</p>
-        <p class="rule-line">• Нажми <b>«Играть»</b></p>
-        <p class="rule-line">• После раунда можно нажать <b>«Забрать»</b></p>
-      </div>
-    </div>
-  </div>
-
   <div class="overlay" id="channelOverlay" aria-hidden="true">
     <div class="popup" role="dialog" aria-modal="true" aria-label="Telegram канал">
       <div class="popup-head">
@@ -994,27 +919,29 @@
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <script>
     const VERIFY_URL = "https://lazrfierfbhwlduqlvws.functions.supabase.co/verify-telegram";
-
     const FILES = { games: "games.html" };
 
     const MIN_BET = 10;
-    const ROWS = 10;
-    const MULTIPLIERS = [0.3, 0.5, 0.7, 1, 2, 10, 2, 1, 0.7, 0.5, 0.3];
-    const SLOT_WEIGHTS = [16, 15, 13, 11, 8, 2, 8, 11, 13, 15, 16];
+    const ROWS = 8;
 
-    const SPEEDS = {
-      slow: 1420,
-      medium: 1120,
-      fast: 860
+    const MULTIPLIERS = [0.2, 0.4, 0.8, 1.5, 10, 1.5, 0.8, 0.4, 0.2];
+    const SLOT_WEIGHTS = [24, 20, 15, 10, 2, 10, 15, 20, 24];
+
+    const SPEED_ORDER = ["slow", "medium", "fast"];
+    const SPEED_LABELS = {
+      slow: "SLOW",
+      medium: "MED",
+      fast: "FAST"
     };
-
-    const BOARD = {
-      width: 280,
-      height: 360,
-      topPad: 34,
-      rowGap: 24,
-      pegGap: 26,
-      binY: 322
+    const SPEED_NAMES = {
+      slow: "Медленный",
+      medium: "Средний",
+      fast: "Быстрый"
+    };
+    const SPEED_DURATION = {
+      slow: 1600,
+      medium: 1150,
+      fast: 850
     };
 
     const $ = (id) => document.getElementById(id);
@@ -1027,7 +954,9 @@
     let isDropping = false;
     let pendingWin = 0;
     let noticeTimer = null;
-    let currentAnimationFrame = null;
+    let animFrame = null;
+
+    let boardLayout = null;
 
     function formatVc(value){
       const n = Number(value ?? 0);
@@ -1175,30 +1104,61 @@
       updateButtons();
     }
 
+    function computeBoardLayout(){
+      const board = $("boardStage");
+      const width = board.clientWidth;
+      const height = board.clientHeight;
+
+      const sidePad = Math.max(26, Math.min(36, width * 0.11));
+      const topPad = 48;
+      const bottomPad = 64;
+
+      const pegGap = (width - sidePad * 2) / ROWS;
+      const rowGap = (height - topPad - bottomPad) / (ROWS - 1);
+      const centerX = width / 2;
+      const binCenterY = height - 34;
+      const binWidth = Math.max(20, Math.min(30, pegGap * 0.72));
+
+      boardLayout = {
+        width,
+        height,
+        sidePad,
+        topPad,
+        bottomPad,
+        pegGap,
+        rowGap,
+        centerX,
+        binCenterY,
+        binWidth
+      };
+    }
+
+    function slotCenterX(index){
+      return boardLayout.centerX + (2 * index - ROWS) * (boardLayout.pegGap / 2);
+    }
+
     function renderBoard(){
+      computeBoardLayout();
+
       const pegsLayer = $("pegsLayer");
       const binsLayer = $("binsLayer");
 
       pegsLayer.innerHTML = "";
       binsLayer.innerHTML = "";
 
-      const centerX = BOARD.width / 2;
-
       for (let row = 0; row < ROWS; row++) {
         const count = row + 1;
-        const y = BOARD.topPad + row * BOARD.rowGap;
-        const startX = centerX - (row * BOARD.pegGap) / 2;
+        const y = boardLayout.topPad + row * boardLayout.rowGap;
+        const startX = boardLayout.centerX - (row * boardLayout.pegGap) / 2;
 
         for (let col = 0; col < count; col++) {
           const peg = document.createElement("div");
           peg.className = "peg";
-          peg.style.left = `${startX + col * BOARD.pegGap}px`;
+          peg.style.left = `${startX + col * boardLayout.pegGap}px`;
           peg.style.top = `${y}px`;
           pegsLayer.appendChild(peg);
         }
       }
-
-      const binStartX = centerX - (ROWS * BOARD.pegGap) / 2;
 
       MULTIPLIERS.forEach((mult, index) => {
         const bin = document.createElement("div");
@@ -1206,12 +1166,23 @@
         const isMid = mult >= 1 && mult < 5;
 
         bin.className = `bin${isHot ? " hot" : ""}${isMid ? " mid" : ""}`;
-        bin.style.left = `${binStartX + index * BOARD.pegGap}px`;
+        bin.style.left = `${slotCenterX(index)}px`;
+        bin.style.width = `${boardLayout.binWidth}px`;
         bin.textContent = `${mult}x`;
         bin.dataset.index = String(index);
 
         binsLayer.appendChild(bin);
       });
+
+      resetBall();
+    }
+
+    function resetBall(){
+      const ball = $("ball");
+      ball.style.opacity = "0";
+      ball.style.left = `${boardLayout.centerX}px`;
+      ball.style.top = "24px";
+      ball.style.transform = "translate(-50%, -50%) scale(1)";
     }
 
     function highlightBin(index){
@@ -1221,13 +1192,13 @@
       setTimeout(() => bin.classList.remove("hit"), 420);
     }
 
-    function setSpeed(speed){
-      if (!SPEEDS[speed]) return;
-      selectedSpeed = speed;
+    function cycleSpeed(){
+      const currentIndex = SPEED_ORDER.indexOf(selectedSpeed);
+      const nextIndex = (currentIndex + 1) % SPEED_ORDER.length;
+      selectedSpeed = SPEED_ORDER[nextIndex];
 
-      document.querySelectorAll("#speedGrid .pill-btn").forEach((btn) => {
-        btn.classList.toggle("active", btn.dataset.speed === speed);
-      });
+      $("speedBtn").textContent = SPEED_LABELS[selectedSpeed];
+      showNotice(`Скорость: ${SPEED_NAMES[selectedSpeed]}`, "info");
     }
 
     function setBalls(count){
@@ -1262,56 +1233,59 @@
     }
 
     function buildPathForSlot(slotIndex){
-      const centerX = BOARD.width / 2;
-      const rightsNeeded = slotIndex;
-
-      const steps = [];
+      const decisions = [];
       for (let i = 0; i < ROWS; i++) {
-        steps.push(i < rightsNeeded ? 1 : 0);
+        decisions.push(i < slotIndex ? 1 : 0);
       }
 
-      const shuffledSteps = shuffle(steps);
-      const points = [{ x:centerX, y:18, type:"start" }];
+      const shuffled = shuffle(decisions);
+
+      const points = [{
+        x: boardLayout.centerX,
+        y: 24,
+        type: "start"
+      }];
 
       let rights = 0;
 
       for (let row = 0; row < ROWS; row++) {
-        const step = shuffledSteps[row];
-        rights += step;
-
-        const pegX = centerX + (2 * rights - (row + 1)) * (BOARD.pegGap / 2);
-        const pegY = BOARD.topPad + row * BOARD.rowGap;
-        const dir = step === 1 ? 1 : -1;
-
-        points.push({ x: pegX, y: pegY, type:"impact" });
+        const pegY = boardLayout.topPad + row * boardLayout.rowGap;
+        const pegX = boardLayout.centerX + (2 * rights - row) * (boardLayout.pegGap / 2);
 
         points.push({
-          x: pegX + dir * (BOARD.pegGap * 0.26),
-          y: pegY + BOARD.rowGap * 0.52,
-          type:"release"
+          x: pegX,
+          y: pegY,
+          type: "impact"
+        });
+
+        const dir = shuffled[row] === 1 ? 1 : -1;
+        rights += shuffled[row];
+
+        const releaseX = pegX + dir * boardLayout.pegGap * 0.34;
+        const releaseY = pegY + boardLayout.rowGap * 0.58;
+
+        points.push({
+          x: releaseX,
+          y: releaseY,
+          type: "release"
         });
       }
 
-      const finalStartX = centerX - (ROWS * BOARD.pegGap) / 2;
-      const finalX = finalStartX + slotIndex * BOARD.pegGap;
-
       points.push({
-        x: finalX,
-        y: BOARD.binY - 18,
-        type:"end"
+        x: slotCenterX(slotIndex),
+        y: boardLayout.binCenterY - 8,
+        type: "end"
       });
 
       return points;
     }
 
-    function lerp(a, b, t){
-      return a + (b - a) * t;
+    function easeInOutQuad(t){
+      return t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
     }
 
-    function easeInOutCubic(t){
-      return t < 0.5
-        ? 4 * t * t * t
-        : 1 - Math.pow(-2 * t + 2, 3) / 2;
+    function easeOutCubic(t){
+      return 1 - Math.pow(1 - t, 3);
     }
 
     function sleep(ms){
@@ -1321,81 +1295,87 @@
     function animateBall(slotIndex){
       return new Promise((resolve) => {
         const ball = $("ball");
-        const path = buildPathForSlot(slotIndex);
-        const duration = SPEEDS[selectedSpeed];
+        const points = buildPathForSlot(slotIndex);
+        const duration = SPEED_DURATION[selectedSpeed];
 
-        const lengths = [];
-        let total = 0;
+        const segments = [];
+        let totalLength = 0;
 
-        for (let i = 0; i < path.length - 1; i++) {
-          const dx = path[i + 1].x - path[i].x;
-          const dy = path[i + 1].y - path[i].y;
+        for (let i = 0; i < points.length - 1; i++) {
+          const dx = points[i + 1].x - points[i].x;
+          const dy = points[i + 1].y - points[i].y;
           const len = Math.hypot(dx, dy);
-          lengths.push(len);
-          total += len;
-        }
 
-        const cumulative = [0];
-        for (let i = 0; i < lengths.length; i++) {
-          cumulative.push(cumulative[i] + lengths[i]);
+          segments.push({
+            from: points[i],
+            to: points[i + 1],
+            len
+          });
+
+          totalLength += len;
         }
 
         ball.style.opacity = "1";
+
         let startTime = 0;
 
-        function frame(now){
-          if (!startTime) startTime = now;
+        function frame(ts){
+          if (!startTime) startTime = ts;
 
-          const elapsed = now - startTime;
+          const elapsed = ts - startTime;
           const progress = Math.min(1, elapsed / duration);
-          const travelled = total * progress;
+          const pathProgress = easeOutCubic(progress);
+          const travel = totalLength * pathProgress;
 
-          let seg = 0;
-          while (seg < lengths.length - 1 && travelled > cumulative[seg + 1]) {
-            seg++;
+          let passed = 0;
+          let currentSeg = segments[0];
+
+          for (let i = 0; i < segments.length; i++) {
+            if (travel <= passed + segments[i].len || i === segments.length - 1) {
+              currentSeg = segments[i];
+              break;
+            }
+            passed += segments[i].len;
           }
 
-          const segStart = cumulative[seg];
-          const segLen = lengths[seg] || 1;
-          const segT = Math.max(0, Math.min(1, (travelled - segStart) / segLen));
-          const eased = easeInOutCubic(segT);
+          const local = currentSeg.len ? (travel - passed) / currentSeg.len : 1;
+          const t = easeInOutQuad(Math.max(0, Math.min(1, local)));
 
-          const p0 = path[seg];
-          const p1 = path[seg + 1];
-
-          let x = lerp(p0.x, p1.x, eased);
-          let y = lerp(p0.y, p1.y, eased);
+          let x = currentSeg.from.x + (currentSeg.to.x - currentSeg.from.x) * t;
+          let y = currentSeg.from.y + (currentSeg.to.y - currentSeg.from.y) * t;
 
           let scaleX = 1;
           let scaleY = 1;
 
-          if (p1.type === "impact" && segT > 0.78) {
-            const crush = Math.sin(((segT - 0.78) / 0.22) * Math.PI);
-            scaleX += 0.18 * crush;
-            scaleY -= 0.14 * crush;
+          if (currentSeg.to.type === "impact" && local > 0.78) {
+            const crush = Math.sin(((local - 0.78) / 0.22) * Math.PI);
+            scaleX += 0.16 * crush;
+            scaleY -= 0.13 * crush;
           }
 
-          if (p0.type === "impact" && segT < 0.35) {
-            const spring = Math.sin((segT / 0.35) * Math.PI);
-            scaleX -= 0.06 * spring;
-            scaleY += 0.10 * spring;
+          if (currentSeg.from.type === "impact" && local < 0.28) {
+            const spring = Math.sin((local / 0.28) * Math.PI);
+            scaleX -= 0.05 * spring;
+            scaleY += 0.08 * spring;
           }
 
-          const spin = elapsed * 0.72;
-          ball.style.transform =
-            `translate(${x}px, ${y}px) translate(-50%, -50%) rotate(${spin}deg) scale(${scaleX}, ${scaleY})`;
+          ball.style.left = `${x}px`;
+          ball.style.top = `${y}px`;
+          ball.style.transform = `translate(-50%, -50%) scale(${scaleX}, ${scaleY})`;
 
           if (progress < 1) {
-            currentAnimationFrame = requestAnimationFrame(frame);
+            animFrame = requestAnimationFrame(frame);
           } else {
-            ball.style.transform =
-              `translate(${p1.x}px, ${p1.y}px) translate(-50%, -50%) rotate(${spin}deg) scale(1,1)`;
+            const end = points[points.length - 1];
+            ball.style.left = `${end.x}px`;
+            ball.style.top = `${end.y}px`;
+            ball.style.transform = "translate(-50%, -50%) scale(1)";
             resolve();
           }
         }
 
-        if (currentAnimationFrame) cancelAnimationFrame(currentAnimationFrame);
-        currentAnimationFrame = requestAnimationFrame(frame);
+        if (animFrame) cancelAnimationFrame(animFrame);
+        animFrame = requestAnimationFrame(frame);
       });
     }
 
@@ -1403,7 +1383,7 @@
       if (isDropping || pendingWin > 0) return;
 
       const bet = getBetAmount();
-      const totalCost = getTotalCost();
+      const totalCost = bet * selectedBalls;
 
       if (bet < MIN_BET) {
         showNotice(`Минимум ${MIN_BET} VC`, "lose");
@@ -1433,10 +1413,7 @@
         await animateBall(slot);
         highlightBin(slot);
 
-        if (payout > 0) {
-          totalPayout += payout;
-        }
-
+        totalPayout += payout;
         await sleep(120);
       }
 
@@ -1484,26 +1461,17 @@
 
     $("backBtn").addEventListener("click", () => goTo(FILES.games));
     $("logoBtn").addEventListener("click", () => openOverlay("channelOverlay"));
-    $("rulesBtn").addEventListener("click", () => openOverlay("rulesOverlay"));
-
     $("channelClose").addEventListener("click", () => closeOverlay("channelOverlay"));
-    $("rulesClose").addEventListener("click", () => closeOverlay("rulesOverlay"));
 
     $("channelOverlay").addEventListener("click", (e) => {
       if (e.target === $("channelOverlay")) closeOverlay("channelOverlay");
-    });
-
-    $("rulesOverlay").addEventListener("click", (e) => {
-      if (e.target === $("rulesOverlay")) closeOverlay("rulesOverlay");
     });
 
     $("goChannel").addEventListener("click", () => {
       openTelegramLinkSafe("https://t.me/vezuspubg");
     });
 
-    document.querySelectorAll("#speedGrid .pill-btn").forEach((btn) => {
-      btn.addEventListener("click", () => setSpeed(btn.dataset.speed));
-    });
+    $("speedBtn").addEventListener("click", cycleSpeed);
 
     document.querySelectorAll("#ballsGrid .pill-btn").forEach((btn) => {
       btn.addEventListener("click", () => setBalls(Number(btn.dataset.balls)));
@@ -1531,13 +1499,16 @@
     document.addEventListener("keydown", (e) => {
       if (e.key === "Escape") {
         closeOverlay("channelOverlay");
-        closeOverlay("rulesOverlay");
       }
+    });
+
+    window.addEventListener("resize", () => {
+      if (!isDropping) renderBoard();
     });
 
     window.addEventListener("load", () => {
       renderBoard();
-      setSpeed("medium");
+      $("speedBtn").textContent = SPEED_LABELS[selectedSpeed];
       setBalls(1);
       updateClaimButton();
       updateButtons();
