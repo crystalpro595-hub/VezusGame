@@ -968,7 +968,7 @@
     const PEG_ROWS = 8;
     const PEG_GAP_X = 28;
     const PEG_GAP_Y = 23;
-    const PEG_START_Y = 32;
+    const PEG_START_Y = 34;
 
     const BALL_R = 8;
     const PEG_R = 5;
@@ -1141,14 +1141,20 @@
       return 4;
     }
 
+    function clamp(val, min, max){
+      return Math.max(min, Math.min(max, val));
+    }
+
     function createBoard(){
       const board = $("board");
       document.querySelectorAll(".peg").forEach(el => el.remove());
       pegs = [];
 
+      // Верхний одиночный штырь убран:
+      // теперь первый ряд начинается с 2 штырей, чтобы шар стартовал из центра.
       for (let row = 0; row < PEG_ROWS; row++) {
-        const pegsInRow = row + 1;
-        const rowWidth = row * PEG_GAP_X;
+        const pegsInRow = row + 2; // 2..9
+        const rowWidth = (pegsInRow - 1) * PEG_GAP_X;
         const startX = BOARD_CENTER_X - rowWidth / 2;
         const y = PEG_START_Y + row * PEG_GAP_Y;
 
@@ -1221,20 +1227,19 @@
       ballState.el.style.transform = `translate(-50%, -50%) scale(${sx.toFixed(3)}, ${sy.toFixed(3)})`;
     }
 
-    function clamp(val, min, max){
-      return Math.max(min, Math.min(max, val));
-    }
-
     function settleBall(ballState, forced = false){
       const targetX = bucketCenter(ballState.targetIndex);
 
       if (!forced) {
-        ballState.vx += (targetX - ballState.x) * 0.0052;
-        ballState.vx *= 0.956;
+        const dx = targetX - ballState.x;
 
-        if (ballState.y > SETTLE_LINE_Y - 8) {
-          ballState.x += (targetX - ballState.x) * 0.20;
-          ballState.vy *= 0.78;
+        // Более мягкое выравнивание внизу, без резкого рывка
+        ballState.vx += clamp(dx * 0.0030, -0.09, 0.09);
+        ballState.vx *= 0.970;
+
+        if (ballState.y > SETTLE_LINE_Y - 7) {
+          ballState.x += dx * 0.12;
+          ballState.vy *= 0.84;
         }
       }
 
@@ -1285,30 +1290,31 @@
 
               ball.vy += 0.225 * step;
 
+              // Очень мягкая наводка, только после середины поля
               let guide = 0;
-              if (ball.y > 78)  guide += (targetX - ball.x) * 0.00007;
-              if (ball.y > 132) guide += (targetX - ball.x) * 0.00013;
-              if (ball.y > 182) guide += (targetX - ball.x) * 0.00024;
+              const dxToTarget = targetX - ball.x;
 
-              guide = clamp(guide, -0.08, 0.08);
+              if (ball.y > 96)  guide += clamp(dxToTarget * 0.00005, -0.016, 0.016);
+              if (ball.y > 148) guide += clamp(dxToTarget * 0.00009, -0.026, 0.026);
+              if (ball.y > 198) guide += clamp(dxToTarget * 0.00016, -0.040, 0.040);
 
               ball.vx += guide * step;
-              ball.vx += Math.sin((now + ball.phase) * 0.004) * 0.0018 * step;
+              ball.vx += Math.sin((now + ball.phase) * 0.0038) * 0.0015 * step;
 
               ball.x += ball.vx * step;
               ball.y += ball.vy * step;
 
-              ball.vx *= 0.9975;
+              ball.vx *= 0.9978;
               ball.vy *= 0.999;
 
               if (ball.x - BALL_R < WALL_LEFT) {
                 ball.x = WALL_LEFT + BALL_R;
-                ball.vx = Math.abs(ball.vx) * 0.90 + 0.04;
+                ball.vx = Math.abs(ball.vx) * 0.78 + 0.03;
               }
 
               if (ball.x + BALL_R > WALL_RIGHT) {
                 ball.x = WALL_RIGHT - BALL_R;
-                ball.vx = -Math.abs(ball.vx) * 0.90 - 0.04;
+                ball.vx = -Math.abs(ball.vx) * 0.78 - 0.03;
               }
 
               for (const peg of pegs) {
@@ -1336,8 +1342,9 @@
                   ball.vx -= (1 + restitution) * rel * nx;
                   ball.vy -= (1 + restitution) * rel * ny;
 
-                  const toward = Math.sign(targetX - ball.x);
-                  const sidePush = (Math.random() - 0.5) * 0.09 + toward * 0.018;
+                  // Лёгкий сдвиг в сторону цели, но без сильного "засоса"
+                  const toward = Math.sign(targetX - ball.x) * 0.010;
+                  const sidePush = (Math.random() - 0.5) * 0.070 + toward;
 
                   ball.vx += sidePush;
 
@@ -1354,6 +1361,7 @@
               }
             }
 
+            // столкновения шаров друг с другом
             for (let i = 0; i < ballStates.length; i++) {
               const a = ballStates[i];
               if (a.settled) continue;
@@ -1466,8 +1474,9 @@
       const ballStates = [];
 
       for (let i = 0; i < selectedBalls; i++) {
-        const spread = (i - (selectedBalls - 1) / 2) * 14;
-        const randomStart = (Math.random() - 0.5) * 46;
+        // Старт почти из центра, без сильного разлёта в стороны
+        const spread = (i - (selectedBalls - 1) / 2) * 10;
+        const randomStart = (Math.random() - 0.5) * 10;
         const startX = clamp(
           BOARD_CENTER_X + spread + randomStart,
           WALL_LEFT + BALL_R + 4,
@@ -1480,8 +1489,8 @@
           el: ballEl,
           x: startX,
           y: 18,
-          vx: (Math.random() - 0.5) * 0.65,
-          vy: 0.09 + Math.random() * 0.05,
+          vx: (Math.random() - 0.5) * 0.16 + spread * 0.008,
+          vy: 0.09 + Math.random() * 0.04,
           settled: false,
           bucketIndex: null,
           targetIndex: chooseTargetBucket(),
