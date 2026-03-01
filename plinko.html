@@ -257,6 +257,7 @@
         radial-gradient(280px 140px at 50% 0%, rgba(42,171,238,.08), transparent 60%),
         linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,0));
       pointer-events:none;
+      z-index:0;
     }
 
     .rail{
@@ -285,8 +286,7 @@
         0 0 0 2px rgba(255,255,255,.04),
         0 2px 8px rgba(0,0,0,.18);
       transform:translate(-50%, -50%);
-      z-index:6;
-      pointer-events:none;
+      z-index:4;
     }
 
     .slot-divider{
@@ -297,15 +297,15 @@
       background: linear-gradient(180deg, rgba(255,255,255,.18), rgba(255,255,255,.04));
       bottom:44px;
       transform:translateX(-50%);
-      z-index:6;
+      z-index:4;
       opacity:.8;
-      pointer-events:none;
     }
 
+    /* ВАЖНО: шарики теперь ПОД штырями */
     .balls-layer{
       position:absolute;
       inset:0;
-      z-index:4;
+      z-index:2;
       pointer-events:none;
     }
 
@@ -318,8 +318,8 @@
         radial-gradient(circle at 30% 30%, #ffffff 0%, #b8ecff 28%, #46c6ff 62%, #0b74a6 100%);
       box-shadow:
         inset 0 1px 2px rgba(255,255,255,.45),
-        0 4px 12px rgba(42,171,238,.28),
-        0 0 16px rgba(64,200,255,.18);
+        0 3px 10px rgba(42,171,238,.24),
+        0 0 10px rgba(64,200,255,.14);
       transform:translate(-50%, -50%);
       will-change:left, top, transform;
     }
@@ -351,7 +351,7 @@
       display:grid;
       grid-template-columns:repeat(9, minmax(0,1fr));
       gap:5px;
-      z-index:3;
+      z-index:5;
     }
 
     .bucket{
@@ -482,18 +482,21 @@
       border:none;
       border-radius:16px;
       cursor:pointer;
-      background: rgba(255,255,255,.08);
-      border:1px solid rgba(255,255,255,.08);
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.12), rgba(255,255,255,.06));
+      border:1px solid rgba(255,255,255,.10);
       color:#fff;
       display:grid;
       place-items:center;
-      box-shadow: inset 0 1px 0 rgba(255,255,255,.04);
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.06),
+        0 8px 14px rgba(0,0,0,.12);
       padding:0;
     }
 
     .bet-toggle svg{
-      width:22px;
-      height:22px;
+      width:24px;
+      height:24px;
       display:block;
     }
 
@@ -787,6 +790,7 @@
       .bet-row{ grid-template-columns:minmax(0,1fr) 44px; }
       .bet-input{ height:44px; font-size:15px; }
       .bet-toggle{ width:44px; height:44px; }
+      .bet-toggle svg{ width:22px; height:22px; }
 
       .play-btn, .claim-btn{ height:48px; font-size:14px; }
       .count-btn{ height:38px; }
@@ -869,15 +873,20 @@
 
             <button class="bet-toggle" id="betToggleBtn" type="button" aria-label="Быстрая ставка">
               <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                <circle cx="12" cy="12" r="8.5" fill="url(#g1)" stroke="rgba(255,255,255,.24)" />
-                <circle cx="12" cy="12" r="5.2" fill="rgba(255,255,255,.14)" />
                 <defs>
-                  <linearGradient id="g1" x1="4" y1="4" x2="20" y2="20">
-                    <stop offset="0" stop-color="#FCD34D"/>
-                    <stop offset="0.55" stop-color="#F59E0B"/>
+                  <linearGradient id="quickBetGrad" x1="4" y1="4" x2="20" y2="20">
+                    <stop offset="0" stop-color="#FDE68A"/>
+                    <stop offset="0.52" stop-color="#F59E0B"/>
                     <stop offset="1" stop-color="#D97706"/>
                   </linearGradient>
                 </defs>
+
+                <ellipse cx="10" cy="16.5" rx="5.3" ry="2.6" fill="url(#quickBetGrad)" stroke="rgba(255,255,255,.22)" />
+                <ellipse cx="10" cy="13.1" rx="5.3" ry="2.6" fill="url(#quickBetGrad)" stroke="rgba(255,255,255,.22)" />
+                <ellipse cx="10" cy="9.7" rx="5.3" ry="2.6" fill="url(#quickBetGrad)" stroke="rgba(255,255,255,.22)" />
+
+                <circle cx="18" cy="8" r="4.1" fill="url(#quickBetGrad)" stroke="rgba(255,255,255,.24)" />
+                <path d="M18 6.2v3.6M16.2 8h3.6" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/>
               </svg>
             </button>
           </div>
@@ -935,8 +944,10 @@
       games: "games.html"
     };
 
+    // 10x и 5x ближе к центру, но не в самом центре
     const MULTIPLIERS = [0.2, 0.4, 5, 10, 2, 10, 5, 0.4, 0.2];
 
+    // Частые низкие, редкие высокие
     const TARGET_WEIGHTS = [
       0.21,
       0.24,
@@ -1145,23 +1156,15 @@
     }
 
     function buildDirectionsForBucket(bucketIndex){
-      const rights = clamp(bucketIndex, 0, PEG_ROWS);
-      const dirs = [
-        ...new Array(rights).fill(1),
-        ...new Array(PEG_ROWS - rights).fill(-1)
+      const finalOffset = (bucketIndex - 4) * 2;
+      const plusCount = (PEG_ROWS + finalOffset) / 2;
+
+      let dirs = [
+        ...new Array(plusCount).fill(1),
+        ...new Array(PEG_ROWS - plusCount).fill(-1)
       ];
+
       return shuffle(dirs);
-    }
-
-    function getGapCenterX(row, gapIndex){
-      // row 0 -> 2 штыря -> 1 промежуток
-      // row 1 -> 3 штыря -> 2 промежутка
-      // ...
-      const pegsInRow = row + 2;
-      const rowWidth = (pegsInRow - 1) * PEG_GAP_X;
-      const startPegX = BOARD_CENTER_X - rowWidth / 2;
-
-      return startPegX + (gapIndex + 0.5) * PEG_GAP_X;
     }
 
     function createBoard(){
@@ -1169,8 +1172,9 @@
 
       board.querySelectorAll(".peg, .slot-divider").forEach(el => el.remove());
 
+      // Первый ряд из 2 штырей — старт с центра
       for (let row = 0; row < PEG_ROWS; row++) {
-        const pegsInRow = row + 2;
+        const pegsInRow = row + 2; // 2..9
         const rowWidth = (pegsInRow - 1) * PEG_GAP_X;
         const startX = BOARD_CENTER_X - rowWidth / 2;
         const y = PEG_START_Y + row * PEG_GAP_Y;
@@ -1242,7 +1246,8 @@
       const dirs = buildDirectionsForBucket(bucketIndex);
       const points = [];
 
-      let gapIndex = 0;
+      let lane = 0;
+      let prevX = startX;
 
       points.push({
         x: startX,
@@ -1251,62 +1256,62 @@
         wobble: 0
       });
 
-      // мягкий вход в первый центральный промежуток
-      points.push({
-        x: getGapCenterX(0, 0),
-        y: PEG_START_Y - 12,
-        arc: 0.2,
-        wobble: (Math.random() - 0.5) * 0.3
-      });
-
       for (let row = 0; row < PEG_ROWS; row++) {
-        const rowY = PEG_START_Y + row * PEG_GAP_Y;
-        const currentGapX = getGapCenterX(row, gapIndex);
-
-        points.push({
-          x: currentGapX,
-          y: rowY - 8,
-          arc: 0.2,
-          wobble: (Math.random() - 0.5) * 0.25
-        });
-
         const dir = dirs[row];
-        const nextGapIndex = gapIndex + (dir > 0 ? 1 : 0);
+        const rowY = PEG_START_Y + row * PEG_GAP_Y;
 
-        const nextGuideX = row < PEG_ROWS - 1
-          ? getGapCenterX(row + 1, nextGapIndex)
-          : bucketCenter(nextGapIndex);
+        const nextLane = lane + dir;
+        const laneX = BOARD_CENTER_X + nextLane * (SLOT_W / 2);
+        const pinchX = BOARD_CENTER_X + ((lane + nextLane) / 2) * (SLOT_W / 2);
+
+        const wobble = (Math.random() - 0.5) * 0.9;
+        const side = dir * (0.9 + Math.random() * 0.45);
 
         points.push({
-          x: (currentGapX + nextGuideX) / 2,
-          y: rowY + 2,
-          arc: 0.45,
-          wobble: (Math.random() - 0.5) * 0.18
+          x: pinchX - side,
+          y: rowY - 5,
+          arc: 1.4,
+          wobble
         });
 
         points.push({
-          x: nextGuideX,
-          y: rowY + 13,
-          arc: 0.18,
-          wobble: (Math.random() - 0.5) * 0.16
+          x: pinchX + side,
+          y: rowY + 4,
+          arc: 2.8,
+          wobble: -wobble * 0.45
         });
 
-        gapIndex = nextGapIndex;
+        points.push({
+          x: laneX + (Math.random() - 0.5) * 0.7,
+          y: rowY + 14,
+          arc: 0.7,
+          wobble: (Math.random() - 0.5) * 0.5
+        });
+
+        lane = nextLane;
+        prevX = laneX;
       }
 
-      const finalX = bucketCenter(gapIndex);
+      const finalX = bucketCenter(bucketIndex);
 
       points.push({
-        x: finalX,
+        x: prevX + (finalX - prevX) * 0.38,
         y: SLOT_GUIDE_Y,
-        arc: 0.16,
+        arc: 0.9,
+        wobble: (Math.random() - 0.5) * 0.25
+      });
+
+      points.push({
+        x: prevX + (finalX - prevX) * 0.68,
+        y: SLOT_GUIDE_Y + 8,
+        arc: 0.45,
         wobble: 0
       });
 
       points.push({
         x: finalX,
         y: SLOT_FINAL_Y + 2,
-        arc: 0.08,
+        arc: 0.18,
         wobble: 0
       });
 
@@ -1345,7 +1350,7 @@
           const dy = end.y - start.y;
           const dist = Math.hypot(dx, dy);
 
-          const duration = Math.max(62, (dist * 9.3) / speedScale);
+          const duration = Math.max(64, (dist * 9.7) / speedScale);
           const startTime = performance.now();
 
           function frame(now){
@@ -1368,10 +1373,10 @@
               x += Math.sin(t * Math.PI) * wobble;
             }
 
-            const speedFeel = Math.min(0.06, (Math.abs(dy) + Math.abs(dx)) * 0.0015);
+            const speedFeel = Math.min(0.08, (Math.abs(dy) + Math.abs(dx)) * 0.0019);
             const compression = Math.sin(t * Math.PI) * speedFeel;
-            const sx = 1 + compression * 0.12;
-            const sy = 1 - compression * 0.22;
+            const sx = 1 + compression * 0.18;
+            const sy = 1 - compression * 0.30;
 
             ball.style.left = `${x}px`;
             ball.style.top = `${y}px`;
