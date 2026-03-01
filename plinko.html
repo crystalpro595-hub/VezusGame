@@ -285,13 +285,43 @@
       background: radial-gradient(circle, rgba(42,171,238,.10), transparent 70%);
       filter: blur(18px);
       pointer-events:none;
+      z-index:1;
     }
 
-    .pegs-layer,
     .bins-layer{
       position:absolute;
       inset:0;
       pointer-events:none;
+      z-index:2;
+    }
+
+    .ball{
+      position:absolute;
+      left:50%;
+      top:26px;
+      width:16px;
+      height:16px;
+      margin-left:-8px;
+      margin-top:-8px;
+      border-radius:50%;
+      background:
+        radial-gradient(circle at 30% 28%, #ffffff 0%, #d7efff 20%, #7dd3fc 42%, #2AABEE 68%, #1d4ed8 100%);
+      border:1px solid rgba(255,255,255,.28);
+      box-shadow:
+        0 0 12px rgba(42,171,238,.16),
+        0 8px 14px rgba(0,0,0,.16),
+        inset 0 1px 0 rgba(255,255,255,.55);
+      transform:translate(-50%, -50%);
+      opacity:0;
+      z-index:3;
+      will-change:left, top, transform, opacity;
+    }
+
+    .pegs-layer{
+      position:absolute;
+      inset:0;
+      pointer-events:none;
+      z-index:4;
     }
 
     .peg{
@@ -355,28 +385,6 @@
         inset 0 1px 0 rgba(255,255,255,.08),
         0 12px 20px rgba(0,0,0,.20);
       filter:brightness(1.14);
-    }
-
-    .ball{
-      position:absolute;
-      left:50%;
-      top:26px;
-      width:18px;
-      height:18px;
-      margin-left:-9px;
-      margin-top:-9px;
-      border-radius:50%;
-      background:
-        radial-gradient(circle at 30% 28%, #ffffff 0%, #d7efff 20%, #7dd3fc 42%, #2AABEE 68%, #1d4ed8 100%);
-      border:1px solid rgba(255,255,255,.28);
-      box-shadow:
-        0 0 12px rgba(42,171,238,.16),
-        0 8px 14px rgba(0,0,0,.16),
-        inset 0 1px 0 rgba(255,255,255,.55);
-      transform:translate(-50%, -50%);
-      opacity:0;
-      z-index:5;
-      will-change:left, top, transform, opacity;
     }
 
     .action-card,
@@ -829,9 +837,9 @@
         <div class="board-wrap">
           <div class="board-stage" id="boardStage">
             <div class="board-glow"></div>
-            <div class="pegs-layer" id="pegsLayer"></div>
             <div class="bins-layer" id="binsLayer"></div>
             <div class="ball" id="ball"></div>
+            <div class="pegs-layer" id="pegsLayer"></div>
           </div>
         </div>
       </div>
@@ -939,9 +947,9 @@
       fast: "Быстро"
     };
     const SPEED_DURATION = {
-      slow: 1800,
-      medium: 1300,
-      fast: 950
+      slow: 1900,
+      medium: 1400,
+      fast: 1050
     };
 
     const $ = (id) => document.getElementById(id);
@@ -1043,17 +1051,9 @@
       return Math.floor(amount);
     }
 
-    function getTotalCost(){
-      return getBetAmount() * selectedBalls;
-    }
-
     function updateButtons(){
       const bet = getBetAmount();
-
-      const canPlay =
-        !isDropping &&
-        pendingWin <= 0 &&
-        bet >= MIN_BET;
+      const canPlay = !isDropping && pendingWin <= 0 && bet >= MIN_BET;
 
       $("playBtn").disabled = !canPlay;
       $("claimBtn").disabled = isDropping || pendingWin <= 0;
@@ -1106,15 +1106,12 @@
       const width = board.clientWidth;
       const height = board.clientHeight;
 
-      const sidePad = Math.max(26, Math.min(34, width * 0.11));
-      const topPad = 46;
-      const bottomPad = 64;
+      const sidePad = Math.max(28, Math.min(36, width * 0.12));
+      const topPad = 54;
+      const bottomPad = 72;
 
       const pegGap = (width - sidePad * 2) / ROWS;
       const rowGap = (height - topPad - bottomPad) / (ROWS - 1);
-      const centerX = width / 2;
-      const binCenterY = height - 34;
-      const binWidth = Math.max(20, Math.min(28, pegGap * 0.72));
 
       boardLayout = {
         width,
@@ -1124,9 +1121,9 @@
         bottomPad,
         pegGap,
         rowGap,
-        centerX,
-        binCenterY,
-        binWidth,
+        centerX: width / 2,
+        binCenterY: height - 34,
+        binWidth: Math.max(20, Math.min(28, pegGap * 0.72)),
         pegRadius: 5
       };
     }
@@ -1229,94 +1226,123 @@
       return a;
     }
 
-    function buildBounceSegments(slotIndex){
+    function pegXFor(row, rightsBefore){
+      return boardLayout.centerX - (row * boardLayout.pegGap) / 2 + rightsBefore * boardLayout.pegGap;
+    }
+
+    function buildPathSegments(slotIndex){
       const rightsNeeded = slotIndex;
-      const decisions = [];
+      const steps = [];
 
       for (let i = 0; i < ROWS; i++) {
-        decisions.push(i < rightsNeeded ? 1 : 0);
+        steps.push(i < rightsNeeded ? 1 : 0);
       }
 
-      const randomOrder = shuffle(decisions);
-
+      const randomSteps = shuffle(steps);
       const segments = [];
-      let currentX = boardLayout.centerX;
-      let currentY = 24;
+
       let rights = 0;
+      let current = {
+        x: boardLayout.centerX,
+        y: 26
+      };
 
       for (let row = 0; row < ROWS; row++) {
         const pegY = boardLayout.topPad + row * boardLayout.rowGap;
-        const pegX = boardLayout.centerX + (2 * rights - row) * (boardLayout.pegGap / 2);
+        const pegX = pegXFor(row, rights);
 
-        const goRight = randomOrder[row] === 1;
+        const goRight = randomSteps[row] === 1;
         const dir = goRight ? 1 : -1;
+        const nextRights = rights + (goRight ? 1 : 0);
 
-        const tangentX = pegX + dir * (boardLayout.pegRadius * 2.0);
-        const tangentY = pegY - (boardLayout.pegRadius * 1.1);
-
-        const exitX = pegX + dir * (boardLayout.pegGap * 0.42);
-        const exitY = pegY + (boardLayout.rowGap * 0.48);
-
-        const control1 = {
-          x: pegX + dir * (boardLayout.pegGap * 0.08),
-          y: pegY - (boardLayout.rowGap * 0.22)
+        const sidePoint = {
+          x: pegX + dir * (boardLayout.pegGap * 0.36),
+          y: pegY
         };
 
-        const control2 = {
-          x: pegX + dir * (boardLayout.pegGap * 0.52),
-          y: pegY + (boardLayout.rowGap * 0.08)
+        const exitPoint = {
+          x: boardLayout.centerX - ((row + 1) * boardLayout.pegGap) / 2 + nextRights * boardLayout.pegGap,
+          y: pegY + boardLayout.rowGap * 0.46
         };
 
         segments.push({
-          type: "curve",
-          p0: { x: currentX, y: currentY },
-          p1: control1,
-          p2: { x: tangentX, y: tangentY }
+          type: "cubic",
+          p0: { ...current },
+          c1: {
+            x: current.x,
+            y: current.y + boardLayout.rowGap * 0.18
+          },
+          c2: {
+            x: pegX + dir * (boardLayout.pegGap * 0.24),
+            y: pegY - boardLayout.rowGap * 0.16
+          },
+          p1: sidePoint
         });
 
         segments.push({
-          type: "curve",
-          p0: { x: tangentX, y: tangentY },
-          p1: control2,
-          p2: { x: exitX, y: exitY }
+          type: "cubic",
+          p0: sidePoint,
+          c1: {
+            x: pegX + dir * (boardLayout.pegGap * 0.52),
+            y: pegY + boardLayout.rowGap * 0.10
+          },
+          c2: {
+            x: exitPoint.x,
+            y: pegY + boardLayout.rowGap * 0.18
+          },
+          p1: exitPoint
         });
 
-        currentX = exitX;
-        currentY = exitY;
-        rights += goRight ? 1 : 0;
+        current = exitPoint;
+        rights = nextRights;
       }
 
       const targetX = slotCenterX(slotIndex);
       const targetY = boardLayout.binCenterY - 8;
 
       segments.push({
-        type: "curve",
-        p0: { x: currentX, y: currentY },
-        p1: {
-          x: currentX + (targetX - currentX) * 0.55,
-          y: currentY + 22
+        type: "cubic",
+        p0: { ...current },
+        c1: {
+          x: current.x + (targetX - current.x) * 0.45,
+          y: current.y + 20
         },
-        p2: { x: targetX, y: targetY }
+        c2: {
+          x: targetX,
+          y: targetY - 14
+        },
+        p1: {
+          x: targetX,
+          y: targetY
+        }
       });
 
       return segments;
     }
 
-    function quadPoint(p0, p1, p2, t){
+    function cubicPoint(p0, c1, c2, p1, t){
       const inv = 1 - t;
       return {
-        x: inv * inv * p0.x + 2 * inv * t * p1.x + t * t * p2.x,
-        y: inv * inv * p0.y + 2 * inv * t * p1.y + t * t * p2.y
+        x:
+          inv * inv * inv * p0.x +
+          3 * inv * inv * t * c1.x +
+          3 * inv * t * t * c2.x +
+          t * t * t * p1.x,
+        y:
+          inv * inv * inv * p0.y +
+          3 * inv * inv * t * c1.y +
+          3 * inv * t * t * c2.y +
+          t * t * t * p1.y
       };
     }
 
-    function curveLength(seg){
+    function cubicLength(seg){
       let len = 0;
       let prev = seg.p0;
 
-      for (let i = 1; i <= 18; i++) {
-        const t = i / 18;
-        const p = quadPoint(seg.p0, seg.p1, seg.p2, t);
+      for (let i = 1; i <= 26; i++) {
+        const t = i / 26;
+        const p = cubicPoint(seg.p0, seg.c1, seg.c2, seg.p1, t);
         len += Math.hypot(p.x - prev.x, p.y - prev.y);
         prev = p;
       }
@@ -1327,16 +1353,15 @@
     function animateBall(slotIndex){
       return new Promise((resolve) => {
         const ball = $("ball");
-        const segments = buildBounceSegments(slotIndex).map((seg) => ({
+        const segments = buildPathSegments(slotIndex).map((seg) => ({
           ...seg,
-          len: curveLength(seg)
+          len: cubicLength(seg)
         }));
 
         const totalLength = segments.reduce((sum, seg) => sum + seg.len, 0);
         const duration = SPEED_DURATION[selectedSpeed];
 
         ball.style.opacity = "1";
-
         let startTime = 0;
 
         function frame(ts){
@@ -1344,7 +1369,9 @@
 
           const elapsed = ts - startTime;
           const progress = Math.min(1, elapsed / duration);
-          const travel = totalLength * Math.pow(progress, 1.06);
+
+          const eased = 1 - Math.pow(1 - progress, 1.65);
+          const travel = totalLength * eased;
 
           let passed = 0;
           let currentSeg = segments[0];
@@ -1360,15 +1387,15 @@
           const localRaw = currentSeg.len ? (travel - passed) / currentSeg.len : 1;
           const local = Math.max(0, Math.min(1, localRaw));
 
-          const pos = quadPoint(currentSeg.p0, currentSeg.p1, currentSeg.p2, local);
+          const pos = cubicPoint(currentSeg.p0, currentSeg.c1, currentSeg.c2, currentSeg.p1, local);
 
           let scaleX = 1;
           let scaleY = 1;
 
-          if (local > 0.72 && local < 0.98) {
-            const crush = Math.sin(((local - 0.72) / 0.26) * Math.PI);
-            scaleX += 0.12 * crush;
-            scaleY -= 0.10 * crush;
+          if (local > 0.82 && local < 1) {
+            const crush = Math.sin(((local - 0.82) / 0.18) * Math.PI);
+            scaleX += 0.10 * crush;
+            scaleY -= 0.08 * crush;
           }
 
           ball.style.left = `${pos.x}px`;
@@ -1378,7 +1405,7 @@
           if (progress < 1) {
             animFrame = requestAnimationFrame(frame);
           } else {
-            const end = currentSeg.p2;
+            const end = currentSeg.p1;
             ball.style.left = `${end.x}px`;
             ball.style.top = `${end.y}px`;
             ball.style.transform = "translate(-50%, -50%) scale(1)";
@@ -1430,7 +1457,7 @@
         highlightBin(slot);
 
         totalPayout += payout;
-        await sleep(120);
+        await sleep(130);
       }
 
       isDropping = false;
