@@ -28,8 +28,6 @@
       --tg2:#229ED9;
       --green1:#22c55e;
       --green2:#16a34a;
-      --red1:#ef4444;
-      --red2:#dc2626;
     }
 
     *{
@@ -140,9 +138,7 @@
     }
 
     .icon-btn:active,
-    .speed-btn:active{
-      transform:scale(.98);
-    }
+    .speed-btn:active{ transform:scale(.98); }
 
     .balance-mini{
       width:100%;
@@ -251,7 +247,7 @@
     }
 
     .board-card{
-      padding:14px 14px 12px;
+      padding:14px 12px 12px;
     }
 
     .board-wrap{
@@ -262,14 +258,14 @@
 
     .board-stage{
       position:relative;
-      width:min(100%, 300px);
-      height:350px;
+      width:min(100%, 340px);
+      height:410px;
       overflow:hidden;
-      border-radius:22px;
+      border-radius:24px;
       background:
-        radial-gradient(circle at 50% 0%, rgba(42,171,238,.10), transparent 40%),
+        radial-gradient(circle at 50% 0%, rgba(42,171,238,.11), transparent 42%),
         linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.015)),
-        rgba(4, 10, 22, .74);
+        rgba(4, 10, 22, .78);
       border:1px solid rgba(255,255,255,.05);
       box-shadow:
         inset 0 1px 0 rgba(255,255,255,.03),
@@ -279,7 +275,7 @@
     .board-glow{
       position:absolute;
       inset:auto 50% 18px 50%;
-      width:190px;
+      width:210px;
       height:96px;
       transform:translateX(-50%);
       background: radial-gradient(circle, rgba(42,171,238,.10), transparent 70%);
@@ -287,6 +283,25 @@
       pointer-events:none;
       z-index:1;
     }
+
+    .side-rail{
+      position:absolute;
+      top:26px;
+      bottom:62px;
+      width:10px;
+      border-radius:999px;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.15), rgba(255,255,255,.03)),
+        rgba(255,255,255,.04);
+      border:1px solid rgba(255,255,255,.06);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.05);
+      z-index:1;
+      pointer-events:none;
+      opacity:.8;
+    }
+
+    .side-rail.left{ left:14px; }
+    .side-rail.right{ right:14px; }
 
     .bins-layer{
       position:absolute;
@@ -299,10 +314,10 @@
       position:absolute;
       left:50%;
       top:26px;
-      width:16px;
-      height:16px;
-      margin-left:-8px;
-      margin-top:-8px;
+      width:14px;
+      height:14px;
+      margin-left:-7px;
+      margin-top:-7px;
       border-radius:50%;
       background:
         radial-gradient(circle at 30% 28%, #ffffff 0%, #d7efff 20%, #7dd3fc 42%, #2AABEE 68%, #1d4ed8 100%);
@@ -326,12 +341,12 @@
 
     .peg{
       position:absolute;
-      width:10px;
-      height:10px;
+      width:12px;
+      height:12px;
       border-radius:50%;
       transform:translate(-50%, -50%);
       background:
-        radial-gradient(circle at 32% 28%, rgba(255,255,255,.95), rgba(210,228,255,.72) 35%, rgba(116,148,190,.48) 60%, rgba(28,42,70,.18) 100%);
+        radial-gradient(circle at 32% 28%, rgba(255,255,255,.95), rgba(210,228,255,.74) 35%, rgba(116,148,190,.50) 60%, rgba(28,42,70,.20) 100%);
       border:1px solid rgba(255,255,255,.18);
       box-shadow:
         0 0 8px rgba(42,171,238,.08),
@@ -343,7 +358,7 @@
       position:absolute;
       bottom:8px;
       transform:translateX(-50%);
-      height:48px;
+      height:50px;
       border-radius:12px 12px 14px 14px;
       display:flex;
       align-items:flex-end;
@@ -555,9 +570,7 @@
     }
 
     .play-btn:active,
-    .claim-btn:active{
-      transform:scale(.985);
-    }
+    .claim-btn:active{ transform:scale(.985); }
 
     .play-btn:disabled,
     .claim-btn:disabled{
@@ -783,7 +796,7 @@
       .logo-btn{ width:46px; height:46px; }
       .balance-mini{ height:38px; }
       .bal-amount{ min-width:74px; height:24px; font-size:12px; }
-      .board-stage{ height:330px; width:min(100%, 286px); }
+      .board-stage{ height:380px; width:min(100%, 306px); }
       .mode-grid{ grid-template-columns:1fr; }
       .quick-bets{ grid-template-columns:repeat(3, minmax(0,1fr)); }
       .play-btn, .claim-btn{ height:50px; font-size:14px; }
@@ -837,6 +850,8 @@
         <div class="board-wrap">
           <div class="board-stage" id="boardStage">
             <div class="board-glow"></div>
+            <div class="side-rail left"></div>
+            <div class="side-rail right"></div>
             <div class="bins-layer" id="binsLayer"></div>
             <div class="ball" id="ball"></div>
             <div class="pegs-layer" id="pegsLayer"></div>
@@ -936,21 +951,9 @@
     const SLOT_WEIGHTS = [24, 20, 15, 10, 2, 10, 15, 20, 24];
 
     const SPEED_ORDER = ["slow", "medium", "fast"];
-    const SPEED_LABELS = {
-      slow: "›",
-      medium: "››",
-      fast: "›››"
-    };
-    const SPEED_NAMES = {
-      slow: "Медленно",
-      medium: "Средне",
-      fast: "Быстро"
-    };
-    const SPEED_DURATION = {
-      slow: 1900,
-      medium: 1400,
-      fast: 1050
-    };
+    const SPEED_LABELS = { slow: "›", medium: "››", fast: "›››" };
+    const SPEED_NAMES = { slow: "Медленно", medium: "Средне", fast: "Быстро" };
+    const SPEED_DURATION = { slow: 2050, medium: 1550, fast: 1180 };
 
     const $ = (id) => document.getElementById(id);
 
@@ -1106,9 +1109,9 @@
       const width = board.clientWidth;
       const height = board.clientHeight;
 
-      const sidePad = Math.max(28, Math.min(36, width * 0.12));
-      const topPad = 54;
-      const bottomPad = 72;
+      const sidePad = Math.max(50, Math.min(56, width * 0.17));
+      const topPad = 64;
+      const bottomPad = 84;
 
       const pegGap = (width - sidePad * 2) / ROWS;
       const rowGap = (height - topPad - bottomPad) / (ROWS - 1);
@@ -1122,9 +1125,10 @@
         pegGap,
         rowGap,
         centerX: width / 2,
-        binCenterY: height - 34,
-        binWidth: Math.max(20, Math.min(28, pegGap * 0.72)),
-        pegRadius: 5
+        binCenterY: height - 36,
+        binWidth: Math.max(20, Math.min(28, pegGap * 0.74)),
+        pegRadius: 6,
+        ballRadius: 7
       };
     }
 
@@ -1176,7 +1180,7 @@
       const ball = $("ball");
       ball.style.opacity = "0";
       ball.style.left = `${boardLayout.centerX}px`;
-      ball.style.top = "24px";
+      ball.style.top = "26px";
       ball.style.transform = "translate(-50%, -50%) scale(1)";
     }
 
@@ -1242,10 +1246,7 @@
       const segments = [];
 
       let rights = 0;
-      let current = {
-        x: boardLayout.centerX,
-        y: 26
-      };
+      let current = { x: boardLayout.centerX, y: 26 };
 
       for (let row = 0; row < ROWS; row++) {
         const pegY = boardLayout.topPad + row * boardLayout.rowGap;
@@ -1255,45 +1256,84 @@
         const dir = goRight ? 1 : -1;
         const nextRights = rights + (goRight ? 1 : 0);
 
-        const sidePoint = {
-          x: pegX + dir * (boardLayout.pegGap * 0.36),
-          y: pegY
+        const nextLaneX =
+          boardLayout.centerX -
+          ((row + 1) * boardLayout.pegGap) / 2 +
+          nextRights * boardLayout.pegGap;
+
+        const entry = {
+          x: pegX + dir * (boardLayout.pegGap * 0.06),
+          y: pegY - boardLayout.rowGap * 0.26
         };
 
-        const exitPoint = {
-          x: boardLayout.centerX - ((row + 1) * boardLayout.pegGap) / 2 + nextRights * boardLayout.pegGap,
-          y: pegY + boardLayout.rowGap * 0.46
+        const shoulder = {
+          x: pegX + dir * (boardLayout.pegGap * 0.34),
+          y: pegY - boardLayout.rowGap * 0.02
+        };
+
+        const wrap = {
+          x: pegX + dir * (boardLayout.pegGap * 0.58),
+          y: pegY + boardLayout.rowGap * 0.16
+        };
+
+        const exit = {
+          x: nextLaneX,
+          y: pegY + boardLayout.rowGap * 0.48
         };
 
         segments.push({
-          type: "cubic",
           p0: { ...current },
           c1: {
             x: current.x,
-            y: current.y + boardLayout.rowGap * 0.18
+            y: current.y + boardLayout.rowGap * 0.15
           },
           c2: {
-            x: pegX + dir * (boardLayout.pegGap * 0.24),
-            y: pegY - boardLayout.rowGap * 0.16
+            x: entry.x - dir * (boardLayout.pegGap * 0.10),
+            y: entry.y - boardLayout.rowGap * 0.06
           },
-          p1: sidePoint
+          p1: entry
         });
 
         segments.push({
-          type: "cubic",
-          p0: sidePoint,
+          p0: entry,
           c1: {
-            x: pegX + dir * (boardLayout.pegGap * 0.52),
-            y: pegY + boardLayout.rowGap * 0.10
+            x: entry.x + dir * (boardLayout.pegGap * 0.10),
+            y: entry.y + boardLayout.rowGap * 0.08
           },
           c2: {
-            x: exitPoint.x,
-            y: pegY + boardLayout.rowGap * 0.18
+            x: shoulder.x,
+            y: shoulder.y - boardLayout.rowGap * 0.06
           },
-          p1: exitPoint
+          p1: shoulder
         });
 
-        current = exitPoint;
+        segments.push({
+          p0: shoulder,
+          c1: {
+            x: shoulder.x + dir * (boardLayout.pegGap * 0.18),
+            y: shoulder.y + boardLayout.rowGap * 0.12
+          },
+          c2: {
+            x: wrap.x - dir * (boardLayout.pegGap * 0.08),
+            y: wrap.y - boardLayout.rowGap * 0.02
+          },
+          p1: wrap
+        });
+
+        segments.push({
+          p0: wrap,
+          c1: {
+            x: wrap.x - dir * (boardLayout.pegGap * 0.08),
+            y: wrap.y + boardLayout.rowGap * 0.10
+          },
+          c2: {
+            x: exit.x,
+            y: exit.y - boardLayout.rowGap * 0.12
+          },
+          p1: exit
+        });
+
+        current = exit;
         rights = nextRights;
       }
 
@@ -1301,11 +1341,10 @@
       const targetY = boardLayout.binCenterY - 8;
 
       segments.push({
-        type: "cubic",
         p0: { ...current },
         c1: {
-          x: current.x + (targetX - current.x) * 0.45,
-          y: current.y + 20
+          x: current.x + (targetX - current.x) * 0.25,
+          y: current.y + 16
         },
         c2: {
           x: targetX,
@@ -1340,8 +1379,8 @@
       let len = 0;
       let prev = seg.p0;
 
-      for (let i = 1; i <= 26; i++) {
-        const t = i / 26;
+      for (let i = 1; i <= 34; i++) {
+        const t = i / 34;
         const p = cubicPoint(seg.p0, seg.c1, seg.c2, seg.p1, t);
         len += Math.hypot(p.x - prev.x, p.y - prev.y);
         prev = p;
@@ -1370,7 +1409,7 @@
           const elapsed = ts - startTime;
           const progress = Math.min(1, elapsed / duration);
 
-          const eased = 1 - Math.pow(1 - progress, 1.65);
+          const eased = 1 - Math.pow(1 - progress, 1.9);
           const travel = totalLength * eased;
 
           let passed = 0;
@@ -1386,14 +1425,13 @@
 
           const localRaw = currentSeg.len ? (travel - passed) / currentSeg.len : 1;
           const local = Math.max(0, Math.min(1, localRaw));
-
           const pos = cubicPoint(currentSeg.p0, currentSeg.c1, currentSeg.c2, currentSeg.p1, local);
 
           let scaleX = 1;
           let scaleY = 1;
 
-          if (local > 0.82 && local < 1) {
-            const crush = Math.sin(((local - 0.82) / 0.18) * Math.PI);
+          if (local > 0.84 && local < 1) {
+            const crush = Math.sin(((local - 0.84) / 0.16) * Math.PI);
             scaleX += 0.10 * crush;
             scaleY -= 0.08 * crush;
           }
@@ -1457,7 +1495,7 @@
         highlightBin(slot);
 
         totalPayout += payout;
-        await sleep(130);
+        await sleep(140);
       }
 
       isDropping = false;
