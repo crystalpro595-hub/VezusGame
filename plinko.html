@@ -817,7 +817,6 @@
 
   <div class="app">
     <div class="content">
-
       <div class="sticky-top">
         <div class="top-row">
           <button class="icon-btn" id="backBtn" aria-label="Назад">←</button>
@@ -906,7 +905,6 @@
           </div>
         </div>
       </div>
-
     </div>
   </div>
 
@@ -944,16 +942,17 @@
 
     const MULTIPLIERS = [10, 5, 2, 0.4, 0.2, 0.4, 2, 5, 10];
 
+    // Центр чаще, края реже
     const TARGET_WEIGHTS = [
-      0.003, // 10x
-      0.015, // 5x
-      0.085, // 2x
-      0.23,  // 0.4x
-      0.334, // 0.2x
-      0.23,  // 0.4x
-      0.085, // 2x
-      0.015, // 5x
-      0.003  // 10x
+      0.003,
+      0.015,
+      0.085,
+      0.23,
+      0.334,
+      0.23,
+      0.085,
+      0.015,
+      0.003
     ];
 
     const SPEEDS = [
@@ -982,8 +981,9 @@
     const BUCKET_COUNT = 9;
     const SLOT_W = (BUCKET_RIGHT - BUCKET_LEFT) / BUCKET_COUNT;
 
-    const CATCH_LINE_Y = 224;
-    const SETTLE_LINE_Y = 231;
+    const SLOT_TOP_Y = 226;
+    const SLOT_SETTLE_Y = 236;
+    const SLOT_WALL_HALF = 1.8;
 
     const $ = (id) => document.getElementById(id);
 
@@ -995,11 +995,16 @@
     let speedIndex = 1;
     let noticeTimer = null;
     let pegs = [];
+    let slotDividers = [];
 
     function formatVc(value){
       const n = Number(value ?? 0);
       if (!Number.isFinite(n)) return "0 VC";
       return Number.isInteger(n) ? `${n} VC` : `${n.toFixed(2)} VC`;
+    }
+
+    function clamp(val, min, max){
+      return Math.max(min, Math.min(max, val));
     }
 
     function goTo(file){
@@ -1130,6 +1135,11 @@
       return BUCKET_LEFT + SLOT_W * index + SLOT_W / 2;
     }
 
+    function getBucketIndex(x){
+      const raw = Math.floor((x - BUCKET_LEFT) / SLOT_W);
+      return clamp(raw, 0, BUCKET_COUNT - 1);
+    }
+
     function chooseTargetBucket(){
       let r = Math.random();
       let sum = 0;
@@ -1141,17 +1151,35 @@
       return 4;
     }
 
-    function clamp(val, min, max){
-      return Math.max(min, Math.min(max, val));
+    function shuffle(arr){
+      const a = [...arr];
+      for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+      }
+      return a;
+    }
+
+    // Мягкий "план" движения, но без телепорта в слот
+    function buildRouteForBucket(bucketIndex){
+      const desired = bucketIndex - 4;
+      const rights = clamp(Math.round((PEG_ROWS + desired) / 2), 0, PEG_ROWS);
+
+      const dirs = [
+        ...new Array(rights).fill(1),
+        ...new Array(PEG_ROWS - rights).fill(-1)
+      ];
+
+      return shuffle(dirs);
     }
 
     function createBoard(){
       const board = $("board");
       document.querySelectorAll(".peg").forEach(el => el.remove());
       pegs = [];
+      slotDividers = [];
 
-      // Верхний одиночный штырь убран:
-      // теперь первый ряд начинается с 2 штырей, чтобы шар стартовал из центра.
+      // Верхний одиночный штырь убран — первый ряд сразу из 2 штырей
       for (let row = 0; row < PEG_ROWS; row++) {
         const pegsInRow = row + 2; // 2..9
         const rowWidth = (pegsInRow - 1) * PEG_GAP_X;
@@ -1161,7 +1189,7 @@
         for (let i = 0; i < pegsInRow; i++) {
           const x = startX + i * PEG_GAP_X;
 
-          pegs.push({ x, y, r: PEG_R });
+          pegs.push({ x, y, r: PEG_R, row });
 
           const peg = document.createElement("div");
           peg.className = "peg";
@@ -1169,6 +1197,10 @@
           peg.style.top = `${y}px`;
           board.appendChild(peg);
         }
+      }
+
+      for (let i = 1; i < BUCKET_COUNT; i++) {
+        slotDividers.push(BUCKET_LEFT + SLOT_W * i);
       }
 
       const buckets = $("buckets");
@@ -1228,40 +1260,36 @@
     }
 
     function settleBall(ballState, forced = false){
-      const targetX = bucketCenter(ballState.targetIndex);
+      const pocket = getBucketIndex(ballState.x);
+      const cx = bucketCenter(pocket);
 
+      // Мягкое торможение внутри уже выбранной ячейки
       if (!forced) {
-        const dx = targetX - ballState.x;
-
-        // Более мягкое выравнивание внизу, без резкого рывка
-        ballState.vx += clamp(dx * 0.0030, -0.09, 0.09);
-        ballState.vx *= 0.970;
-
-        if (ballState.y > SETTLE_LINE_Y - 7) {
-          ballState.x += dx * 0.12;
-          ballState.vy *= 0.84;
-        }
+        ballState.vx *= 0.92;
+        ballState.vy *= 0.86;
+        ballState.x += (cx - ballState.x) * 0.06;
       }
+
+      const lowSpeed = Math.abs(ballState.vx) < 0.07 && Math.abs(ballState.vy) < 0.9;
 
       if (
         forced ||
         (
-          ballState.y >= SETTLE_LINE_Y + 4 &&
-          Math.abs(ballState.x - targetX) < 1.6 &&
-          Math.abs(ballState.vx) < 0.28 &&
-          Math.abs(ballState.vy) < 0.62
+          ballState.y >= SLOT_SETTLE_Y &&
+          Math.abs(cx - ballState.x) < 0.8 &&
+          lowSpeed
         )
       ) {
-        ballState.x = targetX;
-        ballState.y = SETTLE_LINE_Y + 5;
+        ballState.x = cx;
+        ballState.y = SLOT_SETTLE_Y + 4;
         ballState.vx = 0;
         ballState.vy = 0;
         ballState.settled = true;
-        ballState.bucketIndex = ballState.targetIndex;
+        ballState.bucketIndex = pocket;
 
         if (!ballState.didHit) {
           ballState.didHit = true;
-          highlightBucket(ballState.targetIndex);
+          highlightBucket(pocket);
         }
       }
     }
@@ -1276,7 +1304,7 @@
           lastTime = now;
 
           dt *= speedScale;
-          dt = Math.max(0.6, Math.min(1.5, dt));
+          dt = clamp(dt, 0.65, 1.45);
 
           const substeps = 3;
 
@@ -1286,35 +1314,31 @@
             for (const ball of ballStates) {
               if (ball.settled) continue;
 
-              const targetX = bucketCenter(ball.targetIndex);
+              ball.vy += 0.215 * step;
+              ball.vy = Math.min(ball.vy, 4.6);
 
-              ball.vy += 0.225 * step;
+              // Чтобы в самом верху не улетал резко в угол
+              if (ball.y < 110) {
+                ball.vx += (BOARD_CENTER_X - ball.x) * 0.00008 * step;
+              }
 
-              // Очень мягкая наводка, только после середины поля
-              let guide = 0;
-              const dxToTarget = targetX - ball.x;
-
-              if (ball.y > 96)  guide += clamp(dxToTarget * 0.00005, -0.016, 0.016);
-              if (ball.y > 148) guide += clamp(dxToTarget * 0.00009, -0.026, 0.026);
-              if (ball.y > 198) guide += clamp(dxToTarget * 0.00016, -0.040, 0.040);
-
-              ball.vx += guide * step;
-              ball.vx += Math.sin((now + ball.phase) * 0.0038) * 0.0015 * step;
+              // Лёгкое хаотичное гуляние по полю
+              ball.vx += Math.sin((now + ball.phase) * 0.0036) * 0.0013 * step;
 
               ball.x += ball.vx * step;
               ball.y += ball.vy * step;
 
-              ball.vx *= 0.9978;
+              ball.vx *= 0.998;
               ball.vy *= 0.999;
 
               if (ball.x - BALL_R < WALL_LEFT) {
                 ball.x = WALL_LEFT + BALL_R;
-                ball.vx = Math.abs(ball.vx) * 0.78 + 0.03;
+                ball.vx = Math.abs(ball.vx) * 0.82 + 0.025;
               }
 
               if (ball.x + BALL_R > WALL_RIGHT) {
                 ball.x = WALL_RIGHT - BALL_R;
-                ball.vx = -Math.abs(ball.vx) * 0.78 - 0.03;
+                ball.vx = -Math.abs(ball.vx) * 0.82 - 0.025;
               }
 
               for (const peg of pegs) {
@@ -1338,20 +1362,61 @@
                 const rel = ball.vx * nx + ball.vy * ny;
 
                 if (rel < 0) {
-                  const restitution = 0.94;
+                  const restitution = 0.93;
+
                   ball.vx -= (1 + restitution) * rel * nx;
                   ball.vy -= (1 + restitution) * rel * ny;
 
-                  // Лёгкий сдвиг в сторону цели, но без сильного "засоса"
-                  const toward = Math.sign(targetX - ball.x) * 0.010;
-                  const sidePush = (Math.random() - 0.5) * 0.070 + toward;
+                  // Направление ряда применяется только один раз на ряд
+                  if (peg.row !== ball.lastSteerRow) {
+                    ball.lastSteerRow = peg.row;
+                    const dir = ball.route[peg.row] || 0;
+                    ball.vx += dir * (0.018 + Math.random() * 0.014);
+                    ball.vx += (Math.random() - 0.5) * 0.022;
+                  } else {
+                    ball.vx += (Math.random() - 0.5) * 0.010;
+                  }
 
-                  ball.vx += sidePush;
-
-                  if (ny < -0.06) {
-                    ball.vy -= 0.07;
+                  if (ny < -0.05) {
+                    ball.vy -= 0.06;
                   }
                 }
+              }
+
+              // Физические разделители слотов внизу — без телепорта
+              if (ball.y >= SLOT_TOP_Y - BALL_R) {
+                for (const dividerX of slotDividers) {
+                  const dx = ball.x - dividerX;
+                  const minDist = BALL_R + SLOT_WALL_HALF;
+
+                  if (Math.abs(dx) < minDist) {
+                    const nx = dx >= 0 ? 1 : -1;
+                    const overlap = minDist - Math.abs(dx);
+
+                    ball.x += nx * overlap;
+
+                    if (ball.vx * nx < 0) {
+                      ball.vx = -ball.vx * 0.52;
+                    }
+
+                    ball.vx += nx * 0.008;
+                  }
+                }
+              }
+
+              // Анти-зависание в центре и внизу
+              if (
+                ball.y > SLOT_TOP_Y &&
+                ball.y < SLOT_SETTLE_Y &&
+                Math.abs(ball.vx) < 0.018 &&
+                Math.abs(ball.vy) < 0.35
+              ) {
+                ball.vx += (Math.random() - 0.5) * 0.045;
+                ball.vy += 0.02;
+              }
+
+              if (ball.y >= SLOT_TOP_Y) {
+                ball.vx *= 0.992;
               }
 
               ball.trailTick += step;
@@ -1361,7 +1426,7 @@
               }
             }
 
-            // столкновения шаров друг с другом
+            // Столкновения шаров
             for (let i = 0; i < ballStates.length; i++) {
               const a = ballStates[i];
               if (a.settled) continue;
@@ -1405,7 +1470,7 @@
                   b.vx += ix;
                   b.vy += iy;
 
-                  const tangentKick = (Math.random() - 0.5) * 0.05;
+                  const tangentKick = (Math.random() - 0.5) * 0.04;
                   a.vx -= tangentKick;
                   b.vx += tangentKick;
                 }
@@ -1415,7 +1480,7 @@
             for (const ball of ballStates) {
               if (ball.settled) continue;
 
-              if (ball.y >= CATCH_LINE_Y) {
+              if (ball.y >= SLOT_SETTLE_Y) {
                 settleBall(ball, false);
               }
 
@@ -1474,29 +1539,30 @@
       const ballStates = [];
 
       for (let i = 0; i < selectedBalls; i++) {
-        // Старт почти из центра, без сильного разлёта в стороны
         const spread = (i - (selectedBalls - 1) / 2) * 10;
-        const randomStart = (Math.random() - 0.5) * 10;
+        const randomStart = (Math.random() - 0.5) * 8;
         const startX = clamp(
           BOARD_CENTER_X + spread + randomStart,
-          WALL_LEFT + BALL_R + 4,
-          WALL_RIGHT - BALL_R - 4
+          WALL_LEFT + BALL_R + 3,
+          WALL_RIGHT - BALL_R - 3
         );
 
         const ballEl = createBall(startX);
+        const targetIndex = chooseTargetBucket();
 
         ballStates.push({
           el: ballEl,
           x: startX,
           y: 18,
-          vx: (Math.random() - 0.5) * 0.16 + spread * 0.008,
-          vy: 0.09 + Math.random() * 0.04,
+          vx: (Math.random() - 0.5) * 0.12 + spread * 0.006,
+          vy: 0.08 + Math.random() * 0.03,
           settled: false,
           bucketIndex: null,
-          targetIndex: chooseTargetBucket(),
           didHit: false,
           trailTick: Math.random() * 0.9,
-          phase: Math.random() * 10000
+          phase: Math.random() * 10000,
+          route: buildRouteForBucket(targetIndex),
+          lastSteerRow: -1
         });
       }
 
