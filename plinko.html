@@ -282,8 +282,8 @@
       z-index:1;
     }
 
-    .rail.left{ left:12px; }
-    .rail.right{ right:12px; }
+    .rail.left{ left:16px; }
+    .rail.right{ right:16px; }
 
     .peg{
       position:absolute;
@@ -348,8 +348,8 @@
 
     .buckets{
       position:absolute;
-      left:16px;
-      right:16px;
+      left:18px;
+      right:18px;
       bottom:12px;
       display:grid;
       grid-template-columns:repeat(9, minmax(0,1fr));
@@ -952,25 +952,33 @@
 
     const BOARD_W = 300;
     const BOARD_H = 286;
+
     const PEG_ROWS = 8;
-    const PEG_GAP_X = 28;
+    const PEG_GAP_X = 26;
     const PEG_GAP_Y = 23;
-    const PEG_START_Y = 30;
+    const PEG_START_Y = 32;
+
     const BALL_R = 8;
     const PEG_R = 5;
-    const WALL_LEFT = 14;
-    const WALL_RIGHT = BOARD_W - 14;
+
+    const WALL_LEFT = 18;
+    const WALL_RIGHT = BOARD_W - 18;
     const BOARD_CENTER_X = BOARD_W / 2;
 
-    const BUCKET_LEFT = 16;
-    const BUCKET_RIGHT = BOARD_W - 16;
+    const BUCKET_LEFT = 18;
+    const BUCKET_RIGHT = BOARD_W - 18;
     const BUCKET_COUNT = 9;
     const SLOT_W = (BUCKET_RIGHT - BUCKET_LEFT) / BUCKET_COUNT;
+
     const CATCH_LINE_Y = 224;
     const SETTLE_LINE_Y = 231;
 
-    const RARE_10_CHANCE = 0.006;
-    const RARE_5_CHANCE  = 0.028;
+    const RARE_10_CHANCE = 0.004;
+    const RARE_5_CHANCE  = 0.020;
+
+    const FORCE_TO_04_FROM_2 = 0.72;
+    const FORCE_TO_02_FROM_04 = 0.40;
+    const FORCE_EDGE_TO_LOW = 0.72;
 
     const $ = (id) => document.getElementById(id);
 
@@ -998,7 +1006,7 @@
         window.Telegram.WebApp.openTelegramLink(url);
         return;
       }
-      window.open(url, "_blank", "noopener");
+      window.open(url, "_blank', 'noopener");
     }
 
     function loadCachedProfile(){
@@ -1122,30 +1130,46 @@
       return Math.max(0, Math.min(BUCKET_COUNT - 1, raw));
     }
 
-    function guardBucketIndex(rawIdx, rareRoll){
+    function remapBucket(rawIdx, rareRoll){
       if (rawIdx === 0) {
         if (rareRoll < RARE_10_CHANCE) return 0;
         if (rareRoll < RARE_5_CHANCE) return 1;
-        return 2;
+        return rareRoll < FORCE_EDGE_TO_LOW ? 3 : 2;
       }
 
       if (rawIdx === 8) {
         if (rareRoll < RARE_10_CHANCE) return 8;
         if (rareRoll < RARE_5_CHANCE) return 7;
-        return 6;
+        return rareRoll < FORCE_EDGE_TO_LOW ? 5 : 6;
       }
 
       if (rawIdx === 1) {
         if (rareRoll < RARE_5_CHANCE) return 1;
-        return 2;
+        return rareRoll < 0.62 ? 3 : 2;
       }
 
       if (rawIdx === 7) {
         if (rareRoll < RARE_5_CHANCE) return 7;
-        return 6;
+        return rareRoll < 0.62 ? 5 : 6;
       }
 
-      return rawIdx;
+      if (rawIdx === 2) {
+        return rareRoll < FORCE_TO_04_FROM_2 ? 3 : 2;
+      }
+
+      if (rawIdx === 6) {
+        return rareRoll < FORCE_TO_04_FROM_2 ? 5 : 6;
+      }
+
+      if (rawIdx === 3) {
+        return rareRoll < FORCE_TO_02_FROM_04 ? 4 : 3;
+      }
+
+      if (rawIdx === 5) {
+        return rareRoll < FORCE_TO_02_FROM_04 ? 4 : 5;
+      }
+
+      return 4;
     }
 
     function createBoard(){
@@ -1230,18 +1254,18 @@
 
     function settleBall(ballState, forced = false){
       const rawIdx = getBucketIndex(ballState.x);
-      const guardedIdx = guardBucketIndex(rawIdx, ballState.rareRoll);
-      const targetX = bucketCenter(guardedIdx);
+      const targetIdx = remapBucket(rawIdx, ballState.rareRoll);
+      const targetX = bucketCenter(targetIdx);
 
-      ballState.targetIndex = guardedIdx;
+      ballState.targetIndex = targetIdx;
 
       if (!forced) {
-        ballState.vx += (targetX - ballState.x) * 0.0033;
-        ballState.vx *= 0.965;
+        ballState.vx += (targetX - ballState.x) * 0.0038;
+        ballState.vx *= 0.962;
 
-        if (ballState.y > SETTLE_LINE_Y - 5) {
-          ballState.x += (targetX - ballState.x) * 0.16;
-          ballState.vy *= 0.82;
+        if (ballState.y > SETTLE_LINE_Y - 6) {
+          ballState.x += (targetX - ballState.x) * 0.18;
+          ballState.vy *= 0.80;
         }
       }
 
@@ -1259,11 +1283,11 @@
         ballState.vx = 0;
         ballState.vy = 0;
         ballState.settled = true;
-        ballState.bucketIndex = guardedIdx;
+        ballState.bucketIndex = targetIdx;
 
         if (!ballState.didHit) {
           ballState.didHit = true;
-          highlightBucket(guardedIdx);
+          highlightBucket(targetIdx);
         }
       }
     }
@@ -1289,7 +1313,7 @@
               if (ball.settled) continue;
 
               ball.vy += 0.23 * step;
-              ball.vx += ((BOARD_CENTER_X - ball.x) * 0.00014) * step;
+              ball.vx += ((BOARD_CENTER_X - ball.x) * 0.00020) * step;
 
               ball.x += ball.vx * step;
               ball.y += ball.vy * step;
@@ -1460,7 +1484,7 @@
       const ballStates = [];
 
       for (let i = 0; i < selectedBalls; i++) {
-        const startShift = (i - (selectedBalls - 1) / 2) * 12;
+        const startShift = (i - (selectedBalls - 1) / 2) * 9;
         const startX = BOARD_CENTER_X + startShift;
         const ballEl = createBall(startX);
 
@@ -1468,7 +1492,7 @@
           el: ballEl,
           x: startX,
           y: 18,
-          vx: (Math.random() - 0.5) * 0.34 + startShift * 0.02,
+          vx: (Math.random() - 0.5) * 0.28 + startShift * 0.018,
           vy: 0.10 + Math.random() * 0.05,
           settled: false,
           bucketIndex: null,
