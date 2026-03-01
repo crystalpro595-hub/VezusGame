@@ -285,7 +285,8 @@
         0 0 0 2px rgba(255,255,255,.04),
         0 2px 8px rgba(0,0,0,.18);
       transform:translate(-50%, -50%);
-      z-index:2;
+      z-index:6;
+      pointer-events:none;
     }
 
     .slot-divider{
@@ -296,14 +297,15 @@
       background: linear-gradient(180deg, rgba(255,255,255,.18), rgba(255,255,255,.04));
       bottom:44px;
       transform:translateX(-50%);
-      z-index:2;
+      z-index:6;
       opacity:.8;
+      pointer-events:none;
     }
 
     .balls-layer{
       position:absolute;
       inset:0;
-      z-index:5;
+      z-index:4;
       pointer-events:none;
     }
 
@@ -933,10 +935,8 @@
       games: "games.html"
     };
 
-    // 10x и 5x ближе к центру, но не в самом центре
     const MULTIPLIERS = [0.2, 0.4, 5, 10, 2, 10, 5, 0.4, 0.2];
 
-    // Частые низкие, редкие высокие
     const TARGET_WEIGHTS = [
       0.21,
       0.24,
@@ -958,7 +958,6 @@
     const BOARD_W = 300;
     const BOARD_H = 286;
 
-    // Расстояния оставлены комфортными, чтобы не было клипов и застреваний
     const PEG_ROWS = 8;
     const PEG_GAP_X = 31;
     const PEG_GAP_Y = 24;
@@ -1146,15 +1145,23 @@
     }
 
     function buildDirectionsForBucket(bucketIndex){
-      const finalOffset = (bucketIndex - 4) * 2;
-      const plusCount = (PEG_ROWS + finalOffset) / 2;
-
-      let dirs = [
-        ...new Array(plusCount).fill(1),
-        ...new Array(PEG_ROWS - plusCount).fill(-1)
+      const rights = clamp(bucketIndex, 0, PEG_ROWS);
+      const dirs = [
+        ...new Array(rights).fill(1),
+        ...new Array(PEG_ROWS - rights).fill(-1)
       ];
-
       return shuffle(dirs);
+    }
+
+    function getGapCenterX(row, gapIndex){
+      // row 0 -> 2 штыря -> 1 промежуток
+      // row 1 -> 3 штыря -> 2 промежутка
+      // ...
+      const pegsInRow = row + 2;
+      const rowWidth = (pegsInRow - 1) * PEG_GAP_X;
+      const startPegX = BOARD_CENTER_X - rowWidth / 2;
+
+      return startPegX + (gapIndex + 0.5) * PEG_GAP_X;
     }
 
     function createBoard(){
@@ -1162,9 +1169,8 @@
 
       board.querySelectorAll(".peg, .slot-divider").forEach(el => el.remove());
 
-      // Первый ряд из 2 штырей — старт с центра
       for (let row = 0; row < PEG_ROWS; row++) {
-        const pegsInRow = row + 2; // 2..9
+        const pegsInRow = row + 2;
         const rowWidth = (pegsInRow - 1) * PEG_GAP_X;
         const startX = BOARD_CENTER_X - rowWidth / 2;
         const y = PEG_START_Y + row * PEG_GAP_Y;
@@ -1236,8 +1242,7 @@
       const dirs = buildDirectionsForBucket(bucketIndex);
       const points = [];
 
-      let lane = 0;
-      let prevX = startX;
+      let gapIndex = 0;
 
       points.push({
         x: startX,
@@ -1246,62 +1251,62 @@
         wobble: 0
       });
 
-      for (let row = 0; row < PEG_ROWS; row++) {
-        const dir = dirs[row];
-        const rowY = PEG_START_Y + row * PEG_GAP_Y;
-
-        const nextLane = lane + dir;
-        const laneX = BOARD_CENTER_X + nextLane * (SLOT_W / 2);
-        const pinchX = BOARD_CENTER_X + ((lane + nextLane) / 2) * (SLOT_W / 2);
-
-        const wobble = (Math.random() - 0.5) * 2.2;
-        const side = dir * (1.3 + Math.random() * 0.8);
-
-        points.push({
-          x: pinchX - side,
-          y: rowY - 5,
-          arc: 1.8,
-          wobble
-        });
-
-        points.push({
-          x: pinchX + side,
-          y: rowY + 4,
-          arc: 3.8,
-          wobble: -wobble * 0.55
-        });
-
-        points.push({
-          x: laneX + (Math.random() - 0.5) * 1.2,
-          y: rowY + 14,
-          arc: 0.9,
-          wobble: (Math.random() - 0.5) * 1.0
-        });
-
-        lane = nextLane;
-        prevX = laneX;
-      }
-
-      const finalX = bucketCenter(bucketIndex);
-
+      // мягкий вход в первый центральный промежуток
       points.push({
-        x: prevX + (finalX - prevX) * 0.38,
-        y: SLOT_GUIDE_Y,
-        arc: 1.1,
-        wobble: (Math.random() - 0.5) * 0.5
+        x: getGapCenterX(0, 0),
+        y: PEG_START_Y - 12,
+        arc: 0.2,
+        wobble: (Math.random() - 0.5) * 0.3
       });
 
+      for (let row = 0; row < PEG_ROWS; row++) {
+        const rowY = PEG_START_Y + row * PEG_GAP_Y;
+        const currentGapX = getGapCenterX(row, gapIndex);
+
+        points.push({
+          x: currentGapX,
+          y: rowY - 8,
+          arc: 0.2,
+          wobble: (Math.random() - 0.5) * 0.25
+        });
+
+        const dir = dirs[row];
+        const nextGapIndex = gapIndex + (dir > 0 ? 1 : 0);
+
+        const nextGuideX = row < PEG_ROWS - 1
+          ? getGapCenterX(row + 1, nextGapIndex)
+          : bucketCenter(nextGapIndex);
+
+        points.push({
+          x: (currentGapX + nextGuideX) / 2,
+          y: rowY + 2,
+          arc: 0.45,
+          wobble: (Math.random() - 0.5) * 0.18
+        });
+
+        points.push({
+          x: nextGuideX,
+          y: rowY + 13,
+          arc: 0.18,
+          wobble: (Math.random() - 0.5) * 0.16
+        });
+
+        gapIndex = nextGapIndex;
+      }
+
+      const finalX = bucketCenter(gapIndex);
+
       points.push({
-        x: prevX + (finalX - prevX) * 0.68,
-        y: SLOT_GUIDE_Y + 8,
-        arc: 0.6,
+        x: finalX,
+        y: SLOT_GUIDE_Y,
+        arc: 0.16,
         wobble: 0
       });
 
       points.push({
         x: finalX,
         y: SLOT_FINAL_Y + 2,
-        arc: 0.25,
+        arc: 0.08,
         wobble: 0
       });
 
@@ -1340,8 +1345,7 @@
           const dy = end.y - start.y;
           const dist = Math.hypot(dx, dy);
 
-          // Чуть тяжелее: меньше "парит", но без резкого ускорения
-          const duration = Math.max(64, (dist * 9.7) / speedScale);
+          const duration = Math.max(62, (dist * 9.3) / speedScale);
           const startTime = performance.now();
 
           function frame(now){
@@ -1364,10 +1368,10 @@
               x += Math.sin(t * Math.PI) * wobble;
             }
 
-            const speedFeel = Math.min(0.08, (Math.abs(dy) + Math.abs(dx)) * 0.0019);
+            const speedFeel = Math.min(0.06, (Math.abs(dy) + Math.abs(dx)) * 0.0015);
             const compression = Math.sin(t * Math.PI) * speedFeel;
-            const sx = 1 + compression * 0.18;
-            const sy = 1 - compression * 0.30;
+            const sx = 1 + compression * 0.12;
+            const sy = 1 - compression * 0.22;
 
             ball.style.left = `${x}px`;
             ball.style.top = `${y}px`;
