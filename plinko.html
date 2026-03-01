@@ -315,9 +315,35 @@
         radial-gradient(circle at 30% 30%, #ffffff 0%, #b8ecff 28%, #46c6ff 62%, #0b74a6 100%);
       box-shadow:
         inset 0 1px 2px rgba(255,255,255,.45),
-        0 4px 12px rgba(42,171,238,.28);
+        0 4px 12px rgba(42,171,238,.28),
+        0 0 16px rgba(64,200,255,.18);
       transform:translate(-50%, -50%);
       will-change:left, top, transform;
+    }
+
+    .trail{
+      position:absolute;
+      width:9px;
+      height:9px;
+      border-radius:50%;
+      background:
+        radial-gradient(circle, rgba(180,236,255,.55) 0%, rgba(70,198,255,.28) 55%, rgba(70,198,255,0) 100%);
+      transform:translate(-50%, -50%);
+      pointer-events:none;
+      opacity:.38;
+      filter: blur(.4px);
+      animation: trailFade .34s linear forwards;
+    }
+
+    @keyframes trailFade{
+      0%{
+        opacity:.42;
+        transform:translate(-50%, -50%) scale(1);
+      }
+      100%{
+        opacity:0;
+        transform:translate(-50%, -50%) scale(.25);
+      }
     }
 
     .buckets{
@@ -758,6 +784,7 @@
 
       .board{ width:280px; height:270px; }
       .ball{ width:14px; height:14px; }
+      .trail{ width:8px; height:8px; }
 
       .buckets{ left:14px; right:14px; gap:4px; }
       .bucket{ font-size:10px; height:32px; }
@@ -918,7 +945,7 @@
     const MULTIPLIERS = [10, 5, 2, 0.4, 0.2, 0.4, 2, 5, 10];
 
     const SPEEDS = [
-      { label: "›",   scale: 0.82 },
+      { label: "›",   scale: 0.80 },
       { label: "››",  scale: 1.00 },
       { label: "›››", scale: 1.22 }
     ];
@@ -941,6 +968,9 @@
     const SLOT_W = (BUCKET_RIGHT - BUCKET_LEFT) / BUCKET_COUNT;
     const CATCH_LINE_Y = 224;
     const SETTLE_LINE_Y = 231;
+
+    const RARE_10_CHANCE = 0.006;
+    const RARE_5_CHANCE  = 0.028;
 
     const $ = (id) => document.getElementById(id);
 
@@ -1092,6 +1122,32 @@
       return Math.max(0, Math.min(BUCKET_COUNT - 1, raw));
     }
 
+    function guardBucketIndex(rawIdx, rareRoll){
+      if (rawIdx === 0) {
+        if (rareRoll < RARE_10_CHANCE) return 0;
+        if (rareRoll < RARE_5_CHANCE) return 1;
+        return 2;
+      }
+
+      if (rawIdx === 8) {
+        if (rareRoll < RARE_10_CHANCE) return 8;
+        if (rareRoll < RARE_5_CHANCE) return 7;
+        return 6;
+      }
+
+      if (rawIdx === 1) {
+        if (rareRoll < RARE_5_CHANCE) return 1;
+        return 2;
+      }
+
+      if (rawIdx === 7) {
+        if (rareRoll < RARE_5_CHANCE) return 7;
+        return 6;
+      }
+
+      return rawIdx;
+    }
+
     function createBoard(){
       const board = $("board");
       document.querySelectorAll(".peg").forEach(el => el.remove());
@@ -1145,6 +1201,15 @@
       return ball;
     }
 
+    function createTrail(x, y){
+      const t = document.createElement("div");
+      t.className = "trail";
+      t.style.left = `${x}px`;
+      t.style.top = `${y}px`;
+      $("ballsLayer").appendChild(t);
+      setTimeout(() => t.remove(), 340);
+    }
+
     function highlightBucket(index){
       const el = document.querySelector(`.bucket[data-index="${index}"]`);
       if (!el) return;
@@ -1152,7 +1217,58 @@
       setTimeout(() => el.classList.remove("hit"), 300);
     }
 
-    function simulateBall(ballState){
+    function renderBall(ballState){
+      const speed = Math.hypot(ballState.vx, ballState.vy);
+      const stretch = Math.min(0.18, speed * 0.013);
+      const sx = 1 - stretch * 0.55;
+      const sy = 1 + stretch;
+
+      ballState.el.style.left = `${ballState.x}px`;
+      ballState.el.style.top = `${ballState.y}px`;
+      ballState.el.style.transform = `translate(-50%, -50%) scale(${sx.toFixed(3)}, ${sy.toFixed(3)})`;
+    }
+
+    function settleBall(ballState, forced = false){
+      const rawIdx = getBucketIndex(ballState.x);
+      const guardedIdx = guardBucketIndex(rawIdx, ballState.rareRoll);
+      const targetX = bucketCenter(guardedIdx);
+
+      ballState.targetIndex = guardedIdx;
+
+      if (!forced) {
+        ballState.vx += (targetX - ballState.x) * 0.0033;
+        ballState.vx *= 0.965;
+
+        if (ballState.y > SETTLE_LINE_Y - 5) {
+          ballState.x += (targetX - ballState.x) * 0.16;
+          ballState.vy *= 0.82;
+        }
+      }
+
+      if (
+        forced ||
+        (
+          ballState.y >= SETTLE_LINE_Y + 4 &&
+          Math.abs(ballState.x - targetX) < 1.5 &&
+          Math.abs(ballState.vx) < 0.28 &&
+          Math.abs(ballState.vy) < 0.62
+        )
+      ) {
+        ballState.x = targetX;
+        ballState.y = SETTLE_LINE_Y + 5;
+        ballState.vx = 0;
+        ballState.vy = 0;
+        ballState.settled = true;
+        ballState.bucketIndex = guardedIdx;
+
+        if (!ballState.didHit) {
+          ballState.didHit = true;
+          highlightBucket(guardedIdx);
+        }
+      }
+    }
+
+    function simulateBalls(ballStates){
       return new Promise((resolve) => {
         let lastTime = performance.now();
 
@@ -1164,141 +1280,151 @@
           dt *= speedScale;
           dt = Math.max(0.6, Math.min(1.5, dt));
 
-          const substeps = 2;
+          const substeps = 3;
 
           for (let s = 0; s < substeps; s++) {
             const step = dt / substeps;
 
-            ballState.vy += 0.23 * step;
-            ballState.vx += ((BOARD_CENTER_X - ballState.x) * 0.00022) * step;
+            for (const ball of ballStates) {
+              if (ball.settled) continue;
 
-            ballState.x += ballState.vx * step;
-            ballState.y += ballState.vy * step;
+              ball.vy += 0.23 * step;
+              ball.vx += ((BOARD_CENTER_X - ball.x) * 0.00014) * step;
 
-            ballState.vx *= 0.998;
-            ballState.vy *= 0.999;
+              ball.x += ball.vx * step;
+              ball.y += ball.vy * step;
 
-            if (ballState.x - BALL_R < WALL_LEFT) {
-              ballState.x = WALL_LEFT + BALL_R;
-              ballState.vx = Math.abs(ballState.vx) * 0.86 + 0.04;
+              ball.vx *= 0.998;
+              ball.vy *= 0.999;
+
+              if (ball.x - BALL_R < WALL_LEFT) {
+                ball.x = WALL_LEFT + BALL_R;
+                ball.vx = Math.abs(ball.vx) * 0.88 + 0.05;
+              }
+
+              if (ball.x + BALL_R > WALL_RIGHT) {
+                ball.x = WALL_RIGHT - BALL_R;
+                ball.vx = -Math.abs(ball.vx) * 0.88 - 0.05;
+              }
+
+              for (const peg of pegs) {
+                const dx = ball.x - peg.x;
+                const dy = ball.y - peg.y;
+                const minDist = BALL_R + peg.r + 0.45;
+                const distSq = dx * dx + dy * dy;
+
+                if (distSq >= minDist * minDist) continue;
+
+                let dist = Math.sqrt(distSq);
+                if (dist < 0.0001) dist = 0.0001;
+
+                const nx = dx / dist;
+                const ny = dy / dist;
+                const overlap = minDist - dist;
+
+                ball.x += nx * overlap;
+                ball.y += ny * overlap;
+
+                const rel = ball.vx * nx + ball.vy * ny;
+
+                if (rel < 0) {
+                  const restitution = 0.92;
+                  ball.vx -= (1 + restitution) * rel * nx;
+                  ball.vy -= (1 + restitution) * rel * ny;
+
+                  const sidePush = (Math.random() - 0.5) * 0.08 + (nx > 0 ? 0.05 : -0.05);
+                  ball.vx += sidePush;
+
+                  if (ny < -0.08) {
+                    ball.vy -= 0.06;
+                  }
+                }
+              }
+
+              ball.trailTick += step;
+              if (ball.trailTick >= 1.15) {
+                ball.trailTick = 0;
+                createTrail(ball.x, ball.y);
+              }
             }
 
-            if (ballState.x + BALL_R > WALL_RIGHT) {
-              ballState.x = WALL_RIGHT - BALL_R;
-              ballState.vx = -Math.abs(ballState.vx) * 0.86 - 0.04;
-            }
+            for (let i = 0; i < ballStates.length; i++) {
+              const a = ballStates[i];
+              if (a.settled) continue;
 
-            for (const peg of pegs) {
-              const dx = ballState.x - peg.x;
-              const dy = ballState.y - peg.y;
-              const minDist = BALL_R + peg.r + 0.45;
-              const distSq = dx * dx + dy * dy;
+              for (let j = i + 1; j < ballStates.length; j++) {
+                const b = ballStates[j];
+                if (b.settled) continue;
 
-              if (distSq >= minDist * minDist) continue;
+                const dx = b.x - a.x;
+                const dy = b.y - a.y;
+                const minDist = BALL_R * 2;
+                const distSq = dx * dx + dy * dy;
 
-              let dist = Math.sqrt(distSq);
-              if (dist < 0.0001) dist = 0.0001;
+                if (distSq >= minDist * minDist) continue;
 
-              const nx = dx / dist;
-              const ny = dy / dist;
-              const overlap = minDist - dist;
+                let dist = Math.sqrt(distSq);
+                if (dist < 0.0001) dist = 0.0001;
 
-              ballState.x += nx * overlap;
-              ballState.y += ny * overlap;
+                const nx = dx / dist;
+                const ny = dy / dist;
+                const overlap = minDist - dist;
 
-              const rel = ballState.vx * nx + ballState.vy * ny;
+                a.x -= nx * overlap * 0.5;
+                a.y -= ny * overlap * 0.5;
+                b.x += nx * overlap * 0.5;
+                b.y += ny * overlap * 0.5;
 
-              if (rel < 0) {
-                const restitution = 0.9;
-                ballState.vx -= (1 + restitution) * rel * nx;
-                ballState.vy -= (1 + restitution) * rel * ny;
+                const rvx = b.vx - a.vx;
+                const rvy = b.vy - a.vy;
+                const rel = rvx * nx + rvy * ny;
 
-                const sidePush = (Math.random() - 0.5) * 0.06 + (nx > 0 ? 0.05 : -0.05);
-                ballState.vx += sidePush;
+                if (rel < 0) {
+                  const restitution = 0.9;
+                  const impulse = (-(1 + restitution) * rel) / 2;
 
-                if (ny < -0.12) {
-                  ballState.vy -= 0.05;
+                  const ix = impulse * nx;
+                  const iy = impulse * ny;
+
+                  a.vx -= ix;
+                  a.vy -= iy;
+                  b.vx += ix;
+                  b.vy += iy;
+
+                  const tangentKick = (Math.random() - 0.5) * 0.05;
+                  a.vx -= tangentKick;
+                  b.vx += tangentKick;
                 }
               }
             }
 
-            if (ballState.y >= CATCH_LINE_Y) {
-              const idx = getBucketIndex(ballState.x);
-              const targetX = bucketCenter(idx);
+            for (const ball of ballStates) {
+              if (ball.settled) continue;
 
-              ballState.vx += (targetX - ballState.x) * 0.0018 * step;
-              ballState.vx *= 0.96;
-
-              if (ballState.y > SETTLE_LINE_Y) {
-                ballState.x += (targetX - ballState.x) * 0.18 * step;
-                ballState.vy *= 0.84;
+              if (ball.y >= CATCH_LINE_Y) {
+                settleBall(ball, false);
               }
 
-              if (
-                ballState.y >= SETTLE_LINE_Y + 3 &&
-                Math.abs(ballState.x - targetX) < 1.2 &&
-                Math.abs(ballState.vx) < 0.22
-              ) {
-                ballState.x = targetX;
-                ballState.y = SETTLE_LINE_Y + 4;
-                renderBall(ballState);
-                resolve(idx);
-                return;
+              if (ball.y > BOARD_H - 18) {
+                settleBall(ball, true);
               }
-            }
-
-            if (ballState.y > BOARD_H - 18) {
-              const idx = getBucketIndex(ballState.x);
-              ballState.x = bucketCenter(idx);
-              ballState.y = SETTLE_LINE_Y + 4;
-              renderBall(ballState);
-              resolve(idx);
-              return;
             }
           }
 
-          renderBall(ballState);
+          for (const ball of ballStates) {
+            renderBall(ball);
+          }
+
+          if (ballStates.every(ball => ball.settled)) {
+            resolve(ballStates.map(ball => ball.bucketIndex));
+            return;
+          }
+
           requestAnimationFrame(frame);
         }
 
         requestAnimationFrame(frame);
       });
-    }
-
-    function renderBall(ballState){
-      const stretch = Math.min(0.16, Math.abs(ballState.vy) * 0.012);
-      const sx = 1 - stretch * 0.55;
-      const sy = 1 + stretch;
-
-      ballState.el.style.left = `${ballState.x}px`;
-      ballState.el.style.top = `${ballState.y}px`;
-      ballState.el.style.transform = `translate(-50%, -50%) scale(${sx.toFixed(3)}, ${sy.toFixed(3)})`;
-    }
-
-    async function dropOneBall(ballIndex, bet){
-      const startShift = (ballIndex - (selectedBalls - 1) / 2) * 12;
-      const startX = BOARD_CENTER_X + startShift;
-      const ballEl = createBall(startX);
-
-      const ballState = {
-        el: ballEl,
-        x: startX,
-        y: 18,
-        vx: (Math.random() - 0.5) * 0.34 + startShift * 0.02,
-        vy: 0.12 + Math.random() * 0.04
-      };
-
-      const bucketIndex = await simulateBall(ballState);
-      const mult = MULTIPLIERS[bucketIndex];
-      const payout = Math.floor(bet * mult);
-
-      highlightBucket(bucketIndex);
-
-      setTimeout(() => {
-        ballEl.remove();
-      }, 180);
-
-      return payout;
     }
 
     async function playRound(){
@@ -1331,15 +1457,39 @@
       updateBalanceUI();
       saveCachedBalance();
 
-      const drops = [];
+      const ballStates = [];
+
       for (let i = 0; i < selectedBalls; i++) {
-        drops.push(dropOneBall(i, bet));
+        const startShift = (i - (selectedBalls - 1) / 2) * 12;
+        const startX = BOARD_CENTER_X + startShift;
+        const ballEl = createBall(startX);
+
+        ballStates.push({
+          el: ballEl,
+          x: startX,
+          y: 18,
+          vx: (Math.random() - 0.5) * 0.34 + startShift * 0.02,
+          vy: 0.10 + Math.random() * 0.05,
+          settled: false,
+          bucketIndex: null,
+          targetIndex: null,
+          didHit: false,
+          trailTick: Math.random() * 0.9,
+          rareRoll: Math.random()
+        });
       }
 
-      const payouts = await Promise.all(drops);
-      const totalWin = payouts.reduce((sum, value) => sum + value, 0);
+      const bucketIndexes = await simulateBalls(ballStates);
+
+      const totalWin = bucketIndexes.reduce((sum, idx) => {
+        return sum + Math.floor(bet * MULTIPLIERS[idx]);
+      }, 0);
 
       pendingWin = totalWin;
+
+      setTimeout(() => {
+        ballStates.forEach(ball => ball.el.remove());
+      }, 220);
 
       $("playBtn").style.display = "none";
       $("claimBtn").style.display = "block";
