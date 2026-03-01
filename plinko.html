@@ -763,51 +763,32 @@
     }
 
     @keyframes preLogoJump{
-      0%,100%{
-        transform: translateY(0) scale(1,1);
-      }
-      12%{
-        transform: translateY(0) scale(1.05,.93);
-      }
-      38%{
-        transform: translateY(-16px) scale(.98,1.02);
-      }
-      56%{
-        transform: translateY(0) scale(1.03,.95);
-      }
-      72%{
-        transform: translateY(-6px) scale(.995,1.005);
-      }
+      0%,100%{ transform: translateY(0) scale(1,1); }
+      12%{ transform: translateY(0) scale(1.05,.93); }
+      38%{ transform: translateY(-16px) scale(.98,1.02); }
+      56%{ transform: translateY(0) scale(1.03,.95); }
+      72%{ transform: translateY(-6px) scale(.995,1.005); }
     }
 
     @media (max-width: 360px){
       .top-row{ grid-template-columns:36px minmax(0,1fr) 36px 46px; gap:6px; }
-
-      .icon-btn,
-      .speed-btn{ width:36px; height:36px; border-radius:12px; }
-
+      .icon-btn, .speed-btn{ width:36px; height:36px; border-radius:12px; }
       .icon-btn{ font-size:16px; }
       .speed-btn{ font-size:12px; }
-
       .logo-btn{ width:46px; height:46px; }
       .balance-mini{ height:38px; }
       .bal-amount{ min-width:74px; height:24px; font-size:12px; }
-
       .board{ width:280px; height:270px; }
       .ball{ width:14px; height:14px; }
       .trail{ width:7px; height:7px; }
-
       .buckets{ left:14px; right:14px; gap:4px; }
       .bucket{ font-size:10px; height:32px; }
-
       .bet-row{ grid-template-columns:minmax(0,1fr) 44px; }
       .bet-input{ height:44px; font-size:15px; }
       .bet-toggle{ width:44px; height:44px; }
       .bet-toggle svg{ width:22px; height:22px; }
-
       .play-btn, .claim-btn{ height:48px; font-size:14px; }
       .count-btn{ height:38px; }
-
       .pre-logo{ width:76px; height:76px; }
     }
 
@@ -957,21 +938,21 @@
       games: "games.html"
     };
 
-    // 10x и 5x ближе к центру, но не по центру
     const MULTIPLIERS = [0.2, 0.4, 5, 10, 2, 10, 5, 0.4, 0.2];
 
-    // Исправленные шансы: не только края, но низкие множители всё равно чаще
+    // Реально может лететь во все ячейки.
+    // 5x и 10x редкие, но не невозможные.
     // Сумма = 1.00
     const TARGET_WEIGHTS = [
-      0.12, // 0.2
-      0.19, // 0.4
-      0.07, // 5
-      0.02, // 10
-      0.20, // 2
-      0.02, // 10
-      0.07, // 5
-      0.19, // 0.4
-      0.12  // 0.2
+      0.13,  // 0.2
+      0.18,  // 0.4
+      0.08,  // 5
+      0.025, // 10
+      0.17,  // 2
+      0.025, // 10
+      0.08,  // 5
+      0.18,  // 0.4
+      0.13   // 0.2
     ];
 
     const SPEEDS = [
@@ -1164,6 +1145,11 @@
       return BUCKET_LEFT + SLOT_W * index + SLOT_W / 2;
     }
 
+    function getBucketIndex(x){
+      const raw = Math.floor((x - BUCKET_LEFT) / SLOT_W);
+      return clamp(raw, 0, BUCKET_COUNT - 1);
+    }
+
     function chooseTargetBucket(){
       let r = Math.random();
       let sum = 0;
@@ -1291,39 +1277,44 @@
       }, 140);
     }
 
+    // ГЛАВНОЕ: теперь фиксируем шар по ФАКТИЧЕСКОЙ ячейке, а не по targetIndex
     function finalizeBall(ball, bucketIndex){
-      ball.x = bucketCenter(bucketIndex);
+      const realBucket = clamp(bucketIndex, 0, BUCKET_COUNT - 1);
+
+      ball.x = bucketCenter(realBucket);
       ball.y = SLOT_FLOOR_Y - BALL_R;
       ball.vx = 0;
       ball.vy = 0;
-      ball.bucketIndex = bucketIndex;
+      ball.bucketIndex = realBucket;
       ball.settled = true;
 
       if (!ball.didHit) {
         ball.didHit = true;
-        highlightBucket(bucketIndex);
+        highlightBucket(realBucket);
       }
 
       queueBallRemove(ball);
     }
 
+    // Фиксация идёт по текущему X шара
     function settleBall(ball, force = false){
-      const targetBucket = ball.targetIndex;
-      const centerX = bucketCenter(targetBucket);
+      const liveBucket = getBucketIndex(ball.x);
+      const centerX = bucketCenter(liveBucket);
 
       if (force) {
-        finalizeBall(ball, targetBucket);
+        finalizeBall(ball, liveBucket);
         return;
       }
 
-      ball.x += (centerX - ball.x) * 0.24;
-      ball.vx *= 0.76;
+      // мягко доводим в центр ТЕКУЩЕЙ ячейки
+      ball.x += (centerX - ball.x) * 0.18;
+      ball.vx *= 0.78;
 
-      const closeEnough = Math.abs(centerX - ball.x) < 0.65;
-      const slowEnough = Math.abs(ball.vx) < 0.06 && Math.abs(ball.vy) < 0.08;
+      const closeEnough = Math.abs(centerX - ball.x) < 0.55;
+      const slowEnough = Math.abs(ball.vx) < 0.05 && Math.abs(ball.vy) < 0.07;
 
       if (closeEnough && slowEnough) {
-        finalizeBall(ball, targetBucket);
+        finalizeBall(ball, liveBucket);
       }
     }
 
@@ -1352,7 +1343,7 @@
         el: createBall(startX),
         x: startX,
         y: 18,
-        vx: (Math.random() - 0.5) * 0.04,
+        vx: (Math.random() - 0.5) * 0.03,
         vy: 0.02 + Math.random() * 0.03,
         targetIndex,
         route: buildDirectionsForBucket(targetIndex),
@@ -1401,19 +1392,21 @@
               ball.vy += GRAVITY * step;
               ball.vy = Math.min(ball.vy, MAX_VY);
 
-              if (ball.y < 110) {
-                ball.vx += (BOARD_CENTER_X - ball.x) * 0.00004 * step;
+              // лёгкий возврат к центру только наверху
+              if (ball.y < 100) {
+                ball.vx += (BOARD_CENTER_X - ball.x) * 0.000035 * step;
               }
 
+              // маршрут направляет шар в выбранную зону, но не ломает реальную физику
               if (ball.y > 88) {
-                ball.vx += clamp((targetX - ball.x) * 0.00008, -0.012, 0.012) * step;
+                ball.vx += clamp((targetX - ball.x) * 0.00006, -0.010, 0.010) * step;
               }
 
-              if (ball.y > 148) {
-                ball.vx += clamp((targetX - ball.x) * 0.00018, -0.022, 0.022) * step;
+              if (ball.y > 150) {
+                ball.vx += clamp((targetX - ball.x) * 0.00012, -0.016, 0.016) * step;
               }
 
-              ball.vx += Math.sin((now + ball.phase) * 0.0024) * 0.0007 * step;
+              ball.vx += Math.sin((now + ball.phase) * 0.0024) * 0.0006 * step;
 
               ball.x += ball.vx * step;
               ball.y += ball.vy * step;
@@ -1424,14 +1417,14 @@
               if (ball.x - BALL_R < WALL_LEFT) {
                 ball.x = WALL_LEFT + BALL_R;
                 if (ball.vx < 0) {
-                  ball.vx = Math.abs(ball.vx) * WALL_BOUNCE + 0.008;
+                  ball.vx = Math.abs(ball.vx) * WALL_BOUNCE + 0.006;
                 }
               }
 
               if (ball.x + BALL_R > WALL_RIGHT) {
                 ball.x = WALL_RIGHT - BALL_R;
                 if (ball.vx > 0) {
-                  ball.vx = -Math.abs(ball.vx) * WALL_BOUNCE - 0.008;
+                  ball.vx = -Math.abs(ball.vx) * WALL_BOUNCE - 0.006;
                 }
               }
 
@@ -1462,14 +1455,15 @@
 
                 if (peg.row !== ball.lastRowHit) {
                   ball.lastRowHit = peg.row;
+
                   const dir = ball.route[peg.row] || 0;
-                  ball.vx += dir * (0.030 + Math.random() * 0.010);
+                  ball.vx += dir * (0.026 + Math.random() * 0.010);
                   ball.vx += (Math.random() - 0.5) * 0.006;
                 } else {
-                  ball.vx += (Math.random() - 0.5) * 0.003;
+                  ball.vx += (Math.random() - 0.5) * 0.0025;
                 }
 
-                ball.vx = clamp(ball.vx, -1.1, 1.1);
+                ball.vx = clamp(ball.vx, -0.95, 0.95);
 
                 if (ny < -0.08) {
                   ball.vy *= 0.989;
@@ -1497,10 +1491,12 @@
                   }
                 }
 
-                ball.vx += clamp((targetX - ball.x) * 0.00135, -0.060, 0.060) * step;
-                ball.vx *= 0.990;
+                // Внизу чуть-чуть помогаем дойти до цели, но финальный приз всё равно по РЕАЛЬНОЙ ячейке
+                ball.vx += clamp((targetX - ball.x) * 0.0008, -0.030, 0.030) * step;
+                ball.vx *= 0.992;
 
-                if (ball.slotFrames > 22) {
+                // если долго внизу — фиксируем по фактической позиции
+                if (ball.slotFrames > 24) {
                   settleBall(ball, true);
                   continue;
                 }
@@ -1511,13 +1507,13 @@
               if (ball.y + BALL_R > SLOT_FLOOR_Y) {
                 ball.y = SLOT_FLOOR_Y - BALL_R;
 
-                if (Math.abs(ball.vy) > 0.11 && ball.floorHits < 2) {
+                if (Math.abs(ball.vy) > 0.10 && ball.floorHits < 2) {
                   ball.vy = -Math.abs(ball.vy) * FLOOR_BOUNCE;
                   ball.vx *= 0.94;
                   ball.floorHits += 1;
                 } else {
                   ball.vy = 0;
-                  settleBall(ball, ball.floorHits >= 2 || ball.slotFrames > 10);
+                  settleBall(ball, ball.floorHits >= 2 || ball.slotFrames > 8);
                   continue;
                 }
               }
@@ -1525,14 +1521,14 @@
               if (
                 ball.y > 64 &&
                 ball.y < SLOT_GUIDE_Y &&
-                Math.abs(ball.vx) < 0.010 &&
+                Math.abs(ball.vx) < 0.009 &&
                 Math.abs(ball.vy) < 0.14
               ) {
                 ball.idleFrames += 1;
 
                 if (ball.idleFrames > 6) {
                   const pushDir = Math.sign(targetX - ball.x) || (Math.random() < 0.5 ? -1 : 1);
-                  ball.vx += pushDir * (0.028 + Math.random() * 0.012);
+                  ball.vx += pushDir * (0.022 + Math.random() * 0.010);
                   ball.vy += 0.04;
                   ball.idleFrames = 0;
                 }
@@ -1547,6 +1543,7 @@
               }
             }
 
+            // столкновения шаров
             for (let i = 0; i < ballStates.length; i++) {
               const a = ballStates[i];
               if (a.settled) continue;
@@ -1645,8 +1642,10 @@
 
       const bucketIndexes = await simulateBalls(ballStates);
 
+      // Выплата идёт по РЕАЛЬНОЙ ячейке
       const totalWin = bucketIndexes.reduce((sum, idx) => {
-        return sum + Math.floor(bet * MULTIPLIERS[idx]);
+        const safeIdx = clamp(Number(idx) || 0, 0, MULTIPLIERS.length - 1);
+        return sum + Math.floor(bet * MULTIPLIERS[safeIdx]);
       }, 0);
 
       pendingWin = totalWin;
