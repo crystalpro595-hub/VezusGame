@@ -301,7 +301,6 @@
       opacity:.8;
     }
 
-    /* ВАЖНО: шарики теперь ПОД штырями */
     .balls-layer{
       position:absolute;
       inset:0;
@@ -333,14 +332,14 @@
         radial-gradient(circle, rgba(180,236,255,.55) 0%, rgba(70,198,255,.28) 55%, rgba(70,198,255,0) 100%);
       transform:translate(-50%, -50%);
       pointer-events:none;
-      opacity:.28;
+      opacity:.24;
       filter: blur(.4px);
-      animation: trailFade .28s linear forwards;
+      animation: trailFade .24s linear forwards;
     }
 
     @keyframes trailFade{
-      0%{ opacity:.34; transform:translate(-50%, -50%) scale(1); }
-      100%{ opacity:0; transform:translate(-50%, -50%) scale(.22); }
+      0%{ opacity:.32; transform:translate(-50%, -50%) scale(1); }
+      100%{ opacity:0; transform:translate(-50%, -50%) scale(.20); }
     }
 
     .buckets{
@@ -961,9 +960,9 @@
     ];
 
     const SPEEDS = [
-      { label: "›",   scale: 0.88 },
+      { label: "›",   scale: 0.84 },
       { label: "››",  scale: 1.00 },
-      { label: "›››", scale: 1.14 }
+      { label: "›››", scale: 1.16 }
     ];
 
     const BOARD_W = 300;
@@ -975,6 +974,8 @@
     const PEG_START_Y = 36;
 
     const BALL_R = 8;
+    const PEG_COLLISION_R = 6.2;
+    const SLOT_DIVIDER_HALF = 1.8;
 
     const WALL_LEFT = 14;
     const WALL_RIGHT = BOARD_W - 14;
@@ -985,8 +986,16 @@
     const BUCKET_COUNT = 9;
     const SLOT_W = (BUCKET_RIGHT - BUCKET_LEFT) / BUCKET_COUNT;
 
-    const SLOT_GUIDE_Y = 224;
-    const SLOT_FINAL_Y = 234;
+    const SLOT_GUIDE_Y = 222;
+    const SLOT_FLOOR_Y = 236;
+
+    const GRAVITY = 0.19;
+    const AIR_X = 0.998;
+    const AIR_Y = 0.9965;
+    const MAX_VY = 4.8;
+    const PEG_BOUNCE = 0.36;
+    const WALL_BOUNCE = 0.28;
+    const FLOOR_BOUNCE = 0.18;
 
     const $ = (id) => document.getElementById(id);
 
@@ -997,6 +1006,9 @@
     let selectedBalls = 1;
     let speedIndex = 1;
     let noticeTimer = null;
+
+    let pegs = [];
+    let slotDividers = [];
 
     function formatVc(value){
       const n = Number(value ?? 0);
@@ -1136,6 +1148,11 @@
       return BUCKET_LEFT + SLOT_W * index + SLOT_W / 2;
     }
 
+    function getBucketIndex(x){
+      const raw = Math.floor((x - BUCKET_LEFT) / SLOT_W);
+      return clamp(raw, 0, BUCKET_COUNT - 1);
+    }
+
     function chooseTargetBucket(){
       let r = Math.random();
       let sum = 0;
@@ -1157,7 +1174,7 @@
 
     function buildDirectionsForBucket(bucketIndex){
       const finalOffset = (bucketIndex - 4) * 2;
-      const plusCount = (PEG_ROWS + finalOffset) / 2;
+      const plusCount = clamp((PEG_ROWS + finalOffset) / 2, 0, PEG_ROWS);
 
       let dirs = [
         ...new Array(plusCount).fill(1),
@@ -1171,8 +1188,9 @@
       const board = $("board");
 
       board.querySelectorAll(".peg, .slot-divider").forEach(el => el.remove());
+      pegs = [];
+      slotDividers = [];
 
-      // Первый ряд из 2 штырей — старт с центра
       for (let row = 0; row < PEG_ROWS; row++) {
         const pegsInRow = row + 2; // 2..9
         const rowWidth = (pegsInRow - 1) * PEG_GAP_X;
@@ -1181,6 +1199,13 @@
 
         for (let i = 0; i < pegsInRow; i++) {
           const x = startX + i * PEG_GAP_X;
+
+          pegs.push({
+            x,
+            y,
+            row,
+            r: PEG_COLLISION_R
+          });
 
           const peg = document.createElement("div");
           peg.className = "peg";
@@ -1191,9 +1216,12 @@
       }
 
       for (let i = 1; i < BUCKET_COUNT; i++) {
+        const dividerX = BUCKET_LEFT + SLOT_W * i;
+        slotDividers.push(dividerX);
+
         const divider = document.createElement("div");
         divider.className = "slot-divider";
-        divider.style.left = `${BUCKET_LEFT + SLOT_W * i}px`;
+        divider.style.left = `${dividerX}px`;
         board.appendChild(divider);
       }
 
@@ -1232,7 +1260,7 @@
       t.style.left = `${x}px`;
       t.style.top = `${y}px`;
       $("ballsLayer").appendChild(t);
-      setTimeout(() => t.remove(), 280);
+      setTimeout(() => t.remove(), 240);
     }
 
     function highlightBucket(index){
@@ -1242,186 +1270,267 @@
       setTimeout(() => el.classList.remove("hit"), 300);
     }
 
-    function buildPathForBucket(bucketIndex, startX){
-      const dirs = buildDirectionsForBucket(bucketIndex);
-      const points = [];
+    function renderBall(ball){
+      const speed = Math.hypot(ball.vx, ball.vy);
+      const squash = Math.min(0.09, speed * 0.018);
+      const sx = 1 + squash * 0.10;
+      const sy = 1 - squash * 0.14;
 
-      let lane = 0;
-      let prevX = startX;
-
-      points.push({
-        x: startX,
-        y: 18,
-        arc: 0,
-        wobble: 0
-      });
-
-      for (let row = 0; row < PEG_ROWS; row++) {
-        const dir = dirs[row];
-        const rowY = PEG_START_Y + row * PEG_GAP_Y;
-
-        const nextLane = lane + dir;
-        const laneX = BOARD_CENTER_X + nextLane * (SLOT_W / 2);
-        const pinchX = BOARD_CENTER_X + ((lane + nextLane) / 2) * (SLOT_W / 2);
-
-        const wobble = (Math.random() - 0.5) * 0.9;
-        const side = dir * (0.9 + Math.random() * 0.45);
-
-        points.push({
-          x: pinchX - side,
-          y: rowY - 5,
-          arc: 1.4,
-          wobble
-        });
-
-        points.push({
-          x: pinchX + side,
-          y: rowY + 4,
-          arc: 2.8,
-          wobble: -wobble * 0.45
-        });
-
-        points.push({
-          x: laneX + (Math.random() - 0.5) * 0.7,
-          y: rowY + 14,
-          arc: 0.7,
-          wobble: (Math.random() - 0.5) * 0.5
-        });
-
-        lane = nextLane;
-        prevX = laneX;
-      }
-
-      const finalX = bucketCenter(bucketIndex);
-
-      points.push({
-        x: prevX + (finalX - prevX) * 0.38,
-        y: SLOT_GUIDE_Y,
-        arc: 0.9,
-        wobble: (Math.random() - 0.5) * 0.25
-      });
-
-      points.push({
-        x: prevX + (finalX - prevX) * 0.68,
-        y: SLOT_GUIDE_Y + 8,
-        arc: 0.45,
-        wobble: 0
-      });
-
-      points.push({
-        x: finalX,
-        y: SLOT_FINAL_Y + 2,
-        arc: 0.18,
-        wobble: 0
-      });
-
-      points.push({
-        x: finalX,
-        y: SLOT_FINAL_Y,
-        arc: 0,
-        wobble: 0
-      });
-
-      return points;
+      ball.el.style.left = `${ball.x}px`;
+      ball.el.style.top = `${ball.y}px`;
+      ball.el.style.transform = `translate(-50%, -50%) scale(${sx.toFixed(3)}, ${sy.toFixed(3)})`;
     }
 
-    function easeInOutQuad(t){
-      return t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
-    }
-
-    function animateBallPath(ball, points){
-      const speedScale = SPEEDS[speedIndex].scale;
-
-      return new Promise((resolve) => {
-        let segment = 0;
-        let trailTick = 0;
-
-        function runSegment(){
-          if (segment >= points.length - 1) {
-            ball.style.transform = "translate(-50%, -50%) scale(1,1)";
-            resolve();
-            return;
-          }
-
-          const start = points[segment];
-          const end = points[segment + 1];
-
-          const dx = end.x - start.x;
-          const dy = end.y - start.y;
-          const dist = Math.hypot(dx, dy);
-
-          const duration = Math.max(64, (dist * 9.7) / speedScale);
-          const startTime = performance.now();
-
-          function frame(now){
-            let t = (now - startTime) / duration;
-            if (t > 1) t = 1;
-
-            const kx = easeInOutQuad(t);
-            const ky = 1 - Math.pow(1 - t, 1.85);
-
-            let x = start.x + dx * kx;
-            let y = start.y + dy * ky;
-
-            const arc = end.arc || 0;
-            if (arc > 0) {
-              y -= Math.sin(t * Math.PI) * arc;
-            }
-
-            const wobble = end.wobble || 0;
-            if (Math.abs(wobble) > 0.001) {
-              x += Math.sin(t * Math.PI) * wobble;
-            }
-
-            const speedFeel = Math.min(0.08, (Math.abs(dy) + Math.abs(dx)) * 0.0019);
-            const compression = Math.sin(t * Math.PI) * speedFeel;
-            const sx = 1 + compression * 0.18;
-            const sy = 1 - compression * 0.30;
-
-            ball.style.left = `${x}px`;
-            ball.style.top = `${y}px`;
-            ball.style.transform = `translate(-50%, -50%) scale(${sx.toFixed(3)}, ${sy.toFixed(3)})`;
-
-            trailTick += 1;
-            if (trailTick >= 4) {
-              trailTick = 0;
-              createTrail(x, y);
-            }
-
-            if (t < 1) {
-              requestAnimationFrame(frame);
-            } else {
-              segment++;
-              runSegment();
-            }
-          }
-
-          requestAnimationFrame(frame);
-        }
-
-        runSegment();
-      });
-    }
-
-    async function dropOneBall(index, bet){
-      const spread = (index - (selectedBalls - 1) / 2) * 10;
+    function createBallState(i){
+      const spread = (i - (selectedBalls - 1) / 2) * 10;
       const startX = clamp(
         BOARD_CENTER_X + spread + (Math.random() - 0.5) * 4,
         WALL_LEFT + BALL_R + 2,
         WALL_RIGHT - BALL_R - 2
       );
 
-      const ball = createBall(startX);
-      const bucketIndex = chooseTargetBucket();
-      const path = buildPathForBucket(bucketIndex, startX);
+      const targetIndex = chooseTargetBucket();
 
-      await animateBallPath(ball, path);
+      return {
+        el: createBall(startX),
+        x: startX,
+        y: 18,
+        vx: (Math.random() - 0.5) * 0.08,
+        vy: 0.02 + Math.random() * 0.03,
+        route: buildDirectionsForBucket(targetIndex),
+        lastRowHit: -1,
+        bucketIndex: null,
+        settled: false,
+        didHit: false,
+        phase: Math.random() * 9999,
+        trailTick: Math.random() * 2,
+        idleFrames: 0
+      };
+    }
 
-      highlightBucket(bucketIndex);
+    function settleBall(ball){
+      const bucket = getBucketIndex(ball.x);
+      const centerX = bucketCenter(bucket);
 
-      setTimeout(() => ball.remove(), 140);
+      ball.x += (centerX - ball.x) * 0.18;
+      ball.vx *= 0.86;
 
-      return Math.floor(bet * MULTIPLIERS[bucketIndex]);
+      if (Math.abs(centerX - ball.x) < 0.55 && Math.abs(ball.vx) < 0.04 && Math.abs(ball.vy) < 0.05) {
+        ball.x = centerX;
+        ball.y = SLOT_FLOOR_Y - BALL_R;
+        ball.vx = 0;
+        ball.vy = 0;
+        ball.settled = true;
+        ball.bucketIndex = bucket;
+
+        if (!ball.didHit) {
+          ball.didHit = true;
+          highlightBucket(bucket);
+        }
+      }
+    }
+
+    function simulateBalls(ballStates){
+      return new Promise((resolve) => {
+        let lastTime = performance.now();
+        let totalRun = 0;
+
+        function frame(now){
+          const speedScale = SPEEDS[speedIndex].scale;
+          let dt = (now - lastTime) / 16.6667;
+          lastTime = now;
+
+          dt *= speedScale;
+          dt = clamp(dt, 0.70, 1.45);
+          totalRun += (now - lastTime);
+
+          const substeps = 4;
+
+          for (let s = 0; s < substeps; s++) {
+            const step = dt / substeps;
+
+            for (const ball of ballStates) {
+              if (ball.settled) continue;
+
+              ball.vy += GRAVITY * step;
+              ball.vy = Math.min(ball.vy, MAX_VY);
+
+              if (ball.y < 110) {
+                ball.vx += (BOARD_CENTER_X - ball.x) * 0.00007 * step;
+              }
+
+              ball.vx += Math.sin((now + ball.phase) * 0.0025) * 0.0009 * step;
+
+              ball.x += ball.vx * step;
+              ball.y += ball.vy * step;
+
+              ball.vx *= AIR_X;
+              ball.vy *= AIR_Y;
+
+              if (ball.x - BALL_R < WALL_LEFT) {
+                ball.x = WALL_LEFT + BALL_R;
+                if (ball.vx < 0) ball.vx = Math.abs(ball.vx) * WALL_BOUNCE + 0.01;
+              }
+
+              if (ball.x + BALL_R > WALL_RIGHT) {
+                ball.x = WALL_RIGHT - BALL_R;
+                if (ball.vx > 0) ball.vx = -Math.abs(ball.vx) * WALL_BOUNCE - 0.01;
+              }
+
+              for (const peg of pegs) {
+                const dx = ball.x - peg.x;
+                const dy = ball.y - peg.y;
+                const minDist = BALL_R + peg.r + 0.20;
+                const distSq = dx * dx + dy * dy;
+
+                if (distSq >= minDist * minDist) continue;
+
+                let dist = Math.sqrt(distSq);
+                if (dist < 0.0001) dist = 0.0001;
+
+                const nx = dx / dist;
+                const ny = dy / dist;
+                const overlap = minDist - dist;
+
+                ball.x += nx * overlap;
+                ball.y += ny * overlap;
+
+                const rel = ball.vx * nx + ball.vy * ny;
+
+                if (rel < 0) {
+                  ball.vx -= (1 + PEG_BOUNCE) * rel * nx;
+                  ball.vy -= (1 + PEG_BOUNCE) * rel * ny;
+                }
+
+                if (peg.row !== ball.lastRowHit) {
+                  ball.lastRowHit = peg.row;
+                  const dir = ball.route[peg.row] || 0;
+                  ball.vx += dir * (0.050 + Math.random() * 0.018);
+                  ball.vx += (Math.random() - 0.5) * 0.010;
+                } else {
+                  ball.vx += (Math.random() - 0.5) * 0.005;
+                }
+
+                if (ny < -0.08) {
+                  ball.vy *= 0.985;
+                }
+              }
+
+              if (ball.y >= SLOT_GUIDE_Y - BALL_R) {
+                for (const dividerX of slotDividers) {
+                  const dx = ball.x - dividerX;
+                  const minDist = BALL_R + SLOT_DIVIDER_HALF;
+
+                  if (Math.abs(dx) < minDist) {
+                    const nx = dx >= 0 ? 1 : -1;
+                    const overlap = minDist - Math.abs(dx);
+
+                    ball.x += nx * overlap;
+
+                    if (ball.vx * nx < 0) {
+                      ball.vx = -ball.vx * 0.16;
+                    }
+
+                    ball.vx += nx * 0.003;
+                  }
+                }
+
+                const bucket = getBucketIndex(ball.x);
+                const centerX = bucketCenter(bucket);
+
+                ball.vx += (centerX - ball.x) * 0.00065 * step;
+                ball.vx *= 0.992;
+              }
+
+              if (ball.y + BALL_R > SLOT_FLOOR_Y) {
+                ball.y = SLOT_FLOOR_Y - BALL_R;
+
+                if (Math.abs(ball.vy) > 0.12) {
+                  ball.vy = -Math.abs(ball.vy) * FLOOR_BOUNCE;
+                  ball.vx *= 0.94;
+                } else {
+                  ball.vy = 0;
+                  settleBall(ball);
+                }
+              }
+
+              if (ball.y > 70 && Math.abs(ball.vx) < 0.010 && Math.abs(ball.vy) < 0.10) {
+                ball.idleFrames += 1;
+                if (ball.idleFrames > 10) {
+                  ball.vx += (Math.random() - 0.5) * 0.05;
+                  ball.vy += 0.03;
+                  ball.idleFrames = 0;
+                }
+              } else {
+                ball.idleFrames = 0;
+              }
+
+              ball.trailTick += step;
+              if (ball.trailTick >= 2.4) {
+                ball.trailTick = 0;
+                createTrail(ball.x, ball.y);
+              }
+            }
+
+            for (let i = 0; i < ballStates.length; i++) {
+              const a = ballStates[i];
+              if (a.settled) continue;
+
+              for (let j = i + 1; j < ballStates.length; j++) {
+                const b = ballStates[j];
+                if (b.settled) continue;
+
+                const dx = b.x - a.x;
+                const dy = b.y - a.y;
+                const minDist = BALL_R * 2;
+                const distSq = dx * dx + dy * dy;
+
+                if (distSq >= minDist * minDist) continue;
+
+                let dist = Math.sqrt(distSq);
+                if (dist < 0.0001) dist = 0.0001;
+
+                const nx = dx / dist;
+                const ny = dy / dist;
+                const overlap = minDist - dist;
+
+                a.x -= nx * overlap * 0.5;
+                a.y -= ny * overlap * 0.5;
+                b.x += nx * overlap * 0.5;
+                b.y += ny * overlap * 0.5;
+
+                const rvx = b.vx - a.vx;
+                const rvy = b.vy - a.vy;
+                const rel = rvx * nx + rvy * ny;
+
+                if (rel < 0) {
+                  const impulse = (-(1 + 0.26) * rel) / 2;
+                  const ix = impulse * nx;
+                  const iy = impulse * ny;
+
+                  a.vx -= ix;
+                  a.vy -= iy;
+                  b.vx += ix;
+                  b.vy += iy;
+                }
+              }
+            }
+          }
+
+          for (const ball of ballStates) {
+            renderBall(ball);
+          }
+
+          if (ballStates.every(ball => ball.settled)) {
+            resolve(ballStates.map(ball => ball.bucketIndex));
+            return;
+          }
+
+          requestAnimationFrame(frame);
+        }
+
+        requestAnimationFrame(frame);
+      });
     }
 
     async function playRound(){
@@ -1454,15 +1563,22 @@
       updateBalanceUI();
       saveCachedBalance();
 
-      const drops = [];
+      const ballStates = [];
       for (let i = 0; i < selectedBalls; i++) {
-        drops.push(dropOneBall(i, bet));
+        ballStates.push(createBallState(i));
       }
 
-      const payouts = await Promise.all(drops);
-      const totalWin = payouts.reduce((sum, value) => sum + value, 0);
+      const bucketIndexes = await simulateBalls(ballStates);
+
+      const totalWin = bucketIndexes.reduce((sum, idx) => {
+        return sum + Math.floor(bet * MULTIPLIERS[idx]);
+      }, 0);
 
       pendingWin = totalWin;
+
+      setTimeout(() => {
+        ballStates.forEach(ball => ball.el.remove());
+      }, 220);
 
       $("playBtn").style.display = "none";
       $("claimBtn").style.display = "block";
