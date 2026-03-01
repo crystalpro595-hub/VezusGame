@@ -282,8 +282,8 @@
       z-index:1;
     }
 
-    .rail.left{ left:16px; }
-    .rail.right{ right:16px; }
+    .rail.left{ left:14px; }
+    .rail.right{ right:14px; }
 
     .peg{
       position:absolute;
@@ -348,8 +348,8 @@
 
     .buckets{
       position:absolute;
-      left:18px;
-      right:18px;
+      left:16px;
+      right:16px;
       bottom:12px;
       display:grid;
       grid-template-columns:repeat(9, minmax(0,1fr));
@@ -944,6 +944,18 @@
 
     const MULTIPLIERS = [10, 5, 2, 0.4, 0.2, 0.4, 2, 5, 10];
 
+    const TARGET_WEIGHTS = [
+      0.003, // 10x
+      0.015, // 5x
+      0.085, // 2x
+      0.23,  // 0.4x
+      0.334, // 0.2x
+      0.23,  // 0.4x
+      0.085, // 2x
+      0.015, // 5x
+      0.003  // 10x
+    ];
+
     const SPEEDS = [
       { label: "›",   scale: 0.80 },
       { label: "››",  scale: 1.00 },
@@ -954,31 +966,24 @@
     const BOARD_H = 286;
 
     const PEG_ROWS = 8;
-    const PEG_GAP_X = 26;
+    const PEG_GAP_X = 28;
     const PEG_GAP_Y = 23;
     const PEG_START_Y = 32;
 
     const BALL_R = 8;
     const PEG_R = 5;
 
-    const WALL_LEFT = 18;
-    const WALL_RIGHT = BOARD_W - 18;
+    const WALL_LEFT = 14;
+    const WALL_RIGHT = BOARD_W - 14;
     const BOARD_CENTER_X = BOARD_W / 2;
 
-    const BUCKET_LEFT = 18;
-    const BUCKET_RIGHT = BOARD_W - 18;
+    const BUCKET_LEFT = 16;
+    const BUCKET_RIGHT = BOARD_W - 16;
     const BUCKET_COUNT = 9;
     const SLOT_W = (BUCKET_RIGHT - BUCKET_LEFT) / BUCKET_COUNT;
 
     const CATCH_LINE_Y = 224;
     const SETTLE_LINE_Y = 231;
-
-    const RARE_10_CHANCE = 0.004;
-    const RARE_5_CHANCE  = 0.020;
-
-    const FORCE_TO_04_FROM_2 = 0.72;
-    const FORCE_TO_02_FROM_04 = 0.40;
-    const FORCE_EDGE_TO_LOW = 0.72;
 
     const $ = (id) => document.getElementById(id);
 
@@ -1006,7 +1011,7 @@
         window.Telegram.WebApp.openTelegramLink(url);
         return;
       }
-      window.open(url, "_blank', 'noopener");
+      window.open(url, "_blank", "noopener");
     }
 
     function loadCachedProfile(){
@@ -1125,50 +1130,14 @@
       return BUCKET_LEFT + SLOT_W * index + SLOT_W / 2;
     }
 
-    function getBucketIndex(x){
-      const raw = Math.floor((x - BUCKET_LEFT) / SLOT_W);
-      return Math.max(0, Math.min(BUCKET_COUNT - 1, raw));
-    }
+    function chooseTargetBucket(){
+      let r = Math.random();
+      let sum = 0;
 
-    function remapBucket(rawIdx, rareRoll){
-      if (rawIdx === 0) {
-        if (rareRoll < RARE_10_CHANCE) return 0;
-        if (rareRoll < RARE_5_CHANCE) return 1;
-        return rareRoll < FORCE_EDGE_TO_LOW ? 3 : 2;
+      for (let i = 0; i < TARGET_WEIGHTS.length; i++) {
+        sum += TARGET_WEIGHTS[i];
+        if (r <= sum) return i;
       }
-
-      if (rawIdx === 8) {
-        if (rareRoll < RARE_10_CHANCE) return 8;
-        if (rareRoll < RARE_5_CHANCE) return 7;
-        return rareRoll < FORCE_EDGE_TO_LOW ? 5 : 6;
-      }
-
-      if (rawIdx === 1) {
-        if (rareRoll < RARE_5_CHANCE) return 1;
-        return rareRoll < 0.62 ? 3 : 2;
-      }
-
-      if (rawIdx === 7) {
-        if (rareRoll < RARE_5_CHANCE) return 7;
-        return rareRoll < 0.62 ? 5 : 6;
-      }
-
-      if (rawIdx === 2) {
-        return rareRoll < FORCE_TO_04_FROM_2 ? 3 : 2;
-      }
-
-      if (rawIdx === 6) {
-        return rareRoll < FORCE_TO_04_FROM_2 ? 5 : 6;
-      }
-
-      if (rawIdx === 3) {
-        return rareRoll < FORCE_TO_02_FROM_04 ? 4 : 3;
-      }
-
-      if (rawIdx === 5) {
-        return rareRoll < FORCE_TO_02_FROM_04 ? 4 : 5;
-      }
-
       return 4;
     }
 
@@ -1252,20 +1221,20 @@
       ballState.el.style.transform = `translate(-50%, -50%) scale(${sx.toFixed(3)}, ${sy.toFixed(3)})`;
     }
 
-    function settleBall(ballState, forced = false){
-      const rawIdx = getBucketIndex(ballState.x);
-      const targetIdx = remapBucket(rawIdx, ballState.rareRoll);
-      const targetX = bucketCenter(targetIdx);
+    function clamp(val, min, max){
+      return Math.max(min, Math.min(max, val));
+    }
 
-      ballState.targetIndex = targetIdx;
+    function settleBall(ballState, forced = false){
+      const targetX = bucketCenter(ballState.targetIndex);
 
       if (!forced) {
-        ballState.vx += (targetX - ballState.x) * 0.0038;
-        ballState.vx *= 0.962;
+        ballState.vx += (targetX - ballState.x) * 0.0052;
+        ballState.vx *= 0.956;
 
-        if (ballState.y > SETTLE_LINE_Y - 6) {
-          ballState.x += (targetX - ballState.x) * 0.18;
-          ballState.vy *= 0.80;
+        if (ballState.y > SETTLE_LINE_Y - 8) {
+          ballState.x += (targetX - ballState.x) * 0.20;
+          ballState.vy *= 0.78;
         }
       }
 
@@ -1273,7 +1242,7 @@
         forced ||
         (
           ballState.y >= SETTLE_LINE_Y + 4 &&
-          Math.abs(ballState.x - targetX) < 1.5 &&
+          Math.abs(ballState.x - targetX) < 1.6 &&
           Math.abs(ballState.vx) < 0.28 &&
           Math.abs(ballState.vy) < 0.62
         )
@@ -1283,11 +1252,11 @@
         ballState.vx = 0;
         ballState.vy = 0;
         ballState.settled = true;
-        ballState.bucketIndex = targetIdx;
+        ballState.bucketIndex = ballState.targetIndex;
 
         if (!ballState.didHit) {
           ballState.didHit = true;
-          highlightBucket(targetIdx);
+          highlightBucket(ballState.targetIndex);
         }
       }
     }
@@ -1312,23 +1281,34 @@
             for (const ball of ballStates) {
               if (ball.settled) continue;
 
-              ball.vy += 0.23 * step;
-              ball.vx += ((BOARD_CENTER_X - ball.x) * 0.00020) * step;
+              const targetX = bucketCenter(ball.targetIndex);
+
+              ball.vy += 0.225 * step;
+
+              let guide = 0;
+              if (ball.y > 78)  guide += (targetX - ball.x) * 0.00007;
+              if (ball.y > 132) guide += (targetX - ball.x) * 0.00013;
+              if (ball.y > 182) guide += (targetX - ball.x) * 0.00024;
+
+              guide = clamp(guide, -0.08, 0.08);
+
+              ball.vx += guide * step;
+              ball.vx += Math.sin((now + ball.phase) * 0.004) * 0.0018 * step;
 
               ball.x += ball.vx * step;
               ball.y += ball.vy * step;
 
-              ball.vx *= 0.998;
+              ball.vx *= 0.9975;
               ball.vy *= 0.999;
 
               if (ball.x - BALL_R < WALL_LEFT) {
                 ball.x = WALL_LEFT + BALL_R;
-                ball.vx = Math.abs(ball.vx) * 0.88 + 0.05;
+                ball.vx = Math.abs(ball.vx) * 0.90 + 0.04;
               }
 
               if (ball.x + BALL_R > WALL_RIGHT) {
                 ball.x = WALL_RIGHT - BALL_R;
-                ball.vx = -Math.abs(ball.vx) * 0.88 - 0.05;
+                ball.vx = -Math.abs(ball.vx) * 0.90 - 0.04;
               }
 
               for (const peg of pegs) {
@@ -1352,21 +1332,23 @@
                 const rel = ball.vx * nx + ball.vy * ny;
 
                 if (rel < 0) {
-                  const restitution = 0.92;
+                  const restitution = 0.94;
                   ball.vx -= (1 + restitution) * rel * nx;
                   ball.vy -= (1 + restitution) * rel * ny;
 
-                  const sidePush = (Math.random() - 0.5) * 0.08 + (nx > 0 ? 0.05 : -0.05);
+                  const toward = Math.sign(targetX - ball.x);
+                  const sidePush = (Math.random() - 0.5) * 0.09 + toward * 0.018;
+
                   ball.vx += sidePush;
 
-                  if (ny < -0.08) {
-                    ball.vy -= 0.06;
+                  if (ny < -0.06) {
+                    ball.vy -= 0.07;
                   }
                 }
               }
 
               ball.trailTick += step;
-              if (ball.trailTick >= 1.15) {
+              if (ball.trailTick >= 1.1) {
                 ball.trailTick = 0;
                 createTrail(ball.x, ball.y);
               }
@@ -1404,7 +1386,7 @@
                 const rel = rvx * nx + rvy * ny;
 
                 if (rel < 0) {
-                  const restitution = 0.9;
+                  const restitution = 0.90;
                   const impulse = (-(1 + restitution) * rel) / 2;
 
                   const ix = impulse * nx;
@@ -1484,22 +1466,28 @@
       const ballStates = [];
 
       for (let i = 0; i < selectedBalls; i++) {
-        const startShift = (i - (selectedBalls - 1) / 2) * 9;
-        const startX = BOARD_CENTER_X + startShift;
+        const spread = (i - (selectedBalls - 1) / 2) * 14;
+        const randomStart = (Math.random() - 0.5) * 46;
+        const startX = clamp(
+          BOARD_CENTER_X + spread + randomStart,
+          WALL_LEFT + BALL_R + 4,
+          WALL_RIGHT - BALL_R - 4
+        );
+
         const ballEl = createBall(startX);
 
         ballStates.push({
           el: ballEl,
           x: startX,
           y: 18,
-          vx: (Math.random() - 0.5) * 0.28 + startShift * 0.018,
-          vy: 0.10 + Math.random() * 0.05,
+          vx: (Math.random() - 0.5) * 0.65,
+          vy: 0.09 + Math.random() * 0.05,
           settled: false,
           bucketIndex: null,
-          targetIndex: null,
+          targetIndex: chooseTargetBucket(),
           didHit: false,
           trailTick: Math.random() * 0.9,
-          rareRoll: Math.random()
+          phase: Math.random() * 10000
         });
       }
 
