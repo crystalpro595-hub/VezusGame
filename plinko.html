@@ -11,7 +11,6 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
   <link rel="preload" as="image" href="https://i.postimg.cc/qvL497mF/Picsart-26-02-27-02-02-37-502.png">
-
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
 
   <style>
@@ -20,7 +19,7 @@
       --safe-bottom: env(safe-area-inset-bottom, 0px);
       --safe-top: env(safe-area-inset-top, 0px);
 
-      --glass: rgba(12, 14, 20, .82);
+      --glass: rgba(12, 14, 20, .80);
       --stroke: rgba(255,255,255,.08);
       --shadow: 0 18px 42px rgba(0,0,0,.48);
       --shadow-soft: 0 12px 28px rgba(0,0,0,.34);
@@ -31,6 +30,8 @@
       --green2:#16a34a;
       --red1:#ef4444;
       --red2:#dc2626;
+      --yellow1:#ffd95c;
+      --yellow2:#c98a00;
     }
 
     *{
@@ -59,8 +60,8 @@
       position:fixed;
       inset:0;
       background:
-        radial-gradient(900px 600px at 30% 10%, rgba(255,255,255,.05), transparent 60%),
-        linear-gradient(180deg, rgba(0,0,0,.40), rgba(0,0,0,.66));
+        radial-gradient(1000px 700px at 30% 10%, rgba(42,171,238,.14), transparent 55%),
+        linear-gradient(180deg, rgba(0,0,0,.42), rgba(0,0,0,.68));
       pointer-events:none;
       z-index:0;
     }
@@ -73,7 +74,7 @@
       overflow:auto;
       padding:0 16px calc(28px + var(--safe-bottom)) 16px;
       z-index:1;
-      overscroll-behavior:contain;
+      overscroll-behavior: contain;
       scrollbar-width:none;
     }
 
@@ -106,12 +107,13 @@
     .top-row{
       width:100%;
       display:grid;
-      grid-template-columns:40px minmax(0,1fr) 54px;
+      grid-template-columns:40px minmax(0,1fr) 40px 54px;
       gap:8px;
       align-items:center;
     }
 
-    .icon-btn{
+    .icon-btn,
+    .rule-btn{
       width:40px;
       height:40px;
       border:none;
@@ -125,12 +127,29 @@
       cursor:pointer;
       backdrop-filter: blur(10px);
       -webkit-backdrop-filter: blur(10px);
-      font-size:18px;
-      font-weight:900;
       padding:0;
     }
 
-    .icon-btn:active{ transform:scale(.98); }
+    .icon-btn{
+      font-size:18px;
+      font-weight:900;
+    }
+
+    .icon-btn:active,
+    .rule-btn:active{
+      transform:scale(.98);
+    }
+
+    .rule-btn svg{
+      width:18px;
+      height:18px;
+      stroke: rgba(234,241,255,.92);
+      fill:none;
+      stroke-width:2;
+      stroke-linecap:round;
+      stroke-linejoin:round;
+      display:block;
+    }
 
     .balance-mini{
       width:100%;
@@ -220,91 +239,211 @@
       backdrop-filter: blur(10px);
       -webkit-backdrop-filter: blur(10px);
       overflow:hidden;
+      position:relative;
+    }
+
+    .card::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      background:
+        radial-gradient(420px 160px at 0% 0%, rgba(42,171,238,.08), transparent 60%),
+        radial-gradient(360px 140px at 100% 100%, rgba(42,171,238,.05), transparent 60%);
+      pointer-events:none;
+    }
+
+    .card > *{
+      position:relative;
+      z-index:1;
     }
 
     .board-card{
-      padding:12px;
+      padding:14px 14px 10px;
     }
 
     .board-wrap{
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      padding:2px 0 0;
+    }
+
+    .board-stage{
       position:relative;
-      width:100%;
-      aspect-ratio: 1 / 1.06;
-      min-height:320px;
-      border-radius:22px;
+      width:280px;
+      height:360px;
+      max-width:100%;
       overflow:hidden;
+      border-radius:22px;
       background:
-        radial-gradient(280px 180px at 50% 0%, rgba(42,171,238,.12), transparent 65%),
-        linear-gradient(180deg, rgba(7,14,30,.92), rgba(6,12,24,.98));
+        radial-gradient(circle at 50% 0%, rgba(42,171,238,.10), transparent 40%),
+        linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.015)),
+        rgba(4, 10, 22, .72);
       border:1px solid rgba(255,255,255,.05);
       box-shadow:
         inset 0 1px 0 rgba(255,255,255,.03),
-        inset 0 -18px 26px rgba(0,0,0,.22);
+        inset 0 -18px 28px rgba(0,0,0,.16);
     }
 
-    #plinkoCanvas{
-      width:100%;
-      height:100%;
-      display:block;
+    .board-glow{
+      position:absolute;
+      inset:auto 50% 18px 50%;
+      width:210px;
+      height:110px;
+      transform:translateX(-50%);
+      background: radial-gradient(circle, rgba(42,171,238,.10), transparent 70%);
+      filter: blur(18px);
+      pointer-events:none;
     }
 
-    .play-zone{
+    .pegs-layer{
+      position:absolute;
+      inset:0;
+      pointer-events:none;
+    }
+
+    .peg{
+      position:absolute;
+      width:10px;
+      height:10px;
+      margin-left:-5px;
+      margin-top:-5px;
+      border-radius:50%;
+      background:
+        radial-gradient(circle at 32% 28%, rgba(255,255,255,.95), rgba(210,228,255,.72) 35%, rgba(116,148,190,.48) 60%, rgba(28,42,70,.18) 100%);
+      border:1px solid rgba(255,255,255,.18);
+      box-shadow:
+        0 0 8px rgba(42,171,238,.08),
+        inset 0 1px 0 rgba(255,255,255,.42),
+        inset 0 -1px 2px rgba(0,0,0,.16);
+    }
+
+    .bins-layer{
+      position:absolute;
+      left:0;
+      right:0;
+      bottom:8px;
+      height:58px;
+      pointer-events:none;
+    }
+
+    .bin{
+      position:absolute;
+      bottom:0;
+      width:24px;
+      margin-left:-12px;
+      height:48px;
+      border-radius:12px 12px 14px 14px;
       display:flex;
-      flex-direction:column;
-      gap:12px;
-    }
-
-    .primary-btn{
-      width:100%;
-      height:54px;
-      border:none;
-      border-radius:18px;
-      cursor:pointer;
+      align-items:flex-end;
+      justify-content:center;
+      padding-bottom:8px;
       color:#fff;
-      font-size:15px;
+      font-size:11px;
       font-weight:900;
-      letter-spacing:.2px;
-      transition: transform .16s ease, opacity .16s ease, box-shadow .16s ease;
+      letter-spacing:.1px;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.03)),
+        rgba(255,255,255,.04);
+      border:1px solid rgba(255,255,255,.08);
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.05),
+        0 8px 16px rgba(0,0,0,.16);
+      transition: transform .18s ease, box-shadow .18s ease, filter .18s ease;
+      text-shadow: 0 2px 8px rgba(0,0,0,.25);
     }
 
-    .primary-btn.play{
-      background: linear-gradient(180deg, var(--tg1), var(--tg2));
-      box-shadow: 0 18px 34px rgba(34,158,217,.28);
+    .bin.hot{
+      background:
+        linear-gradient(180deg, rgba(255,217,92,.24), rgba(201,138,0,.16)),
+        rgba(255,255,255,.04);
+      color:#fff8d0;
     }
 
-    .primary-btn.claim{
-      background: linear-gradient(180deg, var(--green1), var(--green2));
-      box-shadow: 0 18px 34px rgba(34,197,94,.24);
+    .bin.mid{
+      background:
+        linear-gradient(180deg, rgba(42,171,238,.18), rgba(22,110,170,.12)),
+        rgba(255,255,255,.04);
     }
 
-    .primary-btn:active{
-      transform: scale(.985);
+    .bin.hit{
+      transform: translateY(-5px) scale(1.08);
+      box-shadow:
+        0 0 16px rgba(42,171,238,.18),
+        inset 0 1px 0 rgba(255,255,255,.08),
+        0 12px 20px rgba(0,0,0,.20);
+      filter: brightness(1.14);
     }
 
-    .primary-btn:disabled{
-      opacity:.55;
-      cursor:not-allowed;
-      box-shadow:none;
-      transform:none !important;
+    .ball{
+      position:absolute;
+      left:50%;
+      top:20px;
+      width:18px;
+      height:18px;
+      margin-left:-9px;
+      margin-top:-9px;
+      border-radius:50%;
+      background:
+        radial-gradient(circle at 30% 28%, #ffffff 0%, #d7efff 20%, #7dd3fc 42%, #2AABEE 68%, #1d4ed8 100%);
+      border:1px solid rgba(255,255,255,.28);
+      box-shadow:
+        0 0 12px rgba(42,171,238,.16),
+        0 8px 14px rgba(0,0,0,.16),
+        inset 0 1px 0 rgba(255,255,255,.55);
+      transform: translate(-50%, -50%);
+      opacity:0;
+      will-change: transform, opacity;
+      z-index:5;
     }
 
-    .panel{
+    .action-card,
+    .control-card{
       padding:16px;
       display:flex;
       flex-direction:column;
       gap:14px;
     }
 
-    .label{
+    .section-label{
       font-size:13px;
       font-weight:900;
-      color: rgba(234,241,255,.94);
-      margin-bottom:10px;
+      color: rgba(234,241,255,.95);
+      margin:0 0 10px 0;
     }
+
+    .mode-grid{
+      display:grid;
+      grid-template-columns:repeat(3, minmax(0,1fr));
+      gap:8px;
+    }
+
+    .pill-btn{
+      height:42px;
+      border:none;
+      border-radius:16px;
+      cursor:pointer;
+      background: rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.08);
+      color:#fff;
+      font-size:12px;
+      font-weight:900;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.04);
+      transition: transform .16s ease, box-shadow .16s ease, background .16s ease;
+    }
+
+    .pill-btn.active{
+      background: linear-gradient(180deg, rgba(42,171,238,.22), rgba(34,158,217,.14));
+      box-shadow:
+        0 10px 18px rgba(34,158,217,.14),
+        inset 0 1px 0 rgba(255,255,255,.06);
+    }
+
+    .pill-btn:active{ transform:scale(.98); }
 
     .bet-row{
       display:grid;
-      grid-template-columns:minmax(0,1fr) 50px;
+      grid-template-columns:minmax(0,1fr) 48px;
       gap:8px;
       align-items:center;
     }
@@ -316,7 +455,7 @@
       border:1px solid rgba(255,255,255,.08);
       background: rgba(255,255,255,.06);
       color:#fff;
-      font-size:17px;
+      font-size:16px;
       font-weight:900;
       padding:0 14px;
       outline:none;
@@ -330,7 +469,7 @@
     }
 
     .bet-toggle{
-      width:50px;
+      width:48px;
       height:50px;
       border:none;
       border-radius:18px;
@@ -344,13 +483,18 @@
       padding:0;
     }
 
-    .bet-toggle:active{ transform:scale(.98); }
-
     .bet-toggle svg{
-      width:22px;
-      height:22px;
+      width:20px;
+      height:20px;
       display:block;
+      fill:none;
+      stroke:#fff;
+      stroke-width:1.9;
+      stroke-linecap:round;
+      stroke-linejoin:round;
     }
+
+    .bet-toggle:active{ transform:scale(.98); }
 
     .quick-bets{
       display:grid;
@@ -383,32 +527,55 @@
 
     .quick-btn:active{ transform:scale(.98); }
 
-    .ball-count-grid{
-      display:grid;
-      grid-template-columns:repeat(3, minmax(0,1fr));
-      gap:8px;
+    .action-wrap{
+      max-height:64px;
+      overflow:hidden;
+      transition:max-height .2s ease, opacity .18s ease, transform .18s ease;
     }
 
-    .ball-count-btn{
-      height:42px;
+    .action-wrap.hide{
+      max-height:0;
+      opacity:0;
+      transform:translateY(-6px);
+      pointer-events:none;
+    }
+
+    .play-btn,
+    .claim-btn{
+      width:100%;
+      height:54px;
       border:none;
-      border-radius:15px;
+      border-radius:18px;
       cursor:pointer;
-      background: rgba(255,255,255,.07);
-      border:1px solid rgba(255,255,255,.08);
       color:#fff;
-      font-size:13px;
+      font-size:15px;
       font-weight:900;
-      transition: transform .14s ease, background .14s ease, border-color .14s ease;
+      letter-spacing:.2px;
+      transition: transform .16s ease, opacity .16s ease, box-shadow .16s ease;
     }
 
-    .ball-count-btn.active{
-      background: linear-gradient(180deg, rgba(42,171,238,.28), rgba(34,158,217,.20));
-      border-color: rgba(42,171,238,.28);
-      box-shadow: 0 10px 20px rgba(34,158,217,.14);
+    .play-btn{
+      background: linear-gradient(180deg, var(--tg1), var(--tg2));
+      box-shadow: 0 18px 34px rgba(34,158,217,.28);
     }
 
-    .ball-count-btn:active{ transform:scale(.98); }
+    .claim-btn{
+      background: linear-gradient(180deg, var(--green1), var(--green2));
+      box-shadow: 0 18px 34px rgba(34,197,94,.24);
+    }
+
+    .play-btn:active,
+    .claim-btn:active{
+      transform:scale(.985);
+    }
+
+    .play-btn:disabled,
+    .claim-btn:disabled{
+      opacity:.55;
+      cursor:not-allowed;
+      box-shadow:none;
+      transform:none !important;
+    }
 
     .bottom-notice{
       position:fixed;
@@ -540,7 +707,7 @@
       padding:0;
     }
 
-    .popup-x:active{ transform: scale(.98); }
+    .popup-x:active{ transform:scale(.98); }
 
     .popup-body{
       padding:14px 16px 16px 16px;
@@ -549,7 +716,8 @@
       gap:12px;
     }
 
-    .popup-text{
+    .popup-text,
+    .rule-line{
       margin:0;
       font-size:13px;
       line-height:1.42;
@@ -576,7 +744,7 @@
       font-size:14px;
     }
 
-    .tg-btn:active{ transform: scale(.99); }
+    .tg-btn:active{ transform:scale(.99); }
 
     .tg-ico{
       width:22px;
@@ -593,9 +761,9 @@
       align-items:center;
       justify-content:center;
       background:
-        radial-gradient(900px 650px at 50% 15%, rgba(61,196,255,.20), transparent 52%),
-        linear-gradient(180deg, #020915 0%, #062344 52%, #0a4f82 100%);
-      transition: opacity .28s ease, visibility .28s ease;
+        radial-gradient(900px 700px at 50% 18%, rgba(42,171,238,.22), transparent 42%),
+        linear-gradient(180deg, #03111f 0%, #06325a 48%, #0a5c90 100%);
+      transition: opacity .32s ease, visibility .32s ease;
     }
 
     .preloader.hide{
@@ -605,23 +773,28 @@
     }
 
     .pre-logo{
-      width:90px;
-      height:90px;
+      width:88px;
+      height:88px;
       object-fit:contain;
       display:block;
-      filter: drop-shadow(0 14px 24px rgba(0,0,0,.26));
-      animation: preBounce 1s ease-in-out infinite;
+      filter: drop-shadow(0 14px 24px rgba(0,0,0,.22));
+      animation: preLogoFloat .95s ease-in-out infinite;
     }
 
-    @keyframes preBounce{
+    @keyframes preLogoFloat{
       0%,100%{ transform: translateY(0) scale(1); }
-      50%{ transform: translateY(-9px) scale(1.03); }
+      50%{ transform: translateY(-8px) scale(1.02); }
     }
 
     @media (max-width: 360px){
-      .top-row{ grid-template-columns:36px minmax(0,1fr) 46px; gap:6px; }
+      .top-row{ grid-template-columns:36px minmax(0,1fr) 36px 46px; gap:6px; }
 
-      .icon-btn{ width:36px; height:36px; border-radius:12px; font-size:16px; }
+      .icon-btn,
+      .rule-btn{ width:36px; height:36px; border-radius:12px; }
+
+      .icon-btn{ font-size:16px; }
+
+      .rule-btn svg{ width:17px; height:17px; }
 
       .logo-btn{ width:46px; height:46px; }
 
@@ -629,25 +802,28 @@
 
       .bal-amount{ min-width:74px; height:24px; font-size:12px; }
 
-      .board-wrap{ min-height:280px; border-radius:18px; }
+      .board-stage{
+        width:252px;
+        height:330px;
+      }
 
-      .bet-row{ grid-template-columns:minmax(0,1fr) 46px; }
+      .mode-grid{
+        grid-template-columns:1fr;
+      }
 
-      .bet-input{ height:46px; font-size:15px; }
+      .quick-bets{
+        grid-template-columns:repeat(3, minmax(0,1fr));
+      }
 
-      .bet-toggle{ width:46px; height:46px; border-radius:16px; }
+      .play-btn,
+      .claim-btn{
+        height:50px;
+        font-size:14px;
+      }
 
-      .quick-bets{ grid-template-columns:repeat(3, minmax(0,1fr)); }
-
-      .quick-btn{ height:36px; }
-
-      .primary-btn{ height:50px; font-size:14px; }
-
-      .ball-count-btn{ height:40px; font-size:12px; }
+      .pre-logo{ width:76px; height:76px; }
 
       .tg-btn{ height:48px; border-radius:15px; }
-
-      .pre-logo{ width:78px; height:78px; }
     }
 
     @media (prefers-reduced-motion: reduce){
@@ -678,6 +854,14 @@
             <div class="bal-amount" id="balanceValue">...</div>
           </div>
 
+          <button class="rule-btn" id="rulesBtn" aria-label="Правила">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M9 9a3 3 0 1 1 5.2 2.1c-.9.9-1.7 1.5-1.7 2.9"></path>
+              <path d="M12 17h.01"></path>
+              <circle cx="12" cy="12" r="9"></circle>
+            </svg>
+          </button>
+
           <button class="logo-btn" id="logoBtn" aria-label="Открыть Telegram канал">
             <img
               src="https://i.postimg.cc/qvL497mF/Picsart-26-02-27-02-02-37-502.png"
@@ -692,66 +876,95 @@
 
       <div class="card board-card">
         <div class="board-wrap">
-          <canvas id="plinkoCanvas"></canvas>
-        </div>
-      </div>
-
-      <div class="play-zone">
-        <button class="primary-btn play" id="primaryBtn" type="button">Играть</button>
-
-        <div class="card panel">
-          <div>
-            <div class="label">Ставка</div>
-
-            <div class="bet-row">
-              <input
-                class="bet-input"
-                id="betInput"
-                type="number"
-                min="10"
-                step="1"
-                inputmode="numeric"
-                placeholder="Минимум 10"
-                value="10"
-              >
-
-              <button class="bet-toggle" id="betToggleBtn" type="button" aria-label="Быстрая ставка">
-                <svg viewBox="0 0 24 24" aria-hidden="true">
-                  <defs>
-                    <linearGradient id="coinGradPlinko" x1="0" y1="0" x2="1" y2="1">
-                      <stop offset="0%" stop-color="#ffe27a"/>
-                      <stop offset="55%" stop-color="#f6b428"/>
-                      <stop offset="100%" stop-color="#c98508"/>
-                    </linearGradient>
-                  </defs>
-                  <circle cx="12" cy="12" r="9" fill="url(#coinGradPlinko)" stroke="rgba(255,255,255,.45)" stroke-width="1.1"/>
-                  <circle cx="12" cy="12" r="6.2" fill="none" stroke="rgba(255,255,255,.35)" stroke-width="1"/>
-                  <path d="M9.2 9.4h4.5c1.2 0 2 .7 2 1.7 0 1.1-.8 1.8-2.1 1.8H10.7c-1.3 0-2.1.7-2.1 1.8 0 1 .8 1.7 2 1.7H15" fill="none" stroke="rgba(87,48,0,.85)" stroke-width="1.4" stroke-linecap="round"/>
-                </svg>
-              </button>
-            </div>
-
-            <div class="quick-bets" id="quickBets">
-              <button class="quick-btn" data-bet="10" type="button">10</button>
-              <button class="quick-btn" data-bet="25" type="button">25</button>
-              <button class="quick-btn" data-bet="50" type="button">50</button>
-              <button class="quick-btn" data-bet="100" type="button">100</button>
-              <button class="quick-btn" data-bet="250" type="button">250</button>
-            </div>
-          </div>
-
-          <div>
-            <div class="label">Количество шаров</div>
-
-            <div class="ball-count-grid">
-              <button class="ball-count-btn active" data-count="1" type="button">1 шар</button>
-              <button class="ball-count-btn" data-count="2" type="button">2 шара</button>
-              <button class="ball-count-btn" data-count="3" type="button">3 шара</button>
-            </div>
+          <div class="board-stage" id="boardStage">
+            <div class="board-glow"></div>
+            <div class="pegs-layer" id="pegsLayer"></div>
+            <div class="bins-layer" id="binsLayer"></div>
+            <div class="ball" id="ball"></div>
           </div>
         </div>
       </div>
 
+      <div class="card action-card">
+        <div class="action-wrap" id="playWrap">
+          <button class="play-btn" id="playBtn" type="button">Играть</button>
+        </div>
+
+        <div class="action-wrap hide" id="claimWrap">
+          <button class="claim-btn" id="claimBtn" type="button">Забрать</button>
+        </div>
+      </div>
+
+      <div class="card control-card">
+        <div>
+          <div class="section-label">Скорость падения</div>
+          <div class="mode-grid" id="speedGrid">
+            <button class="pill-btn" data-speed="slow" type="button">Медленный</button>
+            <button class="pill-btn active" data-speed="medium" type="button">Средний</button>
+            <button class="pill-btn" data-speed="fast" type="button">Быстрый</button>
+          </div>
+        </div>
+
+        <div>
+          <div class="section-label">Ставка за 1 шар</div>
+
+          <div class="bet-row">
+            <input
+              class="bet-input"
+              id="betInput"
+              type="number"
+              min="10"
+              step="1"
+              inputmode="numeric"
+              placeholder="Минимум 10"
+              value="10"
+            >
+
+            <button class="bet-toggle" id="betToggleBtn" type="button" aria-label="Быстрый выбор ставки">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <circle cx="12" cy="12" r="8.5"></circle>
+                <path d="M12 7.8v8.4"></path>
+                <path d="M8.8 12h6.4"></path>
+              </svg>
+            </button>
+          </div>
+
+          <div class="quick-bets" id="quickBets">
+            <button class="quick-btn" data-bet="10" type="button">10</button>
+            <button class="quick-btn" data-bet="25" type="button">25</button>
+            <button class="quick-btn" data-bet="50" type="button">50</button>
+            <button class="quick-btn" data-bet="100" type="button">100</button>
+            <button class="quick-btn" data-bet="250" type="button">250</button>
+          </div>
+        </div>
+
+        <div>
+          <div class="section-label">Количество шариков</div>
+          <div class="mode-grid" id="ballsGrid">
+            <button class="pill-btn active" data-balls="1" type="button">1 шар</button>
+            <button class="pill-btn" data-balls="2" type="button">2 шара</button>
+            <button class="pill-btn" data-balls="3" type="button">3 шара</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="overlay" id="rulesOverlay" aria-hidden="true">
+    <div class="popup" role="dialog" aria-modal="true" aria-label="Правила">
+      <div class="popup-head">
+        <div class="popup-title">Правила игры</div>
+        <button class="popup-x" id="rulesClose" aria-label="Закрыть">✕</button>
+      </div>
+
+      <div class="popup-body">
+        <p class="rule-line">• Выбери скорость падения</p>
+        <p class="rule-line">• Укажи ставку за 1 шар</p>
+        <p class="rule-line">• Выбери: 1, 2 или 3 шара</p>
+        <p class="rule-line">• Нажми <b>«Играть»</b></p>
+        <p class="rule-line">• После раунда можно нажать <b>«Забрать»</b></p>
+      </div>
     </div>
   </div>
 
@@ -781,28 +994,40 @@
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <script>
     const VERIFY_URL = "https://lazrfierfbhwlduqlvws.functions.supabase.co/verify-telegram";
-    const MIN_BET = 10;
+
     const FILES = { games: "games.html" };
 
-    const SLOT_MULTIPLIERS = [5, 2.4, 1.4, 0.8, 0.3, 0.8, 1.4, 2.4, 5];
-    const ROWS = SLOT_MULTIPLIERS.length - 1;
+    const MIN_BET = 10;
+    const ROWS = 10;
+    const MULTIPLIERS = [0.3, 0.5, 0.7, 1, 2, 10, 2, 1, 0.7, 0.5, 0.3];
+    const SLOT_WEIGHTS = [16, 15, 13, 11, 8, 2, 8, 11, 13, 15, 16];
+
+    const SPEEDS = {
+      slow: 1420,
+      medium: 1120,
+      fast: 860
+    };
+
+    const BOARD = {
+      width: 280,
+      height: 360,
+      topPad: 34,
+      rowGap: 24,
+      pegGap: 26,
+      binY: 322
+    };
 
     const $ = (id) => document.getElementById(id);
 
     let currentBalance = 0;
-    let pendingWin = 0;
-    let isDropping = false;
-    let selectedBallCount = 1;
+    let selectedSpeed = "medium";
+    let selectedBalls = 1;
     let quickVisible = false;
-    let noticeTimer = null;
 
-    let canvas = null;
-    let ctx = null;
-    let dpr = Math.max(1, window.devicePixelRatio || 1);
-    let boardRect = { width: 0, height: 0 };
-    let activeBalls = [];
-    let rafId = null;
-    let roundState = null;
+    let isDropping = false;
+    let pendingWin = 0;
+    let noticeTimer = null;
+    let currentAnimationFrame = null;
 
     function formatVc(value){
       const n = Number(value ?? 0);
@@ -831,7 +1056,7 @@
     }
 
     function saveCachedBalance(){
-      try{
+      try {
         const cached = loadCachedProfile() || {};
         cached.balance = currentBalance;
         localStorage.setItem("tg_profile", JSON.stringify(cached));
@@ -853,13 +1078,6 @@
       $("balanceValue").textContent = formatVc(currentBalance);
     }
 
-    function getBetAmount(){
-      const raw = $("betInput").value;
-      const amount = Number(raw);
-      if (!raw || !Number.isFinite(amount)) return 0;
-      return Math.floor(amount);
-    }
-
     function showNotice(text, type = "info"){
       const box = $("bottomNotice");
       $("noticeText").textContent = text;
@@ -870,7 +1088,7 @@
       box.classList.add("show");
 
       if (noticeTimer) clearTimeout(noticeTimer);
-      noticeTimer = setTimeout(() => box.classList.remove("show"), 2100);
+      noticeTimer = setTimeout(() => box.classList.remove("show"), 1900);
     }
 
     function setQuickVisible(show){
@@ -878,29 +1096,42 @@
       $("quickBets").classList.toggle("show", quickVisible);
     }
 
-    function setSelectedBallCount(count){
-      selectedBallCount = count;
-      document.querySelectorAll(".ball-count-btn").forEach((btn) => {
-        btn.classList.toggle("active", Number(btn.dataset.count) === count);
-      });
-      updatePrimaryButton();
+    function setClaimVisible(show){
+      $("claimWrap").classList.toggle("hide", !show);
+      $("playWrap").classList.toggle("hide", !!show);
+      updateButtons();
     }
 
-    function updatePrimaryButton(){
-      const btn = $("primaryBtn");
+    function updateClaimButton(){
+      $("claimBtn").textContent = pendingWin > 0
+        ? `Забрать ${formatVc(pendingWin)}`
+        : "Забрать";
+    }
+
+    function getBetAmount(){
+      const raw = $("betInput").value;
+      const amount = Number(raw);
+      if (!raw || !Number.isFinite(amount)) return 0;
+      return Math.floor(amount);
+    }
+
+    function getTotalCost(){
+      return getBetAmount() * selectedBalls;
+    }
+
+    function updateButtons(){
       const bet = getBetAmount();
-      const totalStake = bet * selectedBallCount;
+      const total = getTotalCost();
 
-      if (pendingWin > 0) {
-        btn.className = "primary-btn claim";
-        btn.textContent = `Забрать ${formatVc(pendingWin)}`;
-        btn.disabled = isDropping;
-        return;
-      }
+      const canPlay =
+        !isDropping &&
+        pendingWin <= 0 &&
+        bet >= MIN_BET &&
+        total <= currentBalance;
 
-      btn.className = "primary-btn play";
-      btn.textContent = isDropping ? "Игра..." : "Играть";
-      btn.disabled = isDropping || bet < MIN_BET || totalStake > currentBalance;
+      $("playBtn").disabled = !canPlay;
+      $("claimBtn").disabled = isDropping || pendingWin <= 0;
+      updateClaimButton();
     }
 
     async function autoAuthTelegram(){
@@ -915,7 +1146,7 @@
 
       const initData = getTelegramInitData();
       if (!initData) {
-        updatePrimaryButton();
+        updateButtons();
         return;
       }
 
@@ -941,409 +1172,300 @@
       }
 
       updateBalanceUI();
-      updatePrimaryButton();
+      updateButtons();
     }
 
-    function easeInOutSine(t){
-      return -(Math.cos(Math.PI * t) - 1) / 2;
+    function renderBoard(){
+      const pegsLayer = $("pegsLayer");
+      const binsLayer = $("binsLayer");
+
+      pegsLayer.innerHTML = "";
+      binsLayer.innerHTML = "";
+
+      const centerX = BOARD.width / 2;
+
+      for (let row = 0; row < ROWS; row++) {
+        const count = row + 1;
+        const y = BOARD.topPad + row * BOARD.rowGap;
+        const startX = centerX - (row * BOARD.pegGap) / 2;
+
+        for (let col = 0; col < count; col++) {
+          const peg = document.createElement("div");
+          peg.className = "peg";
+          peg.style.left = `${startX + col * BOARD.pegGap}px`;
+          peg.style.top = `${y}px`;
+          pegsLayer.appendChild(peg);
+        }
+      }
+
+      const binStartX = centerX - (ROWS * BOARD.pegGap) / 2;
+
+      MULTIPLIERS.forEach((mult, index) => {
+        const bin = document.createElement("div");
+        const isHot = mult >= 5;
+        const isMid = mult >= 1 && mult < 5;
+
+        bin.className = `bin${isHot ? " hot" : ""}${isMid ? " mid" : ""}`;
+        bin.style.left = `${binStartX + index * BOARD.pegGap}px`;
+        bin.textContent = `${mult}x`;
+        bin.dataset.index = String(index);
+
+        binsLayer.appendChild(bin);
+      });
+    }
+
+    function highlightBin(index){
+      const bin = document.querySelector(`.bin[data-index="${index}"]`);
+      if (!bin) return;
+      bin.classList.add("hit");
+      setTimeout(() => bin.classList.remove("hit"), 420);
+    }
+
+    function setSpeed(speed){
+      if (!SPEEDS[speed]) return;
+      selectedSpeed = speed;
+
+      document.querySelectorAll("#speedGrid .pill-btn").forEach((btn) => {
+        btn.classList.toggle("active", btn.dataset.speed === speed);
+      });
+    }
+
+    function setBalls(count){
+      selectedBalls = count;
+
+      document.querySelectorAll("#ballsGrid .pill-btn").forEach((btn) => {
+        btn.classList.toggle("active", Number(btn.dataset.balls) === count);
+      });
+
+      updateButtons();
+    }
+
+    function weightedSlot(){
+      const total = SLOT_WEIGHTS.reduce((sum, w) => sum + w, 0);
+      let rnd = Math.random() * total;
+
+      for (let i = 0; i < SLOT_WEIGHTS.length; i++) {
+        rnd -= SLOT_WEIGHTS[i];
+        if (rnd <= 0) return i;
+      }
+
+      return SLOT_WEIGHTS.length - 1;
+    }
+
+    function shuffle(array){
+      const a = array.slice();
+      for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+      }
+      return a;
+    }
+
+    function buildPathForSlot(slotIndex){
+      const centerX = BOARD.width / 2;
+      const rightsNeeded = slotIndex;
+
+      const steps = [];
+      for (let i = 0; i < ROWS; i++) {
+        steps.push(i < rightsNeeded ? 1 : 0);
+      }
+
+      const shuffledSteps = shuffle(steps);
+      const points = [{ x:centerX, y:18, type:"start" }];
+
+      let rights = 0;
+
+      for (let row = 0; row < ROWS; row++) {
+        const step = shuffledSteps[row];
+        rights += step;
+
+        const pegX = centerX + (2 * rights - (row + 1)) * (BOARD.pegGap / 2);
+        const pegY = BOARD.topPad + row * BOARD.rowGap;
+        const dir = step === 1 ? 1 : -1;
+
+        points.push({ x: pegX, y: pegY, type:"impact" });
+
+        points.push({
+          x: pegX + dir * (BOARD.pegGap * 0.26),
+          y: pegY + BOARD.rowGap * 0.52,
+          type:"release"
+        });
+      }
+
+      const finalStartX = centerX - (ROWS * BOARD.pegGap) / 2;
+      const finalX = finalStartX + slotIndex * BOARD.pegGap;
+
+      points.push({
+        x: finalX,
+        y: BOARD.binY - 18,
+        type:"end"
+      });
+
+      return points;
     }
 
     function lerp(a, b, t){
       return a + (b - a) * t;
     }
 
-    function round2(n){
-      return Math.round(n * 100) / 100;
+    function easeInOutCubic(t){
+      return t < 0.5
+        ? 4 * t * t * t
+        : 1 - Math.pow(-2 * t + 2, 3) / 2;
     }
 
-    function resizeCanvas(){
-      const rect = canvas.getBoundingClientRect();
-      boardRect.width = Math.max(280, Math.floor(rect.width));
-      boardRect.height = Math.max(300, Math.floor(rect.height));
-
-      dpr = Math.max(1, window.devicePixelRatio || 1);
-      canvas.width = Math.floor(boardRect.width * dpr);
-      canvas.height = Math.floor(boardRect.height * dpr);
-
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      drawScene();
+    function sleep(ms){
+      return new Promise((resolve) => setTimeout(resolve, ms));
     }
 
-    function getLayout(){
-      const width = boardRect.width;
-      const height = boardRect.height;
+    function animateBall(slotIndex){
+      return new Promise((resolve) => {
+        const ball = $("ball");
+        const path = buildPathForSlot(slotIndex);
+        const duration = SPEEDS[selectedSpeed];
 
-      const sidePad = Math.max(22, width * 0.08);
-      const topPad = 28;
-      const slotH = 42;
-      const bottomPad = 10;
-      const step = (width - sidePad * 2) / ROWS;
-      const centerX = width / 2;
+        const lengths = [];
+        let total = 0;
 
-      const pegAreaTop = topPad + 18;
-      const pegAreaBottom = height - slotH - bottomPad - 32;
-      const rowGap = (pegAreaBottom - pegAreaTop) / (ROWS - 1);
-
-      const pegRows = [];
-      for (let r = 0; r < ROWS; r++) {
-        const y = pegAreaTop + r * rowGap;
-        const startX = centerX - (r * step) / 2;
-        const pegs = [];
-        for (let c = 0; c <= r; c++) pegs.push(startX + c * step);
-        pegRows.push({ y, pegs });
-      }
-
-      const slotY = height - slotH - bottomPad;
-      const slotCenters = [];
-      for (let i = 0; i <= ROWS; i++) {
-        slotCenters.push(centerX + (i - ROWS / 2) * step);
-      }
-
-      return {
-        width,
-        height,
-        sidePad,
-        step,
-        centerX,
-        rowGap,
-        pegRows,
-        slotH,
-        slotY,
-        slotCenters,
-        startX: centerX,
-        startY: 18
-      };
-    }
-
-    function drawRoundedRect(x, y, w, h, r, fill, stroke){
-      ctx.beginPath();
-      ctx.moveTo(x + r, y);
-      ctx.arcTo(x + w, y, x + w, y + h, r);
-      ctx.arcTo(x + w, y + h, x, y + h, r);
-      ctx.arcTo(x, y + h, x, y, r);
-      ctx.arcTo(x, y, x + w, y, r);
-      ctx.closePath();
-
-      if (fill) {
-        ctx.fillStyle = fill;
-        ctx.fill();
-      }
-      if (stroke) {
-        ctx.strokeStyle = stroke;
-        ctx.lineWidth = 1;
-        ctx.stroke();
-      }
-    }
-
-    function drawBoardBase(){
-      const layout = getLayout();
-
-      ctx.clearRect(0, 0, layout.width, layout.height);
-
-      const bgGrad = ctx.createLinearGradient(0, 0, 0, layout.height);
-      bgGrad.addColorStop(0, "rgba(11,20,40,.92)");
-      bgGrad.addColorStop(.58, "rgba(7,14,28,.98)");
-      bgGrad.addColorStop(1, "rgba(6,11,24,1)");
-      ctx.fillStyle = bgGrad;
-      ctx.fillRect(0, 0, layout.width, layout.height);
-
-      const glow = ctx.createRadialGradient(layout.width/2, 20, 10, layout.width/2, 20, layout.width * .55);
-      glow.addColorStop(0, "rgba(42,171,238,.14)");
-      glow.addColorStop(1, "rgba(42,171,238,0)");
-      ctx.fillStyle = glow;
-      ctx.fillRect(0, 0, layout.width, layout.height);
-
-      // Пеги
-      layout.pegRows.forEach((row, r) => {
-        row.pegs.forEach((px) => {
-          const pegGrad = ctx.createLinearGradient(px, row.y - 6, px, row.y + 6);
-          pegGrad.addColorStop(0, "rgba(232,242,255,.92)");
-          pegGrad.addColorStop(.45, "rgba(152,191,230,.88)");
-          pegGrad.addColorStop(1, "rgba(66,110,162,.94)");
-
-          ctx.beginPath();
-          ctx.arc(px, row.y, 5.2, 0, Math.PI * 2);
-          ctx.fillStyle = pegGrad;
-          ctx.fill();
-
-          ctx.beginPath();
-          ctx.arc(px, row.y, 5.2, 0, Math.PI * 2);
-          ctx.strokeStyle = "rgba(255,255,255,.16)";
-          ctx.lineWidth = 1;
-          ctx.stroke();
-
-          ctx.beginPath();
-          ctx.arc(px - 1.1, row.y - 1.4, 1.5, 0, Math.PI * 2);
-          ctx.fillStyle = "rgba(255,255,255,.42)";
-          ctx.fill();
-        });
-      });
-
-      // Линии к слотам
-      for (let i = 0; i <= ROWS; i++) {
-        const cx = layout.slotCenters[i];
-        const topY = layout.slotY - 18;
-
-        ctx.beginPath();
-        ctx.moveTo(cx - layout.step / 2 + 2, topY);
-        ctx.lineTo(cx - layout.step / 2 + 10, layout.slotY + layout.slotH);
-        ctx.strokeStyle = "rgba(255,255,255,.06)";
-        ctx.lineWidth = 2;
-        ctx.stroke();
-
-        ctx.beginPath();
-        ctx.moveTo(cx + layout.step / 2 - 2, topY);
-        ctx.lineTo(cx + layout.step / 2 - 10, layout.slotY + layout.slotH);
-        ctx.stroke();
-      }
-
-      // Слоты
-      SLOT_MULTIPLIERS.forEach((mult, i) => {
-        const slotW = Math.max(28, layout.step - 4);
-        const x = layout.slotCenters[i] - slotW / 2;
-        const y = layout.slotY;
-
-        let fill = "rgba(255,255,255,.07)";
-        if (mult >= 5) fill = "rgba(239,68,68,.22)";
-        else if (mult >= 2) fill = "rgba(249,115,22,.20)";
-        else if (mult >= 1.4) fill = "rgba(250,204,21,.18)";
-        else if (mult >= 0.8) fill = "rgba(59,130,246,.18)";
-        else fill = "rgba(107,114,128,.18)";
-
-        drawRoundedRect(x, y, slotW, layout.slotH, 12, fill, "rgba(255,255,255,.08)");
-
-        ctx.fillStyle = "rgba(255,255,255,.96)";
-        ctx.font = "900 11px Inter, sans-serif";
-        ctx.textAlign = "center";
-        ctx.textBaseline = "middle";
-        ctx.fillText(`${mult}x`, layout.slotCenters[i], y + layout.slotH / 2);
-      });
-
-      return layout;
-    }
-
-    function drawBalls(layout){
-      activeBalls.forEach((ball) => {
-        const ballGrad = ctx.createRadialGradient(
-          ball.x - ball.r * .3,
-          ball.y - ball.r * .4,
-          2,
-          ball.x,
-          ball.y,
-          ball.r
-        );
-
-        ballGrad.addColorStop(0, "rgba(255,255,255,.98)");
-        ballGrad.addColorStop(.34, "rgba(130,221,255,.95)");
-        ballGrad.addColorStop(1, "rgba(32,149,235,.98)");
-
-        ctx.beginPath();
-        ctx.arc(ball.x, ball.y, ball.r, 0, Math.PI * 2);
-        ctx.fillStyle = ballGrad;
-        ctx.fill();
-
-        ctx.beginPath();
-        ctx.arc(ball.x, ball.y, ball.r, 0, Math.PI * 2);
-        ctx.strokeStyle = "rgba(255,255,255,.26)";
-        ctx.lineWidth = 1;
-        ctx.stroke();
-      });
-    }
-
-    function drawScene(){
-      if (!ctx) return;
-      const layout = drawBoardBase();
-      drawBalls(layout);
-    }
-
-    function buildBallPath(){
-      const layout = getLayout();
-
-      const points = [{ x: layout.startX, y: layout.startY }];
-      let x = layout.startX;
-      let rights = 0;
-
-      for (let r = 0; r < ROWS; r++) {
-        const goRight = Math.random() < 0.5;
-        if (goRight) rights++;
-        x += goRight ? layout.step / 2 : -layout.step / 2;
-
-        points.push({
-          x,
-          y: layout.pegRows[r].y + layout.rowGap * 0.46
-        });
-      }
-
-      points.push({
-        x: layout.slotCenters[rights],
-        y: layout.slotY - 9
-      });
-
-      return {
-        slotIndex: rights,
-        points
-      };
-    }
-
-    function startAnimationLoop(){
-      if (rafId) return;
-      rafId = requestAnimationFrame(tick);
-    }
-
-    function stopAnimationLoop(){
-      if (rafId) cancelAnimationFrame(rafId);
-      rafId = null;
-    }
-
-    function tick(ts){
-      let hasActive = false;
-
-      activeBalls = activeBalls.filter((ball) => {
-        if (ts < ball.startAt) {
-          hasActive = true;
-          return true;
+        for (let i = 0; i < path.length - 1; i++) {
+          const dx = path[i + 1].x - path[i].x;
+          const dy = path[i + 1].y - path[i].y;
+          const len = Math.hypot(dx, dy);
+          lengths.push(len);
+          total += len;
         }
 
-        const elapsed = ts - ball.startAt;
-        const progress = Math.min(elapsed / ball.duration, 1);
-
-        const segCount = ball.points.length - 1;
-        const rawSeg = progress * segCount;
-        const segIndex = Math.min(Math.floor(rawSeg), segCount - 1);
-        const localT = easeInOutSine(rawSeg - segIndex);
-
-        const p1 = ball.points[segIndex];
-        const p2 = ball.points[segIndex + 1];
-
-        ball.x = lerp(p1.x, p2.x, localT);
-        ball.y = lerp(p1.y, p2.y, localT);
-        ball.r = 7.5 + Math.sin(progress * Math.PI) * 1.2;
-
-        if (progress >= 1) {
-          handleBallLand(ball.slotIndex);
-          return false;
+        const cumulative = [0];
+        for (let i = 0; i < lengths.length; i++) {
+          cumulative.push(cumulative[i] + lengths[i]);
         }
 
-        hasActive = true;
-        return true;
+        ball.style.opacity = "1";
+        let startTime = 0;
+
+        function frame(now){
+          if (!startTime) startTime = now;
+
+          const elapsed = now - startTime;
+          const progress = Math.min(1, elapsed / duration);
+          const travelled = total * progress;
+
+          let seg = 0;
+          while (seg < lengths.length - 1 && travelled > cumulative[seg + 1]) {
+            seg++;
+          }
+
+          const segStart = cumulative[seg];
+          const segLen = lengths[seg] || 1;
+          const segT = Math.max(0, Math.min(1, (travelled - segStart) / segLen));
+          const eased = easeInOutCubic(segT);
+
+          const p0 = path[seg];
+          const p1 = path[seg + 1];
+
+          let x = lerp(p0.x, p1.x, eased);
+          let y = lerp(p0.y, p1.y, eased);
+
+          let scaleX = 1;
+          let scaleY = 1;
+
+          if (p1.type === "impact" && segT > 0.78) {
+            const crush = Math.sin(((segT - 0.78) / 0.22) * Math.PI);
+            scaleX += 0.18 * crush;
+            scaleY -= 0.14 * crush;
+          }
+
+          if (p0.type === "impact" && segT < 0.35) {
+            const spring = Math.sin((segT / 0.35) * Math.PI);
+            scaleX -= 0.06 * spring;
+            scaleY += 0.10 * spring;
+          }
+
+          const spin = elapsed * 0.72;
+          ball.style.transform =
+            `translate(${x}px, ${y}px) translate(-50%, -50%) rotate(${spin}deg) scale(${scaleX}, ${scaleY})`;
+
+          if (progress < 1) {
+            currentAnimationFrame = requestAnimationFrame(frame);
+          } else {
+            ball.style.transform =
+              `translate(${p1.x}px, ${p1.y}px) translate(-50%, -50%) rotate(${spin}deg) scale(1,1)`;
+            resolve();
+          }
+        }
+
+        if (currentAnimationFrame) cancelAnimationFrame(currentAnimationFrame);
+        currentAnimationFrame = requestAnimationFrame(frame);
       });
-
-      drawScene();
-
-      if (hasActive) {
-        rafId = requestAnimationFrame(tick);
-      } else {
-        stopAnimationLoop();
-        finishRoundIfNeeded();
-      }
     }
 
-    function handleBallLand(slotIndex){
-      if (!roundState) return;
-      const mult = SLOT_MULTIPLIERS[slotIndex] || 0;
-      const payout = round2(roundState.betPerBall * mult);
-
-      roundState.completed += 1;
-      roundState.totalPayout = round2(roundState.totalPayout + payout);
-    }
-
-    function finishRoundIfNeeded(){
-      if (!roundState) return;
-      if (roundState.completed < roundState.totalBalls) return;
-
-      const payout = round2(roundState.totalPayout);
-      const spent = roundState.totalStake;
-      const net = round2(payout - spent);
-
-      if (payout > spent) {
-        pendingWin = payout;
-        showNotice(`Раунд в плюс: ${formatVc(net)}`, "win");
-      } else {
-        pendingWin = 0;
-        if (payout > 0) {
-          currentBalance = round2(currentBalance + payout);
-          saveCachedBalance();
-          updateBalanceUI();
-        }
-
-        if (net < 0) showNotice(`Раунд: ${formatVc(net)}`, "lose");
-        else showNotice("Раунд без изменений", "info");
-      }
-
-      isDropping = false;
-      roundState = null;
-      updatePrimaryButton();
-    }
-
-    function startRound(){
-      if (isDropping) return;
-
-      if (pendingWin > 0) {
-        claimWin();
-        return;
-      }
+    async function playRound(){
+      if (isDropping || pendingWin > 0) return;
 
       const bet = getBetAmount();
-      const totalStake = bet * selectedBallCount;
+      const totalCost = getTotalCost();
 
       if (bet < MIN_BET) {
         showNotice(`Минимум ${MIN_BET} VC`, "lose");
         return;
       }
 
-      if (totalStake > currentBalance) {
+      if (totalCost > currentBalance) {
         showNotice("Недостаточно средств", "lose");
         return;
       }
 
-      currentBalance = round2(currentBalance - totalStake);
-      saveCachedBalance();
-      updateBalanceUI();
-
       isDropping = true;
-      updatePrimaryButton();
       setQuickVisible(false);
 
-      roundState = {
-        betPerBall: bet,
-        totalBalls: selectedBallCount,
-        totalStake,
-        totalPayout: 0,
-        completed: 0
-      };
+      currentBalance -= totalCost;
+      updateBalanceUI();
+      saveCachedBalance();
+      updateButtons();
 
-      const startBase = performance.now() + 40;
-      activeBalls = [];
+      let totalPayout = 0;
 
-      for (let i = 0; i < selectedBallCount; i++) {
-        const path = buildBallPath();
-        const first = path.points[0];
+      for (let i = 0; i < selectedBalls; i++) {
+        const slot = weightedSlot();
+        const mult = MULTIPLIERS[slot];
+        const payout = Math.round(bet * mult);
 
-        activeBalls.push({
-          points: path.points,
-          slotIndex: path.slotIndex,
-          startAt: startBase + i * 220,
-          duration: 980,
-          x: first.x,
-          y: first.y,
-          r: 7.5
-        });
+        await animateBall(slot);
+        highlightBin(slot);
+
+        if (payout > 0) {
+          totalPayout += payout;
+        }
+
+        await sleep(120);
       }
 
-      startAnimationLoop();
+      isDropping = false;
+      pendingWin = totalPayout;
+
+      if (pendingWin > 0) {
+        setClaimVisible(true);
+        showNotice(`Раунд завершён • Забрать ${formatVc(pendingWin)}`, "win");
+      } else {
+        setClaimVisible(false);
+        showNotice("Без выигрыша", "lose");
+      }
+
+      updateButtons();
     }
 
     function claimWin(){
-      if (pendingWin <= 0 || isDropping) return;
+      if (isDropping || pendingWin <= 0) return;
 
-      currentBalance = round2(currentBalance + pendingWin);
-      saveCachedBalance();
+      currentBalance += pendingWin;
       updateBalanceUI();
+      saveCachedBalance();
 
       showNotice(`Забрано ${formatVc(pendingWin)}`, "win");
 
       pendingWin = 0;
-      updatePrimaryButton();
+      setClaimVisible(false);
+      updateButtons();
     }
 
     function openOverlay(id){
@@ -1362,19 +1484,29 @@
 
     $("backBtn").addEventListener("click", () => goTo(FILES.games));
     $("logoBtn").addEventListener("click", () => openOverlay("channelOverlay"));
+    $("rulesBtn").addEventListener("click", () => openOverlay("rulesOverlay"));
+
     $("channelClose").addEventListener("click", () => closeOverlay("channelOverlay"));
+    $("rulesClose").addEventListener("click", () => closeOverlay("rulesOverlay"));
 
     $("channelOverlay").addEventListener("click", (e) => {
       if (e.target === $("channelOverlay")) closeOverlay("channelOverlay");
+    });
+
+    $("rulesOverlay").addEventListener("click", (e) => {
+      if (e.target === $("rulesOverlay")) closeOverlay("rulesOverlay");
     });
 
     $("goChannel").addEventListener("click", () => {
       openTelegramLinkSafe("https://t.me/vezuspubg");
     });
 
-    $("primaryBtn").addEventListener("click", () => {
-      if (pendingWin > 0) claimWin();
-      else startRound();
+    document.querySelectorAll("#speedGrid .pill-btn").forEach((btn) => {
+      btn.addEventListener("click", () => setSpeed(btn.dataset.speed));
+    });
+
+    document.querySelectorAll("#ballsGrid .pill-btn").forEach((btn) => {
+      btn.addEventListener("click", () => setBalls(Number(btn.dataset.balls)));
     });
 
     $("betToggleBtn").addEventListener("click", () => {
@@ -1383,46 +1515,38 @@
 
     document.querySelectorAll(".quick-btn").forEach((btn) => {
       btn.addEventListener("click", () => {
-        const value = btn.getAttribute("data-bet");
-        if (!value) return;
-        $("betInput").value = value;
+        $("betInput").value = btn.dataset.bet || "10";
         setQuickVisible(false);
-        updatePrimaryButton();
+        updateButtons();
       });
     });
 
     $("betInput").addEventListener("input", () => {
-      updatePrimaryButton();
+      updateButtons();
     });
 
-    document.querySelectorAll(".ball-count-btn").forEach((btn) => {
-      btn.addEventListener("click", () => {
-        setSelectedBallCount(Number(btn.dataset.count || 1));
-      });
-    });
+    $("playBtn").addEventListener("click", playRound);
+    $("claimBtn").addEventListener("click", claimWin);
 
     document.addEventListener("keydown", (e) => {
-      if (e.key === "Escape") closeOverlay("channelOverlay");
-      if (e.key === "Enter" && document.activeElement === $("betInput")) startRound();
+      if (e.key === "Escape") {
+        closeOverlay("channelOverlay");
+        closeOverlay("rulesOverlay");
+      }
     });
 
-    window.addEventListener("resize", () => {
-      resizeCanvas();
-    });
-
-    window.addEventListener("load", async () => {
-      canvas = $("plinkoCanvas");
-      ctx = canvas.getContext("2d");
-
-      resizeCanvas();
-      drawScene();
-      updatePrimaryButton();
+    window.addEventListener("load", () => {
+      renderBoard();
+      setSpeed("medium");
+      setBalls(1);
+      updateClaimButton();
+      updateButtons();
 
       setTimeout(() => {
         $("preloader").classList.add("hide");
-      }, 1800);
+      }, 1400);
 
-      await autoAuthTelegram();
+      autoAuthTelegram();
     });
   </script>
 </body>
