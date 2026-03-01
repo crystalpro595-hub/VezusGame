@@ -134,9 +134,9 @@
     }
 
     .speed-btn{
-      font-size:11px;
+      font-size:15px;
       font-weight:900;
-      letter-spacing:.2px;
+      letter-spacing:.4px;
     }
 
     .icon-btn:active,
@@ -262,8 +262,8 @@
 
     .board-stage{
       position:relative;
-      width:min(100%, 310px);
-      height:360px;
+      width:min(100%, 300px);
+      height:350px;
       overflow:hidden;
       border-radius:22px;
       background:
@@ -278,9 +278,9 @@
 
     .board-glow{
       position:absolute;
-      inset:auto 50% 16px 50%;
-      width:200px;
-      height:100px;
+      inset:auto 50% 18px 50%;
+      width:190px;
+      height:96px;
       transform:translateX(-50%);
       background: radial-gradient(circle, rgba(42,171,238,.10), transparent 70%);
       filter: blur(18px);
@@ -771,11 +771,11 @@
       .top-row{ grid-template-columns:36px minmax(0,1fr) 36px 46px; gap:6px; }
       .icon-btn, .speed-btn{ width:36px; height:36px; border-radius:12px; }
       .icon-btn{ font-size:16px; }
-      .speed-btn{ font-size:10px; }
+      .speed-btn{ font-size:13px; }
       .logo-btn{ width:46px; height:46px; }
       .balance-mini{ height:38px; }
       .bal-amount{ min-width:74px; height:24px; font-size:12px; }
-      .board-stage{ height:330px; }
+      .board-stage{ height:330px; width:min(100%, 286px); }
       .mode-grid{ grid-template-columns:1fr; }
       .quick-bets{ grid-template-columns:repeat(3, minmax(0,1fr)); }
       .play-btn, .claim-btn{ height:50px; font-size:14px; }
@@ -811,7 +811,7 @@
             <div class="bal-amount" id="balanceValue">...</div>
           </div>
 
-          <button class="speed-btn" id="speedBtn" aria-label="Сменить скорость">MED</button>
+          <button class="speed-btn" id="speedBtn" aria-label="Сменить скорость">››</button>
 
           <button class="logo-btn" id="logoBtn" aria-label="Открыть Telegram канал">
             <img
@@ -929,19 +929,19 @@
 
     const SPEED_ORDER = ["slow", "medium", "fast"];
     const SPEED_LABELS = {
-      slow: "SLOW",
-      medium: "MED",
-      fast: "FAST"
+      slow: "›",
+      medium: "››",
+      fast: "›››"
     };
     const SPEED_NAMES = {
-      slow: "Медленный",
-      medium: "Средний",
-      fast: "Быстрый"
+      slow: "Медленно",
+      medium: "Средне",
+      fast: "Быстро"
     };
     const SPEED_DURATION = {
-      slow: 1600,
-      medium: 1150,
-      fast: 850
+      slow: 1800,
+      medium: 1300,
+      fast: 950
     };
 
     const $ = (id) => document.getElementById(id);
@@ -955,7 +955,6 @@
     let pendingWin = 0;
     let noticeTimer = null;
     let animFrame = null;
-
     let boardLayout = null;
 
     function formatVc(value){
@@ -1050,13 +1049,11 @@
 
     function updateButtons(){
       const bet = getBetAmount();
-      const total = getTotalCost();
 
       const canPlay =
         !isDropping &&
         pendingWin <= 0 &&
-        bet >= MIN_BET &&
-        total <= currentBalance;
+        bet >= MIN_BET;
 
       $("playBtn").disabled = !canPlay;
       $("claimBtn").disabled = isDropping || pendingWin <= 0;
@@ -1109,15 +1106,15 @@
       const width = board.clientWidth;
       const height = board.clientHeight;
 
-      const sidePad = Math.max(26, Math.min(36, width * 0.11));
-      const topPad = 48;
+      const sidePad = Math.max(26, Math.min(34, width * 0.11));
+      const topPad = 46;
       const bottomPad = 64;
 
       const pegGap = (width - sidePad * 2) / ROWS;
       const rowGap = (height - topPad - bottomPad) / (ROWS - 1);
       const centerX = width / 2;
       const binCenterY = height - 34;
-      const binWidth = Math.max(20, Math.min(30, pegGap * 0.72));
+      const binWidth = Math.max(20, Math.min(28, pegGap * 0.72));
 
       boardLayout = {
         width,
@@ -1129,7 +1126,8 @@
         rowGap,
         centerX,
         binCenterY,
-        binWidth
+        binWidth,
+        pegRadius: 5
       };
     }
 
@@ -1196,7 +1194,6 @@
       const currentIndex = SPEED_ORDER.indexOf(selectedSpeed);
       const nextIndex = (currentIndex + 1) % SPEED_ORDER.length;
       selectedSpeed = SPEED_ORDER[nextIndex];
-
       $("speedBtn").textContent = SPEED_LABELS[selectedSpeed];
       showNotice(`Скорость: ${SPEED_NAMES[selectedSpeed]}`, "info");
     }
@@ -1232,88 +1229,111 @@
       return a;
     }
 
-    function buildPathForSlot(slotIndex){
+    function buildBounceSegments(slotIndex){
+      const rightsNeeded = slotIndex;
       const decisions = [];
+
       for (let i = 0; i < ROWS; i++) {
-        decisions.push(i < slotIndex ? 1 : 0);
+        decisions.push(i < rightsNeeded ? 1 : 0);
       }
 
-      const shuffled = shuffle(decisions);
+      const randomOrder = shuffle(decisions);
 
-      const points = [{
-        x: boardLayout.centerX,
-        y: 24,
-        type: "start"
-      }];
-
+      const segments = [];
+      let currentX = boardLayout.centerX;
+      let currentY = 24;
       let rights = 0;
 
       for (let row = 0; row < ROWS; row++) {
         const pegY = boardLayout.topPad + row * boardLayout.rowGap;
         const pegX = boardLayout.centerX + (2 * rights - row) * (boardLayout.pegGap / 2);
 
-        points.push({
-          x: pegX,
-          y: pegY,
-          type: "impact"
+        const goRight = randomOrder[row] === 1;
+        const dir = goRight ? 1 : -1;
+
+        const tangentX = pegX + dir * (boardLayout.pegRadius * 2.0);
+        const tangentY = pegY - (boardLayout.pegRadius * 1.1);
+
+        const exitX = pegX + dir * (boardLayout.pegGap * 0.42);
+        const exitY = pegY + (boardLayout.rowGap * 0.48);
+
+        const control1 = {
+          x: pegX + dir * (boardLayout.pegGap * 0.08),
+          y: pegY - (boardLayout.rowGap * 0.22)
+        };
+
+        const control2 = {
+          x: pegX + dir * (boardLayout.pegGap * 0.52),
+          y: pegY + (boardLayout.rowGap * 0.08)
+        };
+
+        segments.push({
+          type: "curve",
+          p0: { x: currentX, y: currentY },
+          p1: control1,
+          p2: { x: tangentX, y: tangentY }
         });
 
-        const dir = shuffled[row] === 1 ? 1 : -1;
-        rights += shuffled[row];
-
-        const releaseX = pegX + dir * boardLayout.pegGap * 0.34;
-        const releaseY = pegY + boardLayout.rowGap * 0.58;
-
-        points.push({
-          x: releaseX,
-          y: releaseY,
-          type: "release"
+        segments.push({
+          type: "curve",
+          p0: { x: tangentX, y: tangentY },
+          p1: control2,
+          p2: { x: exitX, y: exitY }
         });
+
+        currentX = exitX;
+        currentY = exitY;
+        rights += goRight ? 1 : 0;
       }
 
-      points.push({
-        x: slotCenterX(slotIndex),
-        y: boardLayout.binCenterY - 8,
-        type: "end"
+      const targetX = slotCenterX(slotIndex);
+      const targetY = boardLayout.binCenterY - 8;
+
+      segments.push({
+        type: "curve",
+        p0: { x: currentX, y: currentY },
+        p1: {
+          x: currentX + (targetX - currentX) * 0.55,
+          y: currentY + 22
+        },
+        p2: { x: targetX, y: targetY }
       });
 
-      return points;
+      return segments;
     }
 
-    function easeInOutQuad(t){
-      return t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+    function quadPoint(p0, p1, p2, t){
+      const inv = 1 - t;
+      return {
+        x: inv * inv * p0.x + 2 * inv * t * p1.x + t * t * p2.x,
+        y: inv * inv * p0.y + 2 * inv * t * p1.y + t * t * p2.y
+      };
     }
 
-    function easeOutCubic(t){
-      return 1 - Math.pow(1 - t, 3);
-    }
+    function curveLength(seg){
+      let len = 0;
+      let prev = seg.p0;
 
-    function sleep(ms){
-      return new Promise((resolve) => setTimeout(resolve, ms));
+      for (let i = 1; i <= 18; i++) {
+        const t = i / 18;
+        const p = quadPoint(seg.p0, seg.p1, seg.p2, t);
+        len += Math.hypot(p.x - prev.x, p.y - prev.y);
+        prev = p;
+      }
+
+      return len;
     }
 
     function animateBall(slotIndex){
       return new Promise((resolve) => {
         const ball = $("ball");
-        const points = buildPathForSlot(slotIndex);
+        const segments = buildBounceSegments(slotIndex).map((seg) => ({
+          ...seg,
+          len: curveLength(seg)
+        }));
+
+        const totalLength = segments.reduce((sum, seg) => sum + seg.len, 0);
         const duration = SPEED_DURATION[selectedSpeed];
-
-        const segments = [];
-        let totalLength = 0;
-
-        for (let i = 0; i < points.length - 1; i++) {
-          const dx = points[i + 1].x - points[i].x;
-          const dy = points[i + 1].y - points[i].y;
-          const len = Math.hypot(dx, dy);
-
-          segments.push({
-            from: points[i],
-            to: points[i + 1],
-            len
-          });
-
-          totalLength += len;
-        }
 
         ball.style.opacity = "1";
 
@@ -1324,8 +1344,7 @@
 
           const elapsed = ts - startTime;
           const progress = Math.min(1, elapsed / duration);
-          const pathProgress = easeOutCubic(progress);
-          const travel = totalLength * pathProgress;
+          const travel = totalLength * Math.pow(progress, 1.06);
 
           let passed = 0;
           let currentSeg = segments[0];
@@ -1338,35 +1357,28 @@
             passed += segments[i].len;
           }
 
-          const local = currentSeg.len ? (travel - passed) / currentSeg.len : 1;
-          const t = easeInOutQuad(Math.max(0, Math.min(1, local)));
+          const localRaw = currentSeg.len ? (travel - passed) / currentSeg.len : 1;
+          const local = Math.max(0, Math.min(1, localRaw));
 
-          let x = currentSeg.from.x + (currentSeg.to.x - currentSeg.from.x) * t;
-          let y = currentSeg.from.y + (currentSeg.to.y - currentSeg.from.y) * t;
+          const pos = quadPoint(currentSeg.p0, currentSeg.p1, currentSeg.p2, local);
 
           let scaleX = 1;
           let scaleY = 1;
 
-          if (currentSeg.to.type === "impact" && local > 0.78) {
-            const crush = Math.sin(((local - 0.78) / 0.22) * Math.PI);
-            scaleX += 0.16 * crush;
-            scaleY -= 0.13 * crush;
+          if (local > 0.72 && local < 0.98) {
+            const crush = Math.sin(((local - 0.72) / 0.26) * Math.PI);
+            scaleX += 0.12 * crush;
+            scaleY -= 0.10 * crush;
           }
 
-          if (currentSeg.from.type === "impact" && local < 0.28) {
-            const spring = Math.sin((local / 0.28) * Math.PI);
-            scaleX -= 0.05 * spring;
-            scaleY += 0.08 * spring;
-          }
-
-          ball.style.left = `${x}px`;
-          ball.style.top = `${y}px`;
+          ball.style.left = `${pos.x}px`;
+          ball.style.top = `${pos.y}px`;
           ball.style.transform = `translate(-50%, -50%) scale(${scaleX}, ${scaleY})`;
 
           if (progress < 1) {
             animFrame = requestAnimationFrame(frame);
           } else {
-            const end = points[points.length - 1];
+            const end = currentSeg.p2;
             ball.style.left = `${end.x}px`;
             ball.style.top = `${end.y}px`;
             ball.style.transform = "translate(-50%, -50%) scale(1)";
@@ -1377,6 +1389,10 @@
         if (animFrame) cancelAnimationFrame(animFrame);
         animFrame = requestAnimationFrame(frame);
       });
+    }
+
+    async function sleep(ms){
+      return new Promise((resolve) => setTimeout(resolve, ms));
     }
 
     async function playRound(){
@@ -1489,17 +1505,13 @@
       });
     });
 
-    $("betInput").addEventListener("input", () => {
-      updateButtons();
-    });
+    $("betInput").addEventListener("input", updateButtons);
 
     $("playBtn").addEventListener("click", playRound);
     $("claimBtn").addEventListener("click", claimWin);
 
     document.addEventListener("keydown", (e) => {
-      if (e.key === "Escape") {
-        closeOverlay("channelOverlay");
-      }
+      if (e.key === "Escape") closeOverlay("channelOverlay");
     });
 
     window.addEventListener("resize", () => {
