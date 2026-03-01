@@ -1,0 +1,1273 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Plinko</title>
+
+  <link rel="preconnect" href="https://i.postimg.cc" crossorigin>
+  <link rel="dns-prefetch" href="https://i.postimg.cc">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  <link rel="preload" as="image" href="https://i.postimg.cc/qvL497mF/Picsart-26-02-27-02-02-37-502.png">
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --text:#eaf1ff;
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+      --safe-top: env(safe-area-inset-top, 0px);
+
+      --glass: rgba(12, 14, 20, .80);
+      --stroke: rgba(255,255,255,.08);
+      --shadow: 0 18px 42px rgba(0,0,0,.48);
+      --shadow-soft: 0 12px 28px rgba(0,0,0,.34);
+
+      --tg1:#2AABEE;
+      --tg2:#229ED9;
+      --green1:#22c55e;
+      --green2:#16a34a;
+      --red1:#ef4444;
+      --red2:#dc2626;
+      --gold1:#fde68a;
+      --gold2:#f59e0b;
+    }
+
+    *{
+      box-sizing:border-box;
+      font-family:'Inter', sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html, body{
+      height:100%;
+      margin:0;
+      overflow:hidden;
+      color:var(--text);
+      background:#020617;
+    }
+
+    body{
+      background-image:url("https://i.postimg.cc/fbJT34yY/076E519D-F095-4957-88BF-5591DEB82533.png");
+      background-size:cover;
+      background-position:center;
+      background-repeat:no-repeat;
+    }
+
+    body::before{
+      content:"";
+      position:fixed;
+      inset:0;
+      background:
+        radial-gradient(900px 600px at 30% 10%, rgba(255,255,255,.05), transparent 60%),
+        linear-gradient(180deg, rgba(0,0,0,.40), rgba(0,0,0,.64));
+      pointer-events:none;
+      z-index:0;
+    }
+
+    *::-webkit-scrollbar{ display:none; }
+
+    .app{
+      position:relative;
+      height:100%;
+      overflow:auto;
+      padding:0 16px calc(28px + var(--safe-bottom)) 16px;
+      z-index:1;
+      overscroll-behavior: contain;
+      scrollbar-width:none;
+    }
+
+    .content{
+      width:100%;
+      max-width:520px;
+      margin:0 auto;
+      display:flex;
+      flex-direction:column;
+      gap:14px;
+      position:relative;
+      z-index:1;
+    }
+
+    .sticky-top{
+      position:sticky;
+      top:0;
+      z-index:40;
+      padding-top: calc(8px + var(--safe-top));
+      padding-bottom:8px;
+      background:
+        linear-gradient(180deg,
+          rgba(2,6,23,.96) 0%,
+          rgba(2,6,23,.86) 72%,
+          rgba(2,6,23,0) 100%);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+    }
+
+    .top-row{
+      width:100%;
+      display:grid;
+      grid-template-columns:40px minmax(0,1fr) 40px 54px;
+      gap:8px;
+      align-items:center;
+    }
+
+    .icon-btn,
+    .rule-btn{
+      width:40px;
+      height:40px;
+      border:none;
+      border-radius:14px;
+      background: var(--glass);
+      border:1px solid var(--stroke);
+      box-shadow: var(--shadow-soft), inset 0 1px 0 rgba(255,255,255,.04);
+      display:grid;
+      place-items:center;
+      color:var(--text);
+      cursor:pointer;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      padding:0;
+    }
+
+    .icon-btn{
+      font-size:18px;
+      font-weight:900;
+    }
+
+    .icon-btn:active,
+    .rule-btn:active{
+      transform:scale(.98);
+    }
+
+    .rule-btn svg{
+      width:19px;
+      height:19px;
+      stroke: rgba(234,241,255,.92);
+      fill:none;
+      stroke-width:2;
+      stroke-linecap:round;
+      stroke-linejoin:round;
+      display:block;
+    }
+
+    .balance-mini{
+      width:100%;
+      min-width:0;
+      height:42px;
+      border-radius:999px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:8px;
+      padding:6px 7px 6px 12px;
+      position:relative;
+      overflow:hidden;
+      background: var(--glass);
+      border:1px solid var(--stroke);
+      box-shadow: var(--shadow), inset 0 1px 0 rgba(255,255,255,.04);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+
+    .balance-mini::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      background:
+        radial-gradient(180px 60px at 0% 0%, rgba(255,255,255,.05), transparent 55%),
+        radial-gradient(180px 60px at 100% 100%, rgba(255,255,255,.03), transparent 55%);
+      pointer-events:none;
+    }
+
+    .bal-title{
+      position:relative;
+      z-index:1;
+      font-size:12px;
+      font-weight:900;
+      color: rgba(234,241,255,.92);
+      white-space:nowrap;
+    }
+
+    .bal-amount{
+      position:relative;
+      z-index:1;
+      min-width:88px;
+      height:28px;
+      border:none;
+      border-radius:999px;
+      padding:0 10px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background: rgba(255,255,255,.08);
+      border:1px solid rgba(255,255,255,.08);
+      color: rgba(234,241,255,.98);
+      font-weight:900;
+      font-size:13px;
+      white-space:nowrap;
+      pointer-events:none;
+    }
+
+    .logo-btn{
+      width:54px;
+      height:54px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background:transparent;
+      border:none;
+      padding:0;
+      margin:0;
+      cursor:pointer;
+    }
+
+    .logo-btn:active{ transform:scale(.98); }
+
+    .logo-btn img{
+      width:100%;
+      height:100%;
+      object-fit:contain;
+      display:block;
+    }
+
+    .card{
+      border-radius:24px;
+      background: var(--glass);
+      border:1px solid var(--stroke);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      overflow:hidden;
+    }
+
+    .board-card{
+      padding:14px;
+    }
+
+    .board-head{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      margin-bottom:12px;
+    }
+
+    .board-title{
+      margin:0;
+      font-size:16px;
+      font-weight:900;
+      letter-spacing:.15px;
+    }
+
+    .board-sub{
+      margin:0;
+      font-size:11px;
+      font-weight:800;
+      color: rgba(234,241,255,.66);
+    }
+
+    .plinko-stage{
+      position:relative;
+      min-height:360px;
+      border-radius:22px;
+      overflow:hidden;
+      background:
+        radial-gradient(500px 220px at 50% 0%, rgba(42,171,238,.08), transparent 60%),
+        linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,.01)),
+        rgba(255,255,255,.03);
+      border:1px solid rgba(255,255,255,.06);
+      padding:14px 10px 12px;
+    }
+
+    .plinko-board{
+      position:relative;
+      width:100%;
+      height:290px;
+      margin:0 auto;
+    }
+
+    .peg{
+      position:absolute;
+      width:9px;
+      height:9px;
+      border-radius:50%;
+      background:
+        radial-gradient(circle at 35% 35%, rgba(255,255,255,.95), rgba(173,216,255,.82) 55%, rgba(42,171,238,.55) 100%);
+      box-shadow:
+        0 0 10px rgba(42,171,238,.18),
+        inset 0 1px 0 rgba(255,255,255,.55);
+      transform: translate(-50%, -50%);
+    }
+
+    .ball{
+      position:absolute;
+      width:16px;
+      height:16px;
+      border-radius:50%;
+      background:
+        radial-gradient(circle at 30% 30%, rgba(255,255,255,.95), rgba(255,224,130,.9) 35%, rgba(245,158,11,.95) 70%, rgba(180,83,9,.95) 100%);
+      box-shadow:
+        0 0 18px rgba(245,158,11,.28),
+        0 6px 12px rgba(0,0,0,.25),
+        inset 0 1px 1px rgba(255,255,255,.45);
+      transform: translate(-50%, -50%);
+      transition: left .1s linear, top .1s linear, transform .1s linear;
+      z-index:5;
+    }
+
+    .ball.drop{
+      transition: left .12s linear, top .12s linear, transform .12s linear;
+    }
+
+    .slots{
+      margin-top:10px;
+      display:grid;
+      grid-template-columns:repeat(9, minmax(0,1fr));
+      gap:6px;
+    }
+
+    .slot{
+      min-width:0;
+      height:44px;
+      border-radius:14px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:11px;
+      font-weight:900;
+      color:#fff;
+      background: rgba(255,255,255,.07);
+      border:1px solid rgba(255,255,255,.08);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.04);
+      transition: transform .15s ease, box-shadow .15s ease, background .15s ease;
+      text-align:center;
+      padding:0 2px;
+    }
+
+    .slot.low{
+      background: linear-gradient(180deg, rgba(239,68,68,.20), rgba(220,38,38,.12));
+    }
+
+    .slot.mid{
+      background: linear-gradient(180deg, rgba(42,171,238,.18), rgba(34,158,217,.10));
+    }
+
+    .slot.high{
+      background: linear-gradient(180deg, rgba(245,158,11,.22), rgba(217,119,6,.14));
+    }
+
+    .slot.hit{
+      transform: translateY(-2px) scale(1.04);
+      box-shadow:
+        0 0 18px rgba(255,255,255,.12),
+        inset 0 1px 0 rgba(255,255,255,.08);
+    }
+
+    .panel{
+      padding:16px;
+      display:flex;
+      flex-direction:column;
+      gap:14px;
+    }
+
+    .label{
+      font-size:13px;
+      font-weight:900;
+      color: rgba(234,241,255,.94);
+      margin-bottom:10px;
+    }
+
+    .bet-row{
+      display:grid;
+      grid-template-columns:minmax(0,1fr) 48px;
+      gap:8px;
+      align-items:center;
+    }
+
+    .bet-input{
+      width:100%;
+      height:50px;
+      border-radius:18px;
+      border:1px solid rgba(255,255,255,.08);
+      background: rgba(255,255,255,.06);
+      color:#fff;
+      font-size:17px;
+      font-weight:900;
+      padding:0 14px;
+      outline:none;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.04);
+      text-align:center;
+    }
+
+    .bet-input::placeholder{
+      color: rgba(234,241,255,.42);
+      font-weight:800;
+    }
+
+    .bet-toggle{
+      width:48px;
+      height:50px;
+      border:none;
+      border-radius:18px;
+      cursor:pointer;
+      background: rgba(255,255,255,.08);
+      border:1px solid rgba(255,255,255,.08);
+      color:#fff;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.04);
+      display:grid;
+      place-items:center;
+      padding:0;
+    }
+
+    .bet-toggle:active{ transform:scale(.98); }
+
+    .bet-toggle svg{
+      width:22px;
+      height:22px;
+      display:block;
+    }
+
+    .quick-bets{
+      display:grid;
+      grid-template-columns:repeat(5, minmax(0,1fr));
+      gap:8px;
+      max-height:0;
+      opacity:0;
+      overflow:hidden;
+      margin-top:0;
+      transition:max-height .2s ease, opacity .2s ease, margin .2s ease;
+    }
+
+    .quick-bets.show{
+      max-height:80px;
+      opacity:1;
+      margin-top:10px;
+    }
+
+    .quick-btn{
+      height:38px;
+      border:none;
+      border-radius:14px;
+      cursor:pointer;
+      background: rgba(255,255,255,.08);
+      border:1px solid rgba(255,255,255,.08);
+      color:#fff;
+      font-size:12px;
+      font-weight:900;
+    }
+
+    .quick-btn:active{ transform:scale(.98); }
+
+    .play-btn{
+      width:100%;
+      height:54px;
+      border:none;
+      border-radius:18px;
+      cursor:pointer;
+      color:#fff;
+      font-size:15px;
+      font-weight:900;
+      letter-spacing:.2px;
+      transition: transform .16s ease, opacity .16s ease, box-shadow .16s ease;
+      background: linear-gradient(180deg, var(--tg1), var(--tg2));
+      box-shadow: 0 18px 34px rgba(34,158,217,.28);
+    }
+
+    .play-btn:active{
+      transform: scale(.985);
+    }
+
+    .play-btn:disabled{
+      opacity:.55;
+      cursor:not-allowed;
+      box-shadow:none;
+      transform:none !important;
+    }
+
+    .bottom-notice{
+      position:fixed;
+      left:50%;
+      bottom: calc(16px + var(--safe-bottom));
+      transform: translateX(-50%) translateY(16px) scale(.98);
+      width:min(390px, calc(100% - 28px));
+      min-height:46px;
+      border-radius:16px;
+      padding:10px 12px;
+      display:flex;
+      align-items:center;
+      gap:10px;
+      color:#fff;
+      font-size:12px;
+      font-weight:900;
+      box-shadow:0 14px 26px rgba(0,0,0,.24);
+      opacity:0;
+      pointer-events:none;
+      transition: opacity .18s ease, transform .18s ease;
+      z-index:500;
+      border:1px solid rgba(255,255,255,.10);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      overflow:hidden;
+    }
+
+    .bottom-notice.show{
+      opacity:1;
+      transform: translateX(-50%) translateY(0) scale(1);
+    }
+
+    .bottom-notice.win{
+      background: linear-gradient(180deg, rgba(34,197,94,.92), rgba(22,163,74,.92));
+    }
+
+    .bottom-notice.lose{
+      background: linear-gradient(180deg, rgba(239,68,68,.92), rgba(220,38,38,.92));
+    }
+
+    .bottom-notice.info{
+      background: linear-gradient(180deg, rgba(42,171,238,.92), rgba(34,158,217,.92));
+    }
+
+    .notice-icon{
+      width:24px;
+      height:24px;
+      border-radius:9px;
+      display:grid;
+      place-items:center;
+      background: rgba(255,255,255,.14);
+      flex:0 0 auto;
+      font-size:12px;
+    }
+
+    .notice-text{
+      flex:1;
+      min-width:0;
+      line-height:1.2;
+    }
+
+    .overlay{
+      position:fixed;
+      inset:0;
+      background: rgba(0,0,0,.72);
+      opacity:0;
+      pointer-events:none;
+      transition: opacity .22s ease;
+      z-index:260;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:18px;
+    }
+
+    .overlay.show{
+      opacity:1;
+      pointer-events:auto;
+    }
+
+    .popup{
+      width:min(440px, 100%);
+      border-radius:24px;
+      overflow:hidden;
+      background: rgba(14,16,24,.94);
+      border: 1px solid rgba(255,255,255,.08);
+      box-shadow: 0 34px 90px rgba(0,0,0,.62);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      position:relative;
+      transform: translateY(12px) scale(.98);
+      opacity:.95;
+      transition: transform .22s ease, opacity .22s ease;
+    }
+
+    .overlay.show .popup{
+      transform: translateY(0) scale(1);
+      opacity:1;
+    }
+
+    .popup-head{
+      padding:16px 16px 10px 16px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      background: rgba(255,255,255,.03);
+      border-bottom: 1px solid rgba(255,255,255,.06);
+    }
+
+    .popup-title{
+      font-weight:900;
+      letter-spacing:.25px;
+      font-size:14px;
+      color: rgba(234,241,255,.95);
+    }
+
+    .popup-x{
+      width:38px;
+      height:38px;
+      border-radius:14px;
+      border:1px solid rgba(255,255,255,.08);
+      background: rgba(255,255,255,.05);
+      color: rgba(234,241,255,.92);
+      cursor:pointer;
+      display:grid;
+      place-items:center;
+      box-shadow: 0 12px 28px rgba(0,0,0,.32);
+      padding:0;
+    }
+
+    .popup-x:active{ transform: scale(.98); }
+
+    .popup-body{
+      padding:14px 16px 16px 16px;
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+    }
+
+    .popup-text,
+    .rule-line{
+      margin:0;
+      font-size:13px;
+      line-height:1.42;
+      color: rgba(234,241,255,.88);
+    }
+
+    .tg-btn{
+      border:none;
+      cursor:pointer;
+      width:100%;
+      height:50px;
+      border-radius:16px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:10px;
+      background: linear-gradient(180deg, var(--tg1), var(--tg2));
+      box-shadow:
+        0 18px 40px rgba(34,158,217,.28),
+        inset 0 1px 0 rgba(255,255,255,.14);
+      color:#fff;
+      font-weight:900;
+      letter-spacing:.2px;
+      font-size:14px;
+    }
+
+    .tg-btn:active{ transform: scale(.99); }
+
+    .tg-ico{
+      width:22px;
+      height:22px;
+      display:block;
+      filter: drop-shadow(0 8px 14px rgba(0,0,0,.18));
+    }
+
+    .preloader{
+      position:fixed;
+      inset:0;
+      z-index:999;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background:
+        radial-gradient(900px 700px at 50% 0%, rgba(42,171,238,.18), transparent 52%),
+        linear-gradient(180deg, #03101d 0%, #082746 46%, #0a4e80 100%);
+      transition: opacity .28s ease, visibility .28s ease;
+    }
+
+    .preloader.hide{
+      opacity:0;
+      visibility:hidden;
+      pointer-events:none;
+    }
+
+    .pre-logo{
+      width:90px;
+      height:90px;
+      object-fit:contain;
+      display:block;
+      filter: drop-shadow(0 16px 26px rgba(0,0,0,.26));
+      animation: preLogoFloat .95s ease-in-out infinite;
+    }
+
+    @keyframes preLogoFloat{
+      0%,100%{ transform: translateY(0) scale(1); }
+      50%{ transform: translateY(-8px) scale(1.02); }
+    }
+
+    @media (max-width: 360px){
+      .top-row{ grid-template-columns:36px minmax(0,1fr) 36px 46px; gap:6px; }
+
+      .icon-btn,
+      .rule-btn{ width:36px; height:36px; border-radius:12px; }
+
+      .icon-btn{ font-size:16px; }
+
+      .rule-btn svg{ width:17px; height:17px; }
+
+      .logo-btn{ width:46px; height:46px; }
+
+      .balance-mini{ height:38px; }
+
+      .bal-amount{ min-width:74px; height:24px; font-size:12px; }
+
+      .plinko-stage{ min-height:330px; }
+      .plinko-board{ height:260px; }
+
+      .bet-row{ grid-template-columns:minmax(0,1fr) 44px; }
+      .bet-input{ height:46px; font-size:15px; }
+      .bet-toggle{ width:44px; height:46px; border-radius:16px; }
+
+      .quick-bets{ grid-template-columns:repeat(3, minmax(0,1fr)); }
+
+      .play-btn{ height:50px; font-size:14px; }
+
+      .tg-btn{ height:48px; border-radius:15px; }
+
+      .pre-logo{ width:76px; height:76px; }
+    }
+
+    @media (prefers-reduced-motion: reduce){
+      *{ transition:none !important; animation:none !important; }
+      .overlay.show .popup{ transform:none !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="preloader" id="preloader">
+    <img class="pre-logo" src="https://i.postimg.cc/qvL497mF/Picsart-26-02-27-02-02-37-502.png" alt="Vezus">
+  </div>
+
+  <div class="bottom-notice info" id="bottomNotice" aria-live="polite">
+    <div class="notice-icon" id="noticeIcon">ℹ</div>
+    <div class="notice-text" id="noticeText">Сообщение</div>
+  </div>
+
+  <div class="app">
+    <div class="content">
+
+      <div class="sticky-top">
+        <div class="top-row">
+          <button class="icon-btn" id="backBtn" aria-label="Назад">←</button>
+
+          <div class="balance-mini" aria-label="Баланс">
+            <span class="bal-title">Баланс</span>
+            <div class="bal-amount" id="balanceValue">...</div>
+          </div>
+
+          <button class="rule-btn" id="rulesBtn" aria-label="Правила">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M9 9a3 3 0 1 1 5.2 2.1c-.9.9-1.7 1.5-1.7 2.9"></path>
+              <path d="M12 17h.01"></path>
+              <circle cx="12" cy="12" r="9"></circle>
+            </svg>
+          </button>
+
+          <button class="logo-btn" id="logoBtn" aria-label="Открыть Telegram канал">
+            <img
+              src="https://i.postimg.cc/qvL497mF/Picsart-26-02-27-02-02-37-502.png"
+              alt="Vezus"
+              loading="eager"
+              fetchpriority="high"
+              decoding="async"
+            >
+          </button>
+        </div>
+      </div>
+
+      <div class="card board-card">
+        <div class="board-head">
+          <div>
+            <p class="board-title">Plinko</p>
+            <p class="board-sub">Шар падает в слот с множителем</p>
+          </div>
+        </div>
+
+        <div class="plinko-stage">
+          <div class="plinko-board" id="plinkoBoard">
+            <div class="ball" id="ball"></div>
+          </div>
+
+          <div class="slots" id="slots"></div>
+        </div>
+      </div>
+
+      <div class="card panel">
+        <div>
+          <div class="label">Ставка</div>
+
+          <div class="bet-row">
+            <input
+              class="bet-input"
+              id="betInput"
+              type="number"
+              min="10"
+              step="1"
+              inputmode="numeric"
+              placeholder="Минимум 10"
+              value="10"
+            >
+
+            <button class="bet-toggle" id="betToggleBtn" type="button" aria-label="Быстрые ставки">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <defs>
+                  <linearGradient id="coinGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#fde68a"></stop>
+                    <stop offset="55%" stop-color="#f59e0b"></stop>
+                    <stop offset="100%" stop-color="#b45309"></stop>
+                  </linearGradient>
+                </defs>
+                <circle cx="12" cy="12" r="8.5" fill="url(#coinGrad)" stroke="rgba(255,255,255,.35)" stroke-width="1.2"></circle>
+                <circle cx="12" cy="12" r="5.2" fill="none" stroke="rgba(255,255,255,.28)" stroke-width="1"></circle>
+                <path d="M9.5 12h5M12 9.5v5" stroke="white" stroke-width="1.7" stroke-linecap="round"></path>
+              </svg>
+            </button>
+          </div>
+
+          <div class="quick-bets" id="quickBets">
+            <button class="quick-btn" data-bet="10" type="button">10</button>
+            <button class="quick-btn" data-bet="25" type="button">25</button>
+            <button class="quick-btn" data-bet="50" type="button">50</button>
+            <button class="quick-btn" data-bet="100" type="button">100</button>
+            <button class="quick-btn" data-bet="250" type="button">250</button>
+          </div>
+        </div>
+
+        <button class="play-btn" id="playBtn" type="button">Играть</button>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="overlay" id="rulesOverlay" aria-hidden="true">
+    <div class="popup" role="dialog" aria-modal="true" aria-label="Правила">
+      <div class="popup-head">
+        <div class="popup-title">Правила игры</div>
+        <button class="popup-x" id="rulesClose" aria-label="Закрыть">✕</button>
+      </div>
+
+      <div class="popup-body">
+        <p class="rule-line">• Минимальная ставка: <b>10 VC</b></p>
+        <p class="rule-line">• Нажми <b>«Играть»</b></p>
+        <p class="rule-line">• Шар упадёт в один из нижних слотов</p>
+        <p class="rule-line">• Выплата зависит от множителя слота</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="overlay" id="channelOverlay" aria-hidden="true">
+    <div class="popup" role="dialog" aria-modal="true" aria-label="Telegram канал">
+      <div class="popup-head">
+        <div class="popup-title">Наш Telegram канал</div>
+        <button class="popup-x" id="channelClose" aria-label="Закрыть">✕</button>
+      </div>
+
+      <div class="popup-body">
+        <p class="popup-text">
+          Нажми кнопку ниже — откроется наш Telegram канал:
+          <b>@vezuspubg</b>
+        </p>
+
+        <button class="tg-btn" id="goChannel" aria-label="Перейти в Telegram канал">
+          <svg class="tg-ico" viewBox="0 0 240 240" aria-hidden="true">
+            <path fill="#fff" d="M120 0C53.7 0 0 53.7 0 120s53.7 120 120 120 120-53.7 120-120S186.3 0 120 0zm58.7 82.3l-19.7 92.8c-1.5 6.6-5.4 8.2-10.9 5.1l-30.2-22.3-14.6 14c-1.6 1.6-3 3-6.1 3l2.2-31.6 57.5-52c2.5-2.2-.5-3.4-3.9-1.2l-71 44.7-30.6-9.6c-6.6-2.1-6.7-6.6 1.4-9.7l119.6-46.1c5.5-2 10.3 1.3 8.8 9.9z"/>
+          </svg>
+          Перейти в Telegram канал
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <script>
+    const VERIFY_URL = "https://lazrfierfbhwlduqlvws.functions.supabase.co/verify-telegram";
+    const MIN_BET = 10;
+    const ROWS = 8;
+    const SLOT_MULTIPLIERS = [0, 0.2, 0.4, 0.8, 1.6, 0.8, 0.4, 0.2, 0];
+
+    const FILES = {
+      games: "games.html"
+    };
+
+    const $ = (id) => document.getElementById(id);
+
+    let currentBalance = 0;
+    let isPlaying = false;
+    let quickVisible = false;
+    let noticeTimer = null;
+
+    function formatVc(value){
+      const n = Number(value ?? 0);
+      if (!Number.isFinite(n)) return "0 VC";
+      return Number.isInteger(n) ? `${n} VC` : `${n.toFixed(2)} VC`;
+    }
+
+    function goTo(file){
+      window.location.href = file;
+    }
+
+    function openTelegramLinkSafe(url){
+      if (window.Telegram && window.Telegram.WebApp && typeof window.Telegram.WebApp.openTelegramLink === "function") {
+        window.Telegram.WebApp.openTelegramLink(url);
+        return;
+      }
+      window.open(url, "_blank", "noopener");
+    }
+
+    function loadCachedProfile(){
+      try {
+        return JSON.parse(localStorage.getItem("tg_profile") || "null");
+      } catch {
+        return null;
+      }
+    }
+
+    function saveCachedBalance(){
+      try {
+        const cached = loadCachedProfile() || {};
+        cached.balance = currentBalance;
+        localStorage.setItem("tg_profile", JSON.stringify(cached));
+      } catch {}
+    }
+
+    function getTelegramInitData(){
+      if (!window.Telegram || !window.Telegram.WebApp) return "";
+
+      try{
+        Telegram.WebApp.ready();
+        if (typeof Telegram.WebApp.expand === "function") Telegram.WebApp.expand();
+      } catch {}
+
+      return Telegram.WebApp.initData || "";
+    }
+
+    function updateBalanceUI(){
+      $("balanceValue").textContent = formatVc(currentBalance);
+    }
+
+    function getBetAmount(){
+      const raw = $("betInput").value;
+      const amount = Number(raw);
+      if (!raw || !Number.isFinite(amount)) return 0;
+      return Math.floor(amount);
+    }
+
+    function showNotice(text, type = "info"){
+      const box = $("bottomNotice");
+      $("noticeText").textContent = text;
+      $("noticeIcon").textContent = type === "win" ? "✓" : type === "lose" ? "✕" : "ℹ";
+
+      box.classList.remove("win", "lose", "info");
+      box.classList.add(type);
+      box.classList.add("show");
+
+      if (noticeTimer) clearTimeout(noticeTimer);
+      noticeTimer = setTimeout(() => {
+        box.classList.remove("show");
+      }, 1900);
+    }
+
+    function setQuickVisible(show){
+      quickVisible = !!show;
+      $("quickBets").classList.toggle("show", quickVisible);
+    }
+
+    function updateButtons(){
+      const bet = getBetAmount();
+      const canPlay = !isPlaying && bet >= MIN_BET && bet <= currentBalance;
+      $("playBtn").disabled = !canPlay;
+    }
+
+    function buildBoard(){
+      const board = $("plinkoBoard");
+      const slotsWrap = $("slots");
+
+      board.querySelectorAll(".peg").forEach(el => el.remove());
+      slotsWrap.innerHTML = "";
+
+      const width = board.clientWidth;
+      const height = board.clientHeight;
+
+      const topY = 18;
+      const bottomY = height - 26;
+      const rowStep = (bottomY - topY) / ROWS;
+
+      for (let row = 0; row < ROWS; row++) {
+        const pegs = row + 1;
+        const y = topY + rowStep * row;
+
+        for (let i = 0; i < pegs; i++) {
+          const x = ((i + 1) / (pegs + 1)) * width;
+          const peg = document.createElement("div");
+          peg.className = "peg";
+          peg.style.left = `${x}px`;
+          peg.style.top = `${y}px`;
+          board.appendChild(peg);
+        }
+      }
+
+      SLOT_MULTIPLIERS.forEach((mult, index) => {
+        const slot = document.createElement("div");
+
+        let cls = "slot mid";
+        if (mult === 0) cls = "slot low";
+        else if (mult >= 1.6) cls = "slot high";
+
+        slot.className = cls;
+        slot.dataset.index = String(index);
+        slot.textContent = `x${mult}`;
+        slotsWrap.appendChild(slot);
+      });
+
+      resetBall();
+    }
+
+    function resetBall(){
+      const board = $("plinkoBoard");
+      const ball = $("ball");
+      const width = board.clientWidth;
+
+      ball.style.left = `${width / 2}px`;
+      ball.style.top = `10px`;
+      ball.style.transform = "translate(-50%, -50%) scale(1)";
+      ball.classList.remove("drop");
+
+      document.querySelectorAll(".slot").forEach(s => s.classList.remove("hit"));
+    }
+
+    async function autoAuthTelegram(){
+      const cached = loadCachedProfile();
+
+      if (cached?.balance != null) {
+        currentBalance = Number(cached.balance) || 0;
+      } else {
+        currentBalance = 0;
+      }
+      updateBalanceUI();
+
+      const initData = getTelegramInitData();
+      if (!initData) {
+        updateButtons();
+        return;
+      }
+
+      $("balanceValue").textContent = "...";
+
+      try{
+        const res = await fetch(VERIFY_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ initData })
+        });
+
+        const json = await res.json().catch(() => ({}));
+
+        if (res.ok && json.ok && json.profile) {
+          currentBalance = Number(json.profile.balance) || 0;
+          localStorage.setItem("tg_profile", JSON.stringify(json.profile));
+        } else {
+          currentBalance = cached?.balance != null ? (Number(cached.balance) || 0) : 0;
+        }
+      } catch {
+        currentBalance = cached?.balance != null ? (Number(cached.balance) || 0) : 0;
+      }
+
+      updateBalanceUI();
+      updateButtons();
+    }
+
+    function wait(ms){
+      return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    async function animateBall(slotIndex){
+      const board = $("plinkoBoard");
+      const ball = $("ball");
+      const width = board.clientWidth;
+      const height = board.clientHeight;
+
+      const topY = 16;
+      const bottomY = height - 14;
+      const rowStep = (bottomY - topY) / (ROWS + 1);
+
+      ball.classList.add("drop");
+
+      let rights = 0;
+      for (let step = 1; step <= ROWS; step++) {
+        const targetRights = Math.min(slotIndex, step);
+        const remaining = ROWS - step;
+        const mustStay = targetRights - rights;
+
+        let goRight = false;
+        if (mustStay > remaining) {
+          goRight = true;
+        } else if (rights >= targetRights) {
+          goRight = false;
+        } else {
+          goRight = Math.random() < 0.5;
+        }
+
+        if (goRight) rights++;
+
+        const positions = step + 1;
+        const x = ((rights + 0.5) / positions) * width;
+        const y = topY + rowStep * step;
+
+        const scale = step < ROWS ? 1.02 : 1;
+        ball.style.left = `${x}px`;
+        ball.style.top = `${y}px`;
+        ball.style.transform = `translate(-50%, -50%) scale(${scale})`;
+
+        await wait(115);
+      }
+
+      const slots = Array.from(document.querySelectorAll(".slot"));
+      const targetSlot = slots[slotIndex];
+      if (targetSlot) {
+        targetSlot.classList.add("hit");
+      }
+
+      const rect = targetSlot.getBoundingClientRect();
+      const boardRect = board.getBoundingClientRect();
+
+      const finalX = rect.left - boardRect.left + (rect.width / 2);
+      const finalY = board.clientHeight + 24;
+
+      ball.style.left = `${finalX}px`;
+      ball.style.top = `${finalY}px`;
+      ball.style.transform = "translate(-50%, -50%) scale(.96)";
+
+      await wait(180);
+    }
+
+    function weightedSlot(){
+      let rights = 0;
+      for (let i = 0; i < ROWS; i++) {
+        if (Math.random() < 0.5) rights++;
+      }
+      return rights;
+    }
+
+    async function playPlinko(){
+      if (isPlaying) return;
+
+      const bet = getBetAmount();
+
+      if (bet < MIN_BET) {
+        showNotice(`Минимум ${MIN_BET} VC`, "lose");
+        return;
+      }
+
+      if (bet > currentBalance) {
+        showNotice("Недостаточно средств", "lose");
+        return;
+      }
+
+      isPlaying = true;
+      setQuickVisible(false);
+      updateButtons();
+      resetBall();
+
+      currentBalance -= bet;
+      updateBalanceUI();
+      saveCachedBalance();
+
+      const slotIndex = weightedSlot();
+      const multiplier = SLOT_MULTIPLIERS[slotIndex];
+      const payout = Math.floor(bet * multiplier);
+
+      await animateBall(slotIndex);
+
+      if (payout > 0) {
+        currentBalance += payout;
+        updateBalanceUI();
+        saveCachedBalance();
+      }
+
+      if (payout === 0) {
+        showNotice(`Мимо • -${formatVc(bet)}`, "lose");
+      } else if (payout >= bet) {
+        showNotice(`x${multiplier} • +${formatVc(payout)}`, "win");
+      } else {
+        showNotice(`x${multiplier} • возврат ${formatVc(payout)}`, "info");
+      }
+
+      isPlaying = false;
+      updateButtons();
+    }
+
+    function openOverlay(id){
+      const el = $(id);
+      el.classList.add("show");
+      el.setAttribute("aria-hidden", "false");
+      document.body.style.overflow = "hidden";
+    }
+
+    function closeOverlay(id){
+      const el = $(id);
+      el.classList.remove("show");
+      el.setAttribute("aria-hidden", "true");
+      document.body.style.overflow = "";
+    }
+
+    $("backBtn").addEventListener("click", () => goTo(FILES.games));
+    $("logoBtn").addEventListener("click", () => openOverlay("channelOverlay"));
+    $("rulesBtn").addEventListener("click", () => openOverlay("rulesOverlay"));
+
+    $("channelClose").addEventListener("click", () => closeOverlay("channelOverlay"));
+    $("rulesClose").addEventListener("click", () => closeOverlay("rulesOverlay"));
+
+    $("channelOverlay").addEventListener("click", (e) => {
+      if (e.target === $("channelOverlay")) closeOverlay("channelOverlay");
+    });
+
+    $("rulesOverlay").addEventListener("click", (e) => {
+      if (e.target === $("rulesOverlay")) closeOverlay("rulesOverlay");
+    });
+
+    $("goChannel").addEventListener("click", () => {
+      openTelegramLinkSafe("https://t.me/vezuspubg");
+    });
+
+    $("betToggleBtn").addEventListener("click", () => {
+      setQuickVisible(!quickVisible);
+    });
+
+    document.querySelectorAll(".quick-btn").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const value = btn.getAttribute("data-bet");
+        if (!value) return;
+        $("betInput").value = value;
+        setQuickVisible(false);
+        updateButtons();
+      });
+    });
+
+    $("betInput").addEventListener("input", updateButtons);
+    $("playBtn").addEventListener("click", playPlinko);
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") {
+        closeOverlay("channelOverlay");
+        closeOverlay("rulesOverlay");
+      }
+    });
+
+    window.addEventListener("resize", () => {
+      buildBoard();
+      updateButtons();
+    });
+
+    window.addEventListener("load", () => {
+      buildBoard();
+      updateButtons();
+
+      setTimeout(() => {
+        $("preloader").classList.add("hide");
+      }, 1900);
+
+      autoAuthTelegram();
+    });
+  </script>
+</body>
+</html>
