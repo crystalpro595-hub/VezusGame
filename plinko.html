@@ -915,21 +915,32 @@
       games: "games.html"
     };
 
-    const MULTIPLIERS = [10, 5, 1.8, 1.2, 0.2, 1.2, 1.8, 5, 10];
-    const WEIGHTS =     [0.005,0.015,0.06,0.15,0.54,0.15,0.06,0.015,0.005];
+    const MULTIPLIERS = [10, 5, 2, 0.4, 0.2, 0.4, 2, 5, 10];
 
     const SPEEDS = [
-      { label: "›",   time: 1.18 },
-      { label: "››",  time: 0.92 },
-      { label: "›››", time: 0.72 }
+      { label: "›",   scale: 0.82 },
+      { label: "››",  scale: 1.00 },
+      { label: "›››", scale: 1.22 }
     ];
 
+    const BOARD_W = 300;
+    const BOARD_H = 286;
     const PEG_ROWS = 8;
-    const BOARD_CENTER_X = 150;
-    const BOARD_TOP_Y = 30;
-    const ROW_GAP = 23;
-    const BUCKET_GAP = 28;
-    const BUCKET_Y = 230;
+    const PEG_GAP_X = 28;
+    const PEG_GAP_Y = 23;
+    const PEG_START_Y = 30;
+    const BALL_R = 8;
+    const PEG_R = 5;
+    const WALL_LEFT = 14;
+    const WALL_RIGHT = BOARD_W - 14;
+    const BOARD_CENTER_X = BOARD_W / 2;
+
+    const BUCKET_LEFT = 16;
+    const BUCKET_RIGHT = BOARD_W - 16;
+    const BUCKET_COUNT = 9;
+    const SLOT_W = (BUCKET_RIGHT - BUCKET_LEFT) / BUCKET_COUNT;
+    const CATCH_LINE_Y = 224;
+    const SETTLE_LINE_Y = 231;
 
     const $ = (id) => document.getElementById(id);
 
@@ -940,6 +951,7 @@
     let selectedBalls = 1;
     let speedIndex = 1;
     let noticeTimer = null;
+    let pegs = [];
 
     function formatVc(value){
       const n = Number(value ?? 0);
@@ -1071,21 +1083,35 @@
       updateButtons();
     }
 
+    function bucketCenter(index){
+      return BUCKET_LEFT + SLOT_W * index + SLOT_W / 2;
+    }
+
+    function getBucketIndex(x){
+      const raw = Math.floor((x - BUCKET_LEFT) / SLOT_W);
+      return Math.max(0, Math.min(BUCKET_COUNT - 1, raw));
+    }
+
     function createBoard(){
       const board = $("board");
-
       document.querySelectorAll(".peg").forEach(el => el.remove());
+      pegs = [];
 
       for (let row = 0; row < PEG_ROWS; row++) {
         const pegsInRow = row + 1;
-        const rowWidth = row * BUCKET_GAP;
+        const rowWidth = row * PEG_GAP_X;
         const startX = BOARD_CENTER_X - rowWidth / 2;
+        const y = PEG_START_Y + row * PEG_GAP_Y;
 
         for (let i = 0; i < pegsInRow; i++) {
+          const x = startX + i * PEG_GAP_X;
+
+          pegs.push({ x, y, r: PEG_R });
+
           const peg = document.createElement("div");
           peg.className = "peg";
-          peg.style.left = `${startX + i * BUCKET_GAP}px`;
-          peg.style.top = `${BOARD_TOP_Y + row * ROW_GAP}px`;
+          peg.style.left = `${x}px`;
+          peg.style.top = `${y}px`;
           board.appendChild(peg);
         }
       }
@@ -1099,7 +1125,7 @@
 
         if (m >= 10) cls = "top";
         else if (m >= 5) cls = "good";
-        else if (m >= 1) cls = "mid";
+        else if (m >= 2) cls = "mid";
 
         el.className = `bucket ${cls}`;
         el.textContent = `${m}x`;
@@ -1108,99 +1134,6 @@
       });
 
       $("ballsLayer").innerHTML = "";
-    }
-
-    function chooseBucketIndex(){
-      let r = Math.random();
-      let acc = 0;
-
-      for (let i = 0; i < WEIGHTS.length; i++) {
-        acc += WEIGHTS[i];
-        if (r <= acc) return i;
-      }
-      return 4;
-    }
-
-    function shuffle(arr){
-      const a = [...arr];
-      for (let i = a.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [a[i], a[j]] = [a[j], a[i]];
-      }
-      return a;
-    }
-
-    function buildDirectionsForBucket(bucketIndex){
-      const finalOffset = (bucketIndex - 4) * 2;
-      const plusCount = (PEG_ROWS + finalOffset) / 2;
-
-      let dirs = [
-        ...new Array(plusCount).fill(1),
-        ...new Array(PEG_ROWS - plusCount).fill(-1)
-      ];
-
-      return shuffle(dirs);
-    }
-
-    function buildBouncePath(bucketIndex, startShift = 0){
-      const dirs = buildDirectionsForBucket(bucketIndex);
-      let offset = 0;
-
-      const points = [{
-        x: BOARD_CENTER_X + startShift,
-        y: 18,
-        bounce: 0
-      }];
-
-      for (let row = 0; row < PEG_ROWS; row++) {
-        const dir = dirs[row];
-        const nextOffset = offset + dir;
-        const rowY = BOARD_TOP_Y + row * ROW_GAP;
-
-        const pegX = BOARD_CENTER_X + ((offset + nextOffset) / 2) * (BUCKET_GAP / 2);
-        const laneX = BOARD_CENTER_X + nextOffset * (BUCKET_GAP / 2);
-
-        points.push({
-          x: pegX - dir * 4,
-          y: rowY - 5,
-          bounce: 0.14
-        });
-
-        points.push({
-          x: pegX + dir * 4.5,
-          y: rowY + 1,
-          bounce: -0.22
-        });
-
-        points.push({
-          x: laneX + dir * 4,
-          y: rowY + 9,
-          bounce: 0.12
-        });
-
-        points.push({
-          x: laneX,
-          y: rowY + 15,
-          bounce: 0
-        });
-
-        offset = nextOffset;
-      }
-
-      const bucketX = BOARD_CENTER_X + (bucketIndex - 4) * BUCKET_GAP;
-
-      points.push({ x: bucketX, y: BUCKET_Y - 8, bounce: 0.08 });
-      points.push({ x: bucketX, y: BUCKET_Y + 2, bounce: -0.10 });
-
-      return points;
-    }
-
-    function easeOutCubic(t){
-      return 1 - Math.pow(1 - t, 3);
-    }
-
-    function easeInOutQuad(t){
-      return t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
     }
 
     function createBall(startX){
@@ -1212,87 +1145,165 @@
       return ball;
     }
 
-    function animateBallPath(ball, points){
-      const speed = SPEEDS[speedIndex].time;
-
-      return new Promise((resolve) => {
-        let segment = 0;
-
-        function runSegment(){
-          if (segment >= points.length - 1) {
-            ball.style.transform = "translate(-50%, -50%) scale(1)";
-            resolve();
-            return;
-          }
-
-          const start = points[segment];
-          const end = points[segment + 1];
-          const dx = end.x - start.x;
-          const dy = end.y - start.y;
-          const dist = Math.hypot(dx, dy);
-
-          const baseDuration = Math.max(42, dist * 8 * speed);
-          const startTime = performance.now();
-
-          function frame(now){
-            let t = (now - startTime) / baseDuration;
-            if (t > 1) t = 1;
-
-            const k = easeInOutQuad(t);
-            const x = start.x + dx * k;
-            const y = start.y + dy * easeOutCubic(t);
-
-            const wobble = Math.sin(t * Math.PI) * (end.bounce || 0);
-            const stretchX = 1 + wobble;
-            const stretchY = 1 - wobble * 0.65;
-
-            ball.style.left = `${x}px`;
-            ball.style.top = `${y}px`;
-            ball.style.transform = `translate(-50%, -50%) scale(${stretchX.toFixed(3)}, ${stretchY.toFixed(3)})`;
-
-            if (t < 1) {
-              requestAnimationFrame(frame);
-            } else {
-              segment++;
-              runSegment();
-            }
-          }
-
-          requestAnimationFrame(frame);
-        }
-
-        runSegment();
-      });
-    }
-
     function highlightBucket(index){
       const el = document.querySelector(`.bucket[data-index="${index}"]`);
       if (!el) return;
       el.classList.add("hit");
-      setTimeout(() => el.classList.remove("hit"), 280);
+      setTimeout(() => el.classList.remove("hit"), 300);
+    }
+
+    function simulateBall(ballState){
+      return new Promise((resolve) => {
+        let lastTime = performance.now();
+
+        function frame(now){
+          const speedScale = SPEEDS[speedIndex].scale;
+          let dt = (now - lastTime) / 16.6667;
+          lastTime = now;
+
+          dt *= speedScale;
+          dt = Math.max(0.6, Math.min(1.5, dt));
+
+          const substeps = 2;
+
+          for (let s = 0; s < substeps; s++) {
+            const step = dt / substeps;
+
+            ballState.vy += 0.23 * step;
+            ballState.vx += ((BOARD_CENTER_X - ballState.x) * 0.00022) * step;
+
+            ballState.x += ballState.vx * step;
+            ballState.y += ballState.vy * step;
+
+            ballState.vx *= 0.998;
+            ballState.vy *= 0.999;
+
+            if (ballState.x - BALL_R < WALL_LEFT) {
+              ballState.x = WALL_LEFT + BALL_R;
+              ballState.vx = Math.abs(ballState.vx) * 0.86 + 0.04;
+            }
+
+            if (ballState.x + BALL_R > WALL_RIGHT) {
+              ballState.x = WALL_RIGHT - BALL_R;
+              ballState.vx = -Math.abs(ballState.vx) * 0.86 - 0.04;
+            }
+
+            for (const peg of pegs) {
+              const dx = ballState.x - peg.x;
+              const dy = ballState.y - peg.y;
+              const minDist = BALL_R + peg.r + 0.45;
+              const distSq = dx * dx + dy * dy;
+
+              if (distSq >= minDist * minDist) continue;
+
+              let dist = Math.sqrt(distSq);
+              if (dist < 0.0001) dist = 0.0001;
+
+              const nx = dx / dist;
+              const ny = dy / dist;
+              const overlap = minDist - dist;
+
+              ballState.x += nx * overlap;
+              ballState.y += ny * overlap;
+
+              const rel = ballState.vx * nx + ballState.vy * ny;
+
+              if (rel < 0) {
+                const restitution = 0.9;
+                ballState.vx -= (1 + restitution) * rel * nx;
+                ballState.vy -= (1 + restitution) * rel * ny;
+
+                const sidePush = (Math.random() - 0.5) * 0.06 + (nx > 0 ? 0.05 : -0.05);
+                ballState.vx += sidePush;
+
+                if (ny < -0.12) {
+                  ballState.vy -= 0.05;
+                }
+              }
+            }
+
+            if (ballState.y >= CATCH_LINE_Y) {
+              const idx = getBucketIndex(ballState.x);
+              const targetX = bucketCenter(idx);
+
+              ballState.vx += (targetX - ballState.x) * 0.0018 * step;
+              ballState.vx *= 0.96;
+
+              if (ballState.y > SETTLE_LINE_Y) {
+                ballState.x += (targetX - ballState.x) * 0.18 * step;
+                ballState.vy *= 0.84;
+              }
+
+              if (
+                ballState.y >= SETTLE_LINE_Y + 3 &&
+                Math.abs(ballState.x - targetX) < 1.2 &&
+                Math.abs(ballState.vx) < 0.22
+              ) {
+                ballState.x = targetX;
+                ballState.y = SETTLE_LINE_Y + 4;
+                renderBall(ballState);
+                resolve(idx);
+                return;
+              }
+            }
+
+            if (ballState.y > BOARD_H - 18) {
+              const idx = getBucketIndex(ballState.x);
+              ballState.x = bucketCenter(idx);
+              ballState.y = SETTLE_LINE_Y + 4;
+              renderBall(ballState);
+              resolve(idx);
+              return;
+            }
+          }
+
+          renderBall(ballState);
+          requestAnimationFrame(frame);
+        }
+
+        requestAnimationFrame(frame);
+      });
+    }
+
+    function renderBall(ballState){
+      const stretch = Math.min(0.16, Math.abs(ballState.vy) * 0.012);
+      const sx = 1 - stretch * 0.55;
+      const sy = 1 + stretch;
+
+      ballState.el.style.left = `${ballState.x}px`;
+      ballState.el.style.top = `${ballState.y}px`;
+      ballState.el.style.transform = `translate(-50%, -50%) scale(${sx.toFixed(3)}, ${sy.toFixed(3)})`;
     }
 
     async function dropOneBall(ballIndex, bet){
-      const startShift = (ballIndex - (selectedBalls - 1) / 2) * 10;
-      const bucketIndex = chooseBucketIndex();
+      const startShift = (ballIndex - (selectedBalls - 1) / 2) * 12;
+      const startX = BOARD_CENTER_X + startShift;
+      const ballEl = createBall(startX);
+
+      const ballState = {
+        el: ballEl,
+        x: startX,
+        y: 18,
+        vx: (Math.random() - 0.5) * 0.34 + startShift * 0.02,
+        vy: 0.12 + Math.random() * 0.04
+      };
+
+      const bucketIndex = await simulateBall(ballState);
       const mult = MULTIPLIERS[bucketIndex];
       const payout = Math.floor(bet * mult);
 
-      const path = buildBouncePath(bucketIndex, startShift);
-      const ball = createBall(BOARD_CENTER_X + startShift);
-
-      await animateBallPath(ball, path);
       highlightBucket(bucketIndex);
 
       setTimeout(() => {
-        ball.remove();
-      }, 140);
+        ballEl.remove();
+      }, 180);
 
       return payout;
     }
 
     async function playRound(){
       if (isPlaying) return;
+
       if (pendingWin > 0) {
         showNotice("Сначала забери выигрыш", "info");
         return;
@@ -1326,7 +1337,7 @@
       }
 
       const payouts = await Promise.all(drops);
-      const totalWin = payouts.reduce((sum, val) => sum + val, 0);
+      const totalWin = payouts.reduce((sum, value) => sum + value, 0);
 
       pendingWin = totalWin;
 
@@ -1338,7 +1349,7 @@
       } else if (totalWin === totalStake) {
         showNotice(`Возврат ${formatVc(totalWin)}`, "info");
       } else {
-        showNotice(`Возврат ${formatVc(totalWin)}`, "lose");
+        showNotice(`К выплате ${formatVc(totalWin)}`, "lose");
       }
 
       isPlaying = false;
