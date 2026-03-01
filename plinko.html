@@ -939,23 +939,17 @@
     // Центр = 0.2, дальше от центра: 0.4 / 2 / 5 / 10
     const MULTIPLIERS = [10, 5, 2, 0.4, 0.2, 0.4, 2, 5, 10];
 
-    // Рекомендуемые шансы:
-    // 0.2 = 50%
-    // 0.4 = 36%
-    // 2   = 10%
-    // 5   = 3%
-    // 10  = 1%
-    // Это заметно выгоднее для тебя.
+    // 10x и 5x теперь реально очень редкие
     const TARGET_WEIGHTS = [
-      0.005, // 10
-      0.015, // 5
-      0.050, // 2
-      0.180, // 0.4
-      0.500, // 0.2 (центр)
-      0.180, // 0.4
-      0.050, // 2
-      0.015, // 5
-      0.005  // 10
+      0.001, // 10
+      0.009, // 5
+      0.040, // 2
+      0.175, // 0.4
+      0.550, // 0.2 (центр)
+      0.175, // 0.4
+      0.040, // 2
+      0.009, // 5
+      0.001  // 10
     ];
 
     const SPEEDS = [
@@ -988,13 +982,22 @@
     const SLOT_GUIDE_Y = 248;
     const SLOT_FLOOR_Y = 270;
 
+    const SAFE_TARGET_MIN = 1;
+    const SAFE_TARGET_MAX = 7;
+
     const GRAVITY = 0.195;
     const AIR_X = 0.9978;
     const AIR_Y = 0.9964;
     const MAX_VY = 4.9;
-    const PEG_BOUNCE = 0.26;
-    const WALL_BOUNCE = 0.20;
-    const FLOOR_BOUNCE = 0.12;
+    const MAX_VX = 0.72;
+
+    const PEG_BOUNCE = 0.24;
+    const WALL_BOUNCE = 0.08;
+    const FLOOR_BOUNCE = 0.10;
+
+    const EDGE_GUARD_ZONE = 34;
+    const EDGE_GUARD_FORCE = 0.0019;
+
     const SIM_FAILSAFE_MS = 9000;
 
     const $ = (id) => document.getElementById(id);
@@ -1153,6 +1156,10 @@
       return clamp(raw, 0, BUCKET_COUNT - 1);
     }
 
+    function getSteeringBucket(index){
+      return clamp(index, SAFE_TARGET_MIN, SAFE_TARGET_MAX);
+    }
+
     function chooseTargetBucket(){
       let r = Math.random();
       let sum = 0;
@@ -1175,7 +1182,8 @@
     }
 
     function buildDirectionsForBucket(bucketIndex){
-      const finalOffset = (bucketIndex - 4) * 2;
+      const safeIndex = getSteeringBucket(bucketIndex);
+      const finalOffset = (safeIndex - 4) * 2;
       const plusCount = clamp((PEG_ROWS + finalOffset) / 2, 0, PEG_ROWS);
 
       const dirs = [
@@ -1307,11 +1315,11 @@
         return;
       }
 
-      ball.x += (centerX - ball.x) * 0.18;
-      ball.vx *= 0.78;
+      ball.x += (centerX - ball.x) * 0.24;
+      ball.vx *= 0.70;
 
       const closeEnough = Math.abs(centerX - ball.x) < 0.55;
-      const slowEnough = Math.abs(ball.vx) < 0.05 && Math.abs(ball.vy) < 0.07;
+      const slowEnough = Math.abs(ball.vx) < 0.045 && Math.abs(ball.vy) < 0.06;
 
       if (closeEnough && slowEnough) {
         finalizeBall(ball, liveBucket);
@@ -1330,23 +1338,25 @@
     }
 
     function createBallState(i){
-      const spread = (i - (selectedBalls - 1) / 2) * 12;
+      const spread = (i - (selectedBalls - 1) / 2) * 8;
       const startX = clamp(
-        BOARD_CENTER_X + spread + (Math.random() - 0.5) * 4,
-        WALL_LEFT + BALL_R + 2,
-        WALL_RIGHT - BALL_R - 2
+        BOARD_CENTER_X + spread + (Math.random() - 0.5) * 2.5,
+        WALL_LEFT + BALL_R + 6,
+        WALL_RIGHT - BALL_R - 6
       );
 
       const targetIndex = chooseTargetBucket();
+      const steeringIndex = getSteeringBucket(targetIndex);
 
       return {
         el: createBall(startX),
         x: startX,
         y: 18,
-        vx: (Math.random() - 0.5) * 0.025,
-        vy: 0.02 + Math.random() * 0.03,
+        vx: (Math.random() - 0.5) * 0.012,
+        vy: 0.02 + Math.random() * 0.025,
         targetIndex,
-        route: buildDirectionsForBucket(targetIndex),
+        steeringIndex,
+        route: buildDirectionsForBucket(steeringIndex),
         lastRowHit: -1,
         bucketIndex: null,
         settled: false,
@@ -1387,24 +1397,35 @@
             for (const ball of ballStates) {
               if (ball.settled) continue;
 
-              const targetX = bucketCenter(ball.targetIndex);
+              const targetX = bucketCenter(ball.steeringIndex);
 
               ball.vy += GRAVITY * step;
               ball.vy = Math.min(ball.vy, MAX_VY);
 
-              if (ball.y < 110) {
-                ball.vx += (BOARD_CENTER_X - ball.x) * 0.00003 * step;
+              // сильный возврат к центру сверху
+              if (ball.y < 120) {
+                ball.vx += clamp((BOARD_CENTER_X - ball.x) * 0.00014, -0.018, 0.018) * step;
+              } else if (ball.y < 210) {
+                // в середине всё ещё тянем к центру сильнее, чем к цели
+                ball.vx += clamp((BOARD_CENTER_X - ball.x) * 0.00010, -0.012, 0.012) * step;
+                ball.vx += clamp((targetX - ball.x) * 0.00004, -0.006, 0.006) * step;
+              } else {
+                // внизу мягко ведём в безопасную цель, не в край
+                ball.vx += clamp((targetX - ball.x) * 0.00009, -0.012, 0.012) * step;
               }
 
-              if (ball.y > 96) {
-                ball.vx += clamp((targetX - ball.x) * 0.00007, -0.011, 0.011) * step;
+              // анти-край: если шар слишком близко к стене, жёстко выталкиваем обратно
+              const leftDanger = (WALL_LEFT + EDGE_GUARD_ZONE) - ball.x;
+              if (leftDanger > 0) {
+                ball.vx += clamp(leftDanger * EDGE_GUARD_FORCE, 0, 0.030) * step;
               }
 
-              if (ball.y > 170) {
-                ball.vx += clamp((targetX - ball.x) * 0.00014, -0.018, 0.018) * step;
+              const rightDanger = ball.x - (WALL_RIGHT - EDGE_GUARD_ZONE);
+              if (rightDanger > 0) {
+                ball.vx -= clamp(rightDanger * EDGE_GUARD_FORCE, 0, 0.030) * step;
               }
 
-              ball.vx += Math.sin((now + ball.phase) * 0.0024) * 0.00055 * step;
+              ball.vx += Math.sin((now + ball.phase) * 0.0024) * 0.00035 * step;
 
               ball.x += ball.vx * step;
               ball.y += ball.vy * step;
@@ -1413,16 +1434,16 @@
               ball.vy *= AIR_Y;
 
               if (ball.x - BALL_R < WALL_LEFT) {
-                ball.x = WALL_LEFT + BALL_R;
+                ball.x = WALL_LEFT + BALL_R + 0.6;
                 if (ball.vx < 0) {
-                  ball.vx = Math.abs(ball.vx) * WALL_BOUNCE + 0.006;
+                  ball.vx = Math.abs(ball.vx) * WALL_BOUNCE + 0.002;
                 }
               }
 
               if (ball.x + BALL_R > WALL_RIGHT) {
-                ball.x = WALL_RIGHT - BALL_R;
+                ball.x = WALL_RIGHT - BALL_R - 0.6;
                 if (ball.vx > 0) {
-                  ball.vx = -Math.abs(ball.vx) * WALL_BOUNCE - 0.006;
+                  ball.vx = -Math.abs(ball.vx) * WALL_BOUNCE - 0.002;
                 }
               }
 
@@ -1455,13 +1476,13 @@
                   ball.lastRowHit = peg.row;
 
                   const dir = ball.route[peg.row] || 0;
-                  ball.vx += dir * (0.024 + Math.random() * 0.010);
-                  ball.vx += (Math.random() - 0.5) * 0.005;
+                  ball.vx += dir * (0.016 + Math.random() * 0.006);
+                  ball.vx += (Math.random() - 0.5) * 0.003;
                 } else {
-                  ball.vx += (Math.random() - 0.5) * 0.002;
+                  ball.vx += (Math.random() - 0.5) * 0.0012;
                 }
 
-                ball.vx = clamp(ball.vx, -0.90, 0.90);
+                ball.vx = clamp(ball.vx, -MAX_VX, MAX_VX);
 
                 if (ny < -0.08) {
                   ball.vy *= 0.989;
@@ -1482,17 +1503,33 @@
                     ball.x += nx * overlap;
 
                     if (ball.vx * nx < 0) {
-                      ball.vx = -ball.vx * 0.10;
+                      ball.vx = -ball.vx * 0.08;
                     }
 
-                    ball.vx += nx * 0.002;
+                    ball.vx += nx * 0.0015;
                   }
                 }
 
-                ball.vx += clamp((targetX - ball.x) * 0.0010, -0.036, 0.036) * step;
-                ball.vx *= 0.992;
+                const liveBucket = getBucketIndex(ball.x);
 
-                if (ball.slotFrames > 24) {
+                // если шар дошёл до самого края внизу — принудительно выталкиваем внутрь
+                if (liveBucket === 0) {
+                  ball.vx += 0.020 * step;
+                } else if (liveBucket === 8) {
+                  ball.vx -= 0.020 * step;
+                }
+
+                if (ball.x < BUCKET_LEFT + SLOT_W * 0.9) {
+                  ball.vx += 0.010 * step;
+                }
+                if (ball.x > BUCKET_RIGHT - SLOT_W * 0.9) {
+                  ball.vx -= 0.010 * step;
+                }
+
+                ball.vx += clamp((targetX - ball.x) * 0.0012, -0.026, 0.026) * step;
+                ball.vx *= 0.991;
+
+                if (ball.slotFrames > 18) {
                   settleBall(ball, true);
                   continue;
                 }
@@ -1503,13 +1540,14 @@
               if (ball.y + BALL_R > SLOT_FLOOR_Y) {
                 ball.y = SLOT_FLOOR_Y - BALL_R;
 
-                if (Math.abs(ball.vy) > 0.10 && ball.floorHits < 2) {
+                // меньше скачет внизу => меньше скатывается по краю
+                if (Math.abs(ball.vy) > 0.10 && ball.floorHits < 1) {
                   ball.vy = -Math.abs(ball.vy) * FLOOR_BOUNCE;
-                  ball.vx *= 0.94;
+                  ball.vx *= 0.90;
                   ball.floorHits += 1;
                 } else {
                   ball.vy = 0;
-                  settleBall(ball, ball.floorHits >= 2 || ball.slotFrames > 8);
+                  settleBall(ball, true);
                   continue;
                 }
               }
@@ -1517,20 +1555,22 @@
               if (
                 ball.y > 70 &&
                 ball.y < SLOT_GUIDE_Y &&
-                Math.abs(ball.vx) < 0.009 &&
+                Math.abs(ball.vx) < 0.008 &&
                 Math.abs(ball.vy) < 0.14
               ) {
                 ball.idleFrames += 1;
 
                 if (ball.idleFrames > 6) {
-                  const pushDir = Math.sign(targetX - ball.x) || (Math.random() < 0.5 ? -1 : 1);
-                  ball.vx += pushDir * (0.020 + Math.random() * 0.010);
-                  ball.vy += 0.04;
+                  const pushDir = Math.sign(BOARD_CENTER_X - ball.x) || (Math.random() < 0.5 ? -1 : 1);
+                  ball.vx += pushDir * (0.018 + Math.random() * 0.006);
+                  ball.vy += 0.03;
                   ball.idleFrames = 0;
                 }
               } else {
                 ball.idleFrames = 0;
               }
+
+              ball.vx = clamp(ball.vx, -MAX_VX, MAX_VX);
 
               ball.trailTick += step;
               if (ball.trailTick >= 2.6) {
@@ -1571,7 +1611,7 @@
                 const rel = rvx * nx + rvy * ny;
 
                 if (rel < 0) {
-                  const impulse = (-(1 + 0.22) * rel) / 2;
+                  const impulse = (-(1 + 0.18) * rel) / 2;
                   const ix = impulse * nx;
                   const iy = impulse * ny;
 
