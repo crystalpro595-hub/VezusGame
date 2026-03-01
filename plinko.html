@@ -9,6 +9,7 @@
   <link rel="dns-prefetch" href="https://i.postimg.cc">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
   <link rel="preload" as="image" href="https://i.postimg.cc/qvL497mF/Picsart-26-02-27-02-02-37-502.png">
 
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
@@ -28,6 +29,10 @@
       --tg2:#229ED9;
       --green1:#22c55e;
       --green2:#16a34a;
+      --blue1:#38bdf8;
+      --blue2:#0284c7;
+      --red1:#ef4444;
+      --red2:#dc2626;
     }
 
     *{
@@ -56,8 +61,8 @@
       position:fixed;
       inset:0;
       background:
-        radial-gradient(1000px 700px at 30% 10%, rgba(42,171,238,.14), transparent 55%),
-        linear-gradient(180deg, rgba(0,0,0,.42), rgba(0,0,0,.68));
+        radial-gradient(900px 600px at 30% 10%, rgba(56,189,248,.08), transparent 60%),
+        linear-gradient(180deg, rgba(0,0,0,.40), rgba(0,0,0,.64));
       pointer-events:none;
       z-index:0;
     }
@@ -103,14 +108,13 @@
     .top-row{
       width:100%;
       display:grid;
-      grid-template-columns:40px minmax(0,1fr) 40px 54px;
+      grid-template-columns:40px minmax(0,1fr) 48px 54px;
       gap:8px;
       align-items:center;
     }
 
     .icon-btn,
     .speed-btn{
-      width:40px;
       height:40px;
       border:none;
       border-radius:14px;
@@ -127,18 +131,23 @@
     }
 
     .icon-btn{
+      width:40px;
       font-size:18px;
       font-weight:900;
     }
 
     .speed-btn{
-      font-size:15px;
+      width:48px;
+      font-size:14px;
       font-weight:900;
-      letter-spacing:.4px;
+      letter-spacing:.5px;
     }
 
     .icon-btn:active,
-    .speed-btn:active{ transform:scale(.98); }
+    .speed-btn:active,
+    .logo-btn:active{
+      transform:scale(.98);
+    }
 
     .balance-mini{
       width:100%;
@@ -176,6 +185,7 @@
       font-weight:900;
       color: rgba(234,241,255,.92);
       white-space:nowrap;
+      pointer-events:none;
     }
 
     .bal-amount{
@@ -211,8 +221,6 @@
       cursor:pointer;
     }
 
-    .logo-btn:active{ transform:scale(.98); }
-
     .logo-btn img{
       width:100%;
       height:100%;
@@ -228,223 +236,94 @@
       backdrop-filter: blur(10px);
       -webkit-backdrop-filter: blur(10px);
       overflow:hidden;
-      position:relative;
-    }
-
-    .card::before{
-      content:"";
-      position:absolute;
-      inset:0;
-      background:
-        radial-gradient(420px 160px at 0% 0%, rgba(42,171,238,.08), transparent 60%),
-        radial-gradient(360px 140px at 100% 100%, rgba(42,171,238,.05), transparent 60%);
-      pointer-events:none;
-    }
-
-    .card > *{
-      position:relative;
-      z-index:1;
     }
 
     .board-card{
-      padding:14px 12px 12px;
+      padding:12px 12px 14px;
     }
 
     .board-wrap{
-      display:flex;
-      justify-content:center;
-      align-items:center;
-    }
-
-    .board-stage{
       position:relative;
-      width:min(100%, 340px);
-      height:410px;
-      overflow:hidden;
-      border-radius:24px;
-      background:
-        radial-gradient(circle at 50% 0%, rgba(42,171,238,.11), transparent 42%),
-        linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.015)),
-        rgba(4, 10, 22, .78);
-      border:1px solid rgba(255,255,255,.05);
-      box-shadow:
-        inset 0 1px 0 rgba(255,255,255,.03),
-        inset 0 -18px 28px rgba(0,0,0,.16);
+      width:100%;
+      max-width:320px;
+      margin:0 auto;
     }
 
     .board-glow{
       position:absolute;
-      inset:auto 50% 18px 50%;
-      width:210px;
-      height:96px;
-      transform:translateX(-50%);
-      background: radial-gradient(circle, rgba(42,171,238,.10), transparent 70%);
-      filter: blur(18px);
+      inset:auto 12px 12px 12px;
+      height:56px;
+      background: radial-gradient(circle, rgba(42,171,238,.22), transparent 70%);
+      filter: blur(14px);
       pointer-events:none;
-      z-index:1;
     }
 
-    .side-rail{
-      position:absolute;
-      top:26px;
-      bottom:62px;
-      width:10px;
-      border-radius:999px;
+    canvas{
+      width:100%;
+      height:auto;
+      display:block;
+      border-radius:22px;
       background:
-        linear-gradient(180deg, rgba(255,255,255,.15), rgba(255,255,255,.03)),
-        rgba(255,255,255,.04);
-      border:1px solid rgba(255,255,255,.06);
-      box-shadow: inset 0 1px 0 rgba(255,255,255,.05);
-      z-index:1;
-      pointer-events:none;
-      opacity:.8;
-    }
-
-    .side-rail.left{ left:14px; }
-    .side-rail.right{ right:14px; }
-
-    .bins-layer{
-      position:absolute;
-      inset:0;
-      pointer-events:none;
-      z-index:2;
-    }
-
-    .ball{
-      position:absolute;
-      left:50%;
-      top:26px;
-      width:14px;
-      height:14px;
-      margin-left:-7px;
-      margin-top:-7px;
-      border-radius:50%;
-      background:
-        radial-gradient(circle at 30% 28%, #ffffff 0%, #d7efff 20%, #7dd3fc 42%, #2AABEE 68%, #1d4ed8 100%);
-      border:1px solid rgba(255,255,255,.28);
+        linear-gradient(180deg, rgba(7,20,40,.96), rgba(7,15,30,.98));
       box-shadow:
-        0 0 12px rgba(42,171,238,.16),
-        0 8px 14px rgba(0,0,0,.16),
-        inset 0 1px 0 rgba(255,255,255,.55);
-      transform:translate(-50%, -50%);
-      opacity:0;
-      z-index:3;
-      will-change:left, top, transform, opacity;
+        inset 0 1px 0 rgba(255,255,255,.04),
+        inset 0 0 0 1px rgba(255,255,255,.03);
     }
 
-    .pegs-layer{
-      position:absolute;
-      inset:0;
-      pointer-events:none;
-      z-index:4;
+    .action-card{
+      padding:14px;
     }
 
-    .peg{
-      position:absolute;
-      width:12px;
-      height:12px;
-      border-radius:50%;
-      transform:translate(-50%, -50%);
-      background:
-        radial-gradient(circle at 32% 28%, rgba(255,255,255,.95), rgba(210,228,255,.74) 35%, rgba(116,148,190,.50) 60%, rgba(28,42,70,.20) 100%);
-      border:1px solid rgba(255,255,255,.18);
-      box-shadow:
-        0 0 8px rgba(42,171,238,.08),
-        inset 0 1px 0 rgba(255,255,255,.42),
-        inset 0 -1px 2px rgba(0,0,0,.16);
-    }
-
-    .bin{
-      position:absolute;
-      bottom:8px;
-      transform:translateX(-50%);
-      height:50px;
-      border-radius:12px 12px 14px 14px;
-      display:flex;
-      align-items:flex-end;
-      justify-content:center;
-      padding-bottom:8px;
+    .play-btn,
+    .claim-btn{
+      width:100%;
+      height:54px;
+      border:none;
+      border-radius:18px;
+      cursor:pointer;
       color:#fff;
-      font-size:11px;
+      font-size:15px;
       font-weight:900;
-      letter-spacing:.1px;
-      background:
-        linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.03)),
-        rgba(255,255,255,.04);
-      border:1px solid rgba(255,255,255,.08);
-      box-shadow:
-        inset 0 1px 0 rgba(255,255,255,.05),
-        0 8px 16px rgba(0,0,0,.16);
-      transition: transform .18s ease, box-shadow .18s ease, filter .18s ease;
-      text-shadow: 0 2px 8px rgba(0,0,0,.25);
-      user-select:none;
+      letter-spacing:.2px;
+      transition: transform .16s ease, opacity .16s ease, box-shadow .16s ease;
     }
 
-    .bin.hot{
-      background:
-        linear-gradient(180deg, rgba(255,216,91,.24), rgba(210,140,14,.16)),
-        rgba(255,255,255,.04);
-      color:#fff8d0;
+    .play-btn{
+      background: linear-gradient(180deg, var(--tg1), var(--tg2));
+      box-shadow: 0 18px 34px rgba(34,158,217,.28);
     }
 
-    .bin.mid{
-      background:
-        linear-gradient(180deg, rgba(42,171,238,.18), rgba(22,110,170,.12)),
-        rgba(255,255,255,.04);
+    .claim-btn{
+      background: linear-gradient(180deg, var(--green1), var(--green2));
+      box-shadow: 0 18px 34px rgba(34,197,94,.24);
     }
 
-    .bin.hit{
-      transform:translateX(-50%) translateY(-5px) scale(1.08);
-      box-shadow:
-        0 0 16px rgba(42,171,238,.18),
-        inset 0 1px 0 rgba(255,255,255,.08),
-        0 12px 20px rgba(0,0,0,.20);
-      filter:brightness(1.14);
+    .play-btn:active,
+    .claim-btn:active{
+      transform:scale(.985);
     }
 
-    .action-card,
-    .control-card{
+    .play-btn:disabled,
+    .claim-btn:disabled{
+      opacity:.55;
+      cursor:not-allowed;
+      box-shadow:none;
+      transform:none !important;
+    }
+
+    .controls-card{
       padding:16px;
       display:flex;
       flex-direction:column;
       gap:14px;
     }
 
-    .section-label{
+    .label{
       font-size:13px;
       font-weight:900;
-      color: rgba(234,241,255,.95);
-      margin:0 0 10px 0;
+      color: rgba(234,241,255,.94);
+      margin-bottom:10px;
     }
-
-    .mode-grid{
-      display:grid;
-      grid-template-columns:repeat(3, minmax(0,1fr));
-      gap:8px;
-    }
-
-    .pill-btn{
-      height:42px;
-      border:none;
-      border-radius:16px;
-      cursor:pointer;
-      background: rgba(255,255,255,.06);
-      border:1px solid rgba(255,255,255,.08);
-      color:#fff;
-      font-size:12px;
-      font-weight:900;
-      box-shadow: inset 0 1px 0 rgba(255,255,255,.04);
-      transition: transform .16s ease, box-shadow .16s ease, background .16s ease;
-    }
-
-    .pill-btn.active{
-      background: linear-gradient(180deg, rgba(42,171,238,.22), rgba(34,158,217,.14));
-      box-shadow:
-        0 10px 18px rgba(34,158,217,.14),
-        inset 0 1px 0 rgba(255,255,255,.06);
-    }
-
-    .pill-btn:active{ transform:scale(.98); }
 
     .bet-row{
       display:grid;
@@ -460,7 +339,7 @@
       border:1px solid rgba(255,255,255,.08);
       background: rgba(255,255,255,.06);
       color:#fff;
-      font-size:16px;
+      font-size:17px;
       font-weight:900;
       padding:0 14px;
       outline:none;
@@ -482,21 +361,16 @@
       background: rgba(255,255,255,.08);
       border:1px solid rgba(255,255,255,.08);
       color:#fff;
-      box-shadow: inset 0 1px 0 rgba(255,255,255,.04);
       display:grid;
       place-items:center;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.04);
       padding:0;
     }
 
     .bet-toggle svg{
-      width:20px;
-      height:20px;
+      width:22px;
+      height:22px;
       display:block;
-      fill:none;
-      stroke:#fff;
-      stroke-width:1.9;
-      stroke-linecap:round;
-      stroke-linejoin:round;
     }
 
     .bet-toggle:active{ transform:scale(.98); }
@@ -532,53 +406,31 @@
 
     .quick-btn:active{ transform:scale(.98); }
 
-    .action-wrap{
-      max-height:64px;
-      overflow:hidden;
-      transition:max-height .2s ease, opacity .18s ease, transform .18s ease;
+    .balls-row{
+      display:grid;
+      grid-template-columns:repeat(3, minmax(0,1fr));
+      gap:8px;
     }
 
-    .action-wrap.hide{
-      max-height:0;
-      opacity:0;
-      transform:translateY(-6px);
-      pointer-events:none;
-    }
-
-    .play-btn,
-    .claim-btn{
-      width:100%;
-      height:54px;
+    .ball-count-btn{
+      height:42px;
       border:none;
-      border-radius:18px;
+      border-radius:16px;
       cursor:pointer;
+      background: rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.08);
       color:#fff;
-      font-size:15px;
+      font-size:13px;
       font-weight:900;
-      letter-spacing:.2px;
-      transition: transform .16s ease, opacity .16s ease, box-shadow .16s ease;
+      transition: transform .14s ease, background .14s ease, box-shadow .14s ease;
     }
 
-    .play-btn{
-      background: linear-gradient(180deg, var(--tg1), var(--tg2));
-      box-shadow: 0 18px 34px rgba(34,158,217,.28);
+    .ball-count-btn.active{
+      background: linear-gradient(180deg, rgba(42,171,238,.28), rgba(34,158,217,.20));
+      box-shadow: 0 10px 20px rgba(34,158,217,.14);
     }
 
-    .claim-btn{
-      background: linear-gradient(180deg, var(--green1), var(--green2));
-      box-shadow: 0 18px 34px rgba(34,197,94,.24);
-    }
-
-    .play-btn:active,
-    .claim-btn:active{ transform:scale(.985); }
-
-    .play-btn:disabled,
-    .claim-btn:disabled{
-      opacity:.55;
-      cursor:not-allowed;
-      box-shadow:none;
-      transform:none !important;
-    }
+    .ball-count-btn:active{ transform:scale(.985); }
 
     .bottom-notice{
       position:fixed;
@@ -615,12 +467,12 @@
       background: linear-gradient(180deg, rgba(34,197,94,.92), rgba(22,163,74,.92));
     }
 
-    .bottom-notice.lose{
-      background: linear-gradient(180deg, rgba(239,68,68,.92), rgba(220,38,38,.92));
-    }
-
     .bottom-notice.info{
       background: linear-gradient(180deg, rgba(42,171,238,.92), rgba(34,158,217,.92));
+    }
+
+    .bottom-notice.lose{
+      background: linear-gradient(180deg, rgba(239,68,68,.92), rgba(220,38,38,.92));
     }
 
     .notice-icon{
@@ -710,7 +562,7 @@
       padding:0;
     }
 
-    .popup-x:active{ transform:scale(.98); }
+    .popup-x:active{ transform: scale(.98); }
 
     .popup-body{
       padding:14px 16px 16px 16px;
@@ -719,7 +571,8 @@
       gap:12px;
     }
 
-    .popup-text{
+    .popup-text,
+    .rule-line{
       margin:0;
       font-size:13px;
       line-height:1.42;
@@ -746,7 +599,7 @@
       font-size:14px;
     }
 
-    .tg-btn:active{ transform:scale(.99); }
+    .tg-btn:active{ transform: scale(.99); }
 
     .tg-ico{
       width:22px;
@@ -763,8 +616,8 @@
       align-items:center;
       justify-content:center;
       background:
-        radial-gradient(900px 700px at 50% 18%, rgba(42,171,238,.22), transparent 42%),
-        linear-gradient(180deg, #03111f 0%, #06325a 48%, #0a5c90 100%);
+        radial-gradient(1000px 700px at 50% 10%, rgba(86,210,255,.24), transparent 50%),
+        linear-gradient(180deg, #020b16 0%, #06213d 48%, #0b4d82 100%);
       transition: opacity .32s ease, visibility .32s ease;
     }
 
@@ -775,33 +628,48 @@
     }
 
     .pre-logo{
-      width:88px;
-      height:88px;
+      width:92px;
+      height:92px;
       object-fit:contain;
       display:block;
       filter: drop-shadow(0 14px 24px rgba(0,0,0,.22));
-      animation: preLogoFloat .95s ease-in-out infinite;
+      animation: preLogoFloat .9s ease-in-out infinite;
     }
 
     @keyframes preLogoFloat{
       0%,100%{ transform: translateY(0) scale(1); }
-      50%{ transform: translateY(-8px) scale(1.02); }
+      50%{ transform: translateY(-8px) scale(1.03); }
     }
 
     @media (max-width: 360px){
-      .top-row{ grid-template-columns:36px minmax(0,1fr) 36px 46px; gap:6px; }
-      .icon-btn, .speed-btn{ width:36px; height:36px; border-radius:12px; }
-      .icon-btn{ font-size:16px; }
-      .speed-btn{ font-size:13px; }
+      .top-row{ grid-template-columns:36px minmax(0,1fr) 44px 46px; gap:6px; }
+
+      .icon-btn,
+      .speed-btn{
+        height:36px;
+        border-radius:12px;
+      }
+
+      .icon-btn{ width:36px; font-size:16px; }
+      .speed-btn{ width:44px; font-size:12px; }
+
       .logo-btn{ width:46px; height:46px; }
+
       .balance-mini{ height:38px; }
       .bal-amount{ min-width:74px; height:24px; font-size:12px; }
-      .board-stage{ height:380px; width:min(100%, 306px); }
-      .mode-grid{ grid-template-columns:1fr; }
+
+      .bet-row{ grid-template-columns:minmax(0,1fr) 44px; }
+      .bet-input{ height:46px; font-size:15px; }
+      .bet-toggle{ width:44px; height:46px; border-radius:16px; }
+
       .quick-bets{ grid-template-columns:repeat(3, minmax(0,1fr)); }
-      .play-btn, .claim-btn{ height:50px; font-size:14px; }
-      .pre-logo{ width:76px; height:76px; }
+
+      .play-btn,
+      .claim-btn{ height:50px; font-size:14px; }
+
       .tg-btn{ height:48px; border-radius:15px; }
+
+      .pre-logo{ width:78px; height:78px; }
     }
 
     @media (prefers-reduced-motion: reduce){
@@ -832,7 +700,7 @@
             <div class="bal-amount" id="balanceValue">...</div>
           </div>
 
-          <button class="speed-btn" id="speedBtn" aria-label="Сменить скорость">››</button>
+          <button class="speed-btn" id="speedBtn" aria-label="Скорость">››</button>
 
           <button class="logo-btn" id="logoBtn" aria-label="Открыть Telegram канал">
             <img
@@ -848,30 +716,19 @@
 
       <div class="card board-card">
         <div class="board-wrap">
-          <div class="board-stage" id="boardStage">
-            <div class="board-glow"></div>
-            <div class="side-rail left"></div>
-            <div class="side-rail right"></div>
-            <div class="bins-layer" id="binsLayer"></div>
-            <div class="ball" id="ball"></div>
-            <div class="pegs-layer" id="pegsLayer"></div>
-          </div>
+          <canvas id="plinkoCanvas" width="320" height="430"></canvas>
+          <div class="board-glow"></div>
         </div>
       </div>
 
       <div class="card action-card">
-        <div class="action-wrap" id="playWrap">
-          <button class="play-btn" id="playBtn" type="button">Играть</button>
-        </div>
-
-        <div class="action-wrap hide" id="claimWrap">
-          <button class="claim-btn" id="claimBtn" type="button">Забрать</button>
-        </div>
+        <button class="play-btn" id="playBtn" type="button">Играть</button>
+        <button class="claim-btn" id="claimBtn" type="button" style="display:none;">Забрать</button>
       </div>
 
-      <div class="card control-card">
+      <div class="card controls-card">
         <div>
-          <div class="section-label">Ставка за 1 шар</div>
+          <div class="label">Ставка за шар</div>
 
           <div class="bet-row">
             <input
@@ -885,11 +742,18 @@
               value="10"
             >
 
-            <button class="bet-toggle" id="betToggleBtn" type="button" aria-label="Быстрый выбор ставки">
+            <button class="bet-toggle" id="betToggleBtn" type="button" aria-label="Быстрая ставка">
               <svg viewBox="0 0 24 24" aria-hidden="true">
-                <circle cx="12" cy="12" r="8.5"></circle>
-                <path d="M12 7.8v8.4"></path>
-                <path d="M8.8 12h6.4"></path>
+                <defs>
+                  <linearGradient id="coinGrad" x1="0" x2="1">
+                    <stop offset="0%" stop-color="#fde68a"/>
+                    <stop offset="100%" stop-color="#f59e0b"/>
+                  </linearGradient>
+                </defs>
+                <circle cx="12" cy="12" r="8.6" fill="url(#coinGrad)" stroke="rgba(255,255,255,.45)" stroke-width="1.2"/>
+                <circle cx="12" cy="12" r="5.7" fill="none" stroke="rgba(255,255,255,.35)" stroke-width="1"/>
+                <path d="M12 7.7v8.6" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/>
+                <path d="M8.4 12h7.2" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/>
               </svg>
             </button>
           </div>
@@ -904,11 +768,12 @@
         </div>
 
         <div>
-          <div class="section-label">Количество шариков</div>
-          <div class="mode-grid" id="ballsGrid">
-            <button class="pill-btn active" data-balls="1" type="button">1 шар</button>
-            <button class="pill-btn" data-balls="2" type="button">2 шара</button>
-            <button class="pill-btn" data-balls="3" type="button">3 шара</button>
+          <div class="label">Шариков</div>
+
+          <div class="balls-row">
+            <button class="ball-count-btn active" data-count="1" type="button">1 шар</button>
+            <button class="ball-count-btn" data-count="2" type="button">2 шара</button>
+            <button class="ball-count-btn" data-count="3" type="button">3 шара</button>
           </div>
         </div>
       </div>
@@ -942,31 +807,88 @@
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <script>
     const VERIFY_URL = "https://lazrfierfbhwlduqlvws.functions.supabase.co/verify-telegram";
-    const FILES = { games: "games.html" };
-
     const MIN_BET = 10;
-    const ROWS = 8;
 
-    const MULTIPLIERS = [0.2, 0.4, 0.8, 1.5, 10, 1.5, 0.8, 0.4, 0.2];
-    const SLOT_WEIGHTS = [24, 20, 15, 10, 2, 10, 15, 20, 24];
+    const FILES = {
+      games: "games.html"
+    };
 
-    const SPEED_ORDER = ["slow", "medium", "fast"];
-    const SPEED_LABELS = { slow: "›", medium: "››", fast: "›››" };
-    const SPEED_NAMES = { slow: "Медленно", medium: "Средне", fast: "Быстро" };
-    const SPEED_DURATION = { slow: 2050, medium: 1550, fast: 1180 };
+    const SPEEDS = [
+      { label:"›", factor:0.85, name:"Медленно" },
+      { label:"››", factor:1.05, name:"Средне" },
+      { label:"›››", factor:1.28, name:"Быстро" }
+    ];
+
+    const SLOT_MULTS = [10, 2, 1.2, 0.8, 0.5, 0.3, 0.5, 0.8, 1.2, 2, 10];
+    const ROWS = 10;
+    const SLOT_COUNT = SLOT_MULTS.length;
 
     const $ = (id) => document.getElementById(id);
 
-    let currentBalance = 0;
-    let selectedSpeed = "medium";
-    let selectedBalls = 1;
-    let quickVisible = false;
+    const canvas = $("plinkoCanvas");
+    const ctx = canvas.getContext("2d");
 
-    let isDropping = false;
-    let pendingWin = 0;
+    const board = {
+      w: canvas.width,
+      h: canvas.height,
+      topPad: 42,
+      sidePad: 24,
+      slotH: 48,
+      pegR: 5.2,
+      ballR: 6.8
+    };
+
+    const pegs = [];
+    const slotRects = [];
+    const balls = [];
+
+    let currentBalance = 0;
+    let speedIndex = 1;
+    let quickVisible = false;
+    let selectedBallCount = 1;
+    let isPlaying = false;
+    let pendingClaim = 0;
+    let spentThisRound = 0;
+    let spawnQueue = 0;
+    let spawnTimer = 0;
+    let lastFrame = 0;
     let noticeTimer = null;
-    let animFrame = null;
-    let boardLayout = null;
+
+    function buildBoard(){
+      pegs.length = 0;
+      slotRects.length = 0;
+
+      const hGap = 27.2;
+      const vGap = 26.4;
+      const startY = board.topPad;
+
+      for (let row = 0; row < ROWS; row++) {
+        const count = row + 1;
+        const rowWidth = (count - 1) * hGap;
+        const startX = (board.w - rowWidth) / 2;
+
+        for (let i = 0; i < count; i++) {
+          pegs.push({
+            x: startX + i * hGap,
+            y: startY + row * vGap,
+            r: board.pegR
+          });
+        }
+      }
+
+      const slotW = (board.w - board.sidePad * 2) / SLOT_COUNT;
+      const slotY = board.h - board.slotH;
+
+      for (let i = 0; i < SLOT_COUNT; i++) {
+        slotRects.push({
+          x: board.sidePad + i * slotW,
+          y: slotY,
+          w: slotW,
+          h: board.slotH,
+          mult: SLOT_MULTS[i]
+        });
+      }
+    }
 
     function formatVc(value){
       const n = Number(value ?? 0);
@@ -1004,17 +926,22 @@
 
     function getTelegramInitData(){
       if (!window.Telegram || !window.Telegram.WebApp) return "";
-
       try{
         Telegram.WebApp.ready();
         if (typeof Telegram.WebApp.expand === "function") Telegram.WebApp.expand();
       } catch {}
-
       return Telegram.WebApp.initData || "";
     }
 
     function updateBalanceUI(){
       $("balanceValue").textContent = formatVc(currentBalance);
+    }
+
+    function getBetAmount(){
+      const raw = $("betInput").value;
+      const amount = Number(raw);
+      if (!raw || !Number.isFinite(amount)) return 0;
+      return Math.floor(amount);
     }
 
     function showNotice(text, type = "info"){
@@ -1027,7 +954,9 @@
       box.classList.add("show");
 
       if (noticeTimer) clearTimeout(noticeTimer);
-      noticeTimer = setTimeout(() => box.classList.remove("show"), 1900);
+      noticeTimer = setTimeout(() => {
+        box.classList.remove("show");
+      }, 2100);
     }
 
     function setQuickVisible(show){
@@ -1035,32 +964,31 @@
       $("quickBets").classList.toggle("show", quickVisible);
     }
 
-    function setClaimVisible(show){
-      $("claimWrap").classList.toggle("hide", !show);
-      $("playWrap").classList.toggle("hide", !!show);
+    function setBallCount(count){
+      selectedBallCount = count;
+      document.querySelectorAll(".ball-count-btn").forEach((btn) => {
+        btn.classList.toggle("active", Number(btn.dataset.count) === count);
+      });
       updateButtons();
     }
 
-    function updateClaimButton(){
-      $("claimBtn").textContent = pendingWin > 0
-        ? `Забрать ${formatVc(pendingWin)}`
-        : "Забрать";
-    }
-
-    function getBetAmount(){
-      const raw = $("betInput").value;
-      const amount = Number(raw);
-      if (!raw || !Number.isFinite(amount)) return 0;
-      return Math.floor(amount);
+    function setSpeed(index, silent = false){
+      speedIndex = index;
+      $("speedBtn").textContent = SPEEDS[speedIndex].label;
+      if (!silent) showNotice(`Скорость: ${SPEEDS[speedIndex].name}`, "info");
     }
 
     function updateButtons(){
       const bet = getBetAmount();
-      const canPlay = !isDropping && pendingWin <= 0 && bet >= MIN_BET;
+      const totalCost = bet * selectedBallCount;
+      const canPlay =
+        !isPlaying &&
+        pendingClaim <= 0 &&
+        bet >= MIN_BET &&
+        totalCost <= currentBalance;
 
       $("playBtn").disabled = !canPlay;
-      $("claimBtn").disabled = isDropping || pendingWin <= 0;
-      updateClaimButton();
+      $("claimBtn").disabled = isPlaying || pendingClaim <= 0;
     }
 
     async function autoAuthTelegram(){
@@ -1104,367 +1032,33 @@
       updateButtons();
     }
 
-    function computeBoardLayout(){
-      const board = $("boardStage");
-      const width = board.clientWidth;
-      const height = board.clientHeight;
+    function spawnBall(){
+      const startX = board.w / 2 + (Math.random() * 6 - 3);
+      const startY = 20;
+      const speedMul = SPEEDS[speedIndex].factor;
 
-      const sidePad = Math.max(50, Math.min(56, width * 0.17));
-      const topPad = 64;
-      const bottomPad = 84;
-
-      const pegGap = (width - sidePad * 2) / ROWS;
-      const rowGap = (height - topPad - bottomPad) / (ROWS - 1);
-
-      boardLayout = {
-        width,
-        height,
-        sidePad,
-        topPad,
-        bottomPad,
-        pegGap,
-        rowGap,
-        centerX: width / 2,
-        binCenterY: height - 36,
-        binWidth: Math.max(20, Math.min(28, pegGap * 0.74)),
-        pegRadius: 6,
-        ballRadius: 7
-      };
-    }
-
-    function slotCenterX(index){
-      return boardLayout.centerX + (2 * index - ROWS) * (boardLayout.pegGap / 2);
-    }
-
-    function renderBoard(){
-      computeBoardLayout();
-
-      const pegsLayer = $("pegsLayer");
-      const binsLayer = $("binsLayer");
-
-      pegsLayer.innerHTML = "";
-      binsLayer.innerHTML = "";
-
-      for (let row = 0; row < ROWS; row++) {
-        const count = row + 1;
-        const y = boardLayout.topPad + row * boardLayout.rowGap;
-        const startX = boardLayout.centerX - (row * boardLayout.pegGap) / 2;
-
-        for (let col = 0; col < count; col++) {
-          const peg = document.createElement("div");
-          peg.className = "peg";
-          peg.style.left = `${startX + col * boardLayout.pegGap}px`;
-          peg.style.top = `${y}px`;
-          pegsLayer.appendChild(peg);
-        }
-      }
-
-      MULTIPLIERS.forEach((mult, index) => {
-        const bin = document.createElement("div");
-        const isHot = mult >= 5;
-        const isMid = mult >= 1 && mult < 5;
-
-        bin.className = `bin${isHot ? " hot" : ""}${isMid ? " mid" : ""}`;
-        bin.style.left = `${slotCenterX(index)}px`;
-        bin.style.width = `${boardLayout.binWidth}px`;
-        bin.textContent = `${mult}x`;
-        bin.dataset.index = String(index);
-
-        binsLayer.appendChild(bin);
-      });
-
-      resetBall();
-    }
-
-    function resetBall(){
-      const ball = $("ball");
-      ball.style.opacity = "0";
-      ball.style.left = `${boardLayout.centerX}px`;
-      ball.style.top = "26px";
-      ball.style.transform = "translate(-50%, -50%) scale(1)";
-    }
-
-    function highlightBin(index){
-      const bin = document.querySelector(`.bin[data-index="${index}"]`);
-      if (!bin) return;
-      bin.classList.add("hit");
-      setTimeout(() => bin.classList.remove("hit"), 420);
-    }
-
-    function cycleSpeed(){
-      const currentIndex = SPEED_ORDER.indexOf(selectedSpeed);
-      const nextIndex = (currentIndex + 1) % SPEED_ORDER.length;
-      selectedSpeed = SPEED_ORDER[nextIndex];
-      $("speedBtn").textContent = SPEED_LABELS[selectedSpeed];
-      showNotice(`Скорость: ${SPEED_NAMES[selectedSpeed]}`, "info");
-    }
-
-    function setBalls(count){
-      selectedBalls = count;
-
-      document.querySelectorAll("#ballsGrid .pill-btn").forEach((btn) => {
-        btn.classList.toggle("active", Number(btn.dataset.balls) === count);
-      });
-
-      updateButtons();
-    }
-
-    function weightedSlot(){
-      const total = SLOT_WEIGHTS.reduce((sum, w) => sum + w, 0);
-      let rnd = Math.random() * total;
-
-      for (let i = 0; i < SLOT_WEIGHTS.length; i++) {
-        rnd -= SLOT_WEIGHTS[i];
-        if (rnd <= 0) return i;
-      }
-
-      return SLOT_WEIGHTS.length - 1;
-    }
-
-    function shuffle(array){
-      const a = array.slice();
-      for (let i = a.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [a[i], a[j]] = [a[j], a[i]];
-      }
-      return a;
-    }
-
-    function pegXFor(row, rightsBefore){
-      return boardLayout.centerX - (row * boardLayout.pegGap) / 2 + rightsBefore * boardLayout.pegGap;
-    }
-
-    function buildPathSegments(slotIndex){
-      const rightsNeeded = slotIndex;
-      const steps = [];
-
-      for (let i = 0; i < ROWS; i++) {
-        steps.push(i < rightsNeeded ? 1 : 0);
-      }
-
-      const randomSteps = shuffle(steps);
-      const segments = [];
-
-      let rights = 0;
-      let current = { x: boardLayout.centerX, y: 26 };
-
-      for (let row = 0; row < ROWS; row++) {
-        const pegY = boardLayout.topPad + row * boardLayout.rowGap;
-        const pegX = pegXFor(row, rights);
-
-        const goRight = randomSteps[row] === 1;
-        const dir = goRight ? 1 : -1;
-        const nextRights = rights + (goRight ? 1 : 0);
-
-        const nextLaneX =
-          boardLayout.centerX -
-          ((row + 1) * boardLayout.pegGap) / 2 +
-          nextRights * boardLayout.pegGap;
-
-        const entry = {
-          x: pegX + dir * (boardLayout.pegGap * 0.06),
-          y: pegY - boardLayout.rowGap * 0.26
-        };
-
-        const shoulder = {
-          x: pegX + dir * (boardLayout.pegGap * 0.34),
-          y: pegY - boardLayout.rowGap * 0.02
-        };
-
-        const wrap = {
-          x: pegX + dir * (boardLayout.pegGap * 0.58),
-          y: pegY + boardLayout.rowGap * 0.16
-        };
-
-        const exit = {
-          x: nextLaneX,
-          y: pegY + boardLayout.rowGap * 0.48
-        };
-
-        segments.push({
-          p0: { ...current },
-          c1: {
-            x: current.x,
-            y: current.y + boardLayout.rowGap * 0.15
-          },
-          c2: {
-            x: entry.x - dir * (boardLayout.pegGap * 0.10),
-            y: entry.y - boardLayout.rowGap * 0.06
-          },
-          p1: entry
-        });
-
-        segments.push({
-          p0: entry,
-          c1: {
-            x: entry.x + dir * (boardLayout.pegGap * 0.10),
-            y: entry.y + boardLayout.rowGap * 0.08
-          },
-          c2: {
-            x: shoulder.x,
-            y: shoulder.y - boardLayout.rowGap * 0.06
-          },
-          p1: shoulder
-        });
-
-        segments.push({
-          p0: shoulder,
-          c1: {
-            x: shoulder.x + dir * (boardLayout.pegGap * 0.18),
-            y: shoulder.y + boardLayout.rowGap * 0.12
-          },
-          c2: {
-            x: wrap.x - dir * (boardLayout.pegGap * 0.08),
-            y: wrap.y - boardLayout.rowGap * 0.02
-          },
-          p1: wrap
-        });
-
-        segments.push({
-          p0: wrap,
-          c1: {
-            x: wrap.x - dir * (boardLayout.pegGap * 0.08),
-            y: wrap.y + boardLayout.rowGap * 0.10
-          },
-          c2: {
-            x: exit.x,
-            y: exit.y - boardLayout.rowGap * 0.12
-          },
-          p1: exit
-        });
-
-        current = exit;
-        rights = nextRights;
-      }
-
-      const targetX = slotCenterX(slotIndex);
-      const targetY = boardLayout.binCenterY - 8;
-
-      segments.push({
-        p0: { ...current },
-        c1: {
-          x: current.x + (targetX - current.x) * 0.25,
-          y: current.y + 16
-        },
-        c2: {
-          x: targetX,
-          y: targetY - 14
-        },
-        p1: {
-          x: targetX,
-          y: targetY
-        }
-      });
-
-      return segments;
-    }
-
-    function cubicPoint(p0, c1, c2, p1, t){
-      const inv = 1 - t;
-      return {
-        x:
-          inv * inv * inv * p0.x +
-          3 * inv * inv * t * c1.x +
-          3 * inv * t * t * c2.x +
-          t * t * t * p1.x,
-        y:
-          inv * inv * inv * p0.y +
-          3 * inv * inv * t * c1.y +
-          3 * inv * t * t * c2.y +
-          t * t * t * p1.y
-      };
-    }
-
-    function cubicLength(seg){
-      let len = 0;
-      let prev = seg.p0;
-
-      for (let i = 1; i <= 34; i++) {
-        const t = i / 34;
-        const p = cubicPoint(seg.p0, seg.c1, seg.c2, seg.p1, t);
-        len += Math.hypot(p.x - prev.x, p.y - prev.y);
-        prev = p;
-      }
-
-      return len;
-    }
-
-    function animateBall(slotIndex){
-      return new Promise((resolve) => {
-        const ball = $("ball");
-        const segments = buildPathSegments(slotIndex).map((seg) => ({
-          ...seg,
-          len: cubicLength(seg)
-        }));
-
-        const totalLength = segments.reduce((sum, seg) => sum + seg.len, 0);
-        const duration = SPEED_DURATION[selectedSpeed];
-
-        ball.style.opacity = "1";
-        let startTime = 0;
-
-        function frame(ts){
-          if (!startTime) startTime = ts;
-
-          const elapsed = ts - startTime;
-          const progress = Math.min(1, elapsed / duration);
-
-          const eased = 1 - Math.pow(1 - progress, 1.9);
-          const travel = totalLength * eased;
-
-          let passed = 0;
-          let currentSeg = segments[0];
-
-          for (let i = 0; i < segments.length; i++) {
-            if (travel <= passed + segments[i].len || i === segments.length - 1) {
-              currentSeg = segments[i];
-              break;
-            }
-            passed += segments[i].len;
-          }
-
-          const localRaw = currentSeg.len ? (travel - passed) / currentSeg.len : 1;
-          const local = Math.max(0, Math.min(1, localRaw));
-          const pos = cubicPoint(currentSeg.p0, currentSeg.c1, currentSeg.c2, currentSeg.p1, local);
-
-          let scaleX = 1;
-          let scaleY = 1;
-
-          if (local > 0.84 && local < 1) {
-            const crush = Math.sin(((local - 0.84) / 0.16) * Math.PI);
-            scaleX += 0.10 * crush;
-            scaleY -= 0.08 * crush;
-          }
-
-          ball.style.left = `${pos.x}px`;
-          ball.style.top = `${pos.y}px`;
-          ball.style.transform = `translate(-50%, -50%) scale(${scaleX}, ${scaleY})`;
-
-          if (progress < 1) {
-            animFrame = requestAnimationFrame(frame);
-          } else {
-            const end = currentSeg.p1;
-            ball.style.left = `${end.x}px`;
-            ball.style.top = `${end.y}px`;
-            ball.style.transform = "translate(-50%, -50%) scale(1)";
-            resolve();
-          }
-        }
-
-        if (animFrame) cancelAnimationFrame(animFrame);
-        animFrame = requestAnimationFrame(frame);
+      balls.push({
+        x: startX,
+        y: startY,
+        vx: (Math.random() * 0.35 - 0.175) * speedMul,
+        vy: 0,
+        r: board.ballR,
+        settled: false,
+        alpha: 1,
+        slotIndex: -1
       });
     }
 
-    async function sleep(ms){
-      return new Promise((resolve) => setTimeout(resolve, ms));
-    }
+    function startRound(){
+      if (isPlaying) return;
 
-    async function playRound(){
-      if (isDropping || pendingWin > 0) return;
+      if (pendingClaim > 0) {
+        showNotice("Сначала забери выигрыш", "info");
+        return;
+      }
 
       const bet = getBetAmount();
-      const totalCost = bet * selectedBalls;
+      const totalCost = bet * selectedBallCount;
 
       if (bet < MIN_BET) {
         showNotice(`Минимум ${MIN_BET} VC`, "lose");
@@ -1476,54 +1070,299 @@
         return;
       }
 
-      isDropping = true;
-      setQuickVisible(false);
-
       currentBalance -= totalCost;
-      updateBalanceUI();
+      spentThisRound = totalCost;
+      pendingClaim = 0;
       saveCachedBalance();
+      updateBalanceUI();
+
+      balls.length = 0;
+      isPlaying = true;
+      spawnQueue = selectedBallCount;
+      spawnTimer = 0;
+
+      $("playBtn").style.display = "block";
+      $("claimBtn").style.display = "none";
       updateButtons();
+    }
 
-      let totalPayout = 0;
+    function finishRound(){
+      isPlaying = false;
 
-      for (let i = 0; i < selectedBalls; i++) {
-        const slot = weightedSlot();
-        const mult = MULTIPLIERS[slot];
-        const payout = Math.round(bet * mult);
+      const payout = Math.max(0, Number(pendingClaim.toFixed(2)));
+      if (payout > 0) {
+        $("claimBtn").textContent = `Забрать ${formatVc(payout)}`;
+        $("playBtn").style.display = "none";
+        $("claimBtn").style.display = "block";
 
-        await animateBall(slot);
-        highlightBin(slot);
-
-        totalPayout += payout;
-        await sleep(140);
-      }
-
-      isDropping = false;
-      pendingWin = totalPayout;
-
-      if (pendingWin > 0) {
-        setClaimVisible(true);
-        showNotice(`Раунд завершён • Забрать ${formatVc(pendingWin)}`, "win");
+        if (payout >= spentThisRound) {
+          showNotice(`Раунд завершён. Забери ${formatVc(payout)}`, "win");
+        } else {
+          showNotice(`Возврат ${formatVc(payout)}`, "info");
+        }
       } else {
-        setClaimVisible(false);
-        showNotice("Без выигрыша", "lose");
+        showNotice("Раунд завершён", "lose");
       }
 
       updateButtons();
     }
 
     function claimWin(){
-      if (isDropping || pendingWin <= 0) return;
+      if (pendingClaim <= 0 || isPlaying) return;
 
-      currentBalance += pendingWin;
-      updateBalanceUI();
+      currentBalance += pendingClaim;
       saveCachedBalance();
+      updateBalanceUI();
 
-      showNotice(`Забрано ${formatVc(pendingWin)}`, "win");
+      showNotice(`Зачислено ${formatVc(pendingClaim)}`, "win");
 
-      pendingWin = 0;
-      setClaimVisible(false);
+      pendingClaim = 0;
+      spentThisRound = 0;
+      $("claimBtn").style.display = "none";
+      $("playBtn").style.display = "block";
+
       updateButtons();
+    }
+
+    function resolveBallToSlot(ball){
+      const slotY = board.h - board.slotH;
+      const slotW = slotRects[0].w;
+      let idx = Math.floor((ball.x - board.sidePad) / slotW);
+      idx = Math.max(0, Math.min(SLOT_COUNT - 1, idx));
+
+      ball.slotIndex = idx;
+      ball.x = slotRects[idx].x + slotRects[idx].w / 2;
+      ball.y = slotY - ball.r;
+      ball.vx = 0;
+      ball.vy = 0;
+      ball.settled = true;
+
+      const betPerBall = getBetAmount();
+      const mult = SLOT_MULTS[idx];
+      pendingClaim += betPerBall * mult;
+    }
+
+    function physicsStep(dt){
+      const speedMul = SPEEDS[speedIndex].factor;
+      const gravity = 980 * speedMul;
+      const slotTop = board.h - board.slotH;
+      const subSteps = 4;
+      const subDt = dt / subSteps;
+
+      if (spawnQueue > 0) {
+        spawnTimer -= dt;
+        if (spawnTimer <= 0) {
+          spawnBall();
+          spawnQueue--;
+          spawnTimer = 0.22 / speedMul;
+        }
+      }
+
+      for (let s = 0; s < subSteps; s++) {
+        for (const ball of balls) {
+          if (ball.settled) continue;
+
+          ball.vy += gravity * subDt;
+          ball.x += ball.vx * subDt;
+          ball.y += ball.vy * subDt;
+
+          if (ball.x < board.sidePad + ball.r) {
+            ball.x = board.sidePad + ball.r;
+            ball.vx *= -0.84;
+          }
+          if (ball.x > board.w - board.sidePad - ball.r) {
+            ball.x = board.w - board.sidePad - ball.r;
+            ball.vx *= -0.84;
+          }
+
+          for (const peg of pegs) {
+            const dx = ball.x - peg.x;
+            const dy = ball.y - peg.y;
+            const minDist = ball.r + peg.r;
+            const distSq = dx * dx + dy * dy;
+
+            if (distSq > 0 && distSq < minDist * minDist) {
+              const dist = Math.sqrt(distSq);
+              const nx = dx / dist;
+              const ny = dy / dist;
+              const overlap = minDist - dist;
+
+              ball.x += nx * overlap;
+              ball.y += ny * overlap;
+
+              const dot = ball.vx * nx + ball.vy * ny;
+              if (dot < 0) {
+                const bounce = 0.9;
+                ball.vx -= (1 + bounce) * dot * nx;
+                ball.vy -= (1 + bounce) * dot * ny;
+
+                ball.vx += (Math.random() * 6 - 3) * speedMul;
+                ball.vx *= 0.992;
+              }
+            }
+          }
+
+          ball.vx *= 0.996;
+
+          if (ball.y >= slotTop - ball.r) {
+            resolveBallToSlot(ball);
+          }
+        }
+      }
+
+      if (isPlaying && spawnQueue === 0 && balls.length > 0 && balls.every(b => b.settled)) {
+        finishRound();
+      }
+    }
+
+    function drawBoard(){
+      ctx.clearRect(0, 0, board.w, board.h);
+
+      const grad = ctx.createLinearGradient(0, 0, 0, board.h);
+      grad.addColorStop(0, "rgba(8,18,36,0.95)");
+      grad.addColorStop(1, "rgba(5,12,24,0.98)");
+      ctx.fillStyle = grad;
+      roundRect(ctx, 0, 0, board.w, board.h, 22);
+      ctx.fill();
+
+      // Верхнее свечение
+      const glow = ctx.createRadialGradient(board.w / 2, 72, 10, board.w / 2, 72, 150);
+      glow.addColorStop(0, "rgba(56,189,248,0.16)");
+      glow.addColorStop(1, "rgba(56,189,248,0)");
+      ctx.fillStyle = glow;
+      ctx.fillRect(0, 0, board.w, 180);
+
+      // Поле
+      const fieldX = board.sidePad - 8;
+      const fieldY = 24;
+      const fieldW = board.w - (board.sidePad - 8) * 2;
+      const fieldH = board.h - 24 - board.slotH + 10;
+
+      ctx.save();
+      roundRect(ctx, fieldX, fieldY, fieldW, fieldH, 20);
+      ctx.clip();
+
+      const fieldGrad = ctx.createLinearGradient(0, fieldY, 0, fieldY + fieldH);
+      fieldGrad.addColorStop(0, "rgba(8,26,50,0.55)");
+      fieldGrad.addColorStop(1, "rgba(5,15,28,0.28)");
+      ctx.fillStyle = fieldGrad;
+      ctx.fillRect(fieldX, fieldY, fieldW, fieldH);
+
+      // Боковые направляющие
+      ctx.strokeStyle = "rgba(56,189,248,0.16)";
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(fieldX + 12, fieldY + 18);
+      ctx.lineTo(fieldX + 22, fieldY + fieldH - 8);
+      ctx.moveTo(fieldX + fieldW - 12, fieldY + 18);
+      ctx.lineTo(fieldX + fieldW - 22, fieldY + fieldH - 8);
+      ctx.stroke();
+      ctx.restore();
+
+      // Штыри
+      for (const peg of pegs) {
+        const pegGrad = ctx.createRadialGradient(peg.x - 1.2, peg.y - 1.2, 1, peg.x, peg.y, peg.r + 2);
+        pegGrad.addColorStop(0, "rgba(255,255,255,0.95)");
+        pegGrad.addColorStop(0.45, "rgba(140,160,190,0.95)");
+        pegGrad.addColorStop(1, "rgba(70,90,120,0.92)");
+
+        ctx.fillStyle = pegGrad;
+        ctx.beginPath();
+        ctx.arc(peg.x, peg.y, peg.r, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.fillStyle = "rgba(255,255,255,0.14)";
+        ctx.beginPath();
+        ctx.arc(peg.x - 1.2, peg.y - 1.2, peg.r * 0.35, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      // Ячейки и множители
+      for (let i = 0; i < slotRects.length; i++) {
+        const slot = slotRects[i];
+        const isHot = slot.mult >= 5;
+        const isWarm = slot.mult >= 2 && slot.mult < 5;
+
+        let fillA = "rgba(255,255,255,0.07)";
+        let fillB = "rgba(255,255,255,0.04)";
+        if (isHot) {
+          fillA = "rgba(249,115,22,0.42)";
+          fillB = "rgba(220,38,38,0.28)";
+        } else if (isWarm) {
+          fillA = "rgba(56,189,248,0.28)";
+          fillB = "rgba(2,132,199,0.18)";
+        }
+
+        const slotGrad = ctx.createLinearGradient(0, slot.y, 0, slot.y + slot.h);
+        slotGrad.addColorStop(0, fillA);
+        slotGrad.addColorStop(1, fillB);
+
+        ctx.fillStyle = slotGrad;
+        roundRect(ctx, slot.x + 1.2, slot.y + 3, slot.w - 2.4, slot.h - 4, 12);
+        ctx.fill();
+
+        ctx.strokeStyle = "rgba(255,255,255,0.08)";
+        ctx.lineWidth = 1;
+        roundRect(ctx, slot.x + 1.2, slot.y + 3, slot.w - 2.4, slot.h - 4, 12);
+        ctx.stroke();
+
+        ctx.fillStyle = "rgba(255,255,255,0.96)";
+        ctx.font = "900 11px Inter, sans-serif";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText(
+          `${String(slot.mult).replace(".0","")}x`,
+          slot.x + slot.w / 2,
+          slot.y + slot.h / 2 + 1
+        );
+      }
+
+      // Шарики
+      for (const ball of balls) {
+        const r = ball.r;
+
+        const ballGrad = ctx.createRadialGradient(ball.x - r * 0.35, ball.y - r * 0.45, 1, ball.x, ball.y, r + 2);
+        ballGrad.addColorStop(0, "rgba(255,255,255,1)");
+        ballGrad.addColorStop(0.35, "rgba(147,197,253,0.98)");
+        ballGrad.addColorStop(1, "rgba(14,165,233,0.95)");
+
+        ctx.fillStyle = "rgba(0,0,0,0.22)";
+        ctx.beginPath();
+        ctx.ellipse(ball.x + 1.4, ball.y + r + 4.2, r * 0.82, r * 0.42, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.fillStyle = ballGrad;
+        ctx.beginPath();
+        ctx.arc(ball.x, ball.y, r, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.fillStyle = "rgba(255,255,255,0.42)";
+        ctx.beginPath();
+        ctx.arc(ball.x - r * 0.28, ball.y - r * 0.34, r * 0.24, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+
+    function roundRect(ctx, x, y, w, h, r){
+      const rr = Math.min(r, w / 2, h / 2);
+      ctx.beginPath();
+      ctx.moveTo(x + rr, y);
+      ctx.arcTo(x + w, y, x + w, y + h, rr);
+      ctx.arcTo(x + w, y + h, x, y + h, rr);
+      ctx.arcTo(x, y + h, x, y, rr);
+      ctx.arcTo(x, y, x + w, y, rr);
+      ctx.closePath();
+    }
+
+    function loop(ts){
+      if (!lastFrame) lastFrame = ts;
+      let dt = (ts - lastFrame) / 1000;
+      lastFrame = ts;
+      dt = Math.min(dt, 0.022);
+
+      physicsStep(dt);
+      drawBoard();
+      requestAnimationFrame(loop);
     }
 
     function openOverlay(id){
@@ -1542,8 +1381,8 @@
 
     $("backBtn").addEventListener("click", () => goTo(FILES.games));
     $("logoBtn").addEventListener("click", () => openOverlay("channelOverlay"));
-    $("channelClose").addEventListener("click", () => closeOverlay("channelOverlay"));
 
+    $("channelClose").addEventListener("click", () => closeOverlay("channelOverlay"));
     $("channelOverlay").addEventListener("click", (e) => {
       if (e.target === $("channelOverlay")) closeOverlay("channelOverlay");
     });
@@ -1552,47 +1391,53 @@
       openTelegramLinkSafe("https://t.me/vezuspubg");
     });
 
-    $("speedBtn").addEventListener("click", cycleSpeed);
-
-    document.querySelectorAll("#ballsGrid .pill-btn").forEach((btn) => {
-      btn.addEventListener("click", () => setBalls(Number(btn.dataset.balls)));
-    });
-
     $("betToggleBtn").addEventListener("click", () => {
       setQuickVisible(!quickVisible);
     });
 
     document.querySelectorAll(".quick-btn").forEach((btn) => {
       btn.addEventListener("click", () => {
-        $("betInput").value = btn.dataset.bet || "10";
+        const value = btn.getAttribute("data-bet");
+        if (!value) return;
+        $("betInput").value = value;
         setQuickVisible(false);
         updateButtons();
       });
     });
 
-    $("betInput").addEventListener("input", updateButtons);
+    $("betInput").addEventListener("input", () => {
+      updateButtons();
+    });
 
-    $("playBtn").addEventListener("click", playRound);
+    document.querySelectorAll(".ball-count-btn").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        setBallCount(Number(btn.dataset.count));
+      });
+    });
+
+    $("speedBtn").addEventListener("click", () => {
+      let next = speedIndex + 1;
+      if (next >= SPEEDS.length) next = 0;
+      setSpeed(next);
+    });
+
+    $("playBtn").addEventListener("click", startRound);
     $("claimBtn").addEventListener("click", claimWin);
 
     document.addEventListener("keydown", (e) => {
       if (e.key === "Escape") closeOverlay("channelOverlay");
     });
 
-    window.addEventListener("resize", () => {
-      if (!isDropping) renderBoard();
-    });
-
     window.addEventListener("load", () => {
-      renderBoard();
-      $("speedBtn").textContent = SPEED_LABELS[selectedSpeed];
-      setBalls(1);
-      updateClaimButton();
-      updateButtons();
+      buildBoard();
+      setSpeed(1, true);
+      setBallCount(1);
+      drawBoard();
+      requestAnimationFrame(loop);
 
       setTimeout(() => {
         $("preloader").classList.add("hide");
-      }, 1400);
+      }, 1200);
 
       autoAuthTelegram();
     });
