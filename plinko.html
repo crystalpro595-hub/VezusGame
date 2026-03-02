@@ -1080,7 +1080,6 @@
     games: "games.html"
   };
 
-  // слоты слева направо
   const MULTIPLIERS = [0.8, 5, 2, 0.4, 0.2, 0.4, 2, 5, 0.8];
 
   const SPEEDS = [
@@ -1490,8 +1489,6 @@
     const targetIndex = clamp(Math.floor(Number(forcedTargetIndex ?? 4)), 0, BUCKET_COUNT - 1);
     const targetCenter = bucketBounds(targetIndex).center;
     const spread = (i - (selectedBalls - 1) / 2) * 7;
-
-    // небольшой стартовый сдвиг в сторону целевого слота — без резких прыжков
     const startBias = clamp((targetCenter - BOARD_CENTER_X) * 0.16, -26, 26);
 
     const startX = clamp(
@@ -1519,7 +1516,6 @@
       startDelay: i * 110,
       active: false,
 
-      restFrames: 0,
       ageMs: 0
     };
   }
@@ -1578,8 +1574,6 @@
       if (Math.abs(dx) < minX) {
         const dir = dx >= 0 ? 1 : -1;
         ball.x = dividerX + dir * minX;
-
-        // мягче отбивает, чтобы шар не зависал между делителями
         ball.vx = dir * Math.max(Math.abs(ball.vx) * 0.24, 4);
       }
     }
@@ -1593,7 +1587,6 @@
     const bounds = bucketBounds(ball.targetIndex);
     const targetCenter = bounds.center;
 
-    // плавное наведение по высоте: чем ниже, тем сильнее, но без телепорта
     const fallFactor = clamp((ball.y - 24) / (DIVIDER_TOP - 32), 0, 1);
     const toward = clamp((targetCenter - ball.x) / 110, -1, 1);
 
@@ -1630,7 +1623,6 @@
       resolvePegCollision(ball, peg);
     }
 
-    // мягкий "коридор" к нужному слоту у самого низа — без x-телепорта
     if (ball.y > 206 && ball.y < FLOOR_Y) {
       const tight = clamp((ball.y - 206) / 40, 0, 1);
 
@@ -1658,9 +1650,12 @@
 
       ball.bucketIndex = currentBucket;
 
-      const insideTargetSlot =
-        ball.x >= bounds.left - 0.5 &&
-        ball.x <= bounds.right + 0.5;
+      // ГЛАВНОЕ ИСПРАВЛЕНИЕ:
+      // как только шар дошёл до нужного множителя — сразу фиксируем
+      if (currentBucket === ball.targetIndex) {
+        finalizeBall(ball, ball.targetIndex);
+        return;
+      }
 
       if (Math.abs(ball.vy) > 10) {
         ball.vy = -Math.abs(ball.vy) * FLOOR_BOUNCE;
@@ -1670,32 +1665,17 @@
         ball.vx *= 0.52;
       }
 
-      // только мягкий доворот скоростью, без сдвига координаты
-      if (!insideTargetSlot) {
-        ball.vx += clamp((targetCenter - ball.x) * 0.14, -10, 10);
-      }
-
-      if (insideTargetSlot && Math.abs(ball.vx) < 4.2 && Math.abs(ball.vy) < 4.2) {
-        ball.restFrames += 1;
+      if (ball.x < bounds.left) {
+        ball.vx += clamp((bounds.left - ball.x) * 0.28, 0, 14);
+      } else if (ball.x > bounds.right) {
+        ball.vx -= clamp((ball.x - bounds.right) * 0.28, 0, 14);
       } else {
-        ball.restFrames = 0;
+        ball.vx += clamp((targetCenter - ball.x) * 0.10, -8, 8);
       }
 
-      if (ball.restFrames > 2) {
-        finalizeBall(ball, ball.targetIndex);
-        return;
-      }
-
-      // запасной мягкий финиш, если уже долго на дне
-      if (ball.ageMs > 9000 && insideTargetSlot) {
-        finalizeBall(ball, ball.targetIndex);
-        return;
-      }
-    } else {
-      ball.restFrames = 0;
+      ball.vx = clamp(ball.vx, -MAX_VX, MAX_VX);
     }
 
-    // последний запасной выход — без скачка в центр
     if (ball.ageMs > 12000) {
       const fallbackBucket = clamp(
         Math.floor((ball.x - BUCKET_LEFT) / SLOT_W),
@@ -1811,7 +1791,6 @@
       ballStates.push(createBallState(i, targetBuckets[i]));
     }
 
-    // считаем по фактическим финальным слотам
     const settledBuckets = await simulateBalls(ballStates);
 
     pendingWin = calculateTotalWin(settledBuckets, bet);
