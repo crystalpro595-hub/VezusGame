@@ -275,6 +275,40 @@
       pointer-events:none;
     }
 
+    .empty-card{
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.01)),
+        rgba(11,16,42,.7);
+      border:1px dashed rgba(255,255,255,.12);
+      box-shadow:
+        0 18px 38px rgba(0,0,0,.24),
+        inset 0 1px 0 rgba(255,255,255,.03);
+    }
+
+    .empty-card::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      z-index:1;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.02), rgba(0,0,0,.08));
+      pointer-events:none;
+    }
+
+    .empty-plus{
+      position:absolute;
+      inset:0;
+      z-index:2;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:34px;
+      font-weight:300;
+      color:rgba(234,241,255,.22);
+      user-select:none;
+      pointer-events:none;
+    }
+
     .channel-overlay{
       position:fixed;
       inset:0;
@@ -484,17 +518,6 @@
           >
         </button>
 
-        <button class="game-card" id="plinkoBtn" type="button" aria-label="Plinko">
-          <img
-            class="game-img"
-            src="https://i.postimg.cc/kMRyhxzT/Picsart-26-03-02-02-44-30-494.jpg"
-            alt="Plinko"
-            loading="eager"
-            fetchpriority="high"
-            decoding="async"
-          >
-        </button>
-
         <button class="game-card" id="minesBtn" type="button" aria-label="Mines">
           <img
             class="game-img"
@@ -506,34 +529,20 @@
           >
         </button>
 
-        <button class="game-card" id="futureGame1Btn" type="button" aria-label="Future Game 1">
-          <img
-            class="game-img"
-            src="YOUR_FUTURE_GAME_1.png"
-            alt="Future Game 1"
-            loading="lazy"
-            decoding="async"
-          >
+        <button class="game-card empty-card" id="futureGame1Btn" type="button" aria-label="Future Game 1">
+          <span class="empty-plus">+</span>
         </button>
 
-        <button class="game-card" id="futureGame2Btn" type="button" aria-label="Future Game 2">
-          <img
-            class="game-img"
-            src="YOUR_FUTURE_GAME_2.png"
-            alt="Future Game 2"
-            loading="lazy"
-            decoding="async"
-          >
+        <button class="game-card empty-card" id="futureGame2Btn" type="button" aria-label="Future Game 2">
+          <span class="empty-plus">+</span>
         </button>
 
-        <button class="game-card" id="futureGame3Btn" type="button" aria-label="Future Game 3">
-          <img
-            class="game-img"
-            src="YOUR_FUTURE_GAME_3.png"
-            alt="Future Game 3"
-            loading="lazy"
-            decoding="async"
-          >
+        <button class="game-card empty-card" id="futureGame3Btn" type="button" aria-label="Future Game 3">
+          <span class="empty-plus">+</span>
+        </button>
+
+        <button class="game-card empty-card" id="futureGame4Btn" type="button" aria-label="Future Game 4">
+          <span class="empty-plus">+</span>
         </button>
       </div>
 
@@ -571,7 +580,7 @@
       index: "index.html",
       wallet: "wallet.html",
       coinflip: "coinflip.html",
-      plinko: "plinko.html"
+      mines: "mines.html"
     };
 
     const $ = (id) => document.getElementById(id);
@@ -676,12 +685,12 @@
     });
 
     $("coinflipBtn").addEventListener("click", () => goTo(FILES.coinflip));
-    $("plinkoBtn").addEventListener("click", () => goTo(FILES.plinko));
-    $("minesBtn").addEventListener("click", () => alert("Mines — скоро"));
+    $("minesBtn").addEventListener("click", () => goTo(FILES.mines));
 
     $("futureGame1Btn").addEventListener("click", () => alert("Скоро"));
     $("futureGame2Btn").addEventListener("click", () => alert("Скоро"));
     $("futureGame3Btn").addEventListener("click", () => alert("Скоро"));
+    $("futureGame4Btn").addEventListener("click", () => alert("Скоро"));
 
     document.addEventListener("keydown", (e) => {
       if (e.key === "Escape") closeChannel();
