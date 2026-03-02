@@ -1108,7 +1108,6 @@
     const PEG_R = 4;
 
     const BOARD_CENTER_X = BOARD_W / 2;
-
     const BUCKET_LEFT = 18;
     const BUCKET_RIGHT = BOARD_W - 18;
     const BUCKET_COUNT = 9;
@@ -1228,7 +1227,7 @@
       if (noticeTimer) clearTimeout(noticeTimer);
       noticeTimer = setTimeout(() => {
         box.classList.remove("show");
-      }, 1900);
+      }, 2200);
     }
 
     function getBetAmount(){
@@ -1274,30 +1273,39 @@
       }
 
       let res;
-
       try{
         res = await fetch(PLINKO_URL, {
           method: "POST",
           mode: "cors",
-          headers: { "Content-Type": "application/json" },
+          cache: "no-store",
+          headers: {
+            "Content-Type": "application/json"
+          },
           body: JSON.stringify({
             action,
             initData,
             ...extra
           })
         });
-      } catch (error) {
-        console.error("plinko-play fetch failed:", error);
-        throw new Error("Нет соединения с Edge Function. Проверь deploy, URL и CORS.");
+      } catch {
+        throw new Error("Нет соединения с Edge Function");
       }
 
-      const json = await res.json().catch(() => ({}));
+      let payload = {};
+      const contentType = res.headers.get("content-type") || "";
 
-      if (!res.ok || !json.ok) {
-        throw new Error(json.error || "Ошибка Edge Function");
+      if (contentType.includes("application/json")) {
+        payload = await res.json().catch(() => ({}));
+      } else {
+        const rawText = await res.text().catch(() => "");
+        payload = { error: rawText || "Неверный ответ сервера" };
       }
 
-      return json;
+      if (!res.ok || !payload.ok) {
+        throw new Error(payload.error || `Ошибка ${res.status}`);
+      }
+
+      return payload;
     }
 
     async function autoAuthTelegram(){
@@ -1310,9 +1318,7 @@
       updateButtons();
 
       const initData = getTelegramInitData();
-      if (!initData) {
-        return;
-      }
+      if (!initData) return;
 
       $("balanceValue").textContent = "...";
 
@@ -1505,13 +1511,12 @@
         const len = Math.hypot(nx, ny) || 1;
         nx /= len;
         ny /= len;
-        dist = 0.0001;
       } else {
         nx = dx / dist;
         ny = dy / dist;
       }
 
-      const overlap = minDist - dist;
+      const overlap = minDist - Math.max(dist, 0.0001);
       ball.x += nx * overlap;
       ball.y += ny * overlap;
 
@@ -1653,9 +1658,6 @@
                 ball.active = true;
               }
 
-              ball.prevX = ball.x;
-              ball.prevY = ball.y;
-
               stepBall(ball, dtSec);
             }
 
@@ -1759,14 +1761,9 @@
         updateBalanceUI();
         saveCachedState();
         syncActionButtons();
-        updateButtons();
-
         showNotice(`Получено ${formatVc(claimed)}`, "win");
       } catch (error) {
         showNotice(error?.message || "Ошибка выдачи", "lose");
-        isPlaying = false;
-        updateButtons();
-        return;
       }
 
       isPlaying = false;
