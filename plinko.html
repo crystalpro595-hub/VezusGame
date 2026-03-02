@@ -1081,776 +1081,819 @@
     </div>
   </div>
 
-  <script src="https://telegram.org/js/telegram-web-app.js"></script>
-  <script>
-    const PLINKO_URL = "https://lazrfierfbhwlduqlvws.supabase.co/functions/v1/plinko-round";
-    const MIN_BET = 10;
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<script>
+  const PLINKO_URL = "https://lazrfierfbhwlduqlvws.supabase.co/functions/v1/plinko-round";
+  const MIN_BET = 10;
 
-    const FILES = {
-      games: "games.html"
-    };
+  const FILES = {
+    games: "games.html"
+  };
 
-    const MULTIPLIERS = [0.8, 5, 2, 0.4, 0.2, 0.4, 2, 5, 0.8];
+  const MULTIPLIERS = [0.8, 5, 2, 0.4, 0.2, 0.4, 2, 5, 0.8];
 
-    const SPEEDS = [
-      { label: ">",   scale: 0.42 },
-      { label: ">>",  scale: 0.68 },
-      { label: ">>>", scale: 1.00 }
-    ];
+  const SPEEDS = [
+    { label: ">",   scale: 0.42 },
+    { label: ">>",  scale: 0.68 },
+    { label: ">>>", scale: 1.00 }
+  ];
 
-    const BOARD_W = 320;
-    const PEG_ROWS = 8;
-    const PEG_GAP_X = 33;
-    const PEG_GAP_Y = 26;
-    const PEG_START_Y = 44;
+  const BOARD_W = 320;
+  const PEG_ROWS = 8;
+  const PEG_GAP_X = 33;
+  const PEG_GAP_Y = 26;
+  const PEG_START_Y = 44;
 
-    const BALL_R = 8;
-    const PEG_R = 4;
+  const BALL_R = 8;
+  const PEG_R = 4;
 
-    const BOARD_CENTER_X = BOARD_W / 2;
-    const BUCKET_LEFT = 18;
-    const BUCKET_RIGHT = BOARD_W - 18;
-    const BUCKET_COUNT = 9;
-    const SLOT_W = (BUCKET_RIGHT - BUCKET_LEFT) / BUCKET_COUNT;
+  const BOARD_CENTER_X = BOARD_W / 2;
+  const BUCKET_LEFT = 18;
+  const BUCKET_RIGHT = BOARD_W - 18;
+  const BUCKET_COUNT = 9;
+  const SLOT_W = (BUCKET_RIGHT - BUCKET_LEFT) / BUCKET_COUNT;
 
-    const SLOT_FLOOR_Y = 270;
-    const FLOOR_Y = SLOT_FLOOR_Y - BALL_R;
-    const DIVIDER_TOP = 252;
-    const DIVIDER_BOTTOM = 274;
+  const SLOT_FLOOR_Y = 270;
+  const FLOOR_Y = SLOT_FLOOR_Y - BALL_R;
+  const DIVIDER_TOP = 252;
+  const DIVIDER_BOTTOM = 274;
 
-    const INNER_LEFT = 24;
-    const INNER_RIGHT = BOARD_W - 24;
+  const INNER_LEFT = 24;
+  const INNER_RIGHT = BOARD_W - 24;
 
-    const GRAVITY = 2100;
-    const AIR_DAMP = 0.9930;
-    const PEG_BOUNCE = 0.26;
-    const WALL_BOUNCE = 0.24;
-    const FLOOR_BOUNCE = 0.08;
-    const STEER_ACCEL = 620;
-    const MAX_VX = 155;
-    const MAX_VY = 700;
+  const GRAVITY = 2100;
+  const AIR_DAMP = 0.9930;
+  const PEG_BOUNCE = 0.26;
+  const WALL_BOUNCE = 0.24;
+  const FLOOR_BOUNCE = 0.08;
+  const STEER_ACCEL = 620;
+  const MAX_VX = 155;
+  const MAX_VY = 700;
 
-    const $ = (id) => document.getElementById(id);
+  const $ = (id) => document.getElementById(id);
 
-    let currentBalance = 0;
-    let pendingWin = 0;
-    let isPlaying = false;
-    let quickVisible = false;
-    let ballsVisible = false;
-    let selectedBalls = 1;
-    let speedIndex = 1;
-    let noticeTimer = null;
+  let currentBalance = 0;
+  let pendingWin = 0;
+  let isPlaying = false;
+  let quickVisible = false;
+  let ballsVisible = false;
+  let selectedBalls = 1;
+  let speedIndex = 1;
+  let noticeTimer = null;
 
-    let pegs = [];
-    let slotDividers = [];
+  let pegs = [];
+  let slotDividers = [];
 
-    function formatVc(value){
-      const n = Number(value ?? 0);
-      if (!Number.isFinite(n)) return "0 VC";
-      return Number.isInteger(n) ? `${n} VC` : `${n.toFixed(2)} VC`;
+  function roundMoney(value){
+    const n = Number(value);
+    if (!Number.isFinite(n)) return 0;
+    return Math.round(n * 100) / 100;
+  }
+
+  function formatVc(value){
+    const n = roundMoney(value);
+    if (!Number.isFinite(n)) return "0 VC";
+    return Number.isInteger(n) ? `${n} VC` : `${n.toFixed(2)} VC`;
+  }
+
+  function clamp(val, min, max){
+    return Math.max(min, Math.min(max, val));
+  }
+
+  function toNum(value){
+    const n = Number(value);
+    return Number.isFinite(n) ? n : 0;
+  }
+
+  function formatMultiplierLabel(value){
+    return Number.isInteger(value) ? String(value) : value.toFixed(1);
+  }
+
+  function calculateBallWin(bet, bucketIndex){
+    const safeBet = Math.max(0, toNum(bet));
+    const safeIdx = clamp(Math.floor(Number(bucketIndex) || 0), 0, MULTIPLIERS.length - 1);
+    const multiplier = toNum(MULTIPLIERS[safeIdx]);
+    return roundMoney(safeBet * multiplier);
+  }
+
+  function calculateTotalWin(bucketIndexes, bet){
+    if (!Array.isArray(bucketIndexes)) return 0;
+
+    let total = 0;
+    for (const idx of bucketIndexes) {
+      total += calculateBallWin(bet, idx);
     }
 
-    function clamp(val, min, max){
-      return Math.max(min, Math.min(max, val));
+    return roundMoney(total);
+  }
+
+  function goTo(file){
+    window.location.href = file;
+  }
+
+  function openTelegramLinkSafe(url){
+    if (window.Telegram && window.Telegram.WebApp && typeof window.Telegram.WebApp.openTelegramLink === "function") {
+      window.Telegram.WebApp.openTelegramLink(url);
+      return;
+    }
+    window.open(url, "_blank", "noopener");
+  }
+
+  function loadCachedProfile(){
+    try {
+      return JSON.parse(localStorage.getItem("tg_profile") || "null");
+    } catch {
+      return null;
+    }
+  }
+
+  function saveCachedState(){
+    try{
+      const cached = loadCachedProfile() || {};
+      cached.balance = roundMoney(currentBalance);
+      cached.reserved_balance = roundMoney(pendingWin);
+      localStorage.setItem("tg_profile", JSON.stringify(cached));
+    } catch {}
+  }
+
+  function getTelegramInitData(){
+    if (!window.Telegram || !window.Telegram.WebApp) return "";
+    try{
+      Telegram.WebApp.ready();
+      if (typeof Telegram.WebApp.expand === "function") Telegram.WebApp.expand();
+    } catch {}
+    return Telegram.WebApp.initData || "";
+  }
+
+  function updateBalanceUI(){
+    $("balanceValue").textContent = formatVc(currentBalance);
+  }
+
+  function syncActionButtons(){
+    if (pendingWin > 0) {
+      $("playBtn").style.display = "none";
+      $("claimBtn").style.display = "block";
+    } else {
+      $("playBtn").style.display = "block";
+      $("claimBtn").style.display = "none";
+    }
+  }
+
+  function showNotice(text, type = "info"){
+    const box = $("bottomNotice");
+    $("noticeText").textContent = text;
+    $("noticeIcon").textContent = type === "win" ? "✓" : type === "lose" ? "✕" : "ℹ";
+
+    box.classList.remove("win", "lose", "info");
+    box.classList.add(type);
+    box.classList.add("show");
+
+    if (noticeTimer) clearTimeout(noticeTimer);
+    noticeTimer = setTimeout(() => {
+      box.classList.remove("show");
+    }, 2200);
+  }
+
+  function getBetAmount(){
+    const raw = $("betInput").value;
+    const amount = Number(raw);
+    if (!raw || !Number.isFinite(amount)) return 0;
+    return Math.floor(amount);
+  }
+
+  function setQuickVisible(show){
+    quickVisible = !!show;
+    $("quickBets").classList.toggle("show", quickVisible);
+  }
+
+  function setBallsVisible(show){
+    ballsVisible = !!show;
+    $("ballPicks").classList.toggle("show", ballsVisible);
+  }
+
+  function updateBallsToggleUI(){
+    $("ballsToggleValue").textContent = String(selectedBalls);
+  }
+
+  function updateButtons(){
+    const totalStake = getBetAmount() * selectedBalls;
+    const canPlay =
+      !isPlaying &&
+      pendingWin <= 0 &&
+      getBetAmount() >= MIN_BET &&
+      totalStake <= currentBalance;
+
+    $("playBtn").disabled = !canPlay;
+    $("claimBtn").disabled = pendingWin <= 0 || isPlaying;
+    $("claimBtn").textContent = pendingWin > 0
+      ? `Забрать ${formatVc(pendingWin)}`
+      : "Забрать";
+  }
+
+  async function plinkoRequest(action, extra = {}){
+    const initData = getTelegramInitData();
+    if (!initData) {
+      throw new Error("Открой игру через Telegram");
     }
 
-    function toNum(value){
-      const n = Number(value);
-      return Number.isFinite(n) ? n : 0;
-    }
-
-    function formatMultiplierLabel(value){
-      return Number.isInteger(value) ? String(value) : value.toFixed(1);
-    }
-
-    function goTo(file){
-      window.location.href = file;
-    }
-
-    function openTelegramLinkSafe(url){
-      if (window.Telegram && window.Telegram.WebApp && typeof window.Telegram.WebApp.openTelegramLink === "function") {
-        window.Telegram.WebApp.openTelegramLink(url);
-        return;
-      }
-      window.open(url, "_blank", "noopener");
-    }
-
-    function loadCachedProfile(){
-      try {
-        return JSON.parse(localStorage.getItem("tg_profile") || "null");
-      } catch {
-        return null;
-      }
-    }
-
-    function saveCachedState(){
-      try{
-        const cached = loadCachedProfile() || {};
-        cached.balance = currentBalance;
-        cached.reserved_balance = pendingWin;
-        localStorage.setItem("tg_profile", JSON.stringify(cached));
-      } catch {}
-    }
-
-    function getTelegramInitData(){
-      if (!window.Telegram || !window.Telegram.WebApp) return "";
-      try{
-        Telegram.WebApp.ready();
-        if (typeof Telegram.WebApp.expand === "function") Telegram.WebApp.expand();
-      } catch {}
-      return Telegram.WebApp.initData || "";
-    }
-
-    function updateBalanceUI(){
-      $("balanceValue").textContent = formatVc(currentBalance);
-    }
-
-    function syncActionButtons(){
-      if (pendingWin > 0) {
-        $("playBtn").style.display = "none";
-        $("claimBtn").style.display = "block";
-      } else {
-        $("playBtn").style.display = "block";
-        $("claimBtn").style.display = "none";
-      }
-    }
-
-    function showNotice(text, type = "info"){
-      const box = $("bottomNotice");
-      $("noticeText").textContent = text;
-      $("noticeIcon").textContent = type === "win" ? "✓" : type === "lose" ? "✕" : "ℹ";
-
-      box.classList.remove("win", "lose", "info");
-      box.classList.add(type);
-      box.classList.add("show");
-
-      if (noticeTimer) clearTimeout(noticeTimer);
-      noticeTimer = setTimeout(() => {
-        box.classList.remove("show");
-      }, 2200);
-    }
-
-    function getBetAmount(){
-      const raw = $("betInput").value;
-      const amount = Number(raw);
-      if (!raw || !Number.isFinite(amount)) return 0;
-      return Math.floor(amount);
-    }
-
-    function setQuickVisible(show){
-      quickVisible = !!show;
-      $("quickBets").classList.toggle("show", quickVisible);
-    }
-
-    function setBallsVisible(show){
-      ballsVisible = !!show;
-      $("ballPicks").classList.toggle("show", ballsVisible);
-    }
-
-    function updateBallsToggleUI(){
-      $("ballsToggleValue").textContent = String(selectedBalls);
-    }
-
-    function updateButtons(){
-      const totalStake = getBetAmount() * selectedBalls;
-      const canPlay =
-        !isPlaying &&
-        pendingWin <= 0 &&
-        getBetAmount() >= MIN_BET &&
-        totalStake <= currentBalance;
-
-      $("playBtn").disabled = !canPlay;
-      $("claimBtn").disabled = pendingWin <= 0 || isPlaying;
-      $("claimBtn").textContent = pendingWin > 0
-        ? `Забрать ${formatVc(pendingWin)}`
-        : "Забрать";
-    }
-
-    async function plinkoRequest(action, extra = {}){
-      const initData = getTelegramInitData();
-      if (!initData) {
-        throw new Error("Открой игру через Telegram");
-      }
-
-      let res;
-      try{
-        res = await fetch(PLINKO_URL, {
-          method: "POST",
-          mode: "cors",
-          cache: "no-store",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({
-            action,
-            initData,
-            ...extra
-          })
-        });
-      } catch {
-        throw new Error("Нет соединения с Edge Function");
-      }
-
-      let payload = {};
-      const contentType = res.headers.get("content-type") || "";
-
-      if (contentType.includes("application/json")) {
-        payload = await res.json().catch(() => ({}));
-      } else {
-        const rawText = await res.text().catch(() => "");
-        payload = { error: rawText || "Неверный ответ сервера" };
-      }
-
-      if (!res.ok || !payload.ok) {
-        throw new Error(payload.error || `Ошибка ${res.status}`);
-      }
-
-      return payload;
-    }
-
-    async function autoAuthTelegram(){
-      const cached = loadCachedProfile();
-
-      currentBalance = toNum(cached?.balance);
-      pendingWin = toNum(cached?.reserved_balance);
-      updateBalanceUI();
-      syncActionButtons();
-      updateButtons();
-
-      const initData = getTelegramInitData();
-      if (!initData) return;
-
-      $("balanceValue").textContent = "...";
-
-      try{
-        const json = await plinkoRequest("status");
-        currentBalance = toNum(json.balance);
-        pendingWin = toNum(json.reserved_balance);
-        saveCachedState();
-      } catch {
-        currentBalance = toNum(cached?.balance);
-        pendingWin = toNum(cached?.reserved_balance);
-      }
-
-      updateBalanceUI();
-      syncActionButtons();
-      updateButtons();
-    }
-
-    function bucketCenter(index){
-      return BUCKET_LEFT + SLOT_W * index + SLOT_W / 2;
-    }
-
-    function getRowPegList(row){
-      const pegsInRow = row + 2;
-      const rowWidth = (pegsInRow - 1) * PEG_GAP_X;
-      const startX = BOARD_CENTER_X - rowWidth / 2;
-      const y = PEG_START_Y + row * PEG_GAP_Y;
-
-      const arr = [];
-      for (let i = 0; i < pegsInRow; i++) {
-        arr.push({ x: startX + i * PEG_GAP_X, y, row });
-      }
-      return arr;
-    }
-
-    function createBoard(){
-      const board = $("board");
-
-      board.querySelectorAll(".peg, .slot-divider").forEach(el => el.remove());
-      pegs = [];
-      slotDividers = [];
-
-      for (let row = 0; row < PEG_ROWS; row++) {
-        const rowPegs = getRowPegList(row);
-
-        for (const p of rowPegs) {
-          pegs.push(p);
-
-          const peg = document.createElement("div");
-          peg.className = "peg";
-          peg.style.left = `${p.x}px`;
-          peg.style.top = `${p.y}px`;
-          board.appendChild(peg);
-        }
-      }
-
-      for (let i = 1; i < BUCKET_COUNT; i++) {
-        const dividerX = BUCKET_LEFT + SLOT_W * i;
-        slotDividers.push(dividerX);
-
-        const divider = document.createElement("div");
-        divider.className = "slot-divider";
-        divider.style.left = `${dividerX}px`;
-        board.appendChild(divider);
-      }
-
-      const buckets = $("buckets");
-      buckets.innerHTML = "";
-
-      MULTIPLIERS.forEach((m, i) => {
-        const el = document.createElement("div");
-
-        let cls = "low";
-        if (m === 0.2) cls = "center";
-        else if (m === 0.8) cls = "edge";
-        else if (m >= 5) cls = "good";
-        else if (m >= 2) cls = "mid";
-
-        el.className = `bucket ${cls}`;
-        el.dataset.index = String(i);
-        el.innerHTML = `<span class="bucket-text">${formatMultiplierLabel(m)}x</span>`;
-        buckets.appendChild(el);
+    let res;
+    try{
+      res = await fetch(PLINKO_URL, {
+        method: "POST",
+        mode: "cors",
+        cache: "no-store",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          action,
+          initData,
+          ...extra
+        })
       });
-
-      $("ballsLayer").innerHTML = "";
+    } catch {
+      throw new Error("Нет соединения с Edge Function");
     }
 
-    function createBall(startX){
-      const ball = document.createElement("div");
-      ball.className = "ball";
-      ball.style.left = `${startX}px`;
-      ball.style.top = `18px`;
-      $("ballsLayer").appendChild(ball);
-      return ball;
+    let payload = {};
+    const contentType = res.headers.get("content-type") || "";
+
+    if (contentType.includes("application/json")) {
+      payload = await res.json().catch(() => ({}));
+    } else {
+      const rawText = await res.text().catch(() => "");
+      payload = { error: rawText || "Неверный ответ сервера" };
     }
 
-    function highlightBucket(index){
-      const el = document.querySelector(`.bucket[data-index="${index}"]`);
-      if (!el) return;
-      el.classList.add("hit");
-      setTimeout(() => el.classList.remove("hit"), 300);
+    if (!res.ok || !payload.ok) {
+      throw new Error(payload.error || `Ошибка ${res.status}`);
     }
 
-    function queueBallRemove(ball){
-      if (ball.removeQueued) return;
-      ball.removeQueued = true;
-      setTimeout(() => {
-        if (ball.el && ball.el.remove) ball.el.remove();
-      }, 140);
+    return payload;
+  }
+
+  async function autoAuthTelegram(){
+    const cached = loadCachedProfile();
+
+    currentBalance = roundMoney(toNum(cached?.balance));
+    pendingWin = roundMoney(toNum(cached?.reserved_balance));
+    updateBalanceUI();
+    syncActionButtons();
+    updateButtons();
+
+    const initData = getTelegramInitData();
+    if (!initData) return;
+
+    $("balanceValue").textContent = "...";
+
+    try{
+      const json = await plinkoRequest("status");
+      currentBalance = roundMoney(toNum(json.balance));
+      pendingWin = roundMoney(toNum(json.reserved_balance));
+      saveCachedState();
+    } catch {
+      currentBalance = roundMoney(toNum(cached?.balance));
+      pendingWin = roundMoney(toNum(cached?.reserved_balance));
     }
 
-    function finalizeBall(ball, bucketIndex){
-      const realBucket = clamp(bucketIndex, 0, BUCKET_COUNT - 1);
+    updateBalanceUI();
+    syncActionButtons();
+    updateButtons();
+  }
 
-      ball.x = bucketCenter(realBucket);
+  function bucketCenter(index){
+    return BUCKET_LEFT + SLOT_W * index + SLOT_W / 2;
+  }
+
+  function getRowPegList(row){
+    const pegsInRow = row + 2;
+    const rowWidth = (pegsInRow - 1) * PEG_GAP_X;
+    const startX = BOARD_CENTER_X - rowWidth / 2;
+    const y = PEG_START_Y + row * PEG_GAP_Y;
+
+    const arr = [];
+    for (let i = 0; i < pegsInRow; i++) {
+      arr.push({ x: startX + i * PEG_GAP_X, y, row });
+    }
+    return arr;
+  }
+
+  function createBoard(){
+    const board = $("board");
+
+    board.querySelectorAll(".peg, .slot-divider").forEach(el => el.remove());
+    pegs = [];
+    slotDividers = [];
+
+    for (let row = 0; row < PEG_ROWS; row++) {
+      const rowPegs = getRowPegList(row);
+
+      for (const p of rowPegs) {
+        pegs.push(p);
+
+        const peg = document.createElement("div");
+        peg.className = "peg";
+        peg.style.left = `${p.x}px`;
+        peg.style.top = `${p.y}px`;
+        board.appendChild(peg);
+      }
+    }
+
+    for (let i = 1; i < BUCKET_COUNT; i++) {
+      const dividerX = BUCKET_LEFT + SLOT_W * i;
+      slotDividers.push(dividerX);
+
+      const divider = document.createElement("div");
+      divider.className = "slot-divider";
+      divider.style.left = `${dividerX}px`;
+      board.appendChild(divider);
+    }
+
+    const buckets = $("buckets");
+    buckets.innerHTML = "";
+
+    MULTIPLIERS.forEach((m, i) => {
+      const el = document.createElement("div");
+
+      let cls = "low";
+      if (m === 0.2) cls = "center";
+      else if (m === 0.8) cls = "edge";
+      else if (m >= 5) cls = "good";
+      else if (m >= 2) cls = "mid";
+
+      el.className = `bucket ${cls}`;
+      el.dataset.index = String(i);
+      el.innerHTML = `<span class="bucket-text">${formatMultiplierLabel(m)}x</span>`;
+      buckets.appendChild(el);
+    });
+
+    $("ballsLayer").innerHTML = "";
+  }
+
+  function createBall(startX){
+    const ball = document.createElement("div");
+    ball.className = "ball";
+    ball.style.left = `${startX}px`;
+    ball.style.top = `18px`;
+    $("ballsLayer").appendChild(ball);
+    return ball;
+  }
+
+  function highlightBucket(index){
+    const el = document.querySelector(`.bucket[data-index="${index}"]`);
+    if (!el) return;
+    el.classList.add("hit");
+    setTimeout(() => el.classList.remove("hit"), 300);
+  }
+
+  function queueBallRemove(ball){
+    if (ball.removeQueued) return;
+    ball.removeQueued = true;
+    setTimeout(() => {
+      if (ball.el && ball.el.remove) ball.el.remove();
+    }, 140);
+  }
+
+  function finalizeBall(ball, bucketIndex){
+    const realBucket = clamp(bucketIndex, 0, BUCKET_COUNT - 1);
+
+    ball.x = bucketCenter(realBucket);
+    ball.y = FLOOR_Y;
+    ball.vx = 0;
+    ball.vy = 0;
+    ball.bucketIndex = realBucket;
+    ball.settled = true;
+
+    ball.el.style.left = `${ball.x}px`;
+    ball.el.style.top = `${ball.y}px`;
+    ball.el.style.transform = `translate(-50%, -50%)`;
+
+    if (!ball.didHit) {
+      ball.didHit = true;
+      highlightBucket(realBucket);
+    }
+
+    queueBallRemove(ball);
+  }
+
+  function renderBall(ball){
+    ball.el.style.left = `${ball.x}px`;
+    ball.el.style.top = `${ball.y}px`;
+    ball.el.style.transform = `translate(-50%, -50%)`;
+  }
+
+  function createBallState(i, forcedTargetIndex){
+    const spread = (i - (selectedBalls - 1) / 2) * 7;
+
+    const startX = clamp(
+      BOARD_CENTER_X + spread + (Math.random() - 0.5) * 2,
+      BOARD_CENTER_X - 20,
+      BOARD_CENTER_X + 20
+    );
+
+    const targetIndex = clamp(Math.floor(Number(forcedTargetIndex ?? 4)), 0, BUCKET_COUNT - 1);
+
+    return {
+      el: createBall(startX),
+      x: startX,
+      y: 18,
+      prevX: startX,
+      prevY: 18,
+      vx: (Math.random() - 0.5) * 4,
+      vy: 0,
+
+      targetIndex,
+      targetX: bucketCenter(targetIndex),
+      bucketIndex: null,
+
+      settled: false,
+      didHit: false,
+      removeQueued: false,
+
+      startDelay: i * 110,
+      active: false,
+
+      restFrames: 0,
+      ageMs: 0
+    };
+  }
+
+  function resolvePegCollision(ball, peg){
+    const minDist = BALL_R + PEG_R;
+    const dx = ball.x - peg.x;
+    const dy = ball.y - peg.y;
+    const distSq = dx * dx + dy * dy;
+
+    if (distSq >= minDist * minDist) return;
+
+    let dist = Math.sqrt(distSq);
+    let nx, ny;
+
+    if (dist < 0.0001) {
+      nx = ball.targetX >= peg.x ? 1 : -1;
+      ny = -0.15;
+      const len = Math.hypot(nx, ny) || 1;
+      nx /= len;
+      ny /= len;
+    } else {
+      nx = dx / dist;
+      ny = dy / dist;
+    }
+
+    const overlap = minDist - Math.max(dist, 0.0001);
+    ball.x += nx * overlap;
+    ball.y += ny * overlap;
+
+    const vn = ball.vx * nx + ball.vy * ny;
+
+    if (vn < 0) {
+      ball.vx -= (1 + PEG_BOUNCE) * vn * nx;
+      ball.vy -= (1 + PEG_BOUNCE) * vn * ny;
+
+      const steerPush = clamp((ball.targetX - ball.x) * 0.014, -10, 10);
+      ball.vx += steerPush;
+
+      ball.vx *= 0.90;
+      ball.vy *= 0.93;
+    }
+
+    ball.vx = clamp(ball.vx, -MAX_VX, MAX_VX);
+    ball.vy = clamp(ball.vy, -MAX_VY, MAX_VY);
+  }
+
+  function resolveDividerCollisions(ball){
+    if (ball.y + BALL_R < DIVIDER_TOP || ball.y - BALL_R > DIVIDER_BOTTOM) return;
+
+    const minX = BALL_R + 1;
+
+    for (const dividerX of slotDividers) {
+      const dx = ball.x - dividerX;
+
+      if (Math.abs(dx) < minX) {
+        const dir = dx >= 0 ? 1 : -1;
+        ball.x = dividerX + dir * minX;
+        ball.vx = dir * Math.max(Math.abs(ball.vx) * 0.42, 10);
+      }
+    }
+  }
+
+  function stepBall(ball, dtSec){
+    if (ball.settled) return;
+
+    ball.ageMs += dtSec * 1000;
+
+    const fallFactor = clamp((ball.y - 24) / (DIVIDER_TOP - 32), 0, 1);
+    const toward = clamp((ball.targetX - ball.x) / 120, -1, 1);
+
+    if (ball.y < DIVIDER_TOP - 8) {
+      ball.vx += toward * STEER_ACCEL * (0.28 + fallFactor * 0.75) * dtSec;
+    }
+
+    ball.vy += GRAVITY * dtSec;
+
+    ball.vx *= Math.pow(AIR_DAMP, dtSec * 60);
+    ball.vy *= Math.pow(0.9985, dtSec * 60);
+
+    ball.vx = clamp(ball.vx, -MAX_VX, MAX_VX);
+    ball.vy = clamp(ball.vy, -MAX_VY, MAX_VY);
+
+    ball.x += ball.vx * dtSec;
+    ball.y += ball.vy * dtSec;
+
+    if (ball.x - BALL_R < INNER_LEFT) {
+      ball.x = INNER_LEFT + BALL_R;
+      ball.vx = Math.abs(ball.vx) * WALL_BOUNCE;
+    }
+
+    if (ball.x + BALL_R > INNER_RIGHT) {
+      ball.x = INNER_RIGHT - BALL_R;
+      ball.vx = -Math.abs(ball.vx) * WALL_BOUNCE;
+    }
+
+    for (const peg of pegs) {
+      resolvePegCollision(ball, peg);
+    }
+
+    resolveDividerCollisions(ball);
+
+    if (ball.y >= FLOOR_Y) {
       ball.y = FLOOR_Y;
-      ball.vx = 0;
-      ball.vy = 0;
-      ball.bucketIndex = realBucket;
-      ball.settled = true;
 
-      ball.el.style.left = `${ball.x}px`;
-      ball.el.style.top = `${ball.y}px`;
-      ball.el.style.transform = `translate(-50%, -50%)`;
-
-      if (!ball.didHit) {
-        ball.didHit = true;
-        highlightBucket(realBucket);
-      }
-
-      queueBallRemove(ball);
-    }
-
-    function renderBall(ball){
-      ball.el.style.left = `${ball.x}px`;
-      ball.el.style.top = `${ball.y}px`;
-      ball.el.style.transform = `translate(-50%, -50%)`;
-    }
-
-    function createBallState(i, forcedTargetIndex){
-      const spread = (i - (selectedBalls - 1) / 2) * 7;
-
-      const startX = clamp(
-        BOARD_CENTER_X + spread + (Math.random() - 0.5) * 2,
-        BOARD_CENTER_X - 20,
-        BOARD_CENTER_X + 20
+      const currentBucket = clamp(
+        Math.floor((ball.x - BUCKET_LEFT) / SLOT_W),
+        0,
+        BUCKET_COUNT - 1
       );
+      ball.bucketIndex = currentBucket;
 
-      const targetIndex = clamp(Math.floor(Number(forcedTargetIndex ?? 4)), 0, BUCKET_COUNT - 1);
-
-      return {
-        el: createBall(startX),
-        x: startX,
-        y: 18,
-        prevX: startX,
-        prevY: 18,
-        vx: (Math.random() - 0.5) * 4,
-        vy: 0,
-
-        targetIndex,
-        targetX: bucketCenter(targetIndex),
-        bucketIndex: null,
-
-        settled: false,
-        didHit: false,
-        removeQueued: false,
-
-        startDelay: i * 110,
-        active: false,
-
-        restFrames: 0,
-        ageMs: 0
-      };
-    }
-
-    function resolvePegCollision(ball, peg){
-      const minDist = BALL_R + PEG_R;
-      const dx = ball.x - peg.x;
-      const dy = ball.y - peg.y;
-      const distSq = dx * dx + dy * dy;
-
-      if (distSq >= minDist * minDist) return;
-
-      let dist = Math.sqrt(distSq);
-      let nx, ny;
-
-      if (dist < 0.0001) {
-        nx = ball.targetX >= peg.x ? 1 : -1;
-        ny = -0.15;
-        const len = Math.hypot(nx, ny) || 1;
-        nx /= len;
-        ny /= len;
+      if (Math.abs(ball.vy) > 12) {
+        ball.vy = -Math.abs(ball.vy) * FLOOR_BOUNCE;
+        ball.vx *= 0.72;
       } else {
-        nx = dx / dist;
-        ny = dy / dist;
+        ball.vy = 0;
+        ball.vx *= 0.55;
       }
 
-      const overlap = minDist - Math.max(dist, 0.0001);
-      ball.x += nx * overlap;
-      ball.y += ny * overlap;
-
-      const vn = ball.vx * nx + ball.vy * ny;
-
-      if (vn < 0) {
-        ball.vx -= (1 + PEG_BOUNCE) * vn * nx;
-        ball.vy -= (1 + PEG_BOUNCE) * vn * ny;
-
-        const steerPush = clamp((ball.targetX - ball.x) * 0.014, -10, 10);
-        ball.vx += steerPush;
-
-        ball.vx *= 0.90;
-        ball.vy *= 0.93;
-      }
-
-      ball.vx = clamp(ball.vx, -MAX_VX, MAX_VX);
-      ball.vy = clamp(ball.vy, -MAX_VY, MAX_VY);
-    }
-
-    function resolveDividerCollisions(ball){
-      if (ball.y + BALL_R < DIVIDER_TOP || ball.y - BALL_R > DIVIDER_BOTTOM) return;
-
-      const minX = BALL_R + 1;
-
-      for (const dividerX of slotDividers) {
-        const dx = ball.x - dividerX;
-
-        if (Math.abs(dx) < minX) {
-          const dir = dx >= 0 ? 1 : -1;
-          ball.x = dividerX + dir * minX;
-          ball.vx = dir * Math.max(Math.abs(ball.vx) * 0.42, 10);
-        }
-      }
-    }
-
-    function stepBall(ball, dtSec){
-      if (ball.settled) return;
-
-      ball.ageMs += dtSec * 1000;
-
-      const fallFactor = clamp((ball.y - 24) / (DIVIDER_TOP - 32), 0, 1);
-      const toward = clamp((ball.targetX - ball.x) / 120, -1, 1);
-
-      if (ball.y < DIVIDER_TOP - 8) {
-        ball.vx += toward * STEER_ACCEL * (0.28 + fallFactor * 0.75) * dtSec;
-      }
-
-      ball.vy += GRAVITY * dtSec;
-
-      ball.vx *= Math.pow(AIR_DAMP, dtSec * 60);
-      ball.vy *= Math.pow(0.9985, dtSec * 60);
-
-      ball.vx = clamp(ball.vx, -MAX_VX, MAX_VX);
-      ball.vy = clamp(ball.vy, -MAX_VY, MAX_VY);
-
-      ball.x += ball.vx * dtSec;
-      ball.y += ball.vy * dtSec;
-
-      if (ball.x - BALL_R < INNER_LEFT) {
-        ball.x = INNER_LEFT + BALL_R;
-        ball.vx = Math.abs(ball.vx) * WALL_BOUNCE;
-      }
-
-      if (ball.x + BALL_R > INNER_RIGHT) {
-        ball.x = INNER_RIGHT - BALL_R;
-        ball.vx = -Math.abs(ball.vx) * WALL_BOUNCE;
-      }
-
-      for (const peg of pegs) {
-        resolvePegCollision(ball, peg);
-      }
-
-      resolveDividerCollisions(ball);
-
-      if (ball.y >= FLOOR_Y) {
-        ball.y = FLOOR_Y;
-
-        const currentBucket = clamp(
-          Math.floor((ball.x - BUCKET_LEFT) / SLOT_W),
-          0,
-          BUCKET_COUNT - 1
-        );
-        ball.bucketIndex = currentBucket;
-
-        if (Math.abs(ball.vy) > 12) {
-          ball.vy = -Math.abs(ball.vy) * FLOOR_BOUNCE;
-          ball.vx *= 0.72;
-        } else {
-          ball.vy = 0;
-          ball.vx *= 0.55;
-        }
-
-        if (Math.abs(ball.vx) < 5 && Math.abs(ball.vy) < 5) {
-          ball.restFrames += 1;
-        } else {
-          ball.restFrames = 0;
-        }
-
-        if (ball.restFrames > 3) {
-          finalizeBall(ball, currentBucket);
-          return;
-        }
+      if (Math.abs(ball.vx) < 5 && Math.abs(ball.vy) < 5) {
+        ball.restFrames += 1;
       } else {
         ball.restFrames = 0;
       }
 
-      if (ball.ageMs > 12000) {
-        const fallbackBucket = clamp(
-          Math.floor((ball.x - BUCKET_LEFT) / SLOT_W),
-          0,
-          BUCKET_COUNT - 1
-        );
-        finalizeBall(ball, fallbackBucket);
+      if (ball.restFrames > 3) {
+        finalizeBall(ball, currentBucket);
+        return;
       }
+    } else {
+      ball.restFrames = 0;
     }
 
-    function simulateBalls(ballStates){
-      return new Promise((resolve) => {
-        let lastTime = performance.now();
-        const simStartedAt = lastTime;
+    if (ball.ageMs > 12000) {
+      const fallbackBucket = clamp(
+        Math.floor((ball.x - BUCKET_LEFT) / SLOT_W),
+        0,
+        BUCKET_COUNT - 1
+      );
+      finalizeBall(ball, fallbackBucket);
+    }
+  }
 
-        function frame(now){
-          const rawDt = now - lastTime;
-          lastTime = now;
+  function simulateBalls(ballStates){
+    return new Promise((resolve) => {
+      let lastTime = performance.now();
+      const simStartedAt = lastTime;
 
-          let simDt = Math.min(34, rawDt) * SPEEDS[speedIndex].scale;
-          const stepMs = 8;
+      function frame(now){
+        const rawDt = now - lastTime;
+        lastTime = now;
 
-          while (simDt > 0) {
-            const step = Math.min(stepMs, simDt);
-            const dtSec = step / 1000;
+        let simDt = Math.min(34, rawDt) * SPEEDS[speedIndex].scale;
+        const stepMs = 8;
 
-            for (const ball of ballStates) {
-              if (ball.settled) continue;
-
-              if (!ball.active) {
-                if (now - simStartedAt < ball.startDelay) continue;
-                ball.active = true;
-              }
-
-              stepBall(ball, dtSec);
-            }
-
-            simDt -= step;
-          }
+        while (simDt > 0) {
+          const step = Math.min(stepMs, simDt);
+          const dtSec = step / 1000;
 
           for (const ball of ballStates) {
-            if (!ball.active || ball.settled) continue;
-            renderBall(ball);
+            if (ball.settled) continue;
+
+            if (!ball.active) {
+              if (now - simStartedAt < ball.startDelay) continue;
+              ball.active = true;
+            }
+
+            stepBall(ball, dtSec);
           }
 
-          if (ballStates.every(ball => ball.settled)) {
-            resolve(ballStates.map(ball => ball.bucketIndex));
-            return;
-          }
+          simDt -= step;
+        }
 
-          requestAnimationFrame(frame);
+        for (const ball of ballStates) {
+          if (!ball.active || ball.settled) continue;
+          renderBall(ball);
+        }
+
+        if (ballStates.every(ball => ball.settled)) {
+          resolve(ballStates.map(ball => ball.bucketIndex));
+          return;
         }
 
         requestAnimationFrame(frame);
-      });
+      }
+
+      requestAnimationFrame(frame);
+    });
+  }
+
+  async function playRound(){
+    if (isPlaying) return;
+
+    if (pendingWin > 0) {
+      showNotice("Сначала забери выигрыш", "info");
+      return;
     }
 
-    async function playRound(){
-      if (isPlaying) return;
+    const bet = getBetAmount();
+    const totalStake = bet * selectedBalls;
 
-      if (pendingWin > 0) {
-        showNotice("Сначала забери выигрыш", "info");
-        return;
-      }
+    if (bet < MIN_BET) {
+      showNotice(`Минимум ${MIN_BET} VC`, "lose");
+      return;
+    }
 
-      const bet = getBetAmount();
-      const totalStake = bet * selectedBalls;
+    if (totalStake > currentBalance) {
+      showNotice("Недостаточно средств", "lose");
+      return;
+    }
 
-      if (bet < MIN_BET) {
-        showNotice(`Минимум ${MIN_BET} VC`, "lose");
-        return;
-      }
+    isPlaying = true;
+    setQuickVisible(false);
+    setBallsVisible(false);
+    $("ballsLayer").innerHTML = "";
+    updateButtons();
 
-      if (totalStake > currentBalance) {
-        showNotice("Недостаточно средств", "lose");
-        return;
-      }
+    let spinData;
 
-      isPlaying = true;
-      setQuickVisible(false);
-      setBallsVisible(false);
-      $("ballsLayer").innerHTML = "";
+    try{
+      spinData = await plinkoRequest("spin", {
+        bet,
+        balls: selectedBalls
+      });
+    } catch (error) {
+      isPlaying = false;
       updateButtons();
+      showNotice(error?.message || "Ошибка ставки", "lose");
+      return;
+    }
 
-      let spinData;
+    currentBalance = roundMoney(toNum(spinData.balance));
+    updateBalanceUI();
+    saveCachedState();
 
-      try{
-        spinData = await plinkoRequest("spin", {
-          bet,
-          balls: selectedBalls
-        });
-      } catch (error) {
-        isPlaying = false;
-        updateButtons();
-        showNotice(error?.message || "Ошибка ставки", "lose");
-        return;
+    const rawServerBuckets = Array.isArray(spinData.bucketIndexes)
+      ? spinData.bucketIndexes
+      : [];
+
+    const serverBuckets = Array.from({ length: selectedBalls }, (_, i) => {
+      return clamp(Math.floor(Number(rawServerBuckets[i] ?? 4)), 0, BUCKET_COUNT - 1);
+    });
+
+    const ballStates = [];
+    for (let i = 0; i < selectedBalls; i++) {
+      ballStates.push(createBallState(i, serverBuckets[i]));
+    }
+
+    await simulateBalls(ballStates);
+
+    // Точный расчет выигрыша по реальным слотам
+    pendingWin = calculateTotalWin(serverBuckets, bet);
+
+    saveCachedState();
+    syncActionButtons();
+    updateButtons();
+
+    isPlaying = false;
+    updateButtons();
+  }
+
+  async function claimWin(){
+    if (pendingWin <= 0 || isPlaying) return;
+
+    const expectedClaim = roundMoney(pendingWin);
+    const balanceBeforeClaim = roundMoney(currentBalance);
+
+    isPlaying = true;
+    updateButtons();
+
+    try{
+      const claimData = await plinkoRequest("claim");
+
+      const serverBalance = roundMoney(toNum(claimData.balance));
+      const expectedBalance = roundMoney(balanceBeforeClaim + expectedClaim);
+
+      // Если сервер вернул корректный баланс — берем его,
+      // если нет — хотя бы фронт покажет правильное умножение
+      if (Math.abs(serverBalance - expectedBalance) <= 0.01) {
+        currentBalance = serverBalance;
+      } else {
+        currentBalance = expectedBalance;
       }
 
-      currentBalance = toNum(spinData.balance);
+      pendingWin = 0;
+
       updateBalanceUI();
       saveCachedState();
-
-      const serverBuckets = Array.isArray(spinData.bucketIndexes)
-        ? spinData.bucketIndexes
-        : new Array(selectedBalls).fill(4);
-
-      const ballStates = [];
-      for (let i = 0; i < selectedBalls; i++) {
-        ballStates.push(createBallState(i, serverBuckets[i] ?? 4));
-      }
-
-      await simulateBalls(ballStates);
-
-      pendingWin = toNum(spinData.pendingWin);
-      saveCachedState();
       syncActionButtons();
+      showNotice(`Получено ${formatVc(expectedClaim)}`, "win");
+    } catch (error) {
+      showNotice(error?.message || "Ошибка выдачи", "lose");
+    }
 
-      isPlaying = false;
+    isPlaying = false;
+    updateButtons();
+  }
+
+  function cycleSpeed(){
+    speedIndex = (speedIndex + 1) % SPEEDS.length;
+    $("speedBtn").textContent = SPEEDS[speedIndex].label;
+  }
+
+  function openOverlay(id){
+    const el = $(id);
+    el.classList.add("show");
+    el.setAttribute("aria-hidden", "false");
+    document.body.style.overflow = "hidden";
+  }
+
+  function closeOverlay(id){
+    const el = $(id);
+    el.classList.remove("show");
+    el.setAttribute("aria-hidden", "true");
+    document.body.style.overflow = "";
+  }
+
+  $("backBtn").addEventListener("click", () => goTo(FILES.games));
+  $("logoBtn").addEventListener("click", () => openOverlay("channelOverlay"));
+  $("channelClose").addEventListener("click", () => closeOverlay("channelOverlay"));
+  $("goChannel").addEventListener("click", () => openTelegramLinkSafe("https://t.me/vezuspubg"));
+
+  $("channelOverlay").addEventListener("click", (e) => {
+    if (e.target === $("channelOverlay")) closeOverlay("channelOverlay");
+  });
+
+  $("speedBtn").addEventListener("click", cycleSpeed);
+
+  $("betToggleBtn").addEventListener("click", () => {
+    setQuickVisible(!quickVisible);
+    if (!quickVisible) setBallsVisible(false);
+  });
+
+  $("ballsToggleBtn").addEventListener("click", () => {
+    setBallsVisible(!ballsVisible);
+    if (!ballsVisible) setQuickVisible(false);
+  });
+
+  document.querySelectorAll(".quick-btn").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      $("betInput").value = btn.dataset.bet || "10";
+      setQuickVisible(false);
       updateButtons();
-    }
-
-    async function claimWin(){
-      if (pendingWin <= 0 || isPlaying) return;
-
-      isPlaying = true;
-      updateButtons();
-
-      try{
-        const claimData = await plinkoRequest("claim");
-
-        const claimed = toNum(claimData.claimed);
-        currentBalance = toNum(claimData.balance);
-        pendingWin = 0;
-
-        updateBalanceUI();
-        saveCachedState();
-        syncActionButtons();
-        showNotice(`Получено ${formatVc(claimed)}`, "win");
-      } catch (error) {
-        showNotice(error?.message || "Ошибка выдачи", "lose");
-      }
-
-      isPlaying = false;
-      updateButtons();
-    }
-
-    function cycleSpeed(){
-      speedIndex = (speedIndex + 1) % SPEEDS.length;
-      $("speedBtn").textContent = SPEEDS[speedIndex].label;
-    }
-
-    function openOverlay(id){
-      const el = $(id);
-      el.classList.add("show");
-      el.setAttribute("aria-hidden", "false");
-      document.body.style.overflow = "hidden";
-    }
-
-    function closeOverlay(id){
-      const el = $(id);
-      el.classList.remove("show");
-      el.setAttribute("aria-hidden", "true");
-      document.body.style.overflow = "";
-    }
-
-    $("backBtn").addEventListener("click", () => goTo(FILES.games));
-    $("logoBtn").addEventListener("click", () => openOverlay("channelOverlay"));
-    $("channelClose").addEventListener("click", () => closeOverlay("channelOverlay"));
-    $("goChannel").addEventListener("click", () => openTelegramLinkSafe("https://t.me/vezuspubg"));
-
-    $("channelOverlay").addEventListener("click", (e) => {
-      if (e.target === $("channelOverlay")) closeOverlay("channelOverlay");
     });
+  });
 
-    $("speedBtn").addEventListener("click", cycleSpeed);
-
-    $("betToggleBtn").addEventListener("click", () => {
-      setQuickVisible(!quickVisible);
-      if (!quickVisible) setBallsVisible(false);
-    });
-
-    $("ballsToggleBtn").addEventListener("click", () => {
-      setBallsVisible(!ballsVisible);
-      if (!ballsVisible) setQuickVisible(false);
-    });
-
-    document.querySelectorAll(".quick-btn").forEach((btn) => {
-      btn.addEventListener("click", () => {
-        $("betInput").value = btn.dataset.bet || "10";
-        setQuickVisible(false);
-        updateButtons();
-      });
-    });
-
-    document.querySelectorAll(".ball-pick-btn").forEach((btn) => {
-      btn.addEventListener("click", () => {
-        document.querySelectorAll(".ball-pick-btn").forEach(b => b.classList.remove("active"));
-        btn.classList.add("active");
-        selectedBalls = Number(btn.dataset.count || 1);
-        updateBallsToggleUI();
-        setBallsVisible(false);
-        updateButtons();
-      });
-    });
-
-    $("betInput").addEventListener("input", updateButtons);
-
-    $("playBtn").addEventListener("click", playRound);
-    $("claimBtn").addEventListener("click", claimWin);
-
-    document.addEventListener("keydown", (e) => {
-      if (e.key === "Escape") closeOverlay("channelOverlay");
-    });
-
-    window.addEventListener("load", () => {
-      createBoard();
-      $("speedBtn").textContent = SPEEDS[speedIndex].label;
+  document.querySelectorAll(".ball-pick-btn").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      document.querySelectorAll(".ball-pick-btn").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      selectedBalls = Number(btn.dataset.count || 1);
       updateBallsToggleUI();
-      syncActionButtons();
+      setBallsVisible(false);
       updateButtons();
-
-      setTimeout(() => {
-        $("preloader").classList.add("hide");
-      }, 1500);
-
-      autoAuthTelegram();
     });
-  </script>
+  });
+
+  $("betInput").addEventListener("input", updateButtons);
+
+  $("playBtn").addEventListener("click", playRound);
+  $("claimBtn").addEventListener("click", claimWin);
+
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") closeOverlay("channelOverlay");
+  });
+
+  window.addEventListener("load", () => {
+    createBoard();
+    $("speedBtn").textContent = SPEEDS[speedIndex].label;
+    updateBallsToggleUI();
+    syncActionButtons();
+    updateButtons();
+
+    setTimeout(() => {
+      $("preloader").classList.add("hide");
+    }, 1500);
+
+    autoAuthTelegram();
+  });
+</script>
 </body>
 </html>
