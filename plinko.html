@@ -309,18 +309,26 @@
       pointer-events:none;
     }
 
+    /* Прозрачный шар */
     .ball{
       position:absolute;
       width:16px;
       height:16px;
       border-radius:50%;
       background:
-        radial-gradient(circle at 32% 28%, #f8feff 0%, #d8f4ff 26%, #8fddff 58%, #44b8f5 100%);
+        radial-gradient(circle at 32% 28%,
+          rgba(255,255,255,.30) 0%,
+          rgba(216,244,255,.20) 24%,
+          rgba(143,221,255,.14) 56%,
+          rgba(68,184,245,.10) 100%);
+      border:1px solid rgba(190,240,255,.42);
       box-shadow:
-        inset 0 1px 1px rgba(255,255,255,.35),
-        0 2px 4px rgba(0,0,0,.18);
+        inset 0 1px 1px rgba(255,255,255,.12),
+        0 1px 3px rgba(0,0,0,.10);
       transform:translate(-50%, -50%);
       will-change:left, top;
+      backdrop-filter: blur(1px);
+      -webkit-backdrop-filter: blur(1px);
     }
 
     .buckets{
@@ -909,7 +917,7 @@
 
       <div class="card panel">
         <div>
-          <p class="label">Ставка</p>
+          <p class="label">Ставка · RTP ~82%</p>
 
           <div class="bet-row">
             <input
@@ -994,17 +1002,17 @@
 
     const MULTIPLIERS = [10, 5, 2, 0.4, 0.2, 0.4, 2, 5, 10];
 
-    // 10x и 5x сделаны заметно реже
+    // Прозрачный и открытый house edge: RTP ~82%
     const TARGET_WEIGHTS = [
-      0.002,
-      0.010,
-      0.080,
-      0.228,
-      0.360,
-      0.228,
-      0.080,
-      0.010,
-      0.002
+      0.002, // 10x
+      0.014, // 5x
+      0.095, // 2x
+      0.265, // 0.4x
+      0.248, // 0.2x
+      0.265, // 0.4x
+      0.095, // 2x
+      0.014, // 5x
+      0.002  // 10x
     ];
 
     const SPEEDS = [
@@ -1041,7 +1049,6 @@
     const INNER_LEFT = 24;
     const INNER_RIGHT = BOARD_W - 24;
 
-    // Более "тяжёлая" и спокойная физика
     const GRAVITY = 2100;
     const AIR_DAMP = 0.9930;
     const PEG_BOUNCE = 0.26;
@@ -1222,27 +1229,6 @@
       }
 
       return 4;
-    }
-
-    function shuffle(arr){
-      const a = [...arr];
-      for (let i = a.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [a[i], a[j]] = [a[j], a[i]];
-      }
-      return a;
-    }
-
-    function buildDirectionsForBucket(bucketIndex){
-      const finalOffset = (bucketIndex - 4) * 2;
-      const plusCount = clamp((PEG_ROWS + finalOffset) / 2, 0, PEG_ROWS);
-
-      const dirs = [
-        ...new Array(plusCount).fill(1),
-        ...new Array(PEG_ROWS - plusCount).fill(-1)
-      ];
-
-      return shuffle(dirs);
     }
 
     function getRowPegList(row){
@@ -1491,6 +1477,8 @@
         ball.vx = -Math.abs(ball.vx) * WALL_BOUNCE;
       }
 
+      // Коллизий шар-шар НЕТ намеренно:
+      // каждый шар считается отдельно, поэтому они не отталкиваются друг от друга.
       for (const peg of pegs) {
         resolvePegCollision(ball, peg);
       }
