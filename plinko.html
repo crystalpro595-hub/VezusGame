@@ -1080,7 +1080,7 @@
     games: "games.html"
   };
 
-  // Слоты слева направо
+  // слоты слева направо
   const MULTIPLIERS = [0.8, 5, 2, 0.4, 0.2, 0.4, 2, 5, 0.8];
 
   const SPEEDS = [
@@ -1160,7 +1160,21 @@
     return Number.isInteger(value) ? String(value) : value.toFixed(1);
   }
 
-  // Главное: точный расчет по индексу ячейки
+  function bucketCenter(index){
+    return BUCKET_LEFT + SLOT_W * index + SLOT_W / 2;
+  }
+
+  function bucketBounds(index){
+    const safeIndex = clamp(Math.floor(Number(index) || 0), 0, BUCKET_COUNT - 1);
+    const left = BUCKET_LEFT + SLOT_W * safeIndex + BALL_R + 1;
+    const right = BUCKET_LEFT + SLOT_W * (safeIndex + 1) - BALL_R - 1;
+    return {
+      left,
+      right,
+      center: (left + right) / 2
+    };
+  }
+
   function calculateBallWin(bet, bucketIndex){
     const safeBet = Math.max(0, Math.floor(toNum(bet)));
     const safeIdx = clamp(Math.floor(Number(bucketIndex) || 0), 0, MULTIPLIERS.length - 1);
@@ -1353,10 +1367,6 @@
     updateButtons();
   }
 
-  function bucketCenter(index){
-    return BUCKET_LEFT + SLOT_W * index + SLOT_W / 2;
-  }
-
   function getRowPegList(row){
     const pegsInRow = row + 2;
     const rowWidth = (pegsInRow - 1) * PEG_GAP_X;
@@ -1448,8 +1458,9 @@
 
   function finalizeBall(ball, bucketIndex){
     const realBucket = clamp(bucketIndex, 0, BUCKET_COUNT - 1);
+    const bounds = bucketBounds(realBucket);
 
-    ball.x = bucketCenter(realBucket);
+    ball.x = clamp(ball.x, bounds.left, bounds.right);
     ball.y = FLOOR_Y;
     ball.vx = 0;
     ball.vy = 0;
@@ -1476,15 +1487,18 @@
   }
 
   function createBallState(i, forcedTargetIndex){
+    const targetIndex = clamp(Math.floor(Number(forcedTargetIndex ?? 4)), 0, BUCKET_COUNT - 1);
+    const targetCenter = bucketBounds(targetIndex).center;
     const spread = (i - (selectedBalls - 1) / 2) * 7;
 
-    const startX = clamp(
-      BOARD_CENTER_X + spread + (Math.random() - 0.5) * 2,
-      BOARD_CENTER_X - 20,
-      BOARD_CENTER_X + 20
-    );
+    // небольшой стартовый сдвиг в сторону целевого слота — без резких прыжков
+    const startBias = clamp((targetCenter - BOARD_CENTER_X) * 0.16, -26, 26);
 
-    const targetIndex = clamp(Math.floor(Number(forcedTargetIndex ?? 4)), 0, BUCKET_COUNT - 1);
+    const startX = clamp(
+      BOARD_CENTER_X + startBias + spread + (Math.random() - 0.5) * 2,
+      BOARD_CENTER_X - 34,
+      BOARD_CENTER_X + 34
+    );
 
     return {
       el: createBall(startX),
@@ -1494,7 +1508,7 @@
       vy: 0,
 
       targetIndex,
-      targetX: bucketCenter(targetIndex),
+      targetX: targetCenter,
       bucketIndex: null,
       finalBucketIndex: targetIndex,
 
@@ -1542,7 +1556,7 @@
       ball.vx -= (1 + PEG_BOUNCE) * vn * nx;
       ball.vy -= (1 + PEG_BOUNCE) * vn * ny;
 
-      const steerPush = clamp((ball.targetX - ball.x) * 0.014, -10, 10);
+      const steerPush = clamp((ball.targetX - ball.x) * 0.012, -8, 8);
       ball.vx += steerPush;
 
       ball.vx *= 0.90;
@@ -1564,7 +1578,9 @@
       if (Math.abs(dx) < minX) {
         const dir = dx >= 0 ? 1 : -1;
         ball.x = dividerX + dir * minX;
-        ball.vx = dir * Math.max(Math.abs(ball.vx) * 0.42, 10);
+
+        // мягче отбивает, чтобы шар не зависал между делителями
+        ball.vx = dir * Math.max(Math.abs(ball.vx) * 0.24, 4);
       }
     }
   }
@@ -1574,17 +1590,19 @@
 
     ball.ageMs += dtSec * 1000;
 
+    const bounds = bucketBounds(ball.targetIndex);
+    const targetCenter = bounds.center;
+
+    // плавное наведение по высоте: чем ниже, тем сильнее, но без телепорта
     const fallFactor = clamp((ball.y - 24) / (DIVIDER_TOP - 32), 0, 1);
-    const toward = clamp((ball.targetX - ball.x) / 120, -1, 1);
+    const toward = clamp((targetCenter - ball.x) / 110, -1, 1);
 
-    if (ball.y < DIVIDER_TOP - 8) {
-      ball.vx += toward * STEER_ACCEL * (0.28 + fallFactor * 0.75) * dtSec;
-    }
+    let steerMult = 0.26 + fallFactor * 0.62;
+    if (ball.y > 190) steerMult += 0.20;
+    if (ball.y > 220) steerMult += 0.18;
 
-    // Сильнее подтягиваем к целевой ячейке у самого низа,
-    // чтобы шарик визуально попадал ровно туда, где и идет расчет.
-    if (ball.y > DIVIDER_TOP - 18 && ball.y < FLOOR_Y + 2) {
-      ball.vx += clamp((ball.targetX - ball.x) * 0.10, -26, 26);
+    if (ball.y < FLOOR_Y - 8) {
+      ball.vx += toward * STEER_ACCEL * steerMult * dtSec;
     }
 
     ball.vy += GRAVITY * dtSec;
@@ -1612,23 +1630,52 @@
       resolvePegCollision(ball, peg);
     }
 
+    // мягкий "коридор" к нужному слоту у самого низа — без x-телепорта
+    if (ball.y > 206 && ball.y < FLOOR_Y) {
+      const tight = clamp((ball.y - 206) / 40, 0, 1);
+
+      if (ball.x < bounds.left) {
+        ball.vx += clamp((bounds.left - ball.x) * (0.20 + tight * 0.26), 0, 18);
+      } else if (ball.x > bounds.right) {
+        ball.vx -= clamp((ball.x - bounds.right) * (0.20 + tight * 0.26), 0, 18);
+      } else {
+        ball.vx += clamp((targetCenter - ball.x) * (0.06 + tight * 0.08), -8, 8);
+      }
+
+      ball.vx = clamp(ball.vx, -MAX_VX, MAX_VX);
+    }
+
     resolveDividerCollisions(ball);
 
     if (ball.y >= FLOOR_Y) {
       ball.y = FLOOR_Y;
 
-      if (Math.abs(ball.vy) > 12) {
+      const currentBucket = clamp(
+        Math.floor((ball.x - BUCKET_LEFT) / SLOT_W),
+        0,
+        BUCKET_COUNT - 1
+      );
+
+      ball.bucketIndex = currentBucket;
+
+      const insideTargetSlot =
+        ball.x >= bounds.left - 0.5 &&
+        ball.x <= bounds.right + 0.5;
+
+      if (Math.abs(ball.vy) > 10) {
         ball.vy = -Math.abs(ball.vy) * FLOOR_BOUNCE;
-        ball.vx *= 0.72;
+        ball.vx *= 0.68;
       } else {
         ball.vy = 0;
-        ball.vx *= 0.45;
+        ball.vx *= 0.52;
       }
 
-      // На полу прижимаем к центру нужной ячейки
-      ball.x += (ball.targetX - ball.x) * 0.22;
+      // только мягкий доворот скоростью, без сдвига координаты
+      if (!insideTargetSlot) {
+        ball.vx += clamp((targetCenter - ball.x) * 0.14, -10, 10);
+      }
 
-      if (Math.abs(ball.targetX - ball.x) < 0.9 && Math.abs(ball.vx) < 4.5 && Math.abs(ball.vy) < 4.5) {
+      if (insideTargetSlot && Math.abs(ball.vx) < 4.2 && Math.abs(ball.vy) < 4.2) {
         ball.restFrames += 1;
       } else {
         ball.restFrames = 0;
@@ -1638,12 +1685,24 @@
         finalizeBall(ball, ball.targetIndex);
         return;
       }
+
+      // запасной мягкий финиш, если уже долго на дне
+      if (ball.ageMs > 9000 && insideTargetSlot) {
+        finalizeBall(ball, ball.targetIndex);
+        return;
+      }
     } else {
       ball.restFrames = 0;
     }
 
+    // последний запасной выход — без скачка в центр
     if (ball.ageMs > 12000) {
-      finalizeBall(ball, ball.targetIndex);
+      const fallbackBucket = clamp(
+        Math.floor((ball.x - BUCKET_LEFT) / SLOT_W),
+        0,
+        BUCKET_COUNT - 1
+      );
+      finalizeBall(ball, fallbackBucket);
     }
   }
 
@@ -1743,23 +1802,23 @@
       ? spinData.bucketIndexes
       : [];
 
-    const serverBuckets = Array.from({ length: selectedBalls }, (_, i) => {
+    const targetBuckets = Array.from({ length: selectedBalls }, (_, i) => {
       return clamp(Math.floor(Number(rawServerBuckets[i] ?? 4)), 0, BUCKET_COUNT - 1);
     });
 
     const ballStates = [];
     for (let i = 0; i < selectedBalls; i++) {
-      ballStates.push(createBallState(i, serverBuckets[i]));
+      ballStates.push(createBallState(i, targetBuckets[i]));
     }
 
-    // Получаем фактические финальные ячейки (они теперь совпадают с визуалом)
+    // считаем по фактическим финальным слотам
     const settledBuckets = await simulateBalls(ballStates);
 
-    // Считаем выигрыш строго по ячейкам
     pendingWin = calculateTotalWin(settledBuckets, bet);
 
     saveCachedState();
     syncActionButtons();
+
     isPlaying = false;
     updateButtons();
   }
@@ -1775,7 +1834,6 @@
     try{
       await plinkoRequest("claim");
 
-      // Баланс на фронте увеличиваем ровно на рассчитанный выигрыш
       currentBalance = roundMoney(currentBalance + expectedClaim);
       pendingWin = 0;
 
