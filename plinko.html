@@ -1083,7 +1083,7 @@
 
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <script>
-    const VERIFY_URL = "https://lazrfierfbhwlduqlvws.functions.supabase.co/verify-telegram";
+    const PLINKO_URL = "https://lazrfierfbhwlduqlvws.functions.supabase.co/plinko-play";
     const MIN_BET = 10;
 
     const FILES = {
@@ -1091,19 +1091,6 @@
     };
 
     const MULTIPLIERS = [0.8, 5, 2, 0.4, 0.2, 0.4, 2, 5, 0.8];
-
-    // Прозрачная настройка: x2 и x5 сделаны заметно реже
-    const TARGET_WEIGHTS = [
-      0.004, // 0.8x
-      0.006, // 5x
-      0.012, // 2x
-      0.196, // 0.4x
-      0.564, // 0.2x
-      0.196, // 0.4x
-      0.012, // 2x
-      0.006, // 5x
-      0.004  // 0.8x
-    ];
 
     const SPEEDS = [
       { label: ">",   scale: 0.42 },
@@ -1129,7 +1116,6 @@
     const BUCKET_COUNT = 9;
     const SLOT_W = (BUCKET_RIGHT - BUCKET_LEFT) / BUCKET_COUNT;
 
-    const SLOT_GUIDE_Y = 248;
     const SLOT_FLOOR_Y = 270;
 
     const FLOOR_Y = SLOT_FLOOR_Y - BALL_R;
@@ -1172,6 +1158,11 @@
       return Math.max(min, Math.min(max, val));
     }
 
+    function toNum(value){
+      const n = Number(value);
+      return Number.isFinite(n) ? n : 0;
+    }
+
     function formatMultiplierLabel(value){
       return Number.isInteger(value) ? String(value) : value.toFixed(1);
     }
@@ -1196,10 +1187,11 @@
       }
     }
 
-    function saveCachedBalance(){
+    function saveCachedState(){
       try{
         const cached = loadCachedProfile() || {};
         cached.balance = currentBalance;
+        cached.reserved_balance = pendingWin;
         localStorage.setItem("tg_profile", JSON.stringify(cached));
       } catch {}
     }
@@ -1215,6 +1207,16 @@
 
     function updateBalanceUI(){
       $("balanceValue").textContent = formatVc(currentBalance);
+    }
+
+    function syncActionButtons(){
+      if (pendingWin > 0) {
+        $("playBtn").style.display = "none";
+        $("claimBtn").style.display = "block";
+      } else {
+        $("playBtn").style.display = "block";
+        $("claimBtn").style.display = "none";
+      }
     }
 
     function showNotice(text, type = "info"){
@@ -1268,61 +1270,66 @@
         : "Забрать";
     }
 
+    async function plinkoRequest(action, extra = {}){
+      const initData = getTelegramInitData();
+      if (!initData) {
+        throw new Error("Открой игру через Telegram");
+      }
+
+      const res = await fetch(PLINKO_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action,
+          initData,
+          ...extra
+        })
+      });
+
+      const json = await res.json().catch(() => ({}));
+
+      if (!res.ok || !json.ok) {
+        throw new Error(json.error || "Ошибка Edge Function");
+      }
+
+      return json;
+    }
+
     async function autoAuthTelegram(){
       const cached = loadCachedProfile();
 
-      if (cached?.balance != null) {
-        currentBalance = Number(cached.balance) || 0;
-      } else {
-        currentBalance = 0;
-      }
+      currentBalance = toNum(cached?.balance);
+      pendingWin = toNum(cached?.reserved_balance);
       updateBalanceUI();
+      syncActionButtons();
+      updateButtons();
 
       const initData = getTelegramInitData();
       if (!initData) {
-        updateButtons();
         return;
       }
 
       $("balanceValue").textContent = "...";
 
       try{
-        const res = await fetch(VERIFY_URL, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ initData })
-        });
+        const json = await plinkoRequest("status");
 
-        const json = await res.json().catch(() => ({}));
+        currentBalance = toNum(json.balance);
+        pendingWin = toNum(json.reserved_balance);
 
-        if (res.ok && json.ok && json.profile) {
-          currentBalance = Number(json.profile.balance) || 0;
-          localStorage.setItem("tg_profile", JSON.stringify(json.profile));
-        } else {
-          currentBalance = cached?.balance != null ? (Number(cached.balance) || 0) : 0;
-        }
+        saveCachedState();
       } catch {
-        currentBalance = cached?.balance != null ? (Number(cached.balance) || 0) : 0;
+        currentBalance = toNum(cached?.balance);
+        pendingWin = toNum(cached?.reserved_balance);
       }
 
       updateBalanceUI();
+      syncActionButtons();
       updateButtons();
     }
 
     function bucketCenter(index){
       return BUCKET_LEFT + SLOT_W * index + SLOT_W / 2;
-    }
-
-    function chooseTargetBucket(){
-      let r = Math.random();
-      let sum = 0;
-
-      for (let i = 0; i < TARGET_WEIGHTS.length; i++) {
-        sum += TARGET_WEIGHTS[i];
-        if (r <= sum) return i;
-      }
-
-      return 4;
     }
 
     function getRowPegList(row){
@@ -1442,7 +1449,7 @@
       ball.el.style.transform = `translate(-50%, -50%)`;
     }
 
-    function createBallState(i){
+    function createBallState(i, forcedTargetIndex){
       const spread = (i - (selectedBalls - 1) / 2) * 7;
 
       const startX = clamp(
@@ -1451,7 +1458,7 @@
         BOARD_CENTER_X + 20
       );
 
-      const targetIndex = chooseTargetBucket();
+      const targetIndex = clamp(Math.floor(Number(forcedTargetIndex ?? 4)), 0, BUCKET_COUNT - 1);
 
       return {
         el: createBall(startX),
@@ -1696,41 +1703,70 @@
       $("ballsLayer").innerHTML = "";
       updateButtons();
 
-      currentBalance -= totalStake;
+      let spinData;
+
+      try{
+        spinData = await plinkoRequest("spin", {
+          bet,
+          balls: selectedBalls
+        });
+      } catch (error) {
+        isPlaying = false;
+        updateButtons();
+        showNotice(error?.message || "Ошибка ставки", "lose");
+        return;
+      }
+
+      currentBalance = toNum(spinData.balance);
       updateBalanceUI();
-      saveCachedBalance();
+      saveCachedState();
+
+      const serverBuckets = Array.isArray(spinData.bucketIndexes)
+        ? spinData.bucketIndexes
+        : new Array(selectedBalls).fill(4);
 
       const ballStates = [];
       for (let i = 0; i < selectedBalls; i++) {
-        ballStates.push(createBallState(i));
+        ballStates.push(createBallState(i, serverBuckets[i] ?? 4));
       }
 
-      const bucketIndexes = await simulateBalls(ballStates);
+      await simulateBalls(ballStates);
 
-      const totalWin = bucketIndexes.reduce((sum, idx) => {
-        const safeIdx = clamp(Number(idx) || 0, 0, MULTIPLIERS.length - 1);
-        return sum + Math.floor(bet * MULTIPLIERS[safeIdx]);
-      }, 0);
-
-      pendingWin = totalWin;
-
-      $("playBtn").style.display = "none";
-      $("claimBtn").style.display = "block";
+      pendingWin = toNum(spinData.pendingWin);
+      saveCachedState();
+      syncActionButtons();
 
       isPlaying = false;
       updateButtons();
     }
 
-    function claimWin(){
+    async function claimWin(){
       if (pendingWin <= 0 || isPlaying) return;
 
-      currentBalance += pendingWin;
-      updateBalanceUI();
-      saveCachedBalance();
+      isPlaying = true;
+      updateButtons();
 
-      pendingWin = 0;
-      $("playBtn").style.display = "block";
-      $("claimBtn").style.display = "none";
+      try{
+        const claimData = await plinkoRequest("claim");
+
+        const claimed = toNum(claimData.claimed);
+        currentBalance = toNum(claimData.balance);
+        pendingWin = 0;
+
+        updateBalanceUI();
+        saveCachedState();
+        syncActionButtons();
+        updateButtons();
+
+        showNotice(`Получено ${formatVc(claimed)}`, "win");
+      } catch (error) {
+        showNotice(error?.message || "Ошибка выдачи", "lose");
+        isPlaying = false;
+        updateButtons();
+        return;
+      }
+
+      isPlaying = false;
       updateButtons();
     }
 
@@ -1805,8 +1841,8 @@
     window.addEventListener("load", () => {
       createBoard();
       $("speedBtn").textContent = SPEEDS[speedIndex].label;
-      $("claimBtn").style.display = "none";
       updateBallsToggleUI();
+      syncActionButtons();
       updateButtons();
 
       setTimeout(() => {
