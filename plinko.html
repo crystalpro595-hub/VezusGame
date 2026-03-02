@@ -129,9 +129,9 @@
 
     .icon-btn{ font-size:18px; font-weight:900; }
     .speed-btn{
-      font-size:12px;
+      font-size:11px;
       font-weight:900;
-      letter-spacing:.2px;
+      letter-spacing:.1px;
     }
 
     .icon-btn:active,
@@ -329,26 +329,28 @@
 
     .trail-line{
       position:absolute;
-      height:4px;
+      height:6px;
       border-radius:999px;
       background:
         linear-gradient(90deg,
-          rgba(160,236,255,0) 0%,
-          rgba(160,236,255,.10) 22%,
-          rgba(90,206,255,.58) 62%,
-          rgba(255,255,255,.95) 100%);
+          rgba(170,242,255,0) 0%,
+          rgba(170,242,255,.14) 16%,
+          rgba(115,220,255,.46) 42%,
+          rgba(84,202,255,.82) 72%,
+          rgba(255,255,255,.98) 100%);
       transform-origin:center center;
       pointer-events:none;
-      opacity:.78;
-      filter: blur(.25px);
+      opacity:.95;
+      filter: blur(.65px);
       box-shadow:
-        0 0 8px rgba(70,198,255,.22),
-        0 0 14px rgba(180,236,255,.10);
-      animation: lineFade .18s linear forwards;
+        0 0 10px rgba(75,205,255,.36),
+        0 0 20px rgba(75,205,255,.22),
+        0 0 30px rgba(185,240,255,.10);
+      animation: lineFade .34s cubic-bezier(.22,.61,.36,1) forwards;
     }
 
     @keyframes lineFade{
-      0%{ opacity:.78; }
+      0%{ opacity:.95; }
       100%{ opacity:0; }
     }
 
@@ -364,63 +366,83 @@
     }
 
     .bucket{
-      height:34px;
-      border-radius:10px;
+      position:relative;
+      overflow:hidden;
+      height:36px;
+      border-radius:12px;
       display:flex;
       align-items:center;
       justify-content:center;
       text-align:center;
-      font-size:11px;
+      font-size:11.5px;
       font-weight:900;
+      letter-spacing:.2px;
       color:#fff;
-      border:1px solid rgba(255,255,255,.10);
-      text-shadow: 0 1px 4px rgba(0,0,0,.28);
+      border:1px solid rgba(255,255,255,.16);
+      text-shadow: 0 1px 6px rgba(0,0,0,.35);
       box-shadow:
-        inset 0 1px 0 rgba(255,255,255,.10),
-        inset 0 -1px 0 rgba(0,0,0,.10),
-        0 8px 14px rgba(0,0,0,.16);
+        inset 0 1px 0 rgba(255,255,255,.18),
+        inset 0 -1px 0 rgba(0,0,0,.14),
+        0 10px 20px rgba(0,0,0,.18);
       transition: transform .16s ease, box-shadow .16s ease, filter .16s ease;
+    }
+
+    .bucket::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.22), rgba(255,255,255,.05) 34%, rgba(255,255,255,0) 70%);
+      pointer-events:none;
     }
 
     .bucket.low{
       background:
-        linear-gradient(180deg, rgba(56,189,248,.98), rgba(14,165,233,.95));
+        radial-gradient(circle at 50% 0%, rgba(255,255,255,.16), transparent 58%),
+        linear-gradient(180deg, #3bc9ff 0%, #1d9bf0 58%, #0b78d1 100%);
       box-shadow:
-        inset 0 1px 0 rgba(255,255,255,.16),
-        0 10px 18px rgba(14,165,233,.22);
+        inset 0 1px 0 rgba(255,255,255,.20),
+        0 10px 20px rgba(29,155,240,.28),
+        0 0 18px rgba(59,201,255,.10);
     }
 
     .bucket.mid{
       background:
-        linear-gradient(180deg, rgba(167,139,250,.98), rgba(124,58,237,.95));
+        radial-gradient(circle at 50% 0%, rgba(255,255,255,.14), transparent 58%),
+        linear-gradient(180deg, #a78bfa 0%, #8b5cf6 56%, #6d28d9 100%);
       box-shadow:
-        inset 0 1px 0 rgba(255,255,255,.14),
-        0 10px 18px rgba(124,58,237,.20);
+        inset 0 1px 0 rgba(255,255,255,.18),
+        0 10px 20px rgba(139,92,246,.24),
+        0 0 18px rgba(167,139,250,.10);
     }
 
     .bucket.good{
       background:
-        linear-gradient(180deg, rgba(52,211,153,.98), rgba(16,185,129,.95));
+        radial-gradient(circle at 50% 0%, rgba(255,255,255,.14), transparent 58%),
+        linear-gradient(180deg, #34d399 0%, #10b981 56%, #059669 100%);
       box-shadow:
-        inset 0 1px 0 rgba(255,255,255,.14),
-        0 10px 18px rgba(16,185,129,.20);
+        inset 0 1px 0 rgba(255,255,255,.18),
+        0 10px 20px rgba(16,185,129,.24),
+        0 0 18px rgba(52,211,153,.10);
     }
 
     .bucket.top{
       background:
-        linear-gradient(180deg, rgba(251,191,36,.98), rgba(244,114,182,.94));
+        radial-gradient(circle at 50% 0%, rgba(255,255,255,.16), transparent 58%),
+        linear-gradient(180deg, #fbbf24 0%, #fb7185 48%, #ec4899 100%);
       box-shadow:
-        inset 0 1px 0 rgba(255,255,255,.16),
-        0 10px 18px rgba(244,114,182,.18);
+        inset 0 1px 0 rgba(255,255,255,.20),
+        0 10px 20px rgba(236,72,153,.24),
+        0 0 18px rgba(251,191,36,.10);
     }
 
     .bucket.hit{
       transform: translateY(-4px) scale(1.06);
       box-shadow:
-        0 0 0 2px rgba(255,255,255,.12),
+        0 0 0 2px rgba(255,255,255,.14),
         0 0 18px rgba(255,255,255,.18),
-        0 12px 18px rgba(0,0,0,.18);
-      filter: brightness(1.10);
+        0 14px 22px rgba(0,0,0,.22);
+      filter: brightness(1.12);
     }
 
     .main-action{ padding:0 12px 12px; }
@@ -802,12 +824,12 @@
       .top-row{ grid-template-columns:36px minmax(0,1fr) 36px 46px; gap:6px; }
       .icon-btn, .speed-btn{ width:36px; height:36px; border-radius:12px; }
       .icon-btn{ font-size:16px; }
-      .speed-btn{ font-size:11px; }
+      .speed-btn{ font-size:10px; }
       .logo-btn{ width:46px; height:46px; }
       .balance-mini{ height:38px; }
       .bal-amount{ min-width:74px; height:24px; font-size:12px; }
       .ball{ width:14px; height:14px; }
-      .bucket{ font-size:10px; height:32px; }
+      .bucket{ font-size:10px; height:34px; }
       .bet-row{ grid-template-columns:minmax(0,1fr) 44px; }
       .bet-input{ height:44px; font-size:15px; }
       .bet-toggle{ width:44px; height:44px; }
@@ -977,13 +999,14 @@
       0.003  // 10
     ];
 
-    // >  = медленно
-    // >> = нормально
+    // Все уровни сделаны медленнее
+    // >   = медленно
+    // >>  = нормально
     // >>> = быстро
     const SPEEDS = [
-      { label: ">",   scale: 0.62 },
-      { label: ">>",  scale: 1.00 },
-      { label: ">>>", scale: 1.65 }
+      { label: ">",   scale: 0.42 },
+      { label: ">>",  scale: 0.68 },
+      { label: ">>>", scale: 1.00 }
     ];
 
     const BOARD_W = 320;
@@ -1008,10 +1031,10 @@
     const SLOT_GUIDE_Y = 248;
     const SLOT_FLOOR_Y = 270;
 
-    const HIT_SEGMENT_MS = 72;
-    const REBOUND_SEGMENT_MS = 92;
-    const END_SEGMENT_MS = 155;
-    const FINAL_SEGMENT_MS = 185;
+    const HIT_SEGMENT_MS = 116;
+    const REBOUND_SEGMENT_MS = 152;
+    const END_SEGMENT_MS = 250;
+    const FINAL_SEGMENT_MS = 320;
 
     const $ = (id) => document.getElementById(id);
 
@@ -1277,7 +1300,7 @@
       const dy = y2 - y1;
       const dist = Math.hypot(dx, dy);
 
-      if (dist < 0.35) return;
+      if (dist < 0.25) return;
 
       const line = document.createElement("div");
       line.className = "trail-line";
@@ -1285,16 +1308,16 @@
       const midX = (x1 + x2) / 2;
       const midY = (y1 + y2) / 2;
       const angle = Math.atan2(dy, dx) * 180 / Math.PI;
-      const width = clamp(dist * 3.1, 14, 42);
+      const width = clamp(dist * 5.4, 24, 88);
 
       line.style.width = `${width}px`;
       line.style.left = `${midX}px`;
       line.style.top = `${midY}px`;
       line.style.transform = `translate(-50%, -50%) rotate(${angle}deg)`;
-      line.style.opacity = String(clamp(dist * 0.55, 0.22, 0.82));
+      line.style.opacity = String(clamp(dist * 0.72, 0.38, 0.96));
 
       $("ballsLayer").appendChild(line);
-      setTimeout(() => line.remove(), 180);
+      setTimeout(() => line.remove(), 340);
     }
 
     function highlightBucket(index){
@@ -1448,11 +1471,13 @@
         segments,
         segmentIndex: 0,
         segmentT: 0,
-        startDelay: i * 90,
+        startDelay: i * 120,
         active: false,
 
         wobblePhase: Math.random() * 10,
-        trailTick: Math.random() * 18
+        trailTick: Math.random() * 10,
+        trailAnchorX: startX,
+        trailAnchorY: 18
       };
     }
 
@@ -1535,9 +1560,11 @@
             }
 
             ball.trailTick += dt;
-            if (!ball.settled && ball.trailTick >= 20) {
+            if (!ball.settled && ball.trailTick >= 10) {
               ball.trailTick = 0;
-              createTrailLine(ball.prevX, ball.prevY, ball.x, ball.y);
+              createTrailLine(ball.trailAnchorX, ball.trailAnchorY, ball.x, ball.y);
+              ball.trailAnchorX = lerp(ball.trailAnchorX, ball.x, 0.82);
+              ball.trailAnchorY = lerp(ball.trailAnchorY, ball.y, 0.82);
             }
 
             if (!ball.settled) {
@@ -1604,7 +1631,7 @@
       $("playBtn").style.display = "none";
       $("claimBtn").style.display = "block";
 
-      // Уведомление о выигрыше/проигрыше убрано
+      // Уведомление о выплате / проигрыше убрано
       isPlaying = false;
       updateButtons();
     }
