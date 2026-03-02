@@ -315,39 +315,12 @@
       height:16px;
       border-radius:50%;
       background:
-        radial-gradient(circle at 30% 30%, #ffffff 0%, #c9f1ff 24%, #6cd8ff 55%, #1698d8 78%, #0b5b86 100%);
+        radial-gradient(circle at 32% 28%, #f8feff 0%, #d8f4ff 26%, #8fddff 58%, #44b8f5 100%);
       box-shadow:
-        inset 0 1px 2px rgba(255,255,255,.40),
-        0 2px 5px rgba(0,0,0,.22);
+        inset 0 1px 1px rgba(255,255,255,.35),
+        0 2px 4px rgba(0,0,0,.18);
       transform:translate(-50%, -50%);
-      will-change:left, top, transform;
-    }
-
-    .trail-line{
-      position:absolute;
-      height:6px;
-      border-radius:999px;
-      background:
-        linear-gradient(90deg,
-          rgba(170,242,255,0) 0%,
-          rgba(170,242,255,.14) 16%,
-          rgba(115,220,255,.46) 42%,
-          rgba(84,202,255,.82) 72%,
-          rgba(255,255,255,.98) 100%);
-      transform-origin:center center;
-      pointer-events:none;
-      opacity:.95;
-      filter: blur(.65px);
-      box-shadow:
-        0 0 10px rgba(75,205,255,.36),
-        0 0 20px rgba(75,205,255,.22),
-        0 0 30px rgba(185,240,255,.10);
-      animation: lineFade .34s cubic-bezier(.22,.61,.36,1) forwards;
-    }
-
-    @keyframes lineFade{
-      0%{ opacity:.95; }
-      100%{ opacity:0; }
+      will-change:left, top;
     }
 
     .buckets{
@@ -1021,16 +994,17 @@
 
     const MULTIPLIERS = [10, 5, 2, 0.4, 0.2, 0.4, 2, 5, 10];
 
+    // 10x и 5x сделаны заметно реже
     const TARGET_WEIGHTS = [
-      0.005,
-      0.025,
-      0.100,
-      0.200,
-      0.340,
-      0.200,
-      0.100,
-      0.025,
-      0.005
+      0.002,
+      0.010,
+      0.080,
+      0.228,
+      0.360,
+      0.228,
+      0.080,
+      0.010,
+      0.002
     ];
 
     const SPEEDS = [
@@ -1067,14 +1041,15 @@
     const INNER_LEFT = 24;
     const INNER_RIGHT = BOARD_W - 24;
 
-    const GRAVITY = 1820;
-    const AIR_DAMP = 0.9992;
-    const PEG_BOUNCE = 0.72;
-    const WALL_BOUNCE = 0.62;
-    const FLOOR_BOUNCE = 0.34;
-    const STEER_ACCEL = 500;
-    const MAX_VX = 230;
-    const MAX_VY = 760;
+    // Более "тяжёлая" и спокойная физика
+    const GRAVITY = 2100;
+    const AIR_DAMP = 0.9930;
+    const PEG_BOUNCE = 0.26;
+    const WALL_BOUNCE = 0.24;
+    const FLOOR_BOUNCE = 0.08;
+    const STEER_ACCEL = 620;
+    const MAX_VX = 155;
+    const MAX_VY = 700;
 
     const $ = (id) => document.getElementById(id);
 
@@ -1098,10 +1073,6 @@
 
     function clamp(val, min, max){
       return Math.max(min, Math.min(max, val));
-    }
-
-    function lerp(a, b, t){
-      return a + (b - a) * t;
     }
 
     function goTo(file){
@@ -1348,31 +1319,6 @@
       return ball;
     }
 
-    function createTrailLine(x1, y1, x2, y2){
-      const dx = x2 - x1;
-      const dy = y2 - y1;
-      const dist = Math.hypot(dx, dy);
-
-      if (dist < 4) return;
-
-      const line = document.createElement("div");
-      line.className = "trail-line";
-
-      const midX = (x1 + x2) / 2;
-      const midY = (y1 + y2) / 2;
-      const angle = Math.atan2(dy, dx) * 180 / Math.PI;
-      const width = clamp(dist * 6.2, 30, 96);
-
-      line.style.width = `${width}px`;
-      line.style.left = `${midX}px`;
-      line.style.top = `${midY}px`;
-      line.style.transform = `translate(-50%, -50%) rotate(${angle}deg)`;
-      line.style.opacity = String(clamp(dist * 0.10, 0.42, 0.96));
-
-      $("ballsLayer").appendChild(line);
-      setTimeout(() => line.remove(), 340);
-    }
-
     function highlightBucket(index){
       const el = document.querySelector(`.bucket[data-index="${index}"]`);
       if (!el) return;
@@ -1400,7 +1346,7 @@
 
       ball.el.style.left = `${ball.x}px`;
       ball.el.style.top = `${ball.y}px`;
-      ball.el.style.transform = `translate(-50%, -50%) scale(1,1)`;
+      ball.el.style.transform = `translate(-50%, -50%)`;
 
       if (!ball.didHit) {
         ball.didHit = true;
@@ -1411,14 +1357,9 @@
     }
 
     function renderBall(ball){
-      const speed = Math.hypot(ball.vx, ball.vy);
-      const squash = Math.min(0.05, speed * 0.00009);
-      const sx = 1 + squash;
-      const sy = 1 - squash * 0.9;
-
       ball.el.style.left = `${ball.x}px`;
       ball.el.style.top = `${ball.y}px`;
-      ball.el.style.transform = `translate(-50%, -50%) scale(${sx.toFixed(3)}, ${sy.toFixed(3)})`;
+      ball.el.style.transform = `translate(-50%, -50%)`;
     }
 
     function createBallState(i){
@@ -1438,7 +1379,7 @@
         y: 18,
         prevX: startX,
         prevY: 18,
-        vx: (Math.random() - 0.5) * 8,
+        vx: (Math.random() - 0.5) * 4,
         vy: 0,
 
         targetIndex,
@@ -1452,16 +1393,12 @@
         startDelay: i * 110,
         active: false,
 
-        trailTick: Math.random() * 12,
-        trailAnchorX: startX,
-        trailAnchorY: 18,
-
         restFrames: 0,
         ageMs: 0
       };
     }
 
-    function resolvePegCollision(ball, peg, dtSec){
+    function resolvePegCollision(ball, peg){
       const minDist = BALL_R + PEG_R;
       const dx = ball.x - peg.x;
       const dy = ball.y - peg.y;
@@ -1474,7 +1411,7 @@
 
       if (dist < 0.0001) {
         nx = ball.targetX >= peg.x ? 1 : -1;
-        ny = -0.2;
+        ny = -0.15;
         const len = Math.hypot(nx, ny) || 1;
         nx /= len;
         ny /= len;
@@ -1494,11 +1431,11 @@
         ball.vx -= (1 + PEG_BOUNCE) * vn * nx;
         ball.vy -= (1 + PEG_BOUNCE) * vn * ny;
 
-        const steerPush = clamp((ball.targetX - ball.x) * 0.012, -14, 14);
+        const steerPush = clamp((ball.targetX - ball.x) * 0.014, -10, 10);
         ball.vx += steerPush;
 
-        ball.vx *= 0.992;
-        ball.vy *= 0.996;
+        ball.vx *= 0.90;
+        ball.vy *= 0.93;
       }
 
       ball.vx = clamp(ball.vx, -MAX_VX, MAX_VX);
@@ -1516,7 +1453,7 @@
         if (Math.abs(dx) < minX) {
           const dir = dx >= 0 ? 1 : -1;
           ball.x = dividerX + dir * minX;
-          ball.vx = dir * Math.max(Math.abs(ball.vx) * 0.58, 18);
+          ball.vx = dir * Math.max(Math.abs(ball.vx) * 0.42, 10);
         }
       }
     }
@@ -1530,12 +1467,14 @@
       const toward = clamp((ball.targetX - ball.x) / 120, -1, 1);
 
       if (ball.y < DIVIDER_TOP - 8) {
-        ball.vx += toward * STEER_ACCEL * (0.20 + fallFactor * 0.95) * dtSec;
+        ball.vx += toward * STEER_ACCEL * (0.28 + fallFactor * 0.75) * dtSec;
       }
 
       ball.vy += GRAVITY * dtSec;
 
       ball.vx *= Math.pow(AIR_DAMP, dtSec * 60);
+      ball.vy *= Math.pow(0.9985, dtSec * 60);
+
       ball.vx = clamp(ball.vx, -MAX_VX, MAX_VX);
       ball.vy = clamp(ball.vy, -MAX_VY, MAX_VY);
 
@@ -1553,7 +1492,7 @@
       }
 
       for (const peg of pegs) {
-        resolvePegCollision(ball, peg, dtSec);
+        resolvePegCollision(ball, peg);
       }
 
       resolveDividerCollisions(ball);
@@ -1568,21 +1507,21 @@
         );
         ball.bucketIndex = currentBucket;
 
-        if (Math.abs(ball.vy) > 18) {
+        if (Math.abs(ball.vy) > 12) {
           ball.vy = -Math.abs(ball.vy) * FLOOR_BOUNCE;
-          ball.vx *= 0.90;
+          ball.vx *= 0.72;
         } else {
           ball.vy = 0;
-          ball.vx *= 0.78;
+          ball.vx *= 0.55;
         }
 
-        if (Math.abs(ball.vx) < 8 && Math.abs(ball.vy) < 8) {
+        if (Math.abs(ball.vx) < 5 && Math.abs(ball.vy) < 5) {
           ball.restFrames += 1;
         } else {
           ball.restFrames = 0;
         }
 
-        if (ball.restFrames > 4) {
+        if (ball.restFrames > 3) {
           finalizeBall(ball, currentBucket);
           return;
         }
@@ -1635,16 +1574,6 @@
 
           for (const ball of ballStates) {
             if (!ball.active || ball.settled) continue;
-
-            ball.trailTick += Math.min(34, rawDt) * SPEEDS[speedIndex].scale;
-
-            if (ball.trailTick >= 14) {
-              ball.trailTick = 0;
-              createTrailLine(ball.trailAnchorX, ball.trailAnchorY, ball.x, ball.y);
-              ball.trailAnchorX = lerp(ball.trailAnchorX, ball.x, 0.62);
-              ball.trailAnchorY = lerp(ball.trailAnchorY, ball.y, 0.62);
-            }
-
             renderBall(ball);
           }
 
