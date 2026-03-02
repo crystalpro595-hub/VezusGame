@@ -1022,15 +1022,15 @@
     const MULTIPLIERS = [10, 5, 2, 0.4, 0.2, 0.4, 2, 5, 10];
 
     const TARGET_WEIGHTS = [
-      0.005, // 10
-      0.025, // 5
-      0.100, // 2
-      0.200, // 0.4
-      0.340, // 0.2
-      0.200, // 0.4
-      0.100, // 2
-      0.025, // 5
-      0.005  // 10
+      0.005,
+      0.025,
+      0.100,
+      0.200,
+      0.340,
+      0.200,
+      0.100,
+      0.025,
+      0.005
     ];
 
     const SPEEDS = [
@@ -1040,6 +1040,8 @@
     ];
 
     const BOARD_W = 320;
+    const BOARD_H = 320;
+
     const PEG_ROWS = 8;
     const PEG_GAP_X = 33;
     const PEG_GAP_Y = 26;
@@ -1047,9 +1049,9 @@
 
     const BALL_R = 8;
     const PEG_R = 4;
-    const CONTACT_R = BALL_R + PEG_R + 0.7;
 
     const BOARD_CENTER_X = BOARD_W / 2;
+
     const BUCKET_LEFT = 18;
     const BUCKET_RIGHT = BOARD_W - 18;
     const BUCKET_COUNT = 9;
@@ -1058,10 +1060,21 @@
     const SLOT_GUIDE_Y = 248;
     const SLOT_FLOOR_Y = 270;
 
-    const HIT_SEGMENT_MS = 96;
-    const ARC_SEGMENT_MS = 176;
-    const END_SEGMENT_MS = 240;
-    const FINAL_SEGMENT_MS = 300;
+    const FLOOR_Y = SLOT_FLOOR_Y - BALL_R;
+    const DIVIDER_TOP = 252;
+    const DIVIDER_BOTTOM = 274;
+
+    const INNER_LEFT = 24;
+    const INNER_RIGHT = BOARD_W - 24;
+
+    const GRAVITY = 1820;
+    const AIR_DAMP = 0.9992;
+    const PEG_BOUNCE = 0.72;
+    const WALL_BOUNCE = 0.62;
+    const FLOOR_BOUNCE = 0.34;
+    const STEER_ACCEL = 500;
+    const MAX_VX = 230;
+    const MAX_VY = 760;
 
     const $ = (id) => document.getElementById(id);
 
@@ -1089,12 +1102,6 @@
 
     function lerp(a, b, t){
       return a + (b - a) * t;
-    }
-
-    function easeInOut(t){
-      return t < 0.5
-        ? 2 * t * t
-        : 1 - Math.pow(-2 * t + 2, 2) / 2;
     }
 
     function goTo(file){
@@ -1280,21 +1287,6 @@
       return arr;
     }
 
-    function getClosestPegForRow(row, desiredX){
-      const rowPegs = getRowPegList(row);
-      let best = rowPegs[0];
-      let bestDist = Math.abs(best.x - desiredX);
-
-      for (let i = 1; i < rowPegs.length; i++) {
-        const d = Math.abs(rowPegs[i].x - desiredX);
-        if (d < bestDist) {
-          best = rowPegs[i];
-          bestDist = d;
-        }
-      }
-      return best;
-    }
-
     function createBoard(){
       const board = $("board");
 
@@ -1400,7 +1392,7 @@
       const realBucket = clamp(bucketIndex, 0, BUCKET_COUNT - 1);
 
       ball.x = bucketCenter(realBucket);
-      ball.y = SLOT_FLOOR_Y - BALL_R;
+      ball.y = FLOOR_Y;
       ball.vx = 0;
       ball.vy = 0;
       ball.bucketIndex = realBucket;
@@ -1420,80 +1412,17 @@
 
     function renderBall(ball){
       const speed = Math.hypot(ball.vx, ball.vy);
-      const squash = Math.min(0.09, speed * 0.04);
-      const sx = 1 + squash * 0.10;
-      const sy = 1 - squash * 0.12;
+      const squash = Math.min(0.05, speed * 0.00009);
+      const sx = 1 + squash;
+      const sy = 1 - squash * 0.9;
 
       ball.el.style.left = `${ball.x}px`;
       ball.el.style.top = `${ball.y}px`;
       ball.el.style.transform = `translate(-50%, -50%) scale(${sx.toFixed(3)}, ${sy.toFixed(3)})`;
     }
 
-    function buildSegments(startX, route, targetIndex){
-      const segments = [];
-      let from = { x: startX, y: 18 };
-
-      for (let row = 0; row < PEG_ROWS; row++) {
-        const dir = route[row];
-        const desiredX = from.x + dir * (PEG_GAP_X * 0.48);
-        const peg = getClosestPegForRow(row, desiredX);
-
-        const startAngle = dir > 0 ? (-140 * Math.PI / 180) : (-40 * Math.PI / 180);
-        const endAngle   = dir > 0 ? (  40 * Math.PI / 180) : (140 * Math.PI / 180);
-
-        const hitPoint = {
-          x: peg.x + Math.cos(startAngle) * CONTACT_R,
-          y: peg.y + Math.sin(startAngle) * CONTACT_R
-        };
-
-        const leavePoint = {
-          x: peg.x + Math.cos(endAngle) * CONTACT_R,
-          y: peg.y + Math.sin(endAngle) * CONTACT_R
-        };
-
-        segments.push({
-          from: { ...from },
-          to: { ...hitPoint },
-          duration: HIT_SEGMENT_MS,
-          kind: "approach"
-        });
-
-        segments.push({
-          pegX: peg.x,
-          pegY: peg.y,
-          radius: CONTACT_R,
-          startAngle,
-          endAngle,
-          duration: ARC_SEGMENT_MS,
-          kind: "arc"
-        });
-
-        from = leavePoint;
-      }
-
-      const finalX = bucketCenter(targetIndex);
-      const guidePoint = { x: finalX, y: SLOT_GUIDE_Y - 6 };
-      const floorPoint = { x: finalX, y: SLOT_FLOOR_Y - BALL_R };
-
-      segments.push({
-        from: { ...from },
-        to: guidePoint,
-        duration: END_SEGMENT_MS,
-        kind: "end"
-      });
-
-      segments.push({
-        from: { ...guidePoint },
-        to: floorPoint,
-        duration: FINAL_SEGMENT_MS,
-        kind: "final"
-      });
-
-      return segments;
-    }
-
     function createBallState(i){
-      const spread = (i - (selectedBalls - 1) / 2) * 6.5;
+      const spread = (i - (selectedBalls - 1) / 2) * 7;
 
       const startX = clamp(
         BOARD_CENTER_X + spread + (Math.random() - 0.5) * 2,
@@ -1502,8 +1431,6 @@
       );
 
       const targetIndex = chooseTargetBucket();
-      const route = buildDirectionsForBucket(targetIndex);
-      const segments = buildSegments(startX, route, targetIndex);
 
       return {
         el: createBall(startX),
@@ -1511,24 +1438,166 @@
         y: 18,
         prevX: startX,
         prevY: 18,
-        vx: 0,
+        vx: (Math.random() - 0.5) * 8,
         vy: 0,
+
         targetIndex,
+        targetX: bucketCenter(targetIndex),
         bucketIndex: null,
+
         settled: false,
         didHit: false,
         removeQueued: false,
 
-        segments,
-        segmentIndex: 0,
-        segmentT: 0,
         startDelay: i * 110,
         active: false,
 
         trailTick: Math.random() * 12,
         trailAnchorX: startX,
-        trailAnchorY: 18
+        trailAnchorY: 18,
+
+        restFrames: 0,
+        ageMs: 0
       };
+    }
+
+    function resolvePegCollision(ball, peg, dtSec){
+      const minDist = BALL_R + PEG_R;
+      const dx = ball.x - peg.x;
+      const dy = ball.y - peg.y;
+      const distSq = dx * dx + dy * dy;
+
+      if (distSq >= minDist * minDist) return;
+
+      let dist = Math.sqrt(distSq);
+      let nx, ny;
+
+      if (dist < 0.0001) {
+        nx = ball.targetX >= peg.x ? 1 : -1;
+        ny = -0.2;
+        const len = Math.hypot(nx, ny) || 1;
+        nx /= len;
+        ny /= len;
+        dist = 0.0001;
+      } else {
+        nx = dx / dist;
+        ny = dy / dist;
+      }
+
+      const overlap = minDist - dist;
+      ball.x += nx * overlap;
+      ball.y += ny * overlap;
+
+      const vn = ball.vx * nx + ball.vy * ny;
+
+      if (vn < 0) {
+        ball.vx -= (1 + PEG_BOUNCE) * vn * nx;
+        ball.vy -= (1 + PEG_BOUNCE) * vn * ny;
+
+        const steerPush = clamp((ball.targetX - ball.x) * 0.012, -14, 14);
+        ball.vx += steerPush;
+
+        ball.vx *= 0.992;
+        ball.vy *= 0.996;
+      }
+
+      ball.vx = clamp(ball.vx, -MAX_VX, MAX_VX);
+      ball.vy = clamp(ball.vy, -MAX_VY, MAX_VY);
+    }
+
+    function resolveDividerCollisions(ball){
+      if (ball.y + BALL_R < DIVIDER_TOP || ball.y - BALL_R > DIVIDER_BOTTOM) return;
+
+      const minX = BALL_R + 1;
+
+      for (const dividerX of slotDividers) {
+        const dx = ball.x - dividerX;
+
+        if (Math.abs(dx) < minX) {
+          const dir = dx >= 0 ? 1 : -1;
+          ball.x = dividerX + dir * minX;
+          ball.vx = dir * Math.max(Math.abs(ball.vx) * 0.58, 18);
+        }
+      }
+    }
+
+    function stepBall(ball, dtSec){
+      if (ball.settled) return;
+
+      ball.ageMs += dtSec * 1000;
+
+      const fallFactor = clamp((ball.y - 24) / (DIVIDER_TOP - 32), 0, 1);
+      const toward = clamp((ball.targetX - ball.x) / 120, -1, 1);
+
+      if (ball.y < DIVIDER_TOP - 8) {
+        ball.vx += toward * STEER_ACCEL * (0.20 + fallFactor * 0.95) * dtSec;
+      }
+
+      ball.vy += GRAVITY * dtSec;
+
+      ball.vx *= Math.pow(AIR_DAMP, dtSec * 60);
+      ball.vx = clamp(ball.vx, -MAX_VX, MAX_VX);
+      ball.vy = clamp(ball.vy, -MAX_VY, MAX_VY);
+
+      ball.x += ball.vx * dtSec;
+      ball.y += ball.vy * dtSec;
+
+      if (ball.x - BALL_R < INNER_LEFT) {
+        ball.x = INNER_LEFT + BALL_R;
+        ball.vx = Math.abs(ball.vx) * WALL_BOUNCE;
+      }
+
+      if (ball.x + BALL_R > INNER_RIGHT) {
+        ball.x = INNER_RIGHT - BALL_R;
+        ball.vx = -Math.abs(ball.vx) * WALL_BOUNCE;
+      }
+
+      for (const peg of pegs) {
+        resolvePegCollision(ball, peg, dtSec);
+      }
+
+      resolveDividerCollisions(ball);
+
+      if (ball.y >= FLOOR_Y) {
+        ball.y = FLOOR_Y;
+
+        const currentBucket = clamp(
+          Math.floor((ball.x - BUCKET_LEFT) / SLOT_W),
+          0,
+          BUCKET_COUNT - 1
+        );
+        ball.bucketIndex = currentBucket;
+
+        if (Math.abs(ball.vy) > 18) {
+          ball.vy = -Math.abs(ball.vy) * FLOOR_BOUNCE;
+          ball.vx *= 0.90;
+        } else {
+          ball.vy = 0;
+          ball.vx *= 0.78;
+        }
+
+        if (Math.abs(ball.vx) < 8 && Math.abs(ball.vy) < 8) {
+          ball.restFrames += 1;
+        } else {
+          ball.restFrames = 0;
+        }
+
+        if (ball.restFrames > 4) {
+          finalizeBall(ball, currentBucket);
+          return;
+        }
+      } else {
+        ball.restFrames = 0;
+      }
+
+      if (ball.ageMs > 12000) {
+        const fallbackBucket = clamp(
+          Math.floor((ball.x - BUCKET_LEFT) / SLOT_W),
+          0,
+          BUCKET_COUNT - 1
+        );
+        finalizeBall(ball, fallbackBucket);
+      }
     }
 
     function simulateBalls(ballStates){
@@ -1540,82 +1609,43 @@
           const rawDt = now - lastTime;
           lastTime = now;
 
-          const dt = Math.min(34, rawDt) * SPEEDS[speedIndex].scale;
+          let simDt = Math.min(34, rawDt) * SPEEDS[speedIndex].scale;
+          const stepMs = 8;
 
-          for (const ball of ballStates) {
-            if (ball.settled) continue;
+          while (simDt > 0) {
+            const step = Math.min(stepMs, simDt);
+            const dtSec = step / 1000;
 
-            if (!ball.active) {
-              if (now - simStartedAt < ball.startDelay) {
-                renderBall(ball);
-                continue;
-              }
-              ball.active = true;
-            }
+            for (const ball of ballStates) {
+              if (ball.settled) continue;
 
-            let remaining = dt;
-
-            while (remaining > 0 && !ball.settled) {
-              const seg = ball.segments[ball.segmentIndex];
-
-              if (!seg) {
-                finalizeBall(ball, ball.targetIndex);
-                break;
-              }
-
-              const msLeft = seg.duration * (1 - ball.segmentT);
-              const used = Math.min(remaining, msLeft);
-
-              ball.segmentT += used / seg.duration;
-              remaining -= used;
-
-              const t = easeInOut(Math.min(ball.segmentT, 1));
-
-              let nextX;
-              let nextY;
-
-              if (seg.kind === "arc") {
-                const ang = lerp(seg.startAngle, seg.endAngle, t);
-                nextX = seg.pegX + Math.cos(ang) * seg.radius;
-                nextY = seg.pegY + Math.sin(ang) * seg.radius;
-              } else {
-                nextX = lerp(seg.from.x, seg.to.x, t);
-                nextY = lerp(seg.from.y, seg.to.y, t);
-
-                if (seg.kind === "end") {
-                  nextY -= Math.sin(t * Math.PI) * 0.9;
-                }
+              if (!ball.active) {
+                if (now - simStartedAt < ball.startDelay) continue;
+                ball.active = true;
               }
 
               ball.prevX = ball.x;
               ball.prevY = ball.y;
-              ball.x = nextX;
-              ball.y = nextY;
-              ball.vx = ball.x - ball.prevX;
-              ball.vy = ball.y - ball.prevY;
 
-              if (ball.segmentT >= 0.999999) {
-                ball.segmentIndex += 1;
-                ball.segmentT = 0;
-
-                if (ball.segmentIndex >= ball.segments.length) {
-                  finalizeBall(ball, ball.targetIndex);
-                  break;
-                }
-              }
+              stepBall(ball, dtSec);
             }
 
-            ball.trailTick += dt;
-            if (!ball.settled && ball.trailTick >= 14) {
+            simDt -= step;
+          }
+
+          for (const ball of ballStates) {
+            if (!ball.active || ball.settled) continue;
+
+            ball.trailTick += Math.min(34, rawDt) * SPEEDS[speedIndex].scale;
+
+            if (ball.trailTick >= 14) {
               ball.trailTick = 0;
               createTrailLine(ball.trailAnchorX, ball.trailAnchorY, ball.x, ball.y);
               ball.trailAnchorX = lerp(ball.trailAnchorX, ball.x, 0.62);
               ball.trailAnchorY = lerp(ball.trailAnchorY, ball.y, 0.62);
             }
 
-            if (!ball.settled) {
-              renderBall(ball);
-            }
+            renderBall(ball);
           }
 
           if (ballStates.every(ball => ball.settled)) {
