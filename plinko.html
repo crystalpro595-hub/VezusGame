@@ -332,35 +332,38 @@
 
     .buckets{
       position:absolute;
-      left:18px;
-      right:18px;
-      bottom:12px;
+      left:12px;
+      right:12px;
+      bottom:10px;
       display:grid;
       grid-template-columns:repeat(9, minmax(0,1fr));
-      gap:0;
+      gap:5px;
       z-index:5;
     }
 
     .bucket{
       position:relative;
       overflow:hidden;
-      height:38px;
-      border-radius:13px;
+      height:44px;
+      border-radius:15px;
       display:flex;
       align-items:center;
       justify-content:center;
       text-align:center;
-      font-size:11.5px;
+      font-size:12px;
       font-weight:900;
-      letter-spacing:.2px;
+      letter-spacing:.25px;
       color:#fff;
-      border:1px solid rgba(255,255,255,.18);
-      text-shadow: 0 1px 7px rgba(0,0,0,.42);
+      border:1px solid rgba(255,255,255,.22);
+      text-shadow: 0 1px 8px rgba(0,0,0,.45);
       box-shadow:
-        inset 0 1px 0 rgba(255,255,255,.18),
-        inset 0 -1px 0 rgba(0,0,0,.14),
-        0 12px 22px rgba(0,0,0,.20);
+        inset 0 1px 0 rgba(255,255,255,.22),
+        inset 0 -1px 0 rgba(0,0,0,.12),
+        0 10px 20px rgba(0,0,0,.22),
+        0 0 0 1px rgba(255,255,255,.02);
       transition: transform .16s ease, box-shadow .16s ease, filter .16s ease;
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
     }
 
     .bucket::before{
@@ -368,78 +371,102 @@
       position:absolute;
       inset:0;
       background:
-        linear-gradient(180deg, rgba(255,255,255,.24), rgba(255,255,255,.08) 34%, rgba(255,255,255,0) 70%);
+        linear-gradient(180deg, rgba(255,255,255,.28), rgba(255,255,255,.10) 34%, rgba(255,255,255,0) 72%);
       pointer-events:none;
     }
 
     .bucket::after{
       content:"";
       position:absolute;
-      inset:auto 12% 6px 12%;
-      height:7px;
+      left:10%;
+      right:10%;
+      bottom:5px;
+      height:8px;
       border-radius:999px;
-      background: rgba(255,255,255,.08);
+      background: rgba(255,255,255,.10);
       filter: blur(6px);
       pointer-events:none;
     }
 
+    .bucket-text{
+      position:relative;
+      z-index:1;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      min-width:100%;
+      height:100%;
+      font-size:12px;
+      font-weight:900;
+    }
+
     .bucket.low{
       background:
-        radial-gradient(circle at 50% 0%, rgba(255,255,255,.18), transparent 58%),
-        linear-gradient(180deg, #55d8ff 0%, #2aa7ff 55%, #1666e8 100%);
+        radial-gradient(circle at 50% 0%, rgba(255,255,255,.20), transparent 58%),
+        linear-gradient(180deg, #66e0ff 0%, #35b8ff 55%, #1a75ea 100%);
       box-shadow:
-        inset 0 1px 0 rgba(255,255,255,.20),
-        0 12px 22px rgba(42,167,255,.22),
-        0 0 20px rgba(85,216,255,.10);
+        inset 0 1px 0 rgba(255,255,255,.22),
+        0 10px 20px rgba(42,167,255,.24),
+        0 0 18px rgba(85,216,255,.12);
     }
 
     .bucket.mid{
       background:
-        radial-gradient(circle at 50% 0%, rgba(255,255,255,.18), transparent 58%),
-        linear-gradient(180deg, #9f7bff 0%, #7c4dff 54%, #5b21b6 100%);
+        radial-gradient(circle at 50% 0%, rgba(255,255,255,.20), transparent 58%),
+        linear-gradient(180deg, #b08aff 0%, #8558ff 54%, #5b21b6 100%);
       box-shadow:
-        inset 0 1px 0 rgba(255,255,255,.18),
-        0 12px 22px rgba(124,77,255,.20),
-        0 0 20px rgba(159,123,255,.10);
+        inset 0 1px 0 rgba(255,255,255,.20),
+        0 10px 20px rgba(124,77,255,.22),
+        0 0 18px rgba(159,123,255,.12);
     }
 
     .bucket.good{
       background:
-        radial-gradient(circle at 50% 0%, rgba(255,255,255,.18), transparent 58%),
-        linear-gradient(180deg, #38e7b2 0%, #13c38d 54%, #0c8f6d 100%);
+        radial-gradient(circle at 50% 0%, rgba(255,255,255,.20), transparent 58%),
+        linear-gradient(180deg, #42efbf 0%, #16c993 54%, #0b8e69 100%);
       box-shadow:
-        inset 0 1px 0 rgba(255,255,255,.18),
-        0 12px 22px rgba(19,195,141,.20),
-        0 0 20px rgba(56,231,178,.10);
+        inset 0 1px 0 rgba(255,255,255,.20),
+        0 10px 20px rgba(19,195,141,.22),
+        0 0 18px rgba(56,231,178,.12);
     }
 
-    .bucket.top{
+    .bucket.edge{
       background:
-        radial-gradient(circle at 50% 0%, rgba(255,255,255,.20), transparent 58%),
-        linear-gradient(180deg, #ffd86b 0%, #ff8a5b 42%, #ff4da0 100%);
+        radial-gradient(circle at 50% 0%, rgba(255,255,255,.18), transparent 60%),
+        linear-gradient(180deg, #84f7ff 0%, #35d8ff 46%, #0aa3d6 100%);
       box-shadow:
-        inset 0 1px 0 rgba(255,255,255,.22),
-        0 12px 22px rgba(255,77,160,.22),
-        0 0 20px rgba(255,216,107,.10);
+        inset 0 1px 0 rgba(255,255,255,.24),
+        0 10px 20px rgba(30,190,255,.20),
+        0 0 18px rgba(132,247,255,.16);
     }
 
     .bucket.center{
       background:
-        radial-gradient(circle at 50% 0%, rgba(255,255,255,.20), transparent 58%),
-        linear-gradient(180deg, #ff8a7a 0%, #ff5f6d 55%, #d73a49 100%);
+        radial-gradient(circle at 50% 0%, rgba(255,255,255,.22), transparent 58%),
+        linear-gradient(180deg, #ff9a8c 0%, #ff6678 55%, #db3f57 100%);
       box-shadow:
-        inset 0 1px 0 rgba(255,255,255,.22),
-        0 12px 22px rgba(255,95,109,.20),
-        0 0 20px rgba(255,138,122,.10);
+        inset 0 1px 0 rgba(255,255,255,.24),
+        0 10px 20px rgba(255,95,109,.22),
+        0 0 18px rgba(255,138,122,.12);
+    }
+
+    .bucket.top{
+      background:
+        radial-gradient(circle at 50% 0%, rgba(255,255,255,.22), transparent 58%),
+        linear-gradient(180deg, #ffd86b 0%, #ff8a5b 42%, #ff4da0 100%);
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.24),
+        0 10px 20px rgba(255,77,160,.22),
+        0 0 18px rgba(255,216,107,.12);
     }
 
     .bucket.hit{
-      transform: translateY(-4px) scale(1.06);
+      transform: translateY(-4px) scale(1.05);
       box-shadow:
-        0 0 0 2px rgba(255,255,255,.14),
-        0 0 18px rgba(255,255,255,.20),
-        0 14px 22px rgba(0,0,0,.22);
-      filter: brightness(1.14);
+        0 0 0 2px rgba(255,255,255,.16),
+        0 0 20px rgba(255,255,255,.22),
+        0 14px 24px rgba(0,0,0,.24);
+      filter: brightness(1.16);
     }
 
     .main-action{ padding:0 12px 12px; }
@@ -809,10 +836,40 @@
       display:flex;
       align-items:center;
       justify-content:center;
+      overflow:hidden;
       background:
-        radial-gradient(900px 600px at 50% 10%, rgba(60,180,255,.20), transparent 46%),
-        linear-gradient(180deg, #041322 0%, #062b4a 48%, #0b507d 100%);
-      transition: opacity .32s ease, visibility .32s ease;
+        linear-gradient(135deg, #0a69ff 0%, #2ab6ff 22%, #74e3ff 45%, #1f87ff 68%, #45d9ff 100%);
+      background-size: 260% 260%;
+      animation: preBgShift 1.9s linear infinite;
+      transition: opacity .28s ease, visibility .28s ease;
+    }
+
+    .preloader::before,
+    .preloader::after{
+      content:"";
+      position:absolute;
+      border-radius:50%;
+      filter: blur(28px);
+      opacity:.75;
+      pointer-events:none;
+    }
+
+    .preloader::before{
+      width:220px;
+      height:220px;
+      background: rgba(255,255,255,.22);
+      top:-40px;
+      left:-30px;
+      animation: floatOrb 1.8s ease-in-out infinite alternate;
+    }
+
+    .preloader::after{
+      width:260px;
+      height:260px;
+      background: rgba(120,240,255,.20);
+      right:-60px;
+      bottom:-60px;
+      animation: floatOrb 1.6s ease-in-out infinite alternate-reverse;
     }
 
     .preloader.hide{
@@ -821,22 +878,53 @@
       pointer-events:none;
     }
 
+    .pre-glow{
+      position:absolute;
+      width:138px;
+      height:138px;
+      border-radius:50%;
+      background:
+        radial-gradient(circle, rgba(255,255,255,.42) 0%, rgba(180,240,255,.18) 42%, rgba(0,0,0,0) 72%);
+      filter: blur(8px);
+      animation: preGlowPulse .82s ease-in-out infinite;
+      pointer-events:none;
+    }
+
     .pre-logo{
+      position:relative;
+      z-index:2;
       width:88px;
       height:88px;
       object-fit:contain;
       display:block;
-      filter: drop-shadow(0 14px 24px rgba(0,0,0,.22));
-      animation: preLogoJump 1.05s cubic-bezier(.36,0,.22,1) infinite;
+      filter: drop-shadow(0 18px 24px rgba(0,0,0,.20));
+      animation: preLogoJump .82s cubic-bezier(.34,.02,.22,1) infinite;
       transform-origin: center bottom;
+    }
+
+    @keyframes preBgShift{
+      0%{ background-position: 0% 50%; }
+      50%{ background-position: 100% 50%; }
+      100%{ background-position: 0% 50%; }
+    }
+
+    @keyframes floatOrb{
+      0%{ transform: translate3d(0,0,0) scale(1); }
+      100%{ transform: translate3d(18px,-12px,0) scale(1.08); }
+    }
+
+    @keyframes preGlowPulse{
+      0%,100%{ transform: scale(.92); opacity:.72; }
+      50%{ transform: scale(1.08); opacity:1; }
     }
 
     @keyframes preLogoJump{
       0%,100%{ transform: translateY(0) scale(1,1); }
-      12%{ transform: translateY(0) scale(1.05,.93); }
-      38%{ transform: translateY(-16px) scale(.98,1.02); }
-      56%{ transform: translateY(0) scale(1.03,.95); }
-      72%{ transform: translateY(-6px) scale(.995,1.005); }
+      12%{ transform: translateY(0) scale(1.10,.88); }
+      36%{ transform: translateY(-24px) scale(.96,1.04); }
+      52%{ transform: translateY(0) scale(1.06,.92); }
+      68%{ transform: translateY(-8px) scale(.99,1.01); }
+      82%{ transform: translateY(0) scale(1.02,.97); }
     }
 
     @media (max-width: 360px){
@@ -848,13 +936,15 @@
       .balance-mini{ height:38px; }
       .bal-amount{ min-width:74px; height:24px; font-size:12px; }
       .ball{ width:14px; height:14px; }
-      .bucket{ font-size:10px; height:34px; }
+      .bucket{ font-size:10px; height:40px; }
+      .bucket-text{ font-size:10px; }
       .bet-row{ grid-template-columns:minmax(0,1fr) 44px 44px; }
       .bet-input{ height:44px; font-size:15px; }
       .bet-toggle{ width:44px; height:44px; }
       .bet-toggle svg{ width:20px; height:20px; }
       .play-btn, .claim-btn{ height:48px; font-size:14px; }
       .pre-logo{ width:76px; height:76px; }
+      .pre-glow{ width:118px; height:118px; }
     }
 
     @media (prefers-reduced-motion: reduce){
@@ -865,6 +955,7 @@
 </head>
 <body>
   <div class="preloader" id="preloader">
+    <div class="pre-glow"></div>
     <img class="pre-logo" src="https://i.postimg.cc/qvL497mF/Picsart-26-02-27-02-02-37-502.png" alt="Vezus">
   </div>
 
@@ -916,7 +1007,7 @@
 
       <div class="card panel">
         <div>
-          <p class="label">Ставка · центр ~96%</p>
+          <p class="label">Ставка · края 0.8x</p>
 
           <div class="bet-row">
             <input
@@ -999,12 +1090,12 @@
       games: "games.html"
     };
 
-    const MULTIPLIERS = [10, 5, 2, 0.4, 0.2, 0.4, 2, 5, 10];
+    // Края теперь 0.8x вместо 10x
+    const MULTIPLIERS = [0.8, 5, 2, 0.4, 0.2, 0.4, 2, 5, 0.8];
 
-    // Примерно 96% выпадений уходит в центр: 0.2 / 0.4 / 2
-    // 5x и особенно 10x — редкие
+    // Центр по-прежнему чаще, 5x редкие, 0.8x по краям мягче
     const TARGET_WEIGHTS = [
-      0.002, // 10x
+      0.002, // 0.8x
       0.018, // 5x
       0.025, // 2x
       0.155, // 0.4x
@@ -1012,7 +1103,7 @@
       0.155, // 0.4x
       0.025, // 2x
       0.018, // 5x
-      0.002  // 10x
+      0.002  // 0.8x
     ];
 
     const SPEEDS = [
@@ -1080,6 +1171,10 @@
 
     function clamp(val, min, max){
       return Math.max(min, Math.min(max, val));
+    }
+
+    function formatMultiplierLabel(value){
+      return Number.isInteger(value) ? String(value) : value.toFixed(1);
     }
 
     function goTo(file){
@@ -1283,13 +1378,13 @@
 
         let cls = "low";
         if (m === 0.2) cls = "center";
-        else if (m >= 10) cls = "top";
+        else if (m === 0.8) cls = "edge";
         else if (m >= 5) cls = "good";
         else if (m >= 2) cls = "mid";
 
         el.className = `bucket ${cls}`;
-        el.textContent = `${m}x`;
         el.dataset.index = String(i);
+        el.innerHTML = `<span class="bucket-text">${formatMultiplierLabel(m)}x</span>`;
         buckets.appendChild(el);
       });
 
@@ -1477,7 +1572,6 @@
         ball.vx = -Math.abs(ball.vx) * WALL_BOUNCE;
       }
 
-      // Шары НЕ сталкиваются между собой
       for (const peg of pegs) {
         resolvePegCollision(ball, peg);
       }
@@ -1718,7 +1812,7 @@
 
       setTimeout(() => {
         $("preloader").classList.add("hide");
-      }, 2200);
+      }, 1500);
 
       autoAuthTelegram();
     });
