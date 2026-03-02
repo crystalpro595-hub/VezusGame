@@ -1115,7 +1115,6 @@
   const AIR_DAMP = 0.9930;
   const PEG_BOUNCE = 0.26;
   const WALL_BOUNCE = 0.24;
-  const FLOOR_BOUNCE = 0.08;
   const STEER_ACCEL = 620;
   const MAX_VX = 155;
   const MAX_VY = 700;
@@ -1452,7 +1451,7 @@
     ball.removeQueued = true;
     setTimeout(() => {
       if (ball.el && ball.el.remove) ball.el.remove();
-    }, 140);
+    }, 30);
   }
 
   function finalizeBall(ball, bucketIndex){
@@ -1642,38 +1641,14 @@
     if (ball.y >= FLOOR_Y) {
       ball.y = FLOOR_Y;
 
-      const currentBucket = clamp(
+      const landedBucket = clamp(
         Math.floor((ball.x - BUCKET_LEFT) / SLOT_W),
         0,
         BUCKET_COUNT - 1
       );
 
-      ball.bucketIndex = currentBucket;
-
-      // ГЛАВНОЕ ИСПРАВЛЕНИЕ:
-      // как только шар дошёл до нужного множителя — сразу фиксируем
-      if (currentBucket === ball.targetIndex) {
-        finalizeBall(ball, ball.targetIndex);
-        return;
-      }
-
-      if (Math.abs(ball.vy) > 10) {
-        ball.vy = -Math.abs(ball.vy) * FLOOR_BOUNCE;
-        ball.vx *= 0.68;
-      } else {
-        ball.vy = 0;
-        ball.vx *= 0.52;
-      }
-
-      if (ball.x < bounds.left) {
-        ball.vx += clamp((bounds.left - ball.x) * 0.28, 0, 14);
-      } else if (ball.x > bounds.right) {
-        ball.vx -= clamp((ball.x - bounds.right) * 0.28, 0, 14);
-      } else {
-        ball.vx += clamp((targetCenter - ball.x) * 0.10, -8, 8);
-      }
-
-      ball.vx = clamp(ball.vx, -MAX_VX, MAX_VX);
+      finalizeBall(ball, landedBucket);
+      return;
     }
 
     if (ball.ageMs > 12000) {
