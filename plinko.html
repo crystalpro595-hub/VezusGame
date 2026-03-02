@@ -28,10 +28,6 @@
       --tg2:#229ED9;
       --green1:#22c55e;
       --green2:#16a34a;
-      --red1:#ef4444;
-      --red2:#dc2626;
-      --amber1:#f59e0b;
-      --amber2:#d97706;
     }
 
     *{
@@ -285,10 +281,11 @@
       height:8px;
       border-radius:50%;
       background:
-        radial-gradient(circle at 35% 30%, rgba(255,255,255,.96), rgba(215,226,245,.90) 42%, rgba(130,145,170,.96) 100%);
+        radial-gradient(circle at 35% 30%, rgba(255,255,255,.98), rgba(230,238,250,.94) 42%, rgba(138,153,180,.98) 100%);
       box-shadow:
-        0 0 0 2px rgba(255,255,255,.03),
-        0 2px 6px rgba(0,0,0,.16);
+        0 0 0 2px rgba(255,255,255,.04),
+        0 0 10px rgba(255,255,255,.08),
+        0 2px 6px rgba(0,0,0,.18);
       transform:translate(-50%, -50%);
       z-index:4;
     }
@@ -318,7 +315,7 @@
       height:16px;
       border-radius:50%;
       background:
-        radial-gradient(circle at 30% 30%, #ffffff 0%, #b8ecff 28%, #46c6ff 62%, #0b74a6 100%);
+        radial-gradient(circle at 30% 30%, #ffffff 0%, #c9f1ff 24%, #6cd8ff 55%, #1698d8 78%, #0b5b86 100%);
       box-shadow:
         inset 0 1px 2px rgba(255,255,255,.40),
         0 2px 5px rgba(0,0,0,.22);
@@ -367,8 +364,8 @@
     .bucket{
       position:relative;
       overflow:hidden;
-      height:36px;
-      border-radius:12px;
+      height:38px;
+      border-radius:13px;
       display:flex;
       align-items:center;
       justify-content:center;
@@ -377,12 +374,12 @@
       font-weight:900;
       letter-spacing:.2px;
       color:#fff;
-      border:1px solid rgba(255,255,255,.16);
-      text-shadow: 0 1px 6px rgba(0,0,0,.35);
+      border:1px solid rgba(255,255,255,.18);
+      text-shadow: 0 1px 7px rgba(0,0,0,.42);
       box-shadow:
         inset 0 1px 0 rgba(255,255,255,.18),
         inset 0 -1px 0 rgba(0,0,0,.14),
-        0 10px 20px rgba(0,0,0,.18);
+        0 12px 22px rgba(0,0,0,.20);
       transition: transform .16s ease, box-shadow .16s ease, filter .16s ease;
     }
 
@@ -391,57 +388,78 @@
       position:absolute;
       inset:0;
       background:
-        linear-gradient(180deg, rgba(255,255,255,.22), rgba(255,255,255,.05) 34%, rgba(255,255,255,0) 70%);
+        linear-gradient(180deg, rgba(255,255,255,.24), rgba(255,255,255,.08) 34%, rgba(255,255,255,0) 70%);
+      pointer-events:none;
+    }
+
+    .bucket::after{
+      content:"";
+      position:absolute;
+      inset:auto 12% 6px 12%;
+      height:7px;
+      border-radius:999px;
+      background: rgba(255,255,255,.08);
+      filter: blur(6px);
       pointer-events:none;
     }
 
     .bucket.low{
       background:
-        radial-gradient(circle at 50% 0%, rgba(255,255,255,.16), transparent 58%),
-        linear-gradient(180deg, #3bc9ff 0%, #1d9bf0 58%, #0b78d1 100%);
+        radial-gradient(circle at 50% 0%, rgba(255,255,255,.18), transparent 58%),
+        linear-gradient(180deg, #55d8ff 0%, #2aa7ff 55%, #1666e8 100%);
       box-shadow:
         inset 0 1px 0 rgba(255,255,255,.20),
-        0 10px 20px rgba(29,155,240,.28),
-        0 0 18px rgba(59,201,255,.10);
+        0 12px 22px rgba(42,167,255,.22),
+        0 0 20px rgba(85,216,255,.10);
     }
 
     .bucket.mid{
       background:
-        radial-gradient(circle at 50% 0%, rgba(255,255,255,.14), transparent 58%),
-        linear-gradient(180deg, #a78bfa 0%, #8b5cf6 56%, #6d28d9 100%);
+        radial-gradient(circle at 50% 0%, rgba(255,255,255,.18), transparent 58%),
+        linear-gradient(180deg, #9f7bff 0%, #7c4dff 54%, #5b21b6 100%);
       box-shadow:
         inset 0 1px 0 rgba(255,255,255,.18),
-        0 10px 20px rgba(139,92,246,.24),
-        0 0 18px rgba(167,139,250,.10);
+        0 12px 22px rgba(124,77,255,.20),
+        0 0 20px rgba(159,123,255,.10);
     }
 
     .bucket.good{
       background:
-        radial-gradient(circle at 50% 0%, rgba(255,255,255,.14), transparent 58%),
-        linear-gradient(180deg, #34d399 0%, #10b981 56%, #059669 100%);
+        radial-gradient(circle at 50% 0%, rgba(255,255,255,.18), transparent 58%),
+        linear-gradient(180deg, #38e7b2 0%, #13c38d 54%, #0c8f6d 100%);
       box-shadow:
         inset 0 1px 0 rgba(255,255,255,.18),
-        0 10px 20px rgba(16,185,129,.24),
-        0 0 18px rgba(52,211,153,.10);
+        0 12px 22px rgba(19,195,141,.20),
+        0 0 20px rgba(56,231,178,.10);
     }
 
     .bucket.top{
       background:
-        radial-gradient(circle at 50% 0%, rgba(255,255,255,.16), transparent 58%),
-        linear-gradient(180deg, #fbbf24 0%, #fb7185 48%, #ec4899 100%);
+        radial-gradient(circle at 50% 0%, rgba(255,255,255,.20), transparent 58%),
+        linear-gradient(180deg, #ffd86b 0%, #ff8a5b 42%, #ff4da0 100%);
       box-shadow:
-        inset 0 1px 0 rgba(255,255,255,.20),
-        0 10px 20px rgba(236,72,153,.24),
-        0 0 18px rgba(251,191,36,.10);
+        inset 0 1px 0 rgba(255,255,255,.22),
+        0 12px 22px rgba(255,77,160,.22),
+        0 0 20px rgba(255,216,107,.10);
+    }
+
+    .bucket.center{
+      background:
+        radial-gradient(circle at 50% 0%, rgba(255,255,255,.20), transparent 58%),
+        linear-gradient(180deg, #ff8a7a 0%, #ff5f6d 55%, #d73a49 100%);
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.22),
+        0 12px 22px rgba(255,95,109,.20),
+        0 0 20px rgba(255,138,122,.10);
     }
 
     .bucket.hit{
       transform: translateY(-4px) scale(1.06);
       box-shadow:
         0 0 0 2px rgba(255,255,255,.14),
-        0 0 18px rgba(255,255,255,.18),
+        0 0 18px rgba(255,255,255,.20),
         0 14px 22px rgba(0,0,0,.22);
-      filter: brightness(1.12);
+      filter: brightness(1.14);
     }
 
     .main-action{ padding:0 12px 12px; }
@@ -1022,8 +1040,6 @@
     ];
 
     const BOARD_W = 320;
-    const BOARD_H = 320;
-
     const PEG_ROWS = 8;
     const PEG_GAP_X = 33;
     const PEG_GAP_Y = 26;
@@ -1031,11 +1047,9 @@
 
     const BALL_R = 8;
     const PEG_R = 4;
+    const CONTACT_R = BALL_R + PEG_R + 0.7;
 
-    const WALL_LEFT = 16;
-    const WALL_RIGHT = BOARD_W - 16;
     const BOARD_CENTER_X = BOARD_W / 2;
-
     const BUCKET_LEFT = 18;
     const BUCKET_RIGHT = BOARD_W - 18;
     const BUCKET_COUNT = 9;
@@ -1044,10 +1058,10 @@
     const SLOT_GUIDE_Y = 248;
     const SLOT_FLOOR_Y = 270;
 
-    const HIT_SEGMENT_MS = 116;
-    const REBOUND_SEGMENT_MS = 152;
-    const END_SEGMENT_MS = 250;
-    const FINAL_SEGMENT_MS = 320;
+    const HIT_SEGMENT_MS = 96;
+    const ARC_SEGMENT_MS = 176;
+    const END_SEGMENT_MS = 240;
+    const FINAL_SEGMENT_MS = 300;
 
     const $ = (id) => document.getElementById(id);
 
@@ -1253,6 +1267,34 @@
       return shuffle(dirs);
     }
 
+    function getRowPegList(row){
+      const pegsInRow = row + 2;
+      const rowWidth = (pegsInRow - 1) * PEG_GAP_X;
+      const startX = BOARD_CENTER_X - rowWidth / 2;
+      const y = PEG_START_Y + row * PEG_GAP_Y;
+
+      const arr = [];
+      for (let i = 0; i < pegsInRow; i++) {
+        arr.push({ x: startX + i * PEG_GAP_X, y, row });
+      }
+      return arr;
+    }
+
+    function getClosestPegForRow(row, desiredX){
+      const rowPegs = getRowPegList(row);
+      let best = rowPegs[0];
+      let bestDist = Math.abs(best.x - desiredX);
+
+      for (let i = 1; i < rowPegs.length; i++) {
+        const d = Math.abs(rowPegs[i].x - desiredX);
+        if (d < bestDist) {
+          best = rowPegs[i];
+          bestDist = d;
+        }
+      }
+      return best;
+    }
+
     function createBoard(){
       const board = $("board");
 
@@ -1261,20 +1303,15 @@
       slotDividers = [];
 
       for (let row = 0; row < PEG_ROWS; row++) {
-        const pegsInRow = row + 2;
-        const rowWidth = (pegsInRow - 1) * PEG_GAP_X;
-        const startX = BOARD_CENTER_X - rowWidth / 2;
-        const y = PEG_START_Y + row * PEG_GAP_Y;
+        const rowPegs = getRowPegList(row);
 
-        for (let i = 0; i < pegsInRow; i++) {
-          const x = startX + i * PEG_GAP_X;
-
-          pegs.push({ x, y, row });
+        for (const p of rowPegs) {
+          pegs.push(p);
 
           const peg = document.createElement("div");
           peg.className = "peg";
-          peg.style.left = `${x}px`;
-          peg.style.top = `${y}px`;
+          peg.style.left = `${p.x}px`;
+          peg.style.top = `${p.y}px`;
           board.appendChild(peg);
         }
       }
@@ -1294,9 +1331,10 @@
 
       MULTIPLIERS.forEach((m, i) => {
         const el = document.createElement("div");
-        let cls = "low";
 
-        if (m >= 10) cls = "top";
+        let cls = "low";
+        if (m === 0.2) cls = "center";
+        else if (m >= 10) cls = "top";
         else if (m >= 5) cls = "good";
         else if (m >= 2) cls = "mid";
 
@@ -1394,56 +1432,43 @@
     function buildSegments(startX, route, targetIndex){
       const segments = [];
       let from = { x: startX, y: 18 };
-      let lane = 0;
-
-      const touchDx = BALL_R - 0.5;
-      const touchDy = BALL_R + PEG_R + 1;
-      const leaveDx = BALL_R + PEG_R + 1.5;
-      const leaveDy = BALL_R + PEG_R - 0.5;
 
       for (let row = 0; row < PEG_ROWS; row++) {
-        const pegY = PEG_START_Y + row * PEG_GAP_Y;
-        const pegX = clamp(
-          BOARD_CENTER_X + lane * (PEG_GAP_X * 0.5),
-          BUCKET_LEFT + SLOT_W * 1.10,
-          BUCKET_RIGHT - SLOT_W * 1.10
-        );
-
         const dir = route[row];
+        const desiredX = from.x + dir * (PEG_GAP_X * 0.48);
+        const peg = getClosestPegForRow(row, desiredX);
+
+        const startAngle = dir > 0 ? (-140 * Math.PI / 180) : (-40 * Math.PI / 180);
+        const endAngle   = dir > 0 ? (  40 * Math.PI / 180) : (140 * Math.PI / 180);
 
         const hitPoint = {
-          x: pegX - dir * touchDx,
-          y: pegY - touchDy
+          x: peg.x + Math.cos(startAngle) * CONTACT_R,
+          y: peg.y + Math.sin(startAngle) * CONTACT_R
+        };
+
+        const leavePoint = {
+          x: peg.x + Math.cos(endAngle) * CONTACT_R,
+          y: peg.y + Math.sin(endAngle) * CONTACT_R
         };
 
         segments.push({
           from: { ...from },
-          to: hitPoint,
+          to: { ...hitPoint },
           duration: HIT_SEGMENT_MS,
-          kind: "hit",
-          dir
+          kind: "approach"
         });
-
-        lane += dir;
-
-        const reboundPoint = {
-          x: clamp(
-            pegX + dir * leaveDx,
-            BUCKET_LEFT + SLOT_W * 1.05,
-            BUCKET_RIGHT - SLOT_W * 1.05
-          ),
-          y: pegY + leaveDy
-        };
 
         segments.push({
-          from: { ...hitPoint },
-          to: reboundPoint,
-          duration: REBOUND_SEGMENT_MS,
-          kind: "rebound",
-          dir
+          pegX: peg.x,
+          pegY: peg.y,
+          radius: CONTACT_R,
+          startAngle,
+          endAngle,
+          duration: ARC_SEGMENT_MS,
+          kind: "arc"
         });
 
-        from = reboundPoint;
+        from = leavePoint;
       }
 
       const finalX = bucketCenter(targetIndex);
@@ -1454,16 +1479,14 @@
         from: { ...from },
         to: guidePoint,
         duration: END_SEGMENT_MS,
-        kind: "end",
-        dir: 0
+        kind: "end"
       });
 
       segments.push({
         from: { ...guidePoint },
         to: floorPoint,
         duration: FINAL_SEGMENT_MS,
-        kind: "final",
-        dir: 0
+        kind: "final"
       });
 
       return segments;
@@ -1548,23 +1571,20 @@
 
               const t = easeInOut(Math.min(ball.segmentT, 1));
 
-              let nextX = lerp(seg.from.x, seg.to.x, t);
-              let nextY = lerp(seg.from.y, seg.to.y, t);
+              let nextX;
+              let nextY;
 
-              if (seg.kind === "hit") {
-                const punch = Math.sin(t * Math.PI);
-                nextY -= punch * 2.2;
-              }
+              if (seg.kind === "arc") {
+                const ang = lerp(seg.startAngle, seg.endAngle, t);
+                nextX = seg.pegX + Math.cos(ang) * seg.radius;
+                nextY = seg.pegY + Math.sin(ang) * seg.radius;
+              } else {
+                nextX = lerp(seg.from.x, seg.to.x, t);
+                nextY = lerp(seg.from.y, seg.to.y, t);
 
-              if (seg.kind === "rebound") {
-                const bounce = Math.sin(t * Math.PI);
-                nextY -= bounce * 4.3;
-                nextX += seg.dir * bounce * 1.8;
-              }
-
-              if (seg.kind === "end") {
-                const smooth = Math.sin(t * Math.PI) * 1.0;
-                nextY -= smooth;
+                if (seg.kind === "end") {
+                  nextY -= Math.sin(t * Math.PI) * 0.9;
+                }
               }
 
               ball.prevX = ball.x;
