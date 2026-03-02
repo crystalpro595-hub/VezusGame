@@ -280,7 +280,7 @@
     }
 
     .coin-shadow.is-flipping{
-      animation: shadowPulse 1.34s cubic-bezier(.22,.61,.36,1) both;
+      animation: shadowPulse 1.5s cubic-bezier(.22,.61,.36,1) both;
     }
 
     .coin-wrap{
@@ -295,7 +295,7 @@
     }
 
     .coin-wrap.is-flipping{
-      animation: coinDepth 1.34s cubic-bezier(.22,.61,.36,1) both;
+      animation: coinDepth 1.5s cubic-bezier(.22,.61,.36,1) both;
     }
 
     .coin-shell{
@@ -313,7 +313,7 @@
     }
 
     .coin-shell.is-flipping{
-      animation: coinFlip 1.34s linear both;
+      animation: coinFlip 1.5s linear both;
     }
 
     .coin-shell.flash-win{
@@ -819,42 +819,11 @@
       display:flex;
       align-items:center;
       justify-content:center;
-      overflow:hidden;
+      padding:24px;
       background:
-        linear-gradient(135deg, #031225 0%, #08315d 26%, #0b5da9 56%, #21b8ff 100%);
-      background-size: 220% 220%;
-      animation: preGradientShift 8s ease-in-out infinite;
+        radial-gradient(1200px 700px at 50% -10%, rgba(255,255,255,.05), transparent 45%),
+        linear-gradient(180deg, #04070d 0%, #0b1020 45%, #121826 100%);
       transition: opacity .32s ease, visibility .32s ease;
-    }
-
-    .preloader::before,
-    .preloader::after{
-      content:"";
-      position:absolute;
-      border-radius:50%;
-      pointer-events:none;
-    }
-
-    .preloader::before{
-      width:min(62vw, 420px);
-      height:min(62vw, 420px);
-      left:-10vw;
-      bottom:-12vw;
-      background:
-        radial-gradient(circle, rgba(255,255,255,.16) 0%, rgba(255,255,255,.05) 34%, transparent 70%);
-      filter: blur(8px);
-      animation: preBlobLeft 7.8s ease-in-out infinite;
-    }
-
-    .preloader::after{
-      width:min(56vw, 360px);
-      height:min(56vw, 360px);
-      right:-8vw;
-      top:-10vw;
-      background:
-        radial-gradient(circle, rgba(91,226,255,.22) 0%, rgba(42,171,238,.08) 38%, transparent 72%);
-      filter: blur(10px);
-      animation: preBlobRight 9s ease-in-out infinite;
     }
 
     .preloader.hide{
@@ -863,38 +832,64 @@
       pointer-events:none;
     }
 
+    .preloader-inner{
+      width:min(320px, 100%);
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      gap:18px;
+    }
+
     .pre-logo{
-      position:relative;
-      z-index:2;
-      width:96px;
-      height:96px;
+      width:92px;
+      height:92px;
       object-fit:contain;
       display:block;
-      filter: drop-shadow(0 16px 32px rgba(0,0,0,.28));
-      animation: preLogoFloat 1.08s cubic-bezier(.34,1.56,.64,1) infinite;
+      filter: drop-shadow(0 12px 26px rgba(0,0,0,.34));
     }
 
-    @keyframes preGradientShift{
-      0%{ background-position: 0% 50%; }
-      50%{ background-position: 100% 50%; }
-      100%{ background-position: 0% 50%; }
+    .pre-track{
+      position:relative;
+      width:100%;
+      height:10px;
+      border-radius:999px;
+      overflow:hidden;
+      background: rgba(255,255,255,.08);
+      border:1px solid rgba(255,255,255,.08);
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.04),
+        0 8px 22px rgba(0,0,0,.22);
     }
 
-    @keyframes preBlobLeft{
-      0%,100%{ transform: translate3d(0,0,0) scale(1); opacity:.8; }
-      50%{ transform: translate3d(24px,-16px,0) scale(1.08); opacity:1; }
+    .pre-bar{
+      width:0%;
+      height:100%;
+      border-radius:999px;
+      background:
+        linear-gradient(90deg, rgba(255,255,255,.78), rgba(42,171,238,.95));
+      box-shadow:
+        0 0 16px rgba(42,171,238,.18),
+        inset 0 1px 0 rgba(255,255,255,.25);
+      transition: width 1.5s linear;
+      position:relative;
     }
 
-    @keyframes preBlobRight{
-      0%,100%{ transform: translate3d(0,0,0) scale(1); opacity:.75; }
-      50%{ transform: translate3d(-22px,18px,0) scale(1.12); opacity:1; }
+    .pre-bar::after{
+      content:"";
+      position:absolute;
+      top:0;
+      right:0;
+      width:46px;
+      height:100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,.42));
+      filter: blur(3px);
     }
 
-    @keyframes preLogoFloat{
-      0%,100%{ transform: translateY(0) scale(1); }
-      26%{ transform: translateY(-14px) scale(1.03); }
-      52%{ transform: translateY(0) scale(.99); }
-      72%{ transform: translateY(-6px) scale(1.01); }
+    .pre-text{
+      font-size:12px;
+      font-weight:800;
+      letter-spacing:.3px;
+      color: rgba(234,241,255,.72);
     }
 
     @media (max-width: 360px){
@@ -940,7 +935,7 @@
 
       .tg-btn{ height:48px; border-radius:15px; }
 
-      .pre-logo{ width:80px; height:80px; }
+      .pre-logo{ width:78px; height:78px; }
     }
 
     @media (prefers-reduced-motion: reduce){
@@ -951,7 +946,13 @@
 </head>
 <body>
   <div class="preloader" id="preloader">
-    <img class="pre-logo" src="https://i.postimg.cc/qvL497mF/Picsart-26-02-27-02-02-37-502.png" alt="Vezus">
+    <div class="preloader-inner">
+      <img class="pre-logo" src="https://i.postimg.cc/qvL497mF/Picsart-26-02-27-02-02-37-502.png" alt="Vezus">
+      <div class="pre-track" aria-hidden="true">
+        <div class="pre-bar" id="preBar"></div>
+      </div>
+      <div class="pre-text">Загрузка...</div>
+    </div>
   </div>
 
   <div class="bottom-notice info" id="bottomNotice" aria-live="polite">
@@ -1131,9 +1132,8 @@
     const GOLD_SRC = "https://i.postimg.cc/50wQKCZL/Picsart-26-02-28-14-51-00-987.png";
     const SILVER_SRC = "https://i.postimg.cc/Rh46k0m4/Picsart-26-02-28-14-51-28-798.png";
 
-    const FLIP_TOTAL_MS = 1340;
-    const FLIP_SWAP_MS = 760;
-    const RESULT_DELAY_MS = 1460;
+    const FLIP_TOTAL_MS = 1500;
+    const RESULT_DELAY_MS = 1640;
     const PRELOADER_HIDE_MS = 1600;
 
     const FILES = {
@@ -1149,8 +1149,8 @@
     let choiceVisible = false;
     let quickVisible = false;
     let noticeTimer = null;
-    let swapTimer = null;
     let finishTimer = null;
+    let flipFrameTimers = [];
 
     let audioCtx = null;
 
@@ -1371,13 +1371,22 @@
       updateButtons();
     }
 
+    function clearFlipTimers(){
+      flipFrameTimers.forEach((t) => clearTimeout(t));
+      flipFrameTimers = [];
+
+      if (finishTimer) {
+        clearTimeout(finishTimer);
+        finishTimer = null;
+      }
+    }
+
     function animateCoinTo(resultSide){
       const coinWrap = $("coinWrap");
       const coinShell = $("coinShell");
       const coinShadow = $("coinShadow");
 
-      if (swapTimer) clearTimeout(swapTimer);
-      if (finishTimer) clearTimeout(finishTimer);
+      clearFlipTimers();
 
       coinWrap.classList.remove("is-flipping");
       coinShell.classList.remove("is-flipping");
@@ -1392,15 +1401,31 @@
       coinShell.classList.add("is-flipping");
       coinShadow.classList.add("is-flipping");
 
-      swapTimer = setTimeout(() => {
-        setCoinFace(resultSide);
-      }, FLIP_SWAP_MS);
+      const frames = [
+        { time: 130, side: "gold" },
+        { time: 270, side: "silver" },
+        { time: 410, side: "gold" },
+        { time: 550, side: "silver" },
+        { time: 690, side: "gold" },
+        { time: 830, side: "silver" },
+        { time: 970, side: "gold" },
+        { time: 1110, side: "silver" },
+        { time: 1260, side: resultSide }
+      ];
+
+      frames.forEach((frame) => {
+        const timer = setTimeout(() => {
+          setCoinFace(frame.side);
+        }, frame.time);
+
+        flipFrameTimers.push(timer);
+      });
 
       finishTimer = setTimeout(() => {
         coinWrap.classList.remove("is-flipping");
         coinShell.classList.remove("is-flipping");
         coinShadow.classList.remove("is-flipping");
-      }, FLIP_TOTAL_MS + 40);
+      }, FLIP_TOTAL_MS + 30);
     }
 
     function startGame(){
@@ -1610,6 +1635,10 @@
       setCoinFace("silver");
       updateClaimButton();
       updateButtons();
+
+      requestAnimationFrame(() => {
+        $("preBar").style.width = "100%";
+      });
 
       setTimeout(() => {
         $("preloader").classList.add("hide");
