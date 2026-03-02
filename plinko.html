@@ -1083,7 +1083,7 @@
 
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <script>
-    const PLINKO_URL = "https://lazrfierfbhwlduqlvws.functions.supabase.co/plinko-play";
+    const PLINKO_URL = "https://lazrfierfbhwlduqlvws.supabase.co/functions/v1/plinko-play";
     const MIN_BET = 10;
 
     const FILES = {
@@ -1099,8 +1099,6 @@
     ];
 
     const BOARD_W = 320;
-    const BOARD_H = 320;
-
     const PEG_ROWS = 8;
     const PEG_GAP_X = 33;
     const PEG_GAP_Y = 26;
@@ -1117,7 +1115,6 @@
     const SLOT_W = (BUCKET_RIGHT - BUCKET_LEFT) / BUCKET_COUNT;
 
     const SLOT_FLOOR_Y = 270;
-
     const FLOOR_Y = SLOT_FLOOR_Y - BALL_R;
     const DIVIDER_TOP = 252;
     const DIVIDER_BOTTOM = 274;
@@ -1276,15 +1273,23 @@
         throw new Error("Открой игру через Telegram");
       }
 
-      const res = await fetch(PLINKO_URL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          action,
-          initData,
-          ...extra
-        })
-      });
+      let res;
+
+      try{
+        res = await fetch(PLINKO_URL, {
+          method: "POST",
+          mode: "cors",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            action,
+            initData,
+            ...extra
+          })
+        });
+      } catch (error) {
+        console.error("plinko-play fetch failed:", error);
+        throw new Error("Нет соединения с Edge Function. Проверь deploy, URL и CORS.");
+      }
 
       const json = await res.json().catch(() => ({}));
 
@@ -1313,10 +1318,8 @@
 
       try{
         const json = await plinkoRequest("status");
-
         currentBalance = toNum(json.balance);
         pendingWin = toNum(json.reserved_balance);
-
         saveCachedState();
       } catch {
         currentBalance = toNum(cached?.balance);
