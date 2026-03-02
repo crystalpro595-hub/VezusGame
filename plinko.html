@@ -450,16 +450,6 @@
         0 0 18px rgba(255,138,122,.12);
     }
 
-    .bucket.top{
-      background:
-        radial-gradient(circle at 50% 0%, rgba(255,255,255,.22), transparent 58%),
-        linear-gradient(180deg, #ffd86b 0%, #ff8a5b 42%, #ff4da0 100%);
-      box-shadow:
-        inset 0 1px 0 rgba(255,255,255,.24),
-        0 10px 20px rgba(255,77,160,.22),
-        0 0 18px rgba(255,216,107,.12);
-    }
-
     .bucket.hit{
       transform: translateY(-4px) scale(1.05);
       box-shadow:
@@ -1090,6 +1080,7 @@
     games: "games.html"
   };
 
+  // Слоты слева направо
   const MULTIPLIERS = [0.8, 5, 2, 0.4, 0.2, 0.4, 2, 5, 0.8];
 
   const SPEEDS = [
@@ -1169,8 +1160,9 @@
     return Number.isInteger(value) ? String(value) : value.toFixed(1);
   }
 
+  // Главное: точный расчет по индексу ячейки
   function calculateBallWin(bet, bucketIndex){
-    const safeBet = Math.max(0, toNum(bet));
+    const safeBet = Math.max(0, Math.floor(toNum(bet)));
     const safeIdx = clamp(Math.floor(Number(bucketIndex) || 0), 0, MULTIPLIERS.length - 1);
     const multiplier = toNum(MULTIPLIERS[safeIdx]);
     return roundMoney(safeBet * multiplier);
@@ -1178,8 +1170,8 @@
 
   function calculateTotalWin(bucketIndexes, bet){
     if (!Array.isArray(bucketIndexes)) return 0;
-
     let total = 0;
+
     for (const idx of bucketIndexes) {
       total += calculateBallWin(bet, idx);
     }
@@ -1462,6 +1454,7 @@
     ball.vx = 0;
     ball.vy = 0;
     ball.bucketIndex = realBucket;
+    ball.finalBucketIndex = realBucket;
     ball.settled = true;
 
     ball.el.style.left = `${ball.x}px`;
@@ -1497,14 +1490,13 @@
       el: createBall(startX),
       x: startX,
       y: 18,
-      prevX: startX,
-      prevY: 18,
       vx: (Math.random() - 0.5) * 4,
       vy: 0,
 
       targetIndex,
       targetX: bucketCenter(targetIndex),
       bucketIndex: null,
+      finalBucketIndex: targetIndex,
 
       settled: false,
       didHit: false,
@@ -1589,6 +1581,12 @@
       ball.vx += toward * STEER_ACCEL * (0.28 + fallFactor * 0.75) * dtSec;
     }
 
+    // Сильнее подтягиваем к целевой ячейке у самого низа,
+    // чтобы шарик визуально попадал ровно туда, где и идет расчет.
+    if (ball.y > DIVIDER_TOP - 18 && ball.y < FLOOR_Y + 2) {
+      ball.vx += clamp((ball.targetX - ball.x) * 0.10, -26, 26);
+    }
+
     ball.vy += GRAVITY * dtSec;
 
     ball.vx *= Math.pow(AIR_DAMP, dtSec * 60);
@@ -1619,29 +1617,25 @@
     if (ball.y >= FLOOR_Y) {
       ball.y = FLOOR_Y;
 
-      const currentBucket = clamp(
-        Math.floor((ball.x - BUCKET_LEFT) / SLOT_W),
-        0,
-        BUCKET_COUNT - 1
-      );
-      ball.bucketIndex = currentBucket;
-
       if (Math.abs(ball.vy) > 12) {
         ball.vy = -Math.abs(ball.vy) * FLOOR_BOUNCE;
         ball.vx *= 0.72;
       } else {
         ball.vy = 0;
-        ball.vx *= 0.55;
+        ball.vx *= 0.45;
       }
 
-      if (Math.abs(ball.vx) < 5 && Math.abs(ball.vy) < 5) {
+      // На полу прижимаем к центру нужной ячейки
+      ball.x += (ball.targetX - ball.x) * 0.22;
+
+      if (Math.abs(ball.targetX - ball.x) < 0.9 && Math.abs(ball.vx) < 4.5 && Math.abs(ball.vy) < 4.5) {
         ball.restFrames += 1;
       } else {
         ball.restFrames = 0;
       }
 
-      if (ball.restFrames > 3) {
-        finalizeBall(ball, currentBucket);
+      if (ball.restFrames > 2) {
+        finalizeBall(ball, ball.targetIndex);
         return;
       }
     } else {
@@ -1649,12 +1643,7 @@
     }
 
     if (ball.ageMs > 12000) {
-      const fallbackBucket = clamp(
-        Math.floor((ball.x - BUCKET_LEFT) / SLOT_W),
-        0,
-        BUCKET_COUNT - 1
-      );
-      finalizeBall(ball, fallbackBucket);
+      finalizeBall(ball, ball.targetIndex);
     }
   }
 
@@ -1694,7 +1683,7 @@
         }
 
         if (ballStates.every(ball => ball.settled)) {
-          resolve(ballStates.map(ball => ball.bucketIndex));
+          resolve(ballStates.map(ball => clamp(ball.finalBucketIndex, 0, BUCKET_COUNT - 1)));
           return;
         }
 
@@ -1763,15 +1752,14 @@
       ballStates.push(createBallState(i, serverBuckets[i]));
     }
 
-    await simulateBalls(ballStates);
+    // Получаем фактические финальные ячейки (они теперь совпадают с визуалом)
+    const settledBuckets = await simulateBalls(ballStates);
 
-    // Точный расчет выигрыша по реальным слотам
-    pendingWin = calculateTotalWin(serverBuckets, bet);
+    // Считаем выигрыш строго по ячейкам
+    pendingWin = calculateTotalWin(settledBuckets, bet);
 
     saveCachedState();
     syncActionButtons();
-    updateButtons();
-
     isPlaying = false;
     updateButtons();
   }
@@ -1780,25 +1768,15 @@
     if (pendingWin <= 0 || isPlaying) return;
 
     const expectedClaim = roundMoney(pendingWin);
-    const balanceBeforeClaim = roundMoney(currentBalance);
 
     isPlaying = true;
     updateButtons();
 
     try{
-      const claimData = await plinkoRequest("claim");
+      await plinkoRequest("claim");
 
-      const serverBalance = roundMoney(toNum(claimData.balance));
-      const expectedBalance = roundMoney(balanceBeforeClaim + expectedClaim);
-
-      // Если сервер вернул корректный баланс — берем его,
-      // если нет — хотя бы фронт покажет правильное умножение
-      if (Math.abs(serverBalance - expectedBalance) <= 0.01) {
-        currentBalance = serverBalance;
-      } else {
-        currentBalance = expectedBalance;
-      }
-
+      // Баланс на фронте увеличиваем ровно на рассчитанный выигрыш
+      currentBalance = roundMoney(currentBalance + expectedClaim);
       pendingWin = 0;
 
       updateBalanceUI();
