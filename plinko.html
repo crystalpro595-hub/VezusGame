@@ -987,22 +987,24 @@
 
     const MULTIPLIERS = [10, 5, 2, 0.4, 0.2, 0.4, 2, 5, 10];
 
+    // Чуть выше шанс на выигрыш:
+    // 10x = 1%
+    // 5x  = 5%
+    // 2x  = 20%
+    // 0.4 = 40%
+    // 0.2 = 34%
     const TARGET_WEIGHTS = [
-      0.003, // 10
-      0.012, // 5
-      0.070, // 2
-      0.215, // 0.4
-      0.400, // 0.2
-      0.215, // 0.4
-      0.070, // 2
-      0.012, // 5
-      0.003  // 10
+      0.005, // 10
+      0.025, // 5
+      0.100, // 2
+      0.200, // 0.4
+      0.340, // 0.2
+      0.200, // 0.4
+      0.100, // 2
+      0.025, // 5
+      0.005  // 10
     ];
 
-    // Все уровни сделаны медленнее
-    // >   = медленно
-    // >>  = нормально
-    // >>> = быстро
     const SPEEDS = [
       { label: ">",   scale: 0.42 },
       { label: ">>",  scale: 0.68 },
@@ -1018,6 +1020,7 @@
     const PEG_START_Y = 44;
 
     const BALL_R = 8;
+    const PEG_R = 4;
 
     const WALL_LEFT = 16;
     const WALL_RIGHT = BOARD_W - 16;
@@ -1300,7 +1303,8 @@
       const dy = y2 - y1;
       const dist = Math.hypot(dx, dy);
 
-      if (dist < 0.25) return;
+      // Убираем мелкие "точки" — рисуем только нормальный отрезок
+      if (dist < 4) return;
 
       const line = document.createElement("div");
       line.className = "trail-line";
@@ -1308,13 +1312,13 @@
       const midX = (x1 + x2) / 2;
       const midY = (y1 + y2) / 2;
       const angle = Math.atan2(dy, dx) * 180 / Math.PI;
-      const width = clamp(dist * 5.4, 24, 88);
+      const width = clamp(dist * 6.2, 30, 96);
 
       line.style.width = `${width}px`;
       line.style.left = `${midX}px`;
       line.style.top = `${midY}px`;
       line.style.transform = `translate(-50%, -50%) rotate(${angle}deg)`;
-      line.style.opacity = String(clamp(dist * 0.72, 0.38, 0.96));
+      line.style.opacity = String(clamp(dist * 0.10, 0.42, 0.96));
 
       $("ballsLayer").appendChild(line);
       setTimeout(() => line.remove(), 340);
@@ -1373,6 +1377,11 @@
       let from = { x: startX, y: 18 };
       let lane = 0;
 
+      const touchDx = BALL_R - 0.5;
+      const touchDy = BALL_R + PEG_R + 1;
+      const leaveDx = BALL_R + PEG_R + 1.5;
+      const leaveDy = BALL_R + PEG_R - 0.5;
+
       for (let row = 0; row < PEG_ROWS; row++) {
         const pegY = PEG_START_Y + row * PEG_GAP_Y;
         const pegX = clamp(
@@ -1383,9 +1392,10 @@
 
         const dir = route[row];
 
+        // Точка касания сверху-сбоку, чтобы шар НЕ входил в штырёк
         const hitPoint = {
-          x: pegX,
-          y: pegY - 1
+          x: pegX - dir * touchDx,
+          y: pegY - touchDy
         };
 
         segments.push({
@@ -1398,13 +1408,14 @@
 
         lane += dir;
 
+        // Выход снизу-сбоку, тоже мимо центра штырька
         const reboundPoint = {
           x: clamp(
-            BOARD_CENTER_X + lane * (PEG_GAP_X * 0.5) + dir * 3.5,
+            pegX + dir * leaveDx,
             BUCKET_LEFT + SLOT_W * 1.05,
             BUCKET_RIGHT - SLOT_W * 1.05
           ),
-          y: pegY + 13
+          y: pegY + leaveDy
         };
 
         segments.push({
@@ -1474,8 +1485,7 @@
         startDelay: i * 120,
         active: false,
 
-        wobblePhase: Math.random() * 10,
-        trailTick: Math.random() * 10,
+        trailTick: Math.random() * 12,
         trailAnchorX: startX,
         trailAnchorY: 18
       };
@@ -1526,18 +1536,17 @@
 
               if (seg.kind === "hit") {
                 const punch = Math.sin(t * Math.PI);
-                nextY -= punch * 3.2;
-                nextX += Math.sin((now * 0.02) + ball.wobblePhase + ball.segmentIndex) * 0.6 * (1 - t);
+                nextY -= punch * 2.2;
               }
 
               if (seg.kind === "rebound") {
                 const bounce = Math.sin(t * Math.PI);
-                nextY -= bounce * 5.4;
-                nextX += seg.dir * bounce * 2.6;
+                nextY -= bounce * 4.3;
+                nextX += seg.dir * bounce * 1.8;
               }
 
               if (seg.kind === "end") {
-                const smooth = Math.sin(t * Math.PI) * 1.2;
+                const smooth = Math.sin(t * Math.PI) * 1.0;
                 nextY -= smooth;
               }
 
@@ -1560,11 +1569,11 @@
             }
 
             ball.trailTick += dt;
-            if (!ball.settled && ball.trailTick >= 10) {
+            if (!ball.settled && ball.trailTick >= 14) {
               ball.trailTick = 0;
               createTrailLine(ball.trailAnchorX, ball.trailAnchorY, ball.x, ball.y);
-              ball.trailAnchorX = lerp(ball.trailAnchorX, ball.x, 0.82);
-              ball.trailAnchorY = lerp(ball.trailAnchorY, ball.y, 0.82);
+              ball.trailAnchorX = lerp(ball.trailAnchorX, ball.x, 0.62);
+              ball.trailAnchorY = lerp(ball.trailAnchorY, ball.y, 0.62);
             }
 
             if (!ball.settled) {
@@ -1631,7 +1640,6 @@
       $("playBtn").style.display = "none";
       $("claimBtn").style.display = "block";
 
-      // Уведомление о выплате / проигрыше убрано
       isPlaying = false;
       updateButtons();
     }
