@@ -320,9 +320,8 @@
       background:
         radial-gradient(circle at 30% 30%, #ffffff 0%, #b8ecff 28%, #46c6ff 62%, #0b74a6 100%);
       box-shadow:
-        inset 0 1px 2px rgba(255,255,255,.45),
-        0 3px 10px rgba(42,171,238,.24),
-        0 0 10px rgba(64,200,255,.14);
+        inset 0 1px 2px rgba(255,255,255,.40),
+        0 2px 5px rgba(0,0,0,.22);
       transform:translate(-50%, -50%);
       will-change:left, top, transform;
     }
@@ -500,7 +499,7 @@
 
     .bet-row{
       display:grid;
-      grid-template-columns:minmax(0,1fr) 48px;
+      grid-template-columns:minmax(0,1fr) 48px 48px;
       gap:8px;
       align-items:center;
     }
@@ -544,16 +543,39 @@
     }
 
     .bet-toggle svg{
-      width:24px;
-      height:24px;
+      width:22px;
+      height:22px;
       display:block;
     }
 
     .bet-toggle:active{ transform:scale(.98); }
 
-    .quick-bets{
+    .balls-toggle{
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      gap:2px;
+    }
+
+    .balls-toggle-num{
+      font-size:13px;
+      font-weight:900;
+      line-height:1;
+      color:#fff;
+    }
+
+    .balls-toggle-dot{
+      width:9px;
+      height:9px;
+      border-radius:50%;
+      background: linear-gradient(180deg, #ffffff, #d9f3ff 60%, #9fdcff 100%);
+      box-shadow: inset 0 1px 1px rgba(255,255,255,.5);
+    }
+
+    .quick-bets,
+    .ball-picks{
       display:grid;
-      grid-template-columns:repeat(5, minmax(0,1fr));
       gap:8px;
       max-height:0;
       opacity:0;
@@ -562,13 +584,30 @@
       transition:max-height .2s ease, opacity .2s ease, margin .2s ease;
     }
 
-    .quick-bets.show{
-      max-height:80px;
+    .quick-bets{
+      grid-template-columns:repeat(5, minmax(0,1fr));
+    }
+
+    .quick-bets.show,
+    .ball-picks.show{
       opacity:1;
       margin-top:8px;
     }
 
-    .quick-btn{
+    .quick-bets.show{
+      max-height:80px;
+    }
+
+    .ball-picks{
+      grid-template-columns:repeat(3, minmax(0,1fr));
+    }
+
+    .ball-picks.show{
+      max-height:92px;
+    }
+
+    .quick-btn,
+    .ball-pick-btn{
       height:36px;
       border:none;
       border-radius:13px;
@@ -580,33 +619,15 @@
       font-weight:900;
     }
 
-    .quick-btn:active{ transform:scale(.98); }
-
-    .ball-counts{
-      display:grid;
-      grid-template-columns:repeat(3, minmax(0,1fr));
-      gap:8px;
+    .quick-btn:active,
+    .ball-pick-btn:active{
+      transform:scale(.98);
     }
 
-    .count-btn{
-      height:40px;
-      border:none;
-      border-radius:14px;
-      cursor:pointer;
-      background: rgba(255,255,255,.06);
-      border:1px solid rgba(255,255,255,.08);
-      color:#fff;
-      font-size:12px;
-      font-weight:900;
-      transition: transform .16s ease, background .16s ease, box-shadow .16s ease;
-    }
-
-    .count-btn.active{
+    .ball-pick-btn.active{
       background: linear-gradient(180deg, rgba(42,171,238,.92), rgba(34,158,217,.92));
-      box-shadow: 0 12px 20px rgba(34,158,217,.20);
+      box-shadow: 0 10px 18px rgba(34,158,217,.18);
     }
-
-    .count-btn:active{ transform:scale(.98); }
 
     .bottom-notice{
       position:fixed;
@@ -830,12 +851,11 @@
       .bal-amount{ min-width:74px; height:24px; font-size:12px; }
       .ball{ width:14px; height:14px; }
       .bucket{ font-size:10px; height:34px; }
-      .bet-row{ grid-template-columns:minmax(0,1fr) 44px; }
+      .bet-row{ grid-template-columns:minmax(0,1fr) 44px 44px; }
       .bet-input{ height:44px; font-size:15px; }
       .bet-toggle{ width:44px; height:44px; }
-      .bet-toggle svg{ width:22px; height:22px; }
+      .bet-toggle svg{ width:20px; height:20px; }
       .play-btn, .claim-btn{ height:48px; font-size:14px; }
-      .count-btn{ height:38px; }
       .pre-logo{ width:76px; height:76px; }
     }
 
@@ -914,21 +934,17 @@
 
             <button class="bet-toggle" id="betToggleBtn" type="button" aria-label="Быстрая ставка">
               <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                <defs>
-                  <linearGradient id="quickBetGrad" x1="4" y1="4" x2="20" y2="20">
-                    <stop offset="0" stop-color="#FDE68A"/>
-                    <stop offset="0.52" stop-color="#F59E0B"/>
-                    <stop offset="1" stop-color="#D97706"/>
-                  </linearGradient>
-                </defs>
-
-                <ellipse cx="10" cy="16.5" rx="5.3" ry="2.6" fill="url(#quickBetGrad)" stroke="rgba(255,255,255,.22)" />
-                <ellipse cx="10" cy="13.1" rx="5.3" ry="2.6" fill="url(#quickBetGrad)" stroke="rgba(255,255,255,.22)" />
-                <ellipse cx="10" cy="9.7" rx="5.3" ry="2.6" fill="url(#quickBetGrad)" stroke="rgba(255,255,255,.22)" />
-
-                <circle cx="18" cy="8" r="4.1" fill="url(#quickBetGrad)" stroke="rgba(255,255,255,.24)" />
-                <path d="M18 6.2v3.6M16.2 8h3.6" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/>
+                <path d="M6 7H14" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/>
+                <path d="M6 12H16" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/>
+                <path d="M6 17H12" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/>
+                <path d="M18 8V14" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/>
+                <path d="M15 11H21" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/>
               </svg>
+            </button>
+
+            <button class="bet-toggle balls-toggle" id="ballsToggleBtn" type="button" aria-label="Выбор количества шариков">
+              <span class="balls-toggle-num" id="ballsToggleValue">1</span>
+              <span class="balls-toggle-dot"></span>
             </button>
           </div>
 
@@ -939,14 +955,14 @@
             <button class="quick-btn" data-bet="100" type="button">100</button>
             <button class="quick-btn" data-bet="250" type="button">250</button>
           </div>
-        </div>
 
-        <div>
-          <p class="label">Шарики</p>
-          <div class="ball-counts">
-            <button class="count-btn active" data-count="1" type="button">1 шар</button>
-            <button class="count-btn" data-count="2" type="button">2 шара</button>
-            <button class="count-btn" data-count="3" type="button">3 шара</button>
+          <div class="ball-picks" id="ballPicks">
+            <button class="ball-pick-btn active" data-count="1" type="button">1</button>
+            <button class="ball-pick-btn" data-count="2" type="button">2</button>
+            <button class="ball-pick-btn" data-count="3" type="button">3</button>
+            <button class="ball-pick-btn" data-count="4" type="button">4</button>
+            <button class="ball-pick-btn" data-count="5" type="button">5</button>
+            <button class="ball-pick-btn" data-count="6" type="button">6</button>
           </div>
         </div>
       </div>
@@ -987,12 +1003,6 @@
 
     const MULTIPLIERS = [10, 5, 2, 0.4, 0.2, 0.4, 2, 5, 10];
 
-    // Чуть выше шанс на выигрыш:
-    // 10x = 1%
-    // 5x  = 5%
-    // 2x  = 20%
-    // 0.4 = 40%
-    // 0.2 = 34%
     const TARGET_WEIGHTS = [
       0.005, // 10
       0.025, // 5
@@ -1045,6 +1055,7 @@
     let pendingWin = 0;
     let isPlaying = false;
     let quickVisible = false;
+    let ballsVisible = false;
     let selectedBalls = 1;
     let speedIndex = 1;
     let noticeTimer = null;
@@ -1138,6 +1149,15 @@
     function setQuickVisible(show){
       quickVisible = !!show;
       $("quickBets").classList.toggle("show", quickVisible);
+    }
+
+    function setBallsVisible(show){
+      ballsVisible = !!show;
+      $("ballPicks").classList.toggle("show", ballsVisible);
+    }
+
+    function updateBallsToggleUI(){
+      $("ballsToggleValue").textContent = String(selectedBalls);
     }
 
     function updateButtons(){
@@ -1303,7 +1323,6 @@
       const dy = y2 - y1;
       const dist = Math.hypot(dx, dy);
 
-      // Убираем мелкие "точки" — рисуем только нормальный отрезок
       if (dist < 4) return;
 
       const line = document.createElement("div");
@@ -1392,7 +1411,6 @@
 
         const dir = route[row];
 
-        // Точка касания сверху-сбоку, чтобы шар НЕ входил в штырёк
         const hitPoint = {
           x: pegX - dir * touchDx,
           y: pegY - touchDy
@@ -1408,7 +1426,6 @@
 
         lane += dir;
 
-        // Выход снизу-сбоку, тоже мимо центра штырька
         const reboundPoint = {
           x: clamp(
             pegX + dir * leaveDx,
@@ -1453,12 +1470,12 @@
     }
 
     function createBallState(i){
-      const spread = (i - (selectedBalls - 1) / 2) * 8;
+      const spread = (i - (selectedBalls - 1) / 2) * 6.5;
 
       const startX = clamp(
         BOARD_CENTER_X + spread + (Math.random() - 0.5) * 2,
-        BOARD_CENTER_X - 12,
-        BOARD_CENTER_X + 12
+        BOARD_CENTER_X - 20,
+        BOARD_CENTER_X + 20
       );
 
       const targetIndex = chooseTargetBucket();
@@ -1482,7 +1499,7 @@
         segments,
         segmentIndex: 0,
         segmentT: 0,
-        startDelay: i * 120,
+        startDelay: i * 110,
         active: false,
 
         trailTick: Math.random() * 12,
@@ -1616,6 +1633,7 @@
 
       isPlaying = true;
       setQuickVisible(false);
+      setBallsVisible(false);
       $("ballsLayer").innerHTML = "";
       updateButtons();
 
@@ -1689,6 +1707,12 @@
 
     $("betToggleBtn").addEventListener("click", () => {
       setQuickVisible(!quickVisible);
+      if (!quickVisible) setBallsVisible(false);
+    });
+
+    $("ballsToggleBtn").addEventListener("click", () => {
+      setBallsVisible(!ballsVisible);
+      if (!ballsVisible) setQuickVisible(false);
     });
 
     document.querySelectorAll(".quick-btn").forEach((btn) => {
@@ -1699,16 +1723,18 @@
       });
     });
 
-    $("betInput").addEventListener("input", updateButtons);
-
-    document.querySelectorAll(".count-btn").forEach((btn) => {
+    document.querySelectorAll(".ball-pick-btn").forEach((btn) => {
       btn.addEventListener("click", () => {
-        document.querySelectorAll(".count-btn").forEach(b => b.classList.remove("active"));
+        document.querySelectorAll(".ball-pick-btn").forEach(b => b.classList.remove("active"));
         btn.classList.add("active");
         selectedBalls = Number(btn.dataset.count || 1);
+        updateBallsToggleUI();
+        setBallsVisible(false);
         updateButtons();
       });
     });
+
+    $("betInput").addEventListener("input", updateButtons);
 
     $("playBtn").addEventListener("click", playRound);
     $("claimBtn").addEventListener("click", claimWin);
@@ -1721,6 +1747,7 @@
       createBoard();
       $("speedBtn").textContent = SPEEDS[speedIndex].label;
       $("claimBtn").style.display = "none";
+      updateBallsToggleUI();
       updateButtons();
 
       setTimeout(() => {
