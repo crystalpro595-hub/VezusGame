@@ -1,0 +1,1423 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Mines</title>
+
+  <link rel="preconnect" href="https://i.postimg.cc" crossorigin>
+  <link rel="dns-prefetch" href="https://i.postimg.cc">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  <link rel="preload" as="image" href="https://i.postimg.cc/qvL497mF/Picsart-26-02-27-02-02-37-502.png">
+  <link rel="preload" as="image" href="https://i.postimg.cc/mDjzbZ5Y/Picsart-26-03-03-12-46-32-641.png">
+  <link rel="preload" as="image" href="https://i.postimg.cc/ncBsz1gH/Picsart-26-03-03-12-46-14-937.png">
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --text:#eaf1ff;
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+      --safe-top: env(safe-area-inset-top, 0px);
+
+      --glass: rgba(12, 14, 20, .80);
+      --stroke: rgba(255,255,255,.08);
+      --shadow: 0 16px 38px rgba(0,0,0,.42);
+      --shadow-soft: 0 10px 22px rgba(0,0,0,.28);
+
+      --tg1:#2AABEE;
+      --tg2:#229ED9;
+      --green1:#22c55e;
+      --green2:#16a34a;
+      --violet1:#8b5cf6;
+      --violet2:#6d28d9;
+    }
+
+    *{
+      box-sizing:border-box;
+      font-family:'Inter', sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html, body{
+      height:100%;
+      margin:0;
+      overflow:hidden;
+      color:var(--text);
+      background:#020617;
+    }
+
+    body{
+      background-image:url("https://i.postimg.cc/fbJT34yY/076E519D-F095-4957-88BF-5591DEB82533.png");
+      background-size:cover;
+      background-position:center;
+      background-repeat:no-repeat;
+    }
+
+    body::before{
+      content:"";
+      position:fixed;
+      inset:0;
+      background:
+        radial-gradient(900px 600px at 30% 10%, rgba(255,255,255,.05), transparent 60%),
+        linear-gradient(180deg, rgba(0,0,0,.38), rgba(0,0,0,.64));
+      pointer-events:none;
+      z-index:0;
+    }
+
+    *::-webkit-scrollbar{ display:none; }
+
+    .app{
+      position:relative;
+      height:100%;
+      overflow:auto;
+      padding:0 12px calc(18px + var(--safe-bottom)) 12px;
+      z-index:1;
+      overscroll-behavior: contain;
+      scrollbar-width:none;
+    }
+
+    .content{
+      width:100%;
+      max-width:460px;
+      margin:0 auto;
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+      position:relative;
+      z-index:1;
+    }
+
+    .sticky-top{
+      position:sticky;
+      top:0;
+      z-index:40;
+      padding-top: calc(6px + var(--safe-top));
+      padding-bottom:6px;
+      background:
+        linear-gradient(180deg,
+          rgba(2,6,23,.96) 0%,
+          rgba(2,6,23,.86) 72%,
+          rgba(2,6,23,0) 100%);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+    }
+
+    .top-row{
+      width:100%;
+      display:grid;
+      grid-template-columns:36px minmax(0,1fr) 36px 46px;
+      gap:6px;
+      align-items:center;
+    }
+
+    .icon-btn,
+    .rule-btn{
+      width:36px;
+      height:36px;
+      border:none;
+      border-radius:12px;
+      background: var(--glass);
+      border:1px solid var(--stroke);
+      box-shadow: var(--shadow-soft), inset 0 1px 0 rgba(255,255,255,.04);
+      display:grid;
+      place-items:center;
+      color:var(--text);
+      cursor:pointer;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      padding:0;
+    }
+
+    .icon-btn{
+      font-size:16px;
+      font-weight:900;
+    }
+
+    .icon-btn:active,
+    .rule-btn:active{
+      transform:scale(.98);
+    }
+
+    .rule-btn svg{
+      width:16px;
+      height:16px;
+      stroke: rgba(234,241,255,.92);
+      fill:none;
+      stroke-width:2;
+      stroke-linecap:round;
+      stroke-linejoin:round;
+      display:block;
+    }
+
+    .balance-mini{
+      width:100%;
+      min-width:0;
+      height:38px;
+      border-radius:999px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:6px;
+      padding:5px 6px 5px 10px;
+      position:relative;
+      overflow:hidden;
+      background: var(--glass);
+      border:1px solid var(--stroke);
+      box-shadow: var(--shadow), inset 0 1px 0 rgba(255,255,255,.04);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+
+    .balance-mini::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      background:
+        radial-gradient(140px 50px at 0% 0%, rgba(255,255,255,.05), transparent 55%),
+        radial-gradient(140px 50px at 100% 100%, rgba(255,255,255,.03), transparent 55%);
+      pointer-events:none;
+    }
+
+    .bal-title{
+      position:relative;
+      z-index:1;
+      font-size:11px;
+      font-weight:900;
+      color: rgba(234,241,255,.92);
+      white-space:nowrap;
+    }
+
+    .bal-amount{
+      position:relative;
+      z-index:1;
+      min-width:72px;
+      height:24px;
+      border:none;
+      border-radius:999px;
+      padding:0 8px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background: rgba(255,255,255,.08);
+      border:1px solid rgba(255,255,255,.08);
+      color: rgba(234,241,255,.98);
+      font-weight:900;
+      font-size:12px;
+      white-space:nowrap;
+      pointer-events:none;
+    }
+
+    .logo-btn{
+      width:46px;
+      height:46px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background:transparent;
+      border:none;
+      padding:0;
+      margin:0;
+      cursor:pointer;
+    }
+
+    .logo-btn:active{ transform:scale(.98); }
+
+    .logo-btn img{
+      width:100%;
+      height:100%;
+      object-fit:contain;
+      display:block;
+    }
+
+    .card{
+      border-radius:18px;
+      background: var(--glass);
+      border:1px solid var(--stroke);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      overflow:hidden;
+    }
+
+    .hero-card{
+      padding:8px;
+    }
+
+    .stats-grid{
+      display:grid;
+      grid-template-columns:repeat(3, minmax(0,1fr));
+      gap:6px;
+    }
+
+    .stat-box{
+      min-height:48px;
+      border-radius:12px;
+      padding:6px;
+      background: rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.08);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.04);
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+      gap:3px;
+    }
+
+    .stat-label{
+      font-size:9px;
+      font-weight:800;
+      color:rgba(234,241,255,.62);
+      line-height:1;
+    }
+
+    .stat-value{
+      font-size:12px;
+      font-weight:900;
+      color:#fff;
+      line-height:1.1;
+      word-break:break-word;
+    }
+
+    .board-wrap{
+      padding:8px;
+    }
+
+    .board{
+      width:100%;
+      display:grid;
+      grid-template-columns:repeat(5, minmax(0,1fr));
+      gap:6px;
+    }
+
+    .cell{
+      aspect-ratio:1 / 1;
+      border:none;
+      border-radius:12px;
+      cursor:pointer;
+      position:relative;
+      display:grid;
+      place-items:center;
+      padding:0;
+      transition: transform .18s ease, box-shadow .18s ease, background .18s ease, border-color .18s ease, opacity .18s ease;
+      border:1px solid rgba(255,255,255,.08);
+      box-shadow:
+        0 8px 18px rgba(0,0,0,.16),
+        inset 0 1px 0 rgba(255,255,255,.04);
+    }
+
+    .cell:active{
+      transform:scale(.97);
+    }
+
+    .cell.locked{
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.04));
+    }
+
+    .cell.locked:hover{
+      border-color: rgba(42,171,238,.16);
+    }
+
+    .cell.safe{
+      background:
+        linear-gradient(180deg, rgba(34,211,238,.24), rgba(8,145,178,.12));
+      border-color: rgba(34,211,238,.22);
+      box-shadow:
+        0 8px 18px rgba(0,0,0,.14),
+        0 0 14px rgba(34,211,238,.10),
+        inset 0 1px 0 rgba(255,255,255,.07);
+    }
+
+    .cell.mine{
+      background:
+        linear-gradient(180deg, rgba(239,68,68,.25), rgba(220,38,38,.13));
+      border-color: rgba(239,68,68,.22);
+      box-shadow:
+        0 8px 18px rgba(0,0,0,.14),
+        0 0 14px rgba(239,68,68,.10),
+        inset 0 1px 0 rgba(255,255,255,.07);
+    }
+
+    .cell.reveal-safe{
+      animation: revealSafe .32s cubic-bezier(.22,1,.36,1);
+    }
+
+    .cell.reveal-mine{
+      animation: revealMine .32s cubic-bezier(.22,1,.36,1);
+    }
+
+    @keyframes revealSafe{
+      0%{ transform: scale(.72); opacity:.18; }
+      60%{ transform: scale(1.08); opacity:1; }
+      100%{ transform: scale(1); opacity:1; }
+    }
+
+    @keyframes revealMine{
+      0%{ transform: scale(.72); opacity:.18; }
+      60%{ transform: scale(1.08); opacity:1; }
+      100%{ transform: scale(1); opacity:1; }
+    }
+
+    .cell.disabled{
+      cursor:default;
+    }
+
+    .cell-dot{
+      width:7px;
+      height:7px;
+      border-radius:50%;
+      background: rgba(255,255,255,.18);
+      box-shadow: 0 0 8px rgba(255,255,255,.06);
+    }
+
+    .safe-icon,
+    .mine-icon{
+      width:60%;
+      height:60%;
+      object-fit:contain;
+      display:block;
+      filter: drop-shadow(0 3px 6px rgba(0,0,0,.18));
+      user-select:none;
+      pointer-events:none;
+    }
+
+    .panel{
+      padding:10px;
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+    }
+
+    .label{
+      font-size:12px;
+      font-weight:900;
+      color: rgba(234,241,255,.94);
+      margin-bottom:7px;
+    }
+
+    .bet-row{
+      display:grid;
+      grid-template-columns:minmax(0,1fr) 42px;
+      gap:6px;
+      align-items:center;
+    }
+
+    .bet-input{
+      width:100%;
+      height:42px;
+      border-radius:14px;
+      border:1px solid rgba(255,255,255,.08);
+      background: rgba(255,255,255,.06);
+      color:#fff;
+      font-size:15px;
+      font-weight:900;
+      padding:0 12px;
+      outline:none;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.04);
+      text-align:center;
+    }
+
+    .bet-input::placeholder{
+      color: rgba(234,241,255,.42);
+      font-weight:800;
+    }
+
+    .bet-toggle{
+      width:42px;
+      height:42px;
+      border:none;
+      border-radius:14px;
+      cursor:pointer;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.14), rgba(255,255,255,.06));
+      border:1px solid rgba(255,255,255,.12);
+      color:#fff;
+      display:grid;
+      place-items:center;
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.08),
+        0 6px 14px rgba(0,0,0,.14);
+      padding:0;
+    }
+
+    .bet-toggle:active{ transform:scale(.98); }
+
+    .bet-toggle svg{
+      width:19px;
+      height:19px;
+      display:block;
+      filter: drop-shadow(0 3px 6px rgba(0,0,0,.18));
+    }
+
+    .quick-bets{
+      display:grid;
+      grid-template-columns:repeat(5, minmax(0,1fr));
+      gap:6px;
+      max-height:0;
+      opacity:0;
+      overflow:hidden;
+      margin-top:0;
+      transition:max-height .24s ease, opacity .24s ease, margin .24s ease;
+    }
+
+    .quick-bets.show{
+      max-height:60px;
+      opacity:1;
+      margin-top:8px;
+    }
+
+    .quick-btn{
+      height:32px;
+      border:none;
+      border-radius:11px;
+      cursor:pointer;
+      background: rgba(255,255,255,.08);
+      border:1px solid rgba(255,255,255,.08);
+      color:#fff;
+      font-size:11px;
+      font-weight:900;
+      transition: transform .16s ease, opacity .2s ease, background .16s ease;
+    }
+
+    .quick-btn:active{ transform:scale(.98); }
+
+    .mine-count-row{
+      display:grid;
+      grid-template-columns:repeat(4, minmax(0,1fr));
+      gap:6px;
+    }
+
+    .mine-count-btn{
+      height:36px;
+      border:none;
+      border-radius:12px;
+      cursor:pointer;
+      background: rgba(255,255,255,.07);
+      border:1px solid rgba(255,255,255,.08);
+      color:#fff;
+      font-size:11px;
+      font-weight:900;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.03);
+      transition: transform .18s ease, background .18s ease, border-color .18s ease, opacity .2s ease;
+    }
+
+    .mine-count-btn.active{
+      background:
+        linear-gradient(180deg, rgba(139,92,246,.28), rgba(109,40,217,.16));
+      border-color: rgba(139,92,246,.24);
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.05),
+        0 0 12px rgba(139,92,246,.08);
+    }
+
+    .mine-count-btn:disabled{
+      opacity:.55;
+      cursor:not-allowed;
+    }
+
+    .mine-count-btn:active{
+      transform:scale(.98);
+    }
+
+    .action-grid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:8px;
+    }
+
+    .start-btn,
+    .cash-btn{
+      width:100%;
+      height:42px;
+      border:none;
+      border-radius:14px;
+      cursor:pointer;
+      color:#fff;
+      font-size:12px;
+      font-weight:900;
+      letter-spacing:.2px;
+      transition: transform .16s ease, opacity .16s ease, box-shadow .16s ease;
+    }
+
+    .start-btn{
+      background: linear-gradient(180deg, var(--tg1), var(--tg2));
+      box-shadow: 0 12px 24px rgba(34,158,217,.22);
+    }
+
+    .cash-btn{
+      background: linear-gradient(180deg, var(--green1), var(--green2));
+      box-shadow: 0 12px 24px rgba(34,197,94,.20);
+    }
+
+    .start-btn:active,
+    .cash-btn:active{
+      transform: scale(.985);
+    }
+
+    .start-btn:disabled,
+    .cash-btn:disabled{
+      opacity:.55;
+      cursor:not-allowed;
+      box-shadow:none;
+      transform:none !important;
+    }
+
+    .bottom-notice{
+      position:fixed;
+      left:50%;
+      bottom: calc(12px + var(--safe-bottom));
+      transform: translateX(-50%) translateY(16px) scale(.98);
+      width:min(360px, calc(100% - 24px));
+      min-height:40px;
+      border-radius:14px;
+      padding:8px 10px;
+      display:flex;
+      align-items:center;
+      gap:8px;
+      color:#fff;
+      font-size:11px;
+      font-weight:900;
+      box-shadow:0 12px 24px rgba(0,0,0,.22);
+      opacity:0;
+      pointer-events:none;
+      transition: opacity .18s ease, transform .18s ease;
+      z-index:500;
+      border:1px solid rgba(255,255,255,.10);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      overflow:hidden;
+    }
+
+    .bottom-notice.show{
+      opacity:1;
+      transform: translateX(-50%) translateY(0) scale(1);
+    }
+
+    .bottom-notice.win{
+      background: linear-gradient(180deg, rgba(34,197,94,.92), rgba(22,163,74,.92));
+    }
+
+    .bottom-notice.lose{
+      background: linear-gradient(180deg, rgba(239,68,68,.92), rgba(220,38,38,.92));
+    }
+
+    .bottom-notice.info{
+      background: linear-gradient(180deg, rgba(42,171,238,.92), rgba(34,158,217,.92));
+    }
+
+    .notice-icon{
+      width:20px;
+      height:20px;
+      border-radius:7px;
+      display:grid;
+      place-items:center;
+      background: rgba(255,255,255,.14);
+      flex:0 0 auto;
+      font-size:11px;
+    }
+
+    .notice-text{
+      flex:1;
+      min-width:0;
+      line-height:1.2;
+    }
+
+    .overlay{
+      position:fixed;
+      inset:0;
+      background: rgba(0,0,0,.72);
+      opacity:0;
+      pointer-events:none;
+      transition: opacity .22s ease;
+      z-index:260;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:14px;
+    }
+
+    .overlay.show{
+      opacity:1;
+      pointer-events:auto;
+    }
+
+    .popup{
+      width:min(420px, 100%);
+      border-radius:18px;
+      overflow:hidden;
+      background: rgba(14,16,24,.94);
+      border: 1px solid rgba(255,255,255,.08);
+      box-shadow: 0 28px 70px rgba(0,0,0,.56);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      position:relative;
+      transform: translateY(12px) scale(.98);
+      opacity:.95;
+      transition: transform .22s ease, opacity .22s ease;
+    }
+
+    .overlay.show .popup{
+      transform: translateY(0) scale(1);
+      opacity:1;
+    }
+
+    .popup-head{
+      padding:12px 12px 8px 12px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      background: rgba(255,255,255,.03);
+      border-bottom: 1px solid rgba(255,255,255,.06);
+    }
+
+    .popup-title{
+      font-weight:900;
+      letter-spacing:.25px;
+      font-size:13px;
+      color: rgba(234,241,255,.95);
+    }
+
+    .popup-x{
+      width:34px;
+      height:34px;
+      border-radius:12px;
+      border:1px solid rgba(255,255,255,.08);
+      background: rgba(255,255,255,.05);
+      color: rgba(234,241,255,.92);
+      cursor:pointer;
+      display:grid;
+      place-items:center;
+      box-shadow: 0 10px 20px rgba(0,0,0,.26);
+      padding:0;
+    }
+
+    .popup-x:active{ transform: scale(.98); }
+
+    .popup-body{
+      padding:12px;
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+    }
+
+    .popup-text,
+    .rule-line{
+      margin:0;
+      font-size:12px;
+      line-height:1.4;
+      color: rgba(234,241,255,.88);
+    }
+
+    .tg-btn{
+      border:none;
+      cursor:pointer;
+      width:100%;
+      height:44px;
+      border-radius:14px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:10px;
+      background: linear-gradient(180deg, var(--tg1), var(--tg2));
+      box-shadow:
+        0 12px 24px rgba(34,158,217,.24),
+        inset 0 1px 0 rgba(255,255,255,.14);
+      color:#fff;
+      font-weight:900;
+      letter-spacing:.2px;
+      font-size:13px;
+    }
+
+    .tg-btn:active{ transform: scale(.99); }
+
+    .tg-ico{
+      width:20px;
+      height:20px;
+      display:block;
+      filter: drop-shadow(0 8px 14px rgba(0,0,0,.18));
+    }
+
+    @media (max-width: 360px){
+      .app{ padding:0 10px calc(14px + var(--safe-bottom)) 10px; }
+      .content{ gap:8px; }
+      .board{ gap:5px; }
+      .cell{ border-radius:10px; }
+      .quick-bets{ grid-template-columns:repeat(5, minmax(0,1fr)); gap:5px; }
+      .quick-btn{ font-size:10px; }
+      .mine-count-row{ gap:5px; }
+      .mine-count-btn{ font-size:10px; height:34px; }
+      .stat-box{ min-height:44px; }
+      .stat-label{ font-size:8px; }
+      .stat-value{ font-size:11px; }
+    }
+
+    @media (prefers-reduced-motion: reduce){
+      *{ transition:none !important; animation:none !important; }
+      .overlay.show .popup{ transform:none !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="bottom-notice info" id="bottomNotice" aria-live="polite">
+    <div class="notice-icon" id="noticeIcon">ℹ</div>
+    <div class="notice-text" id="noticeText">Сообщение</div>
+  </div>
+
+  <div class="app">
+    <div class="content">
+
+      <div class="sticky-top">
+        <div class="top-row">
+          <button class="icon-btn" id="backBtn" aria-label="Назад">←</button>
+
+          <div class="balance-mini" aria-label="Баланс">
+            <span class="bal-title">Баланс</span>
+            <div class="bal-amount" id="balanceValue">...</div>
+          </div>
+
+          <button class="rule-btn" id="rulesBtn" aria-label="Правила">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M9 9a3 3 0 1 1 5.2 2.1c-.9.9-1.7 1.5-1.7 2.9"></path>
+              <path d="M12 17h.01"></path>
+              <circle cx="12" cy="12" r="9"></circle>
+            </svg>
+          </button>
+
+          <button class="logo-btn" id="logoBtn" aria-label="Открыть Telegram канал">
+            <img
+              src="https://i.postimg.cc/qvL497mF/Picsart-26-02-27-02-02-37-502.png"
+              alt="Vezus"
+              loading="eager"
+              fetchpriority="high"
+              decoding="async"
+            >
+          </button>
+        </div>
+      </div>
+
+      <div class="card hero-card">
+        <div class="stats-grid">
+          <div class="stat-box">
+            <div class="stat-label">Умножение</div>
+            <div class="stat-value" id="multiplierValue">x1.00</div>
+          </div>
+
+          <div class="stat-box">
+            <div class="stat-label">Мин</div>
+            <div class="stat-value" id="minesCountView">3</div>
+          </div>
+
+          <div class="stat-box">
+            <div class="stat-label">Забрать</div>
+            <div class="stat-value" id="cashoutValue">0 VC</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card board-wrap">
+        <div class="board" id="board"></div>
+      </div>
+
+      <div class="card panel">
+        <div>
+          <div class="label">Ставка</div>
+
+          <div class="bet-row">
+            <input
+              class="bet-input"
+              id="betInput"
+              type="number"
+              min="10"
+              step="1"
+              inputmode="numeric"
+              placeholder="Мин. 10"
+              value="10"
+            >
+
+            <button class="bet-toggle" id="betToggleBtn" type="button" aria-label="Быстрые ставки">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <g fill="none" stroke="rgba(255,255,255,.96)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="9" cy="12" r="3.7"></circle>
+                  <circle cx="14.8" cy="12" r="3.7"></circle>
+                  <path d="M18.5 6.2v4.2"></path>
+                  <path d="M16.4 8.3h4.2"></path>
+                </g>
+              </svg>
+            </button>
+          </div>
+
+          <div class="quick-bets" id="quickBets">
+            <button class="quick-btn" data-bet="10" type="button">10</button>
+            <button class="quick-btn" data-bet="25" type="button">25</button>
+            <button class="quick-btn" data-bet="50" type="button">50</button>
+            <button class="quick-btn" data-bet="100" type="button">100</button>
+            <button class="quick-btn" data-bet="250" type="button">250</button>
+          </div>
+        </div>
+
+        <div>
+          <div class="label">Количество мин</div>
+
+          <div class="mine-count-row">
+            <button class="mine-count-btn active" data-mines="3" type="button">3</button>
+            <button class="mine-count-btn" data-mines="5" type="button">5</button>
+            <button class="mine-count-btn" data-mines="7" type="button">7</button>
+            <button class="mine-count-btn" data-mines="10" type="button">10</button>
+          </div>
+        </div>
+
+        <div class="action-grid">
+          <button class="start-btn" id="startBtn" type="button">Начать</button>
+          <button class="cash-btn" id="cashBtn" type="button" disabled>Забрать</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="overlay" id="rulesOverlay" aria-hidden="true">
+    <div class="popup" role="dialog" aria-modal="true" aria-label="Правила">
+      <div class="popup-head">
+        <div class="popup-title">Правила игры</div>
+        <button class="popup-x" id="rulesClose" aria-label="Закрыть">✕</button>
+      </div>
+
+      <div class="popup-body">
+        <p class="rule-line">• Пока игра работает только на <b>LocalStorage</b></p>
+        <p class="rule-line">• Если баланса нет, автоматически создаётся <b>1000 VC</b></p>
+        <p class="rule-line">• Нажми <b>«Начать»</b> — ставка спишется сразу</p>
+        <p class="rule-line">• Открывай безопасные клетки и жми <b>«Забрать»</b></p>
+        <p class="rule-line">• Если попадёшь на мину — ставка сгорает</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="overlay" id="channelOverlay" aria-hidden="true">
+    <div class="popup" role="dialog" aria-modal="true" aria-label="Telegram канал">
+      <div class="popup-head">
+        <div class="popup-title">Наш Telegram канал</div>
+        <button class="popup-x" id="channelClose" aria-label="Закрыть">✕</button>
+      </div>
+
+      <div class="popup-body">
+        <p class="popup-text">
+          Нажми кнопку ниже — откроется наш Telegram канал:
+          <b>@vezuspubg</b>
+        </p>
+
+        <button class="tg-btn" id="goChannel" aria-label="Перейти в Telegram канал">
+          <svg class="tg-ico" viewBox="0 0 240 240" aria-hidden="true">
+            <path fill="#fff" d="M120 0C53.7 0 0 53.7 0 120s53.7 120 120 120 120-53.7 120-120S186.3 0 120 0zm58.7 82.3l-19.7 92.8c-1.5 6.6-5.4 8.2-10.9 5.1l-30.2-22.3-14.6 14c-1.6 1.6-3 3-6.1 3l2.2-31.6 57.5-52c2.5-2.2-.5-3.4-3.9-1.2l-71 44.7-30.6-9.6c-6.6-2.1-6.7-6.6 1.4-9.7l119.6-46.1c5.5-2 10.3 1.3 8.8 9.9z"/>
+          </svg>
+          Перейти в Telegram канал
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <script>
+    const PROFILE_KEY = "tg_profile";
+    const ROUND_KEY = "mines_round_v2";
+
+    const DEFAULT_BALANCE = 1000;
+    const MIN_BET = 10;
+    const TOTAL_CELLS = 25;
+    const HOUSE_EDGE_MULT = 0.72;
+
+    const SAFE_ICON_SRC = "https://i.postimg.cc/mDjzbZ5Y/Picsart-26-03-03-12-46-32-641.png";
+    const MINE_ICON_SRC = "https://i.postimg.cc/ncBsz1gH/Picsart-26-03-03-12-46-14-937.png";
+
+    const FILES = {
+      games: "games.html"
+    };
+
+    const $ = (id) => document.getElementById(id);
+
+    let currentBalance = 0;
+    let selectedMines = 3;
+    let roundState = null;
+    let quickVisible = false;
+    let noticeTimer = null;
+    let lastRevealIndex = -1;
+    let lastRevealType = "";
+
+    function formatVc(value){
+      const n = Number(value ?? 0);
+      if (!Number.isFinite(n)) return "0 VC";
+      return Number.isInteger(n) ? `${n} VC` : `${n.toFixed(2)} VC`;
+    }
+
+    function goTo(file){
+      window.location.href = file;
+    }
+
+    function openTelegramLinkSafe(url){
+      if (window.Telegram && window.Telegram.WebApp && typeof window.Telegram.WebApp.openTelegramLink === "function") {
+        window.Telegram.WebApp.openTelegramLink(url);
+        return;
+      }
+      window.open(url, "_blank", "noopener");
+    }
+
+    function showNotice(text, type = "info"){
+      const box = $("bottomNotice");
+      $("noticeText").textContent = text;
+      $("noticeIcon").textContent = type === "win" ? "✓" : type === "lose" ? "✕" : "ℹ";
+
+      box.classList.remove("win", "lose", "info");
+      box.classList.add(type);
+      box.classList.add("show");
+
+      if (noticeTimer) clearTimeout(noticeTimer);
+      noticeTimer = setTimeout(() => {
+        box.classList.remove("show");
+      }, 1900);
+    }
+
+    function readProfile(){
+      try{
+        return JSON.parse(localStorage.getItem(PROFILE_KEY) || "null");
+      } catch {
+        return null;
+      }
+    }
+
+    function writeProfile(profile){
+      localStorage.setItem(PROFILE_KEY, JSON.stringify(profile));
+    }
+
+    function ensureProfile(){
+      const cached = readProfile();
+      if (cached && Number.isFinite(Number(cached.balance))) {
+        currentBalance = Number(cached.balance) || 0;
+        return;
+      }
+
+      const profile = { balance: DEFAULT_BALANCE };
+      currentBalance = profile.balance;
+      writeProfile(profile);
+    }
+
+    function saveBalance(){
+      const profile = readProfile() || {};
+      profile.balance = currentBalance;
+      writeProfile(profile);
+    }
+
+    function loadRoundState(){
+      try{
+        const parsed = JSON.parse(localStorage.getItem(ROUND_KEY) || "null");
+        if (!parsed || typeof parsed !== "object") return null;
+        if (!Array.isArray(parsed.mineIndexes) || !Array.isArray(parsed.opened)) return null;
+
+        const validMines = Number(parsed.minesCount);
+        if (![3,5,7,10].includes(validMines)) return null;
+
+        if (validMines >= TOTAL_CELLS) return null;
+
+        return parsed;
+      } catch {
+        return null;
+      }
+    }
+
+    function saveRoundState(){
+      if (!roundState) {
+        localStorage.removeItem(ROUND_KEY);
+        return;
+      }
+      localStorage.setItem(ROUND_KEY, JSON.stringify(roundState));
+    }
+
+    function getBetAmount(){
+      const raw = $("betInput").value;
+      const amount = Number(raw);
+      if (!raw || !Number.isFinite(amount)) return 0;
+      return Math.floor(amount);
+    }
+
+    function setQuickVisible(show){
+      quickVisible = !!show;
+      $("quickBets").classList.toggle("show", quickVisible);
+    }
+
+    function updateBalanceUI(){
+      $("balanceValue").textContent = formatVc(currentBalance);
+    }
+
+    function calcMultiplier(safePicks, minesCount){
+      const safeCells = TOTAL_CELLS - minesCount;
+      if (safePicks <= 0) return 1;
+
+      let mult = 1;
+
+      for (let i = 0; i < safePicks; i++) {
+        mult *= (TOTAL_CELLS - i) / (safeCells - i);
+      }
+
+      mult *= HOUSE_EDGE_MULT;
+      return Math.max(1, Number(mult.toFixed(2)));
+    }
+
+    function getCurrentMultiplier(){
+      const safePicks = roundState?.safePicks || 0;
+      const minesCount = roundState?.minesCount || selectedMines;
+      return calcMultiplier(safePicks, minesCount);
+    }
+
+    function getCurrentCashout(){
+      if (!roundState) return 0;
+      const multiplier = getCurrentMultiplier();
+      return Number((roundState.bet * multiplier).toFixed(2));
+    }
+
+    function updateMineButtons(){
+      document.querySelectorAll(".mine-count-btn").forEach((btn) => {
+        const mines = Number(btn.getAttribute("data-mines"));
+        const active = mines === selectedMines;
+        btn.classList.toggle("active", active);
+        btn.disabled = !!roundState?.active;
+      });
+
+      $("minesCountView").textContent = String(roundState?.minesCount || selectedMines);
+    }
+
+    function updateStats(){
+      const multiplier = getCurrentMultiplier();
+      $("multiplierValue").textContent = `x${multiplier.toFixed(2)}`;
+
+      if (roundState?.active && roundState.safePicks > 0) {
+        $("cashoutValue").textContent = formatVc(getCurrentCashout());
+      } else if (roundState?.finished && roundState.cashedOut) {
+        $("cashoutValue").textContent = formatVc(roundState.payout || 0);
+      } else {
+        $("cashoutValue").textContent = "0 VC";
+      }
+    }
+
+    function updateButtons(){
+      const bet = getBetAmount();
+      const roundActive = !!roundState?.active;
+      const canStart = !roundActive && bet >= MIN_BET && bet <= currentBalance;
+      const canCash = roundActive && (roundState.safePicks || 0) > 0;
+
+      $("startBtn").disabled = !canStart;
+      $("cashBtn").disabled = !canCash;
+
+      if (roundActive) {
+        $("startBtn").textContent = "Игра идёт";
+      } else if (roundState?.finished) {
+        $("startBtn").textContent = "Новая";
+      } else {
+        $("startBtn").textContent = "Начать";
+      }
+
+      $("cashBtn").textContent = canCash
+        ? `Забрать ${formatVc(getCurrentCashout())}`
+        : "Забрать";
+    }
+
+    function createImage(src, className){
+      const img = document.createElement("img");
+      img.src = src;
+      img.alt = "";
+      img.className = className;
+      img.draggable = false;
+      return img;
+    }
+
+    function renderBoard(){
+      const board = $("board");
+      board.innerHTML = "";
+
+      const animatedIndex = lastRevealIndex;
+      const animatedType = lastRevealType;
+
+      for (let i = 0; i < TOTAL_CELLS; i++) {
+        const cell = document.createElement("button");
+        cell.type = "button";
+        cell.className = "cell";
+
+        const isOpened = !!roundState?.opened?.includes(i);
+        const isMine = !!roundState?.mineIndexes?.includes(i);
+        const showMine = !!(roundState && roundState.finished && roundState.crashed && isMine);
+
+        if (showMine) {
+          cell.classList.add("mine", "disabled");
+          if (i === animatedIndex && animatedType === "mine") {
+            cell.classList.add("reveal-mine");
+          }
+          cell.appendChild(createImage(MINE_ICON_SRC, "mine-icon"));
+          cell.disabled = true;
+        } else if (isOpened) {
+          cell.classList.add("safe", "disabled");
+          if (i === animatedIndex && animatedType === "safe") {
+            cell.classList.add("reveal-safe");
+          }
+          cell.appendChild(createImage(SAFE_ICON_SRC, "safe-icon"));
+          cell.disabled = true;
+        } else {
+          cell.classList.add("locked");
+          cell.disabled = !roundState?.active;
+          const dot = document.createElement("span");
+          dot.className = "cell-dot";
+          cell.appendChild(dot);
+        }
+
+        cell.addEventListener("click", () => openCell(i));
+        board.appendChild(cell);
+      }
+
+      lastRevealIndex = -1;
+      lastRevealType = "";
+    }
+
+    function generateMineIndexes(count){
+      const used = new Set();
+
+      while (used.size < count) {
+        const index = Math.floor(Math.random() * TOTAL_CELLS);
+        used.add(index);
+      }
+
+      return [...used];
+    }
+
+    function startGame(){
+      if (roundState?.active) {
+        showNotice("Сначала закончи текущую игру", "info");
+        return;
+      }
+
+      if (![3,5,7,10].includes(selectedMines)) {
+        selectedMines = 3;
+      }
+
+      const bet = getBetAmount();
+
+      if (bet < MIN_BET) {
+        showNotice(`Минимальная ставка ${MIN_BET} VC`, "lose");
+        return;
+      }
+
+      if (bet > currentBalance) {
+        showNotice("Недостаточно средств", "lose");
+        return;
+      }
+
+      currentBalance -= bet;
+      saveBalance();
+      updateBalanceUI();
+
+      lastRevealIndex = -1;
+      lastRevealType = "";
+
+      roundState = {
+        active: true,
+        finished: false,
+        crashed: false,
+        cashedOut: false,
+        payout: 0,
+        bet,
+        minesCount: selectedMines,
+        mineIndexes: generateMineIndexes(selectedMines),
+        opened: [],
+        safePicks: 0
+      };
+
+      saveRoundState();
+      setQuickVisible(false);
+      updateMineButtons();
+      updateStats();
+      updateButtons();
+      renderBoard();
+
+      showNotice(`Игра началась. Мин: ${selectedMines}`, "info");
+    }
+
+    function finishWithMine(triggerIndex){
+      lastRevealIndex = triggerIndex;
+      lastRevealType = "mine";
+
+      roundState.active = false;
+      roundState.finished = true;
+      roundState.crashed = true;
+      roundState.cashedOut = false;
+      roundState.payout = 0;
+
+      saveRoundState();
+      updateStats();
+      updateButtons();
+      renderBoard();
+
+      showNotice("Ты попал на мину", "lose");
+    }
+
+    function cashOut(isAuto = false){
+      if (!roundState?.active) return;
+
+      if ((roundState.safePicks || 0) <= 0) {
+        showNotice("Сначала открой безопасную клетку", "info");
+        return;
+      }
+
+      const payout = getCurrentCashout();
+
+      currentBalance = Number((currentBalance + payout).toFixed(2));
+      saveBalance();
+      updateBalanceUI();
+
+      roundState.active = false;
+      roundState.finished = true;
+      roundState.crashed = false;
+      roundState.cashedOut = true;
+      roundState.payout = payout;
+
+      saveRoundState();
+      updateStats();
+      updateButtons();
+      renderBoard();
+
+      showNotice(
+        isAuto
+          ? `Все клетки открыты: ${formatVc(payout)}`
+          : `Забрано ${formatVc(payout)}`,
+        "win"
+      );
+    }
+
+    function openCell(index){
+      if (!roundState?.active) return;
+      if (roundState.opened.includes(index)) return;
+
+      const isMine = roundState.mineIndexes.includes(index);
+
+      if (isMine) {
+        finishWithMine(index);
+        return;
+      }
+
+      lastRevealIndex = index;
+      lastRevealType = "safe";
+
+      roundState.opened.push(index);
+      roundState.safePicks = roundState.opened.length;
+
+      const safeCells = TOTAL_CELLS - roundState.minesCount;
+
+      if (roundState.safePicks >= safeCells) {
+        saveRoundState();
+        renderBoard();
+        updateStats();
+        updateButtons();
+        cashOut(true);
+        return;
+      }
+
+      saveRoundState();
+      renderBoard();
+      updateStats();
+      updateButtons();
+    }
+
+    function openOverlay(id){
+      const el = $(id);
+      el.classList.add("show");
+      el.setAttribute("aria-hidden", "false");
+      document.body.style.overflow = "hidden";
+    }
+
+    function closeOverlay(id){
+      const el = $(id);
+      el.classList.remove("show");
+      el.setAttribute("aria-hidden", "true");
+      document.body.style.overflow = "";
+    }
+
+    $("backBtn").addEventListener("click", () => goTo(FILES.games));
+    $("logoBtn").addEventListener("click", () => openOverlay("channelOverlay"));
+    $("rulesBtn").addEventListener("click", () => openOverlay("rulesOverlay"));
+
+    $("channelClose").addEventListener("click", () => closeOverlay("channelOverlay"));
+    $("rulesClose").addEventListener("click", () => closeOverlay("rulesOverlay"));
+
+    $("channelOverlay").addEventListener("click", (e) => {
+      if (e.target === $("channelOverlay")) closeOverlay("channelOverlay");
+    });
+
+    $("rulesOverlay").addEventListener("click", (e) => {
+      if (e.target === $("rulesOverlay")) closeOverlay("rulesOverlay");
+    });
+
+    $("goChannel").addEventListener("click", () => {
+      openTelegramLinkSafe("https://t.me/vezuspubg");
+    });
+
+    $("betToggleBtn").addEventListener("click", () => {
+      setQuickVisible(!quickVisible);
+    });
+
+    document.querySelectorAll(".quick-btn").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const value = Number(btn.getAttribute("data-bet"));
+        if (!Number.isFinite(value)) return;
+        $("betInput").value = String(value);
+        setQuickVisible(false);
+        updateButtons();
+      });
+    });
+
+    document.querySelectorAll(".mine-count-btn").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        if (roundState?.active) return;
+
+        const value = Number(btn.getAttribute("data-mines"));
+        if (!Number.isFinite(value)) return;
+        if (![3,5,7,10].includes(value)) return;
+
+        selectedMines = value;
+        updateMineButtons();
+        updateStats();
+        updateButtons();
+        showNotice(`Выбрано мин: ${value}`, "info");
+      });
+    });
+
+    $("betInput").addEventListener("input", () => {
+      updateButtons();
+    });
+
+    $("startBtn").addEventListener("click", startGame);
+    $("cashBtn").addEventListener("click", () => cashOut(false));
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") {
+        closeOverlay("channelOverlay");
+        closeOverlay("rulesOverlay");
+      }
+    });
+
+    function init(){
+      ensureProfile();
+      updateBalanceUI();
+
+      const savedRound = loadRoundState();
+      if (savedRound) {
+        roundState = savedRound;
+        selectedMines = [3,5,7,10].includes(savedRound.minesCount) ? savedRound.minesCount : 3;
+      }
+
+      updateMineButtons();
+      updateStats();
+      updateButtons();
+      renderBoard();
+    }
+
+    window.addEventListener("load", init);
+  </script>
+</body>
+</html>
