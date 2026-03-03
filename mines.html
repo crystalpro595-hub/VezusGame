@@ -78,7 +78,7 @@
       flex-direction:column;
       align-items:center;
       justify-content:center;
-      gap:18px;
+      gap:24px;
       background:
         radial-gradient(900px 420px at 50% 18%, rgba(255,255,255,.30), transparent 52%),
         radial-gradient(700px 340px at 20% 80%, rgba(125,211,252,.28), transparent 56%),
@@ -94,16 +94,16 @@
     }
 
     .pre-logo{
-      width:92px;
-      height:92px;
+      width:150px;
+      height:150px;
       object-fit:contain;
       display:block;
-      filter: drop-shadow(0 10px 24px rgba(0,0,0,.20));
+      filter: drop-shadow(0 12px 30px rgba(0,0,0,.22));
     }
 
     .pre-bar{
-      width:min(220px, calc(100% - 70px));
-      height:7px;
+      width:min(260px, calc(100% - 60px));
+      height:8px;
       border-radius:999px;
       background: rgba(255,255,255,.22);
       overflow:hidden;
@@ -363,6 +363,7 @@
         inset 0 1px 0 rgba(255,255,255,.04);
       background:
         linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.04));
+      overflow:visible;
     }
 
     .cell:active{
@@ -389,7 +390,7 @@
       border-color: rgba(239,68,68,.22);
       box-shadow:
         0 8px 18px rgba(0,0,0,.14),
-        0 0 14px rgba(239,68,68,.10),
+        0 0 14px rgba(239,68,68,.16),
         inset 0 1px 0 rgba(255,255,255,.07);
     }
 
@@ -398,7 +399,34 @@
     }
 
     .cell.reveal-mine{
-      animation: revealMine .32s cubic-bezier(.22,1,.36,1);
+      animation: revealMine .42s cubic-bezier(.22,1,.36,1);
+    }
+
+    .cell.explode::before,
+    .cell.explode::after{
+      content:"";
+      position:absolute;
+      left:50%;
+      top:50%;
+      transform:translate(-50%, -50%);
+      border-radius:50%;
+      pointer-events:none;
+      z-index:1;
+    }
+
+    .cell.explode::before{
+      width:20%;
+      height:20%;
+      background: radial-gradient(circle, rgba(255,245,180,.95) 0%, rgba(255,120,70,.82) 45%, rgba(255,70,70,0) 72%);
+      animation: blastCore .58s ease-out forwards;
+    }
+
+    .cell.explode::after{
+      width:26%;
+      height:26%;
+      border: 3px solid rgba(255,210,120,.85);
+      box-shadow: 0 0 18px rgba(255,120,70,.45);
+      animation: blastRing .68s ease-out forwards;
     }
 
     @keyframes revealSafe{
@@ -408,9 +436,35 @@
     }
 
     @keyframes revealMine{
-      0%{ transform: scale(.72); opacity:.18; }
-      60%{ transform: scale(1.08); opacity:1; }
-      100%{ transform: scale(1); opacity:1; }
+      0%{ transform: scale(.58) rotate(-8deg); opacity:.08; }
+      55%{ transform: scale(1.14) rotate(6deg); opacity:1; }
+      100%{ transform: scale(1) rotate(0deg); opacity:1; }
+    }
+
+    @keyframes blastCore{
+      0%{
+        opacity:0;
+        transform:translate(-50%, -50%) scale(.2);
+      }
+      25%{
+        opacity:1;
+        transform:translate(-50%, -50%) scale(2.6);
+      }
+      100%{
+        opacity:0;
+        transform:translate(-50%, -50%) scale(5.2);
+      }
+    }
+
+    @keyframes blastRing{
+      0%{
+        opacity:.95;
+        transform:translate(-50%, -50%) scale(.35);
+      }
+      100%{
+        opacity:0;
+        transform:translate(-50%, -50%) scale(4.6);
+      }
     }
 
     .cell.disabled{
@@ -434,6 +488,8 @@
       filter: drop-shadow(0 3px 6px rgba(0,0,0,.18));
       user-select:none;
       pointer-events:none;
+      position:relative;
+      z-index:2;
     }
 
     .panel{
@@ -813,7 +869,7 @@
       .stat-box{ min-height:44px; }
       .stat-label{ font-size:8px; }
       .stat-value{ font-size:11px; }
-      .pre-logo{ width:82px; height:82px; }
+      .pre-logo{ width:124px; height:124px; }
     }
 
     @media (prefers-reduced-motion: reduce){
@@ -990,7 +1046,7 @@
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <script>
     const PROFILE_KEY = "tg_profile";
-    const ROUND_KEY = "mines_round_v4";
+    const ROUND_KEY = "mines_round_v5";
 
     const DEFAULT_BALANCE = 1000;
     const MIN_BET = 10;
@@ -999,6 +1055,9 @@
 
     const SAFE_ICON_SRC = "https://i.postimg.cc/mDjzbZ5Y/Picsart-26-03-03-12-46-32-641.png";
     const MINE_ICON_SRC = "https://i.postimg.cc/ncBsz1gH/Picsart-26-03-03-12-46-14-937.png";
+
+    const RESET_DELAY_LOSE = 1100;
+    const RESET_DELAY_WIN = 850;
 
     const FILES = {
       games: "games.html"
@@ -1013,6 +1072,8 @@
     let noticeTimer = null;
     let lastRevealIndex = -1;
     let lastRevealType = "";
+    let isResetting = false;
+    let resetTimer = null;
 
     function formatVc(value){
       const n = Number(value ?? 0);
@@ -1090,7 +1151,6 @@
         const validMines = Number(parsed.minesCount);
         if (![3,5,7,10].includes(validMines)) return null;
         if (validMines >= TOTAL_CELLS) return null;
-
         if (!parsed.active) return null;
 
         return parsed;
@@ -1156,7 +1216,7 @@
       document.querySelectorAll(".mine-count-btn").forEach((btn) => {
         const mines = Number(btn.getAttribute("data-mines"));
         btn.classList.toggle("active", mines === activeMines);
-        btn.disabled = !!roundState?.active;
+        btn.disabled = !!roundState?.active || isResetting;
       });
 
       $("minesCountView").textContent = String(activeMines);
@@ -1174,16 +1234,16 @@
     }
 
     function updateControlsState(){
-      const isActive = !!roundState?.active;
+      const blocked = !!roundState?.active || isResetting;
 
-      $("betInput").disabled = isActive;
-      $("betToggleBtn").disabled = isActive;
+      $("betInput").disabled = blocked;
+      $("betToggleBtn").disabled = blocked;
 
       document.querySelectorAll(".quick-btn").forEach((btn) => {
-        btn.disabled = isActive;
+        btn.disabled = blocked;
       });
 
-      if (isActive) {
+      if (blocked) {
         setQuickVisible(false);
       }
     }
@@ -1191,8 +1251,8 @@
     function updateButtons(){
       const bet = getBetAmount();
       const roundActive = !!roundState?.active;
-      const canStart = !roundActive && bet >= MIN_BET && bet <= currentBalance;
-      const canCash = roundActive && (roundState.safePicks || 0) > 0;
+      const canStart = !roundActive && !isResetting && bet >= MIN_BET && bet <= currentBalance;
+      const canCash = roundActive && !isResetting && (roundState.safePicks || 0) > 0;
 
       $("startBtn").disabled = !canStart;
       $("cashBtn").disabled = !canCash;
@@ -1208,6 +1268,7 @@
         : "Забрать";
 
       updateControlsState();
+      updateMineButtons();
     }
 
     function createImage(src, className){
@@ -1238,7 +1299,7 @@
         if (showMine) {
           cell.classList.add("mine", "disabled");
           if (i === animatedIndex && animatedType === "mine") {
-            cell.classList.add("reveal-mine");
+            cell.classList.add("reveal-mine", "explode");
           }
           cell.appendChild(createImage(MINE_ICON_SRC, "mine-icon"));
           cell.disabled = true;
@@ -1251,7 +1312,7 @@
           cell.disabled = true;
         } else {
           cell.classList.add("locked");
-          cell.disabled = !roundState?.active;
+          cell.disabled = !roundState?.active || isResetting;
           const dot = document.createElement("span");
           dot.className = "cell-dot";
           cell.appendChild(dot);
@@ -1277,16 +1338,31 @@
     }
 
     function resetToIdleBoard(){
+      if (resetTimer) {
+        clearTimeout(resetTimer);
+        resetTimer = null;
+      }
+
+      isResetting = false;
       clearRoundState();
-      updateMineButtons();
       updateStats();
       updateButtons();
       renderBoard();
     }
 
+    function scheduleReset(delay){
+      isResetting = true;
+      updateButtons();
+
+      if (resetTimer) clearTimeout(resetTimer);
+      resetTimer = setTimeout(() => {
+        resetToIdleBoard();
+      }, delay);
+    }
+
     function startGame(){
-      if (roundState?.active) {
-        showNotice("Сначала закончи текущую игру");
+      if (roundState?.active || isResetting) {
+        showNotice("Подожди завершения раунда");
         return;
       }
 
@@ -1326,13 +1402,14 @@
 
       saveRoundState();
       setQuickVisible(false);
-      updateMineButtons();
       updateStats();
       updateButtons();
       renderBoard();
     }
 
     function finishWithMine(triggerIndex){
+      if (!roundState) return;
+
       lastRevealIndex = triggerIndex;
       lastRevealType = "mine";
 
@@ -1340,13 +1417,14 @@
       roundState.crashed = true;
 
       renderBoard();
-      setTimeout(() => {
-        resetToIdleBoard();
-      }, 260);
+      updateStats();
+      updateButtons();
+
+      scheduleReset(RESET_DELAY_LOSE);
     }
 
     function cashOut(){
-      if (!roundState?.active) return;
+      if (!roundState?.active || isResetting) return;
 
       if ((roundState.safePicks || 0) <= 0) {
         showNotice("Сначала открой безопасную клетку");
@@ -1359,11 +1437,18 @@
       saveBalance();
       updateBalanceUI();
 
-      resetToIdleBoard();
+      roundState.active = false;
+      roundState.crashed = false;
+
+      renderBoard();
+      updateStats();
+      updateButtons();
+
+      scheduleReset(RESET_DELAY_WIN);
     }
 
     function openCell(index){
-      if (!roundState?.active) return;
+      if (!roundState?.active || isResetting) return;
       if (roundState.opened.includes(index)) return;
 
       const isMine = roundState.mineIndexes.includes(index);
@@ -1444,14 +1529,16 @@
 
     document.querySelectorAll(".mine-count-btn").forEach((btn) => {
       btn.addEventListener("click", () => {
-        if (roundState?.active) return;
+        if (roundState?.active || isResetting) return;
 
         const value = Number(btn.getAttribute("data-mines"));
         if (!Number.isFinite(value)) return;
         if (![3,5,7,10].includes(value)) return;
 
         selectedMines = value;
-        resetToIdleBoard();
+        updateStats();
+        updateButtons();
+        renderBoard();
       });
     });
 
@@ -1479,7 +1566,6 @@
         selectedMines = [3,5,7,10].includes(savedRound.minesCount) ? savedRound.minesCount : 3;
       }
 
-      updateMineButtons();
       updateStats();
       updateButtons();
       renderBoard();
