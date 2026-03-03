@@ -80,9 +80,10 @@
       justify-content:center;
       gap:18px;
       background:
-        radial-gradient(700px 360px at 50% 20%, rgba(70,210,255,.18), transparent 55%),
-        radial-gradient(600px 280px at 50% 75%, rgba(42,171,238,.14), transparent 52%),
-        linear-gradient(180deg, rgba(4,14,36,.98), rgba(4,28,58,.98));
+        radial-gradient(900px 420px at 50% 18%, rgba(255,255,255,.30), transparent 52%),
+        radial-gradient(700px 340px at 20% 80%, rgba(125,211,252,.28), transparent 56%),
+        radial-gradient(700px 340px at 80% 78%, rgba(56,189,248,.24), transparent 56%),
+        linear-gradient(180deg, #8fe9ff 0%, #4fcfff 40%, #1dafff 100%);
       transition: opacity .45s ease, visibility .45s ease;
     }
 
@@ -97,25 +98,25 @@
       height:92px;
       object-fit:contain;
       display:block;
-      filter: drop-shadow(0 10px 24px rgba(0,0,0,.28));
+      filter: drop-shadow(0 10px 24px rgba(0,0,0,.20));
     }
 
     .pre-bar{
       width:min(220px, calc(100% - 70px));
       height:7px;
       border-radius:999px;
-      background: rgba(255,255,255,.10);
+      background: rgba(255,255,255,.22);
       overflow:hidden;
-      border:1px solid rgba(255,255,255,.08);
-      box-shadow: inset 0 1px 0 rgba(255,255,255,.04);
+      border:1px solid rgba(255,255,255,.24);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.12);
     }
 
     .pre-bar-fill{
       width:0%;
       height:100%;
       border-radius:999px;
-      background: linear-gradient(90deg, #55d8ff, #2AABEE, #7dd3fc);
-      box-shadow: 0 0 14px rgba(42,171,238,.35);
+      background: linear-gradient(90deg, #ffffff, #dff7ff, #ffffff);
+      box-shadow: 0 0 14px rgba(255,255,255,.55);
       animation: preloadFill 4s linear forwards;
     }
 
@@ -989,7 +990,7 @@
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <script>
     const PROFILE_KEY = "tg_profile";
-    const ROUND_KEY = "mines_round_v3";
+    const ROUND_KEY = "mines_round_v4";
 
     const DEFAULT_BALANCE = 1000;
     const MIN_BET = 10;
@@ -1076,6 +1077,8 @@
     function clearRoundState(){
       roundState = null;
       localStorage.removeItem(ROUND_KEY);
+      lastRevealIndex = -1;
+      lastRevealType = "";
     }
 
     function loadRoundState(){
@@ -1088,6 +1091,8 @@
         if (![3,5,7,10].includes(validMines)) return null;
         if (validMines >= TOTAL_CELLS) return null;
 
+        if (!parsed.active) return null;
+
         return parsed;
       } catch {
         return null;
@@ -1095,7 +1100,7 @@
     }
 
     function saveRoundState(){
-      if (!roundState) {
+      if (!roundState || !roundState.active) {
         localStorage.removeItem(ROUND_KEY);
         return;
       }
@@ -1194,8 +1199,6 @@
 
       if (roundActive) {
         $("startBtn").textContent = "Игра идёт";
-      } else if (roundState?.finished) {
-        $("startBtn").textContent = "Новая";
       } else {
         $("startBtn").textContent = "Начать";
       }
@@ -1230,7 +1233,7 @@
 
         const isOpened = !!roundState?.opened?.includes(i);
         const isMine = !!roundState?.mineIndexes?.includes(i);
-        const showMine = !!(roundState && roundState.finished && roundState.crashed && isMine);
+        const showMine = !!(roundState && !roundState.active && roundState.crashed && isMine);
 
         if (showMine) {
           cell.classList.add("mine", "disabled");
@@ -1273,14 +1276,18 @@
       return [...used];
     }
 
+    function resetToIdleBoard(){
+      clearRoundState();
+      updateMineButtons();
+      updateStats();
+      updateButtons();
+      renderBoard();
+    }
+
     function startGame(){
       if (roundState?.active) {
         showNotice("Сначала закончи текущую игру");
         return;
-      }
-
-      if (roundState?.finished) {
-        clearRoundState();
       }
 
       if (![3,5,7,10].includes(selectedMines)) {
@@ -1301,19 +1308,15 @@
         return;
       }
 
+      clearRoundState();
+
       currentBalance -= bet;
       saveBalance();
       updateBalanceUI();
 
-      lastRevealIndex = -1;
-      lastRevealType = "";
-
       roundState = {
         active: true,
-        finished: false,
         crashed: false,
-        cashedOut: false,
-        payout: 0,
         bet,
         minesCount: selectedMines,
         mineIndexes: generateMineIndexes(selectedMines),
@@ -1334,15 +1337,12 @@
       lastRevealType = "mine";
 
       roundState.active = false;
-      roundState.finished = true;
       roundState.crashed = true;
-      roundState.cashedOut = false;
-      roundState.payout = 0;
 
-      saveRoundState();
-      updateStats();
-      updateButtons();
       renderBoard();
+      setTimeout(() => {
+        resetToIdleBoard();
+      }, 260);
     }
 
     function cashOut(){
@@ -1359,16 +1359,7 @@
       saveBalance();
       updateBalanceUI();
 
-      roundState.active = false;
-      roundState.finished = true;
-      roundState.crashed = false;
-      roundState.cashedOut = true;
-      roundState.payout = payout;
-
-      saveRoundState();
-      updateStats();
-      updateButtons();
-      renderBoard();
+      resetToIdleBoard();
     }
 
     function openCell(index){
@@ -1391,10 +1382,7 @@
       const safeCells = TOTAL_CELLS - roundState.minesCount;
 
       if (roundState.safePicks >= safeCells) {
-        saveRoundState();
         renderBoard();
-        updateStats();
-        updateButtons();
         cashOut();
         return;
       }
@@ -1462,18 +1450,8 @@
         if (!Number.isFinite(value)) return;
         if (![3,5,7,10].includes(value)) return;
 
-        if (roundState?.finished) {
-          clearRoundState();
-        }
-
         selectedMines = value;
-        lastRevealIndex = -1;
-        lastRevealType = "";
-
-        updateMineButtons();
-        updateStats();
-        updateButtons();
-        renderBoard();
+        resetToIdleBoard();
       });
     });
 
