@@ -1,0 +1,1791 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Cups</title>
+
+  <link rel="preconnect" href="https://i.postimg.cc" crossorigin>
+  <link rel="dns-prefetch" href="https://i.postimg.cc">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  <link rel="preload" as="image" href="https://i.postimg.cc/qvL497mF/Picsart-26-02-27-02-02-37-502.png">
+  <link rel="preload" as="image" href="https://i.postimg.cc/kXzYVvHy/Picsart-26-03-03-20-02-10-468.png">
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --text:#eaf1ff;
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+      --safe-top: env(safe-area-inset-top, 0px);
+
+      --glass: rgba(12, 14, 20, .80);
+      --stroke: rgba(255,255,255,.08);
+      --shadow: 0 16px 38px rgba(0,0,0,.42);
+      --shadow-soft: 0 10px 22px rgba(0,0,0,.28);
+
+      --tg1:#2AABEE;
+      --tg2:#229ED9;
+      --violet1:#8b5cf6;
+      --violet2:#6d28d9;
+    }
+
+    *{
+      box-sizing:border-box;
+      font-family:'Inter', sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html, body{
+      height:100%;
+      margin:0;
+      overflow:hidden;
+      color:var(--text);
+      background:#020617;
+    }
+
+    body{
+      background-image:url("https://i.postimg.cc/fbJT34yY/076E519D-F095-4957-88BF-5591DEB82533.png");
+      background-size:cover;
+      background-position:center;
+      background-repeat:no-repeat;
+    }
+
+    body::before{
+      content:"";
+      position:fixed;
+      inset:0;
+      background:
+        radial-gradient(900px 600px at 30% 10%, rgba(255,255,255,.05), transparent 60%),
+        linear-gradient(180deg, rgba(0,0,0,.40), rgba(0,0,0,.66));
+      pointer-events:none;
+      z-index:0;
+    }
+
+    *::-webkit-scrollbar{ display:none; }
+
+    .app{
+      position:relative;
+      height:100%;
+      overflow:auto;
+      padding:0 12px calc(20px + var(--safe-bottom)) 12px;
+      z-index:1;
+      overscroll-behavior: contain;
+      scrollbar-width:none;
+    }
+
+    .content{
+      width:100%;
+      max-width:460px;
+      margin:0 auto;
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+      position:relative;
+      z-index:1;
+    }
+
+    .sticky-top{
+      position:sticky;
+      top:0;
+      z-index:40;
+      padding-top: calc(6px + var(--safe-top));
+      padding-bottom:6px;
+      background:
+        linear-gradient(180deg,
+          rgba(2,6,23,.96) 0%,
+          rgba(2,6,23,.86) 72%,
+          rgba(2,6,23,0) 100%);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+    }
+
+    .top-row{
+      width:100%;
+      display:grid;
+      grid-template-columns:36px minmax(0,1fr) 36px 46px;
+      gap:6px;
+      align-items:center;
+    }
+
+    .icon-btn,
+    .rule-btn{
+      width:36px;
+      height:36px;
+      border:none;
+      border-radius:12px;
+      background: var(--glass);
+      border:1px solid var(--stroke);
+      box-shadow: var(--shadow-soft), inset 0 1px 0 rgba(255,255,255,.04);
+      display:grid;
+      place-items:center;
+      color:var(--text);
+      cursor:pointer;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      padding:0;
+    }
+
+    .icon-btn{
+      font-size:16px;
+      font-weight:900;
+    }
+
+    .icon-btn:active,
+    .rule-btn:active{
+      transform:scale(.98);
+    }
+
+    .rule-btn svg{
+      width:16px;
+      height:16px;
+      stroke: rgba(234,241,255,.92);
+      fill:none;
+      stroke-width:2;
+      stroke-linecap:round;
+      stroke-linejoin:round;
+      display:block;
+    }
+
+    .balance-mini{
+      width:100%;
+      min-width:0;
+      height:38px;
+      border-radius:999px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:6px;
+      padding:5px 6px 5px 10px;
+      position:relative;
+      overflow:hidden;
+      background: var(--glass);
+      border:1px solid var(--stroke);
+      box-shadow: var(--shadow), inset 0 1px 0 rgba(255,255,255,.04);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+
+    .balance-mini::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      background:
+        radial-gradient(140px 50px at 0% 0%, rgba(255,255,255,.05), transparent 55%),
+        radial-gradient(140px 50px at 100% 100%, rgba(255,255,255,.03), transparent 55%);
+      pointer-events:none;
+    }
+
+    .bal-title{
+      position:relative;
+      z-index:1;
+      font-size:11px;
+      font-weight:900;
+      color: rgba(234,241,255,.92);
+      white-space:nowrap;
+    }
+
+    .bal-amount{
+      position:relative;
+      z-index:1;
+      min-width:76px;
+      height:24px;
+      border:none;
+      border-radius:999px;
+      padding:0 8px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background: rgba(255,255,255,.08);
+      border:1px solid rgba(255,255,255,.08);
+      color: rgba(234,241,255,.98);
+      font-weight:900;
+      font-size:12px;
+      white-space:nowrap;
+      pointer-events:none;
+    }
+
+    .logo-btn{
+      width:46px;
+      height:46px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background:transparent;
+      border:none;
+      padding:0;
+      margin:0;
+      cursor:pointer;
+    }
+
+    .logo-btn:active{ transform:scale(.98); }
+
+    .logo-btn img{
+      width:100%;
+      height:100%;
+      object-fit:contain;
+      display:block;
+    }
+
+    .card{
+      border-radius:18px;
+      background: var(--glass);
+      border:1px solid var(--stroke);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      overflow:hidden;
+    }
+
+    .hero-card{
+      padding:8px;
+    }
+
+    .stats-grid{
+      display:grid;
+      grid-template-columns:repeat(3, minmax(0,1fr));
+      gap:6px;
+    }
+
+    .stat-box{
+      min-height:48px;
+      border-radius:12px;
+      padding:6px;
+      background: rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.08);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.04);
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+      gap:3px;
+    }
+
+    .stat-label{
+      font-size:9px;
+      font-weight:800;
+      color:rgba(234,241,255,.62);
+      line-height:1;
+    }
+
+    .stat-value{
+      font-size:12px;
+      font-weight:900;
+      color:#fff;
+      line-height:1.1;
+      word-break:break-word;
+    }
+
+    .stage-wrap{
+      padding:10px;
+    }
+
+    .stage{
+      --cup-w:112px;
+      --cup-h:156px;
+      --cup-bottom:42px;
+      --ball-size:28px;
+      --ball-bottom:48px;
+
+      position:relative;
+      width:100%;
+      height:270px;
+      border-radius:16px;
+      overflow:hidden;
+      background:
+        radial-gradient(420px 180px at 50% -10%, rgba(255,255,255,.08), transparent 55%),
+        linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02));
+      border:1px solid rgba(255,255,255,.06);
+    }
+
+    .stage::before{
+      content:"";
+      position:absolute;
+      inset:auto 0 0 0;
+      height:84px;
+      background:
+        radial-gradient(ellipse at 50% 100%, rgba(42,171,238,.22), transparent 60%),
+        linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.01));
+      border-top:1px solid rgba(255,255,255,.05);
+    }
+
+    .stage::after{
+      content:"";
+      position:absolute;
+      left:50%;
+      bottom:22px;
+      width:86%;
+      height:18px;
+      transform:translateX(-50%);
+      border-radius:999px;
+      background: linear-gradient(180deg, rgba(120,220,255,.14), rgba(25,80,130,.18));
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.05);
+      pointer-events:none;
+    }
+
+    .table-shadow{
+      position:absolute;
+      left:50%;
+      bottom:32px;
+      width:82%;
+      height:28px;
+      transform:translateX(-50%);
+      border-radius:999px;
+      background: radial-gradient(ellipse at center, rgba(0,0,0,.34), rgba(0,0,0,0) 72%);
+      pointer-events:none;
+      z-index:1;
+    }
+
+    .ball{
+      position:absolute;
+      left:0;
+      bottom:var(--ball-bottom);
+      width:var(--ball-size);
+      height:var(--ball-size);
+      border-radius:50%;
+      transform:translate3d(0,0,0) scale(.45);
+      opacity:0;
+      background:
+        radial-gradient(circle at 30% 28%, rgba(255,255,255,.98), rgba(255,255,255,.40) 14%, transparent 15%),
+        radial-gradient(circle at 40% 38%, #f8fbff 0%, #dbe2ea 28%, #adb9c6 55%, #7d8996 78%, #5e6670 100%);
+      box-shadow:
+        0 0 16px rgba(196,210,224,.24),
+        0 8px 12px rgba(0,0,0,.16);
+      transition:
+        opacity .22s ease,
+        transform .22s ease;
+      pointer-events:none;
+      z-index:2;
+      will-change: transform;
+    }
+
+    .ball.show{
+      opacity:1;
+    }
+
+    .cup-wrap{
+      position:absolute;
+      left:0;
+      bottom:var(--cup-bottom);
+      width:var(--cup-w);
+      height:var(--cup-h);
+      border:none;
+      padding:0;
+      background:transparent;
+      cursor:pointer;
+      z-index:3;
+      display:flex;
+      align-items:flex-end;
+      justify-content:center;
+      filter: drop-shadow(0 10px 14px rgba(0,0,0,.18));
+      will-change: transform, opacity, filter;
+      transition: opacity .2s ease;
+    }
+
+    .cup-wrap.hidden-cup{
+      opacity:0;
+      pointer-events:none;
+    }
+
+    .cup-wrap::after{
+      content:"";
+      position:absolute;
+      left:50%;
+      bottom:2px;
+      width:60%;
+      height:14px;
+      transform:translateX(-50%);
+      border-radius:999px;
+      background: radial-gradient(ellipse at center, rgba(0,0,0,.24), rgba(0,0,0,0) 74%);
+      pointer-events:none;
+      opacity:.95;
+      transition: opacity .2s ease, transform .2s ease;
+    }
+
+    .cup-wrap.pickable .cup-img{
+      filter:
+        drop-shadow(0 16px 20px rgba(0,0,0,.20))
+        drop-shadow(0 0 10px rgba(42,171,238,.08));
+    }
+
+    .cup-img{
+      width:100%;
+      height:100%;
+      object-fit:contain;
+      display:block;
+      user-select:none;
+      pointer-events:none;
+      filter: drop-shadow(0 12px 14px rgba(0,0,0,.18));
+      will-change: transform, filter;
+    }
+
+    .stage-hint{
+      position:absolute;
+      left:50%;
+      bottom:8px;
+      transform:translateX(-50%);
+      width:calc(100% - 20px);
+      text-align:center;
+      font-size:11px;
+      font-weight:800;
+      color:rgba(234,241,255,.72);
+      pointer-events:none;
+      z-index:1;
+      min-height:14px;
+    }
+
+    .panel{
+      padding:10px;
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+    }
+
+    .label{
+      font-size:12px;
+      font-weight:900;
+      color: rgba(234,241,255,.94);
+      margin-bottom:7px;
+    }
+
+    .bet-row{
+      display:grid;
+      grid-template-columns:minmax(0,1fr) 42px 78px;
+      gap:6px;
+      align-items:center;
+    }
+
+    .bet-input{
+      width:100%;
+      height:42px;
+      border-radius:14px;
+      border:1px solid rgba(255,255,255,.08);
+      background: rgba(255,255,255,.06);
+      color:#fff;
+      font-size:15px;
+      font-weight:900;
+      padding:0 12px;
+      outline:none;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.04);
+      text-align:center;
+    }
+
+    .bet-input::placeholder{
+      color: rgba(234,241,255,.42);
+      font-weight:800;
+    }
+
+    .bet-input:disabled{
+      opacity:.55;
+      cursor:not-allowed;
+    }
+
+    .bet-toggle,
+    .count-toggle{
+      height:42px;
+      border:none;
+      border-radius:14px;
+      cursor:pointer;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.14), rgba(255,255,255,.06));
+      border:1px solid rgba(255,255,255,.12);
+      color:#fff;
+      display:grid;
+      place-items:center;
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.08),
+        0 6px 14px rgba(0,0,0,.14);
+      padding:0;
+    }
+
+    .bet-toggle{
+      width:42px;
+    }
+
+    .count-toggle{
+      width:78px;
+      font-size:11px;
+      font-weight:900;
+      letter-spacing:.1px;
+      padding:0 8px;
+    }
+
+    .bet-toggle:active,
+    .count-toggle:active{
+      transform:scale(.98);
+    }
+
+    .bet-toggle svg{
+      width:19px;
+      height:19px;
+      display:block;
+      filter: drop-shadow(0 3px 6px rgba(0,0,0,.18));
+    }
+
+    .bet-toggle:disabled,
+    .quick-btn:disabled,
+    .count-toggle:disabled,
+    .count-btn:disabled{
+      opacity:.55;
+      cursor:not-allowed;
+      transform:none !important;
+    }
+
+    .quick-bets,
+    .count-menu{
+      display:grid;
+      gap:6px;
+      max-height:0;
+      opacity:0;
+      overflow:hidden;
+      margin-top:0;
+      transition:max-height .24s ease, opacity .24s ease, margin .24s ease;
+    }
+
+    .quick-bets{
+      grid-template-columns:repeat(5, minmax(0,1fr));
+    }
+
+    .quick-bets.show,
+    .count-menu.show{
+      opacity:1;
+      margin-top:8px;
+    }
+
+    .quick-bets.show{
+      max-height:60px;
+    }
+
+    .count-menu{
+      grid-template-columns:repeat(3, minmax(0,1fr));
+    }
+
+    .count-menu.show{
+      max-height:52px;
+    }
+
+    .quick-btn,
+    .count-btn{
+      height:32px;
+      border:none;
+      border-radius:11px;
+      cursor:pointer;
+      background: rgba(255,255,255,.08);
+      border:1px solid rgba(255,255,255,.08);
+      color:#fff;
+      font-size:11px;
+      font-weight:900;
+    }
+
+    .quick-btn:active,
+    .count-btn:active{
+      transform:scale(.98);
+    }
+
+    .count-btn.active{
+      background:
+        linear-gradient(180deg, rgba(139,92,246,.28), rgba(109,40,217,.16));
+      border-color: rgba(139,92,246,.24);
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.05),
+        0 0 12px rgba(139,92,246,.08);
+    }
+
+    .play-btn{
+      width:100%;
+      height:44px;
+      border:none;
+      border-radius:14px;
+      cursor:pointer;
+      color:#fff;
+      font-size:13px;
+      font-weight:900;
+      letter-spacing:.2px;
+      background: linear-gradient(180deg, var(--tg1), var(--tg2));
+      box-shadow: 0 12px 24px rgba(34,158,217,.22);
+    }
+
+    .play-btn:active{ transform: scale(.985); }
+
+    .play-btn:disabled{
+      opacity:.55;
+      cursor:not-allowed;
+      box-shadow:none;
+      transform:none !important;
+    }
+
+    .overlay{
+      position:fixed;
+      inset:0;
+      background: rgba(0,0,0,.72);
+      opacity:0;
+      pointer-events:none;
+      transition: opacity .22s ease;
+      z-index:260;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:14px;
+    }
+
+    .overlay.show{
+      opacity:1;
+      pointer-events:auto;
+    }
+
+    .popup{
+      width:min(420px, 100%);
+      border-radius:18px;
+      overflow:hidden;
+      background: rgba(14,16,24,.94);
+      border: 1px solid rgba(255,255,255,.08);
+      box-shadow: 0 28px 70px rgba(0,0,0,.56);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      position:relative;
+      transform: translateY(12px) scale(.98);
+      opacity:.95;
+      transition: transform .22s ease, opacity .22s ease;
+    }
+
+    .overlay.show .popup{
+      transform: translateY(0) scale(1);
+      opacity:1;
+    }
+
+    .popup-head{
+      padding:12px 12px 8px 12px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      background: rgba(255,255,255,.03);
+      border-bottom: 1px solid rgba(255,255,255,.06);
+    }
+
+    .popup-title{
+      font-weight:900;
+      letter-spacing:.25px;
+      font-size:13px;
+      color: rgba(234,241,255,.95);
+    }
+
+    .popup-x{
+      width:34px;
+      height:34px;
+      border-radius:12px;
+      border:1px solid rgba(255,255,255,.08);
+      background: rgba(255,255,255,.05);
+      color: rgba(234,241,255,.92);
+      cursor:pointer;
+      display:grid;
+      place-items:center;
+      box-shadow: 0 10px 20px rgba(0,0,0,.26);
+      padding:0;
+    }
+
+    .popup-x:active{ transform: scale(.98); }
+
+    .popup-body{
+      padding:12px;
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+    }
+
+    .popup-text,
+    .rule-line{
+      margin:0;
+      font-size:12px;
+      line-height:1.4;
+      color: rgba(234,241,255,.88);
+    }
+
+    .tg-btn{
+      border:none;
+      cursor:pointer;
+      width:100%;
+      height:44px;
+      border-radius:14px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:10px;
+      background: linear-gradient(180deg, var(--tg1), var(--tg2));
+      box-shadow:
+        0 12px 24px rgba(34,158,217,.24),
+        inset 0 1px 0 rgba(255,255,255,.14);
+      color:#fff;
+      font-weight:900;
+      letter-spacing:.2px;
+      font-size:13px;
+    }
+
+    .tg-btn:active{ transform: scale(.99); }
+
+    .tg-ico{
+      width:20px;
+      height:20px;
+      display:block;
+      filter: drop-shadow(0 8px 14px rgba(0,0,0,.18));
+    }
+
+    @media (max-width: 360px){
+      .app{ padding:0 10px calc(14px + var(--safe-bottom)) 10px; }
+      .content{ gap:8px; }
+      .stage{ height:244px; }
+      .bet-row{ grid-template-columns:minmax(0,1fr) 40px 70px; }
+      .count-toggle{ width:70px; font-size:10px; }
+      .quick-bets{ gap:5px; }
+      .quick-btn,
+      .count-btn{ font-size:10px; }
+      .stat-box{ min-height:44px; }
+      .stat-label{ font-size:8px; }
+      .stat-value{ font-size:11px; }
+    }
+
+    @media (prefers-reduced-motion: reduce){
+      *{ transition:none !important; animation:none !important; }
+      .overlay.show .popup{ transform:none !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <div class="content">
+
+      <div class="sticky-top">
+        <div class="top-row">
+          <button class="icon-btn" id="backBtn" aria-label="Назад">←</button>
+
+          <div class="balance-mini" aria-label="Баланс">
+            <span class="bal-title">Баланс</span>
+            <div class="bal-amount" id="balanceValue">...</div>
+          </div>
+
+          <button class="rule-btn" id="rulesBtn" aria-label="Правила">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M9 9a3 3 0 1 1 5.2 2.1c-.9.9-1.7 1.5-1.7 2.9"></path>
+              <path d="M12 17h.01"></path>
+              <circle cx="12" cy="12" r="9"></circle>
+            </svg>
+          </button>
+
+          <button class="logo-btn" id="logoBtn" aria-label="Открыть Telegram канал">
+            <img
+              src="https://i.postimg.cc/qvL497mF/Picsart-26-02-27-02-02-37-502.png"
+              alt="Vezus"
+              loading="eager"
+              fetchpriority="high"
+              decoding="async"
+            >
+          </button>
+        </div>
+      </div>
+
+      <div class="card hero-card">
+        <div class="stats-grid">
+          <div class="stat-box">
+            <div class="stat-label">Выплата</div>
+            <div class="stat-value" id="payoutValue">x2.50</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-label">Стаканы</div>
+            <div class="stat-value" id="cupsCountValue">3</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-label">Макс. ставка</div>
+            <div class="stat-value">5000 VC</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card stage-wrap">
+        <div class="stage" id="stage">
+          <div class="table-shadow"></div>
+          <div class="ball" id="ball"></div>
+
+          <button class="cup-wrap" id="cup0" data-cup="0" type="button" aria-label="Стакан 1">
+            <img class="cup-img" src="https://i.postimg.cc/kXzYVvHy/Picsart-26-03-03-20-02-10-468.png" alt="">
+          </button>
+
+          <button class="cup-wrap" id="cup1" data-cup="1" type="button" aria-label="Стакан 2">
+            <img class="cup-img" src="https://i.postimg.cc/kXzYVvHy/Picsart-26-03-03-20-02-10-468.png" alt="">
+          </button>
+
+          <button class="cup-wrap" id="cup2" data-cup="2" type="button" aria-label="Стакан 3">
+            <img class="cup-img" src="https://i.postimg.cc/kXzYVvHy/Picsart-26-03-03-20-02-10-468.png" alt="">
+          </button>
+
+          <button class="cup-wrap hidden-cup" id="cup3" data-cup="3" type="button" aria-label="Стакан 4">
+            <img class="cup-img" src="https://i.postimg.cc/kXzYVvHy/Picsart-26-03-03-20-02-10-468.png" alt="">
+          </button>
+
+          <button class="cup-wrap hidden-cup" id="cup4" data-cup="4" type="button" aria-label="Стакан 5">
+            <img class="cup-img" src="https://i.postimg.cc/kXzYVvHy/Picsart-26-03-03-20-02-10-468.png" alt="">
+          </button>
+
+          <div class="stage-hint" id="stageHint"></div>
+        </div>
+      </div>
+
+      <div class="card panel">
+        <div>
+          <div class="label">Ставка</div>
+
+          <div class="bet-row">
+            <input
+              class="bet-input"
+              id="betInput"
+              type="number"
+              min="10"
+              max="5000"
+              step="1"
+              inputmode="numeric"
+              placeholder="Мин. 10"
+              value="10"
+            >
+
+            <button class="bet-toggle" id="betToggleBtn" type="button" aria-label="Быстрые ставки">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <g fill="none" stroke="rgba(255,255,255,.96)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="9" cy="12" r="3.7"></circle>
+                  <circle cx="14.8" cy="12" r="3.7"></circle>
+                  <path d="M18.5 6.2v4.2"></path>
+                  <path d="M16.4 8.3h4.2"></path>
+                </g>
+              </svg>
+            </button>
+
+            <button class="count-toggle" id="cupCountToggleBtn" type="button">3 стак.</button>
+          </div>
+
+          <div class="quick-bets" id="quickBets">
+            <button class="quick-btn" data-bet="10" type="button">10</button>
+            <button class="quick-btn" data-bet="50" type="button">50</button>
+            <button class="quick-btn" data-bet="100" type="button">100</button>
+            <button class="quick-btn" data-bet="250" type="button">250</button>
+            <button class="quick-btn" data-bet="500" type="button">500</button>
+          </div>
+
+          <div class="count-menu" id="cupCountMenu">
+            <button class="count-btn active" data-count="3" type="button">3</button>
+            <button class="count-btn" data-count="4" type="button">4</button>
+            <button class="count-btn" data-count="5" type="button">5</button>
+          </div>
+        </div>
+
+        <button class="play-btn" id="playBtn" type="button">Играть</button>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="overlay" id="rulesOverlay" aria-hidden="true">
+    <div class="popup" role="dialog" aria-modal="true" aria-label="Правила">
+      <div class="popup-head">
+        <div class="popup-title">Правила игры</div>
+        <button class="popup-x" id="rulesClose" aria-label="Закрыть">✕</button>
+      </div>
+
+      <div class="popup-body">
+        <p class="rule-line">• Выбери ставку</p>
+        <p class="rule-line">• Выбери количество стаканов</p>
+        <p class="rule-line">• Нажми «Играть»</p>
+        <p class="rule-line">• Следи за перемешиванием</p>
+        <p class="rule-line">• Выбери стакан после остановки</p>
+        <p class="rule-line">• 3 стакана — x2.5</p>
+        <p class="rule-line">• 4 стакана — x3.6</p>
+        <p class="rule-line">• 5 стаканов — x4.7</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="overlay" id="channelOverlay" aria-hidden="true">
+    <div class="popup" role="dialog" aria-modal="true" aria-label="Telegram канал">
+      <div class="popup-head">
+        <div class="popup-title">Наш Telegram канал</div>
+        <button class="popup-x" id="channelClose" aria-label="Закрыть">✕</button>
+      </div>
+
+      <div class="popup-body">
+        <p class="popup-text">
+          Нажми кнопку ниже — откроется наш Telegram канал:
+          <b>@vezuspubg</b>
+        </p>
+
+        <button class="tg-btn" id="goChannel" aria-label="Перейти в Telegram канал">
+          <svg class="tg-ico" viewBox="0 0 240 240" aria-hidden="true">
+            <path fill="#fff" d="M120 0C53.7 0 0 53.7 0 120s53.7 120 120 120 120-53.7 120-120S186.3 0 120 0zm58.7 82.3l-19.7 92.8c-1.5 6.6-5.4 8.2-10.9 5.1l-30.2-22.3-14.6 14c-1.6 1.6-3 3-6.1 3l2.2-31.6 57.5-52c2.5-2.2-.5-3.4-3.9-1.2l-71 44.7-30.6-9.6c-6.6-2.1-6.7-6.6 1.4-9.7l119.6-46.1c5.5-2 10.3 1.3 8.8 9.9z"/>
+          </svg>
+          Перейти в Telegram канал
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <script>
+    const PROFILE_KEY = "tg_profile";
+
+    const DEFAULT_BALANCE = 1000;
+    const TOPUP_THRESHOLD = 100;
+    const MIN_BET = 10;
+    const MAX_BET = 5000;
+
+    const CUP_MULTIPLIERS = {
+      3: 2.5,
+      4: 3.6,
+      5: 4.7
+    };
+
+    const FILES = {
+      games: "games.html"
+    };
+
+    const $ = (id) => document.getElementById(id);
+
+    let currentBalance = 1000;
+    let quickVisible = false;
+    let countMenuVisible = false;
+    let selectedCupCount = 3;
+
+    let gameState = "idle"; // idle | covering | shuffling | guessing | reveal
+    let roundBet = 0;
+    let ballCupId = 1;
+    let pickedCupId = null;
+    let shuffleToken = 0;
+    let stageMessage = "";
+
+    let cups = [];
+    let slotCenters = [];
+    let stageLayout = null;
+
+    const cupEls = {
+      0: $("cup0"),
+      1: $("cup1"),
+      2: $("cup2"),
+      3: $("cup3"),
+      4: $("cup4")
+    };
+
+    function sleep(ms){
+      return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    function rand(min, max){
+      return Math.random() * (max - min) + min;
+    }
+
+    function randInt(min, max){
+      return Math.floor(rand(min, max + 1));
+    }
+
+    function formatVc(value){
+      const n = Number(value ?? 0);
+      if (!Number.isFinite(n)) return "0 VC";
+      return Number.isInteger(n) ? `${n} VC` : `${n.toFixed(2)} VC`;
+    }
+
+    function easeInOutCubic(t){
+      return t < 0.5
+        ? 4 * t * t * t
+        : 1 - Math.pow(-2 * t + 2, 3) / 2;
+    }
+
+    function rafAnimate(duration, draw){
+      return new Promise(resolve => {
+        const start = performance.now();
+
+        function frame(now){
+          const elapsed = now - start;
+          const raw = Math.min(1, elapsed / duration);
+          const eased = easeInOutCubic(raw);
+
+          draw(eased, raw);
+
+          if (raw < 1) {
+            requestAnimationFrame(frame);
+          } else {
+            resolve();
+          }
+        }
+
+        requestAnimationFrame(frame);
+      });
+    }
+
+    function goTo(file){
+      window.location.href = file;
+    }
+
+    function openTelegramLinkSafe(url){
+      if (window.Telegram && window.Telegram.WebApp && typeof window.Telegram.WebApp.openTelegramLink === "function") {
+        window.Telegram.WebApp.openTelegramLink(url);
+        return;
+      }
+      window.open(url, "_blank", "noopener");
+    }
+
+    function getCurrentMultiplier(){
+      return CUP_MULTIPLIERS[selectedCupCount] || 2.5;
+    }
+
+    function setStatus(text){
+      stageMessage = text;
+      updateStageHint();
+    }
+
+    function updateStageHint(){
+      $("stageHint").textContent = stageMessage || "";
+    }
+
+    function readProfile(){
+      try{
+        return JSON.parse(localStorage.getItem(PROFILE_KEY) || "null");
+      } catch {
+        return null;
+      }
+    }
+
+    function writeProfile(profile){
+      localStorage.setItem(PROFILE_KEY, JSON.stringify(profile));
+    }
+
+    function normalizeBalance(){
+      currentBalance = Number(currentBalance) || 0;
+
+      if (currentBalance < TOPUP_THRESHOLD) {
+        currentBalance = DEFAULT_BALANCE;
+      }
+
+      currentBalance = Number(currentBalance.toFixed(2));
+    }
+
+    function ensureProfile(){
+      const cached = readProfile();
+
+      if (cached && Number.isFinite(Number(cached.balance))) {
+        currentBalance = Number(cached.balance) || 0;
+      } else {
+        currentBalance = DEFAULT_BALANCE;
+      }
+
+      normalizeBalance();
+      saveBalance();
+    }
+
+    function saveBalance(){
+      normalizeBalance();
+      const profile = readProfile() || {};
+      profile.balance = currentBalance;
+      writeProfile(profile);
+    }
+
+    function updateBalanceUI(){
+      normalizeBalance();
+      $("balanceValue").textContent = formatVc(currentBalance);
+    }
+
+    function updateStats(){
+      $("payoutValue").textContent = `x${getCurrentMultiplier().toFixed(2)}`;
+      $("cupsCountValue").textContent = String(selectedCupCount);
+    }
+
+    function getBetAmount(){
+      const raw = $("betInput").value;
+      const amount = Number(raw);
+      if (!raw || !Number.isFinite(amount)) return 0;
+      return Math.floor(amount);
+    }
+
+    function setQuickVisible(show){
+      if ($("betToggleBtn").disabled && show) return;
+      quickVisible = !!show;
+      $("quickBets").classList.toggle("show", quickVisible);
+    }
+
+    function setCountMenuVisible(show){
+      if ($("cupCountToggleBtn").disabled && show) return;
+      countMenuVisible = !!show;
+      $("cupCountMenu").classList.toggle("show", countMenuVisible);
+    }
+
+    function updateCountToggleText(){
+      $("cupCountToggleBtn").textContent = `${selectedCupCount} стак.`;
+      if (selectedCupCount === 5) {
+        $("cupCountToggleBtn").textContent = "5 стак.";
+      }
+    }
+
+    function updateCountButtons(){
+      document.querySelectorAll(".count-btn").forEach((btn) => {
+        const value = Number(btn.getAttribute("data-count"));
+        btn.classList.toggle("active", value === selectedCupCount);
+      });
+      updateCountToggleText();
+    }
+
+    function getLayoutForCount(count){
+      if (count === 5) {
+        return {
+          cupW: 76,
+          cupH: 112,
+          cupBottom: 56,
+          ballSize: 22,
+          ballBottom: 58,
+          sidePad: 0.10
+        };
+      }
+
+      if (count === 4) {
+        return {
+          cupW: 92,
+          cupH: 132,
+          cupBottom: 48,
+          ballSize: 24,
+          ballBottom: 52,
+          sidePad: 0.12
+        };
+      }
+
+      return {
+        cupW: 112,
+        cupH: 156,
+        cupBottom: 42,
+        ballSize: 28,
+        ballBottom: 48,
+        sidePad: 0.16
+      };
+    }
+
+    function applyStageLayout(){
+      const stage = $("stage");
+      stageLayout = getLayoutForCount(selectedCupCount);
+
+      stage.style.setProperty("--cup-w", `${stageLayout.cupW}px`);
+      stage.style.setProperty("--cup-h", `${stageLayout.cupH}px`);
+      stage.style.setProperty("--cup-bottom", `${stageLayout.cupBottom}px`);
+      stage.style.setProperty("--ball-size", `${stageLayout.ballSize}px`);
+      stage.style.setProperty("--ball-bottom", `${stageLayout.ballBottom}px`);
+
+      const width = stage.clientWidth || 320;
+      const usable = width - (width * stageLayout.sidePad * 2);
+      const start = width * stageLayout.sidePad;
+
+      slotCenters = Array.from({ length: selectedCupCount }, (_, i) => {
+        if (selectedCupCount === 1) return width / 2;
+        return start + (usable * (i / (selectedCupCount - 1)));
+      });
+    }
+
+    function getCupLeftForSlot(slot){
+      const center = slotCenters[slot] || 0;
+      return center - (stageLayout.cupW / 2);
+    }
+
+    function getBallLeftForCupId(id){
+      const cup = cupById(id);
+      if (!cup) return 0;
+      const center = slotCenters[cup.slot] || 0;
+      return center - (stageLayout.ballSize / 2);
+    }
+
+    function applyCupTransform(el, x, y = 0, scale = 1){
+      el.style.transform = `translate3d(${x}px, ${y}px, 0) scale(${scale})`;
+    }
+
+    function applyBallTransform(x, scale = 1){
+      $("ball").style.transform = `translate3d(${x}px, 0, 0) scale(${scale})`;
+    }
+
+    function cupById(id){
+      return cups.find(c => c.id === id);
+    }
+
+    function cupAtSlot(slot){
+      return cups.find(c => c.slot === slot);
+    }
+
+    function resetCups(){
+      applyStageLayout();
+
+      cups = Array.from({ length: selectedCupCount }, (_, i) => ({
+        id: i,
+        slot: i
+      }));
+
+      ballCupId = Math.floor((selectedCupCount - 1) / 2);
+      pickedCupId = null;
+    }
+
+    function setInputsLocked(locked){
+      $("betInput").disabled = locked;
+      $("betToggleBtn").disabled = locked;
+      $("cupCountToggleBtn").disabled = locked;
+
+      document.querySelectorAll(".quick-btn").forEach(btn => {
+        btn.disabled = locked;
+      });
+
+      document.querySelectorAll(".count-btn").forEach(btn => {
+        btn.disabled = locked;
+      });
+
+      $("playBtn").disabled = locked;
+
+      if (locked) {
+        setQuickVisible(false);
+        setCountMenuVisible(false);
+      }
+    }
+
+    function updatePlayButton(){
+      const btn = $("playBtn");
+
+      if (gameState === "covering" || gameState === "shuffling") {
+        btn.textContent = "Крутим...";
+      } else if (gameState === "guessing") {
+        btn.textContent = "Выбери стакан";
+      } else if (gameState === "reveal") {
+        btn.textContent = "Проверка...";
+      } else {
+        btn.textContent = "Играть";
+      }
+    }
+
+    function renderStage(){
+      applyStageLayout();
+
+      for (let id = 0; id < 5; id++) {
+        const el = cupEls[id];
+        const img = el.querySelector(".cup-img");
+
+        el.classList.remove("hidden-cup", "pickable");
+
+        if (id >= selectedCupCount) {
+          el.classList.add("hidden-cup");
+          el.disabled = true;
+          applyCupTransform(el, (($("stage").clientWidth / 2) - (stageLayout.cupW / 2)), 22, 0.7);
+          continue;
+        }
+
+        const cup = cupById(id);
+        if (!cup) continue;
+
+        const x = getCupLeftForSlot(cup.slot);
+        let y = 0;
+        let scale = 1;
+        let imgLift = 0;
+        let shadow = "drop-shadow(0 10px 14px rgba(0,0,0,.18))";
+        let imgShadow = "drop-shadow(0 12px 14px rgba(0,0,0,.18))";
+
+        if (gameState === "idle" && id === ballCupId) {
+          y = -72;
+          scale = 1.03;
+          imgLift = -6;
+          shadow = "drop-shadow(0 22px 28px rgba(0,0,0,.26))";
+          imgShadow = "drop-shadow(0 18px 20px rgba(0,0,0,.20))";
+        }
+
+        if (gameState === "reveal" && (id === pickedCupId || (pickedCupId !== ballCupId && id === ballCupId))) {
+          y = -72;
+          scale = 1.03;
+          imgLift = -6;
+          shadow = "drop-shadow(0 22px 28px rgba(0,0,0,.26))";
+          imgShadow = "drop-shadow(0 18px 20px rgba(0,0,0,.20))";
+        }
+
+        if (gameState === "guessing") {
+          el.classList.add("pickable");
+        }
+
+        el.disabled = gameState !== "guessing";
+        el.style.filter = shadow;
+        img.style.filter = imgShadow;
+        img.style.transform = `translateY(${imgLift}px) scale(${scale})`;
+
+        applyCupTransform(el, x, y, scale);
+      }
+
+      const ball = $("ball");
+      const showBall = gameState === "idle" || gameState === "reveal";
+      ball.classList.toggle("show", showBall);
+
+      const ballX = getBallLeftForCupId(ballCupId);
+      applyBallTransform(ballX, showBall ? 1 : 0.45);
+
+      updatePlayButton();
+      updateStageHint();
+    }
+
+    function getPairKey(a, b){
+      return [Math.min(a, b), Math.max(a, b)].join("-");
+    }
+
+    function randomPairSlots(excludeKey = ""){
+      let slotA = 0;
+      let slotB = 1;
+      let key = "";
+      let tries = 0;
+
+      do {
+        slotA = Math.floor(Math.random() * selectedCupCount);
+        slotB = Math.floor(Math.random() * selectedCupCount);
+
+        while (slotB === slotA) {
+          slotB = Math.floor(Math.random() * selectedCupCount);
+        }
+
+        key = getPairKey(slotA, slotB);
+        tries++;
+      } while (excludeKey && key === excludeKey && tries < 8);
+
+      return { slotA, slotB, key };
+    }
+
+    function randomDirection(previous = 0){
+      if (previous && Math.random() < 0.68) {
+        return -previous;
+      }
+      return Math.random() > 0.5 ? 1 : -1;
+    }
+
+    async function animateMove(moveMap, duration, baseArc = 18, options = {}){
+      const movers = Object.keys(moveMap).map(Number);
+      const moverCount = movers.length;
+      const wobbleStrength = options.wobbleStrength ?? (moverCount === 2 ? 9 : 5);
+      const scaleBoost = options.scaleBoost ?? (moverCount === 2 ? 0.04 : 0.03);
+
+      const startData = movers.map((id, idx) => {
+        const cup = cupById(id);
+        const fromX = getCupLeftForSlot(cup.slot);
+        const toX = getCupLeftForSlot(moveMap[id]);
+
+        return {
+          id,
+          fromSlot: cup.slot,
+          toSlot: moveMap[id],
+          fromX,
+          toX,
+          arc: baseArc + rand(0, moverCount === 2 ? 12 : 8),
+          wobble: rand(wobbleStrength * 0.45, wobbleStrength),
+          phase: idx * 0.95,
+          layerBias: idx % 2 === 0 ? 1 : -1
+        };
+      });
+
+      await rafAnimate(duration, (eased, raw) => {
+        const lift = Math.sin(raw * Math.PI);
+
+        for (let id = 0; id < 5; id++) {
+          const el = cupEls[id];
+          const img = el.querySelector(".cup-img");
+
+          if (id >= selectedCupCount) continue;
+
+          const cup = cupById(id);
+          if (!cup) continue;
+
+          const moving = startData.find(item => item.id === id);
+
+          let x = getCupLeftForSlot(cup.slot);
+          let y = 0;
+          let scale = 1;
+          let shadow = "drop-shadow(0 10px 14px rgba(0,0,0,.18))";
+          let imgShadow = "drop-shadow(0 12px 14px rgba(0,0,0,.18))";
+
+          if (moving) {
+            const baseX = moving.fromX + ((moving.toX - moving.fromX) * eased);
+            const weave = Math.sin((raw * Math.PI * (moverCount === 2 ? 2.1 : 1.5)) + moving.phase) * moving.wobble * lift;
+
+            x = baseX + weave;
+            y = -lift * moving.arc;
+            scale = 1 + (lift * (moving.layerBias > 0 ? scaleBoost : -0.012));
+
+            shadow = "drop-shadow(0 18px 24px rgba(0,0,0,.24))";
+            imgShadow = "drop-shadow(0 14px 16px rgba(0,0,0,.20))";
+          }
+
+          el.style.filter = shadow;
+          img.style.filter = imgShadow;
+          img.style.transform = `translateY(0px) scale(${scale})`;
+
+          applyCupTransform(el, x, y, scale);
+        }
+      });
+
+      startData.forEach(item => {
+        const cup = cupById(item.id);
+        if (cup) cup.slot = item.toSlot;
+      });
+
+      renderStage();
+    }
+
+    async function animatePairSwap(slotA, slotB, moveMs){
+      const cupA = cupAtSlot(slotA);
+      const cupB = cupAtSlot(slotB);
+      if (!cupA || !cupB) return;
+
+      const map = {
+        [cupA.id]: slotB,
+        [cupB.id]: slotA
+      };
+
+      await animateMove(map, moveMs, 18, {
+        wobbleStrength: 10,
+        scaleBoost: 0.045
+      });
+    }
+
+    async function animateCycle(direction, moveMs){
+      const map = {};
+      cups.forEach(cup => {
+        map[cup.id] = direction > 0
+          ? (cup.slot + 1) % selectedCupCount
+          : (cup.slot + selectedCupCount - 1) % selectedCupCount;
+      });
+
+      await animateMove(map, moveMs, 15, {
+        wobbleStrength: 4,
+        scaleBoost: 0.03
+      });
+    }
+
+    async function animateCombo(baseMs, lastPairKey = "", lastDirection = 0){
+      let pairKey = lastPairKey;
+      let direction = lastDirection;
+      const steps = selectedCupCount >= 5 ? 3 : 2;
+
+      for (let step = 0; step < steps; step++) {
+        const stepMs = Math.max(145, Math.round(baseMs - (step * rand(18, 34))));
+        const roll = Math.random();
+
+        if (roll < 0.30 && selectedCupCount > 3) {
+          direction = randomDirection(direction);
+          await animateCycle(direction, Math.max(155, stepMs));
+        } else {
+          const pair = randomPairSlots(pairKey);
+          pairKey = pair.key;
+          await animatePairSwap(pair.slotA, pair.slotB, stepMs);
+        }
+
+        if (step < steps - 1) {
+          await sleep(randInt(0, 5));
+        }
+      }
+
+      return { pairKey, direction };
+    }
+
+    async function startShuffleSequence(token){
+      gameState = "shuffling";
+      setInputsLocked(true);
+      renderStage();
+
+      let lastPairKey = "";
+      let lastDirection = 0;
+
+      const moves = 18 + (selectedCupCount * 3) + randInt(2, 5);
+
+      for (let i = 0; i < moves; i++) {
+        if (token !== shuffleToken) return;
+
+        const progress = i / Math.max(1, moves - 1);
+        const baseMs = Math.max(
+          155,
+          Math.round(295 - (progress * 120) - rand(0, 18))
+        );
+
+        const roll = Math.random();
+
+        if (roll < 0.22) {
+          lastDirection = randomDirection(lastDirection);
+          await animateCycle(lastDirection, Math.max(165, baseMs + randInt(8, 18)));
+        } else if (roll < 0.56) {
+          const pair = randomPairSlots(lastPairKey);
+          lastPairKey = pair.key;
+          await animatePairSwap(pair.slotA, pair.slotB, baseMs);
+
+          if (progress > 0.52 && Math.random() < 0.42) {
+            const follow = randomPairSlots(lastPairKey);
+            lastPairKey = follow.key;
+            await sleep(randInt(0, 4));
+            await animatePairSwap(
+              follow.slotA,
+              follow.slotB,
+              Math.max(145, baseMs - randInt(18, 32))
+            );
+          }
+        } else {
+          const combo = await animateCombo(baseMs, lastPairKey, lastDirection);
+          lastPairKey = combo.pairKey;
+          lastDirection = combo.direction;
+        }
+
+        if (token !== shuffleToken) return;
+
+        if (progress > 0.70 && Math.random() < 0.28) {
+          lastDirection = randomDirection(lastDirection);
+          await sleep(randInt(0, 3));
+          await animateCycle(
+            lastDirection,
+            Math.max(145, baseMs - randInt(12, 22))
+          );
+        }
+
+        await sleep(randInt(0, 6));
+      }
+
+      if (token !== shuffleToken) return;
+
+      gameState = "guessing";
+      setInputsLocked(true);
+      setStatus("Угадай, где шарик");
+      renderStage();
+    }
+
+    async function startRound(){
+      if (gameState !== "idle") return;
+
+      const bet = getBetAmount();
+
+      if (bet < MIN_BET) {
+        setStatus(`Минимальная ставка ${MIN_BET} VC`);
+        return;
+      }
+
+      if (bet > MAX_BET) {
+        $("betInput").value = String(MAX_BET);
+        setStatus(`Максимальная ставка ${MAX_BET} VC`);
+        return;
+      }
+
+      if (bet > currentBalance) {
+        setStatus("Недостаточно средств");
+        return;
+      }
+
+      roundBet = bet;
+      currentBalance = Number((currentBalance - bet).toFixed(2));
+      saveBalance();
+      updateBalanceUI();
+
+      resetCups();
+
+      gameState = "covering";
+      setInputsLocked(true);
+      setStatus("Перемешиваем...");
+      renderStage();
+
+      await sleep(220);
+      if (gameState !== "covering") return;
+
+      shuffleToken++;
+      const token = shuffleToken;
+      startShuffleSequence(token);
+    }
+
+    async function revealChoice(cupId){
+      if (gameState !== "guessing") return;
+
+      gameState = "reveal";
+      pickedCupId = cupId;
+      shuffleToken++;
+
+      const win = cupId === ballCupId;
+
+      renderStage();
+
+      if (win) {
+        const payout = Number((roundBet * getCurrentMultiplier()).toFixed(2));
+        currentBalance = Number((currentBalance + payout).toFixed(2));
+        saveBalance();
+        updateBalanceUI();
+        setStatus(`Ты угадал: +${formatVc(payout)}`);
+        await sleep(1100);
+      } else {
+        saveBalance();
+        updateBalanceUI();
+        setStatus("Не угадал");
+        await sleep(1250);
+      }
+
+      resetToIdle();
+    }
+
+    function resetToIdle(){
+      roundBet = 0;
+      pickedCupId = null;
+      resetCups();
+      gameState = "idle";
+      setInputsLocked(false);
+      updateBalanceUI();
+      updateStats();
+      updateCountButtons();
+      setStatus("");
+      renderStage();
+    }
+
+    function applyCupCount(count){
+      if (![3,4,5].includes(count)) return;
+      if (gameState !== "idle") return;
+
+      selectedCupCount = count;
+      updateStats();
+      updateCountButtons();
+      resetCups();
+      setStatus("");
+      renderStage();
+    }
+
+    function openOverlay(id){
+      const el = $(id);
+      el.classList.add("show");
+      el.setAttribute("aria-hidden", "false");
+      document.body.style.overflow = "hidden";
+    }
+
+    function closeOverlay(id){
+      const el = $(id);
+      el.classList.remove("show");
+      el.setAttribute("aria-hidden", "true");
+      document.body.style.overflow = "";
+    }
+
+    $("backBtn").addEventListener("click", () => goTo(FILES.games));
+    $("logoBtn").addEventListener("click", () => openOverlay("channelOverlay"));
+    $("rulesBtn").addEventListener("click", () => openOverlay("rulesOverlay"));
+
+    $("channelClose").addEventListener("click", () => closeOverlay("channelOverlay"));
+    $("rulesClose").addEventListener("click", () => closeOverlay("rulesOverlay"));
+
+    $("channelOverlay").addEventListener("click", (e) => {
+      if (e.target === $("channelOverlay")) closeOverlay("channelOverlay");
+    });
+
+    $("rulesOverlay").addEventListener("click", (e) => {
+      if (e.target === $("rulesOverlay")) closeOverlay("rulesOverlay");
+    });
+
+    $("goChannel").addEventListener("click", () => {
+      openTelegramLinkSafe("https://t.me/vezuspubg");
+    });
+
+    $("betToggleBtn").addEventListener("click", () => {
+      if ($("betToggleBtn").disabled) return;
+      setCountMenuVisible(false);
+      setQuickVisible(!quickVisible);
+    });
+
+    $("cupCountToggleBtn").addEventListener("click", () => {
+      if ($("cupCountToggleBtn").disabled) return;
+      setQuickVisible(false);
+      setCountMenuVisible(!countMenuVisible);
+    });
+
+    document.querySelectorAll(".quick-btn").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        if (btn.disabled) return;
+        const value = Number(btn.getAttribute("data-bet"));
+        if (!Number.isFinite(value)) return;
+        $("betInput").value = String(Math.min(value, MAX_BET));
+        setQuickVisible(false);
+      });
+    });
+
+    document.querySelectorAll(".count-btn").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        if (btn.disabled) return;
+        const value = Number(btn.getAttribute("data-count"));
+        if (!Number.isFinite(value)) return;
+        applyCupCount(value);
+        setCountMenuVisible(false);
+      });
+    });
+
+    $("betInput").addEventListener("input", () => {
+      const input = $("betInput");
+      let value = Number(input.value);
+
+      if (!input.value) return;
+
+      if (!Number.isFinite(value)) {
+        input.value = "";
+        return;
+      }
+
+      value = Math.floor(value);
+
+      if (value > MAX_BET) value = MAX_BET;
+      if (value < 0) value = 0;
+
+      input.value = String(value);
+    });
+
+    $("playBtn").addEventListener("click", startRound);
+
+    Object.values(cupEls).forEach((el) => {
+      el.addEventListener("click", () => {
+        const id = Number(el.getAttribute("data-cup"));
+        if (!Number.isFinite(id)) return;
+        revealChoice(id);
+      });
+    });
+
+    document.addEventListener("click", (e) => {
+      const countToggle = $("cupCountToggleBtn");
+      const countMenu = $("cupCountMenu");
+      const betToggle = $("betToggleBtn");
+      const quickMenu = $("quickBets");
+
+      if (
+        countMenuVisible &&
+        e.target !== countToggle &&
+        !countToggle.contains(e.target) &&
+        e.target !== countMenu &&
+        !countMenu.contains(e.target)
+      ) {
+        setCountMenuVisible(false);
+      }
+
+      if (
+        quickVisible &&
+        e.target !== betToggle &&
+        !betToggle.contains(e.target) &&
+        e.target !== quickMenu &&
+        !quickMenu.contains(e.target)
+      ) {
+        setQuickVisible(false);
+      }
+    });
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") {
+        closeOverlay("channelOverlay");
+        closeOverlay("rulesOverlay");
+        setCountMenuVisible(false);
+        setQuickVisible(false);
+      }
+    });
+
+    window.addEventListener("resize", () => {
+      if (gameState !== "shuffling") {
+        renderStage();
+      }
+    });
+
+    function init(){
+      ensureProfile();
+      updateBalanceUI();
+      updateStats();
+      updateCountButtons();
+      resetToIdle();
+    }
+
+    window.addEventListener("load", init);
+  </script>
+</body>
+</html>
