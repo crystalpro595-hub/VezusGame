@@ -347,13 +347,13 @@
       display:grid;
       grid-template-columns:repeat(5, minmax(0,1fr));
       gap:6px;
-      transition: opacity .28s ease, filter .28s ease, transform .28s ease;
+      transition: opacity .40s ease, filter .40s ease, transform .40s ease;
     }
 
     .board-wrap.is-fading .board{
-      opacity:.18;
-      filter: blur(2px);
-      transform: scale(.985);
+      opacity:.14;
+      filter: blur(2.5px);
+      transform: scale(.982);
     }
 
     .board-dim{
@@ -361,10 +361,10 @@
       inset:8px;
       border-radius:14px;
       background:
-        radial-gradient(circle at 50% 50%, rgba(255,255,255,.06), rgba(4,8,18,.72));
+        radial-gradient(circle at 50% 50%, rgba(255,255,255,.05), rgba(4,8,18,.78));
       opacity:0;
       pointer-events:none;
-      transition: opacity .28s ease;
+      transition: opacity .40s ease;
       z-index:5;
     }
 
@@ -525,48 +525,21 @@
     }
 
     @keyframes blastCore{
-      0%{
-        opacity:0;
-        transform:translate(-50%, -50%) scale(.15);
-      }
-      18%{
-        opacity:1;
-        transform:translate(-50%, -50%) scale(2.3);
-      }
-      42%{
-        opacity:1;
-        transform:translate(-50%, -50%) scale(3.8);
-      }
-      100%{
-        opacity:0;
-        transform:translate(-50%, -50%) scale(6.6);
-      }
+      0%{ opacity:0; transform:translate(-50%, -50%) scale(.15); }
+      18%{ opacity:1; transform:translate(-50%, -50%) scale(2.3); }
+      42%{ opacity:1; transform:translate(-50%, -50%) scale(3.8); }
+      100%{ opacity:0; transform:translate(-50%, -50%) scale(6.6); }
     }
 
     @keyframes blastRing{
-      0%{
-        opacity:1;
-        transform:translate(-50%, -50%) scale(.25);
-      }
-      35%{
-        opacity:.95;
-        transform:translate(-50%, -50%) scale(2.7);
-      }
-      100%{
-        opacity:0;
-        transform:translate(-50%, -50%) scale(5.6);
-      }
+      0%{ opacity:1; transform:translate(-50%, -50%) scale(.25); }
+      35%{ opacity:.95; transform:translate(-50%, -50%) scale(2.7); }
+      100%{ opacity:0; transform:translate(-50%, -50%) scale(5.6); }
     }
 
     @keyframes sparkBurst{
-      0%{
-        opacity:1;
-        transform:translate(-50%, -50%) scale(.25) rotate(0deg);
-      }
-      100%{
-        opacity:0;
-        transform:translate(-50%, -50%) scale(1.9) rotate(18deg);
-      }
+      0%{ opacity:1; transform:translate(-50%, -50%) scale(.25) rotate(0deg); }
+      100%{ opacity:0; transform:translate(-50%, -50%) scale(1.9) rotate(18deg); }
     }
 
     .cell.disabled{
@@ -919,7 +892,7 @@
       padding:12px;
       display:flex;
       flex-direction:column;
-      gap:10px;
+      gap:8px;
     }
 
     .popup-text,
@@ -1110,17 +1083,17 @@
   <div class="overlay" id="rulesOverlay" aria-hidden="true">
     <div class="popup" role="dialog" aria-modal="true" aria-label="Правила">
       <div class="popup-head">
-        <div class="popup-title">Правила игры</div>
+        <div class="popup-title">Правила</div>
         <button class="popup-x" id="rulesClose" aria-label="Закрыть">✕</button>
       </div>
 
       <div class="popup-body">
-        <p class="rule-line">• Пока игра работает только на <b>LocalStorage</b></p>
-        <p class="rule-line">• Если баланса нет, автоматически создаётся <b>1000 VC</b></p>
+        <p class="rule-line">• Минимальная ставка: <b>10 VC</b></p>
         <p class="rule-line">• Максимальная ставка: <b>5000 VC</b></p>
-        <p class="rule-line">• Нажми <b>«Начать»</b> — ставка спишется сразу</p>
-        <p class="rule-line">• Открывай безопасные клетки и жми <b>«Забрать»</b></p>
-        <p class="rule-line">• Если попадёшь на мину — ставка сгорает</p>
+        <p class="rule-line">• Выбери ставку и количество мин</p>
+        <p class="rule-line">• Нажми <b>«Начать»</b></p>
+        <p class="rule-line">• Открывай безопасные клетки</p>
+        <p class="rule-line">• Нажми <b>«Забрать»</b> до попадания на мину</p>
       </div>
     </div>
   </div>
@@ -1151,7 +1124,7 @@
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <script>
     const PROFILE_KEY = "tg_profile";
-    const ROUND_KEY = "mines_round_v6";
+    const ROUND_KEY = "mines_round_v7";
 
     const DEFAULT_BALANCE = 1000;
     const MIN_BET = 10;
@@ -1162,9 +1135,10 @@
     const SAFE_ICON_SRC = "https://i.postimg.cc/mDjzbZ5Y/Picsart-26-03-03-12-46-32-641.png";
     const MINE_ICON_SRC = "https://i.postimg.cc/ncBsz1gH/Picsart-26-03-03-12-46-14-937.png";
 
-    const RESET_DELAY_LOSE = 1250;
-    const RESET_DELAY_WIN = 950;
-    const FADE_RELEASE_DELAY = 220;
+    const RESET_DELAY_LOSE = 1650;
+    const RESET_DELAY_WIN = 650;
+    const FADE_RELEASE_DELAY_LOSE = 420;
+    const FADE_RELEASE_DELAY_WIN = 120;
 
     const FILES = {
       games: "games.html"
@@ -1182,6 +1156,7 @@
     let isResetting = false;
     let resetTimer = null;
     let fadeTimer = null;
+    let lastResetType = "win";
 
     function formatVc(value){
       const n = Number(value ?? 0);
@@ -1462,15 +1437,20 @@
       updateStats();
       renderBoard();
 
+      const releaseDelay = lastResetType === "lose"
+        ? FADE_RELEASE_DELAY_LOSE
+        : FADE_RELEASE_DELAY_WIN;
+
       if (fadeTimer) clearTimeout(fadeTimer);
       fadeTimer = setTimeout(() => {
         isResetting = false;
         setBoardFading(false);
         updateButtons();
-      }, FADE_RELEASE_DELAY);
+      }, releaseDelay);
     }
 
-    function scheduleReset(delay){
+    function scheduleReset(delay, type){
+      lastResetType = type;
       isResetting = true;
       setBoardFading(true);
       updateButtons();
@@ -1553,7 +1533,7 @@
       updateStats();
       updateButtons();
 
-      scheduleReset(RESET_DELAY_LOSE);
+      scheduleReset(RESET_DELAY_LOSE, "lose");
     }
 
     function cashOut(){
@@ -1577,7 +1557,7 @@
       updateStats();
       updateButtons();
 
-      scheduleReset(RESET_DELAY_WIN);
+      scheduleReset(RESET_DELAY_WIN, "win");
     }
 
     function openCell(index){
