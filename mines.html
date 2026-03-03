@@ -337,7 +337,9 @@
     }
 
     .board-wrap{
+      position:relative;
       padding:8px;
+      overflow:hidden;
     }
 
     .board{
@@ -345,6 +347,29 @@
       display:grid;
       grid-template-columns:repeat(5, minmax(0,1fr));
       gap:6px;
+      transition: opacity .28s ease, filter .28s ease, transform .28s ease;
+    }
+
+    .board-wrap.is-fading .board{
+      opacity:.18;
+      filter: blur(2px);
+      transform: scale(.985);
+    }
+
+    .board-dim{
+      position:absolute;
+      inset:8px;
+      border-radius:14px;
+      background:
+        radial-gradient(circle at 50% 50%, rgba(255,255,255,.06), rgba(4,8,18,.72));
+      opacity:0;
+      pointer-events:none;
+      transition: opacity .28s ease;
+      z-index:5;
+    }
+
+    .board-wrap.is-fading .board-dim{
+      opacity:1;
     }
 
     .cell{
@@ -386,12 +411,12 @@
 
     .cell.mine{
       background:
-        linear-gradient(180deg, rgba(239,68,68,.25), rgba(220,38,38,.13));
-      border-color: rgba(239,68,68,.22);
+        linear-gradient(180deg, rgba(239,68,68,.28), rgba(220,38,38,.15));
+      border-color: rgba(255,90,90,.34);
       box-shadow:
-        0 8px 18px rgba(0,0,0,.14),
-        0 0 14px rgba(239,68,68,.16),
-        inset 0 1px 0 rgba(255,255,255,.07);
+        0 8px 18px rgba(0,0,0,.16),
+        0 0 18px rgba(255,90,90,.22),
+        inset 0 1px 0 rgba(255,255,255,.08);
     }
 
     .cell.reveal-safe{
@@ -399,7 +424,7 @@
     }
 
     .cell.reveal-mine{
-      animation: revealMine .42s cubic-bezier(.22,1,.36,1);
+      animation: revealMine .46s cubic-bezier(.22,1,.36,1), mineShake .40s ease-in-out;
     }
 
     .cell.explode::before,
@@ -415,18 +440,68 @@
     }
 
     .cell.explode::before{
-      width:20%;
-      height:20%;
-      background: radial-gradient(circle, rgba(255,245,180,.95) 0%, rgba(255,120,70,.82) 45%, rgba(255,70,70,0) 72%);
-      animation: blastCore .58s ease-out forwards;
+      width:18%;
+      height:18%;
+      background:
+        radial-gradient(circle, rgba(255,255,220,1) 0%, rgba(255,215,110,.98) 18%, rgba(255,120,50,.92) 42%, rgba(255,60,60,.55) 66%, rgba(255,60,60,0) 78%);
+      box-shadow:
+        0 0 16px rgba(255,220,120,.9),
+        0 0 28px rgba(255,120,50,.65);
+      animation: blastCore .72s ease-out forwards;
     }
 
     .cell.explode::after{
-      width:26%;
-      height:26%;
-      border: 3px solid rgba(255,210,120,.85);
-      box-shadow: 0 0 18px rgba(255,120,70,.45);
-      animation: blastRing .68s ease-out forwards;
+      width:24%;
+      height:24%;
+      border: 3px solid rgba(255,230,160,.9);
+      box-shadow:
+        0 0 12px rgba(255,220,140,.8),
+        0 0 22px rgba(255,120,70,.45);
+      animation: blastRing .82s ease-out forwards;
+    }
+
+    .blast-sparks{
+      position:absolute;
+      inset:-22%;
+      pointer-events:none;
+      z-index:1;
+    }
+
+    .blast-sparks::before,
+    .blast-sparks::after{
+      content:"";
+      position:absolute;
+      left:50%;
+      top:50%;
+      width:10px;
+      height:10px;
+      border-radius:50%;
+      transform:translate(-50%, -50%);
+      background: transparent;
+      box-shadow:
+        0 -30px 0 1px rgba(255,240,180,.95),
+        22px -22px 0 1px rgba(255,180,120,.9),
+        30px 0 0 1px rgba(255,140,80,.88),
+        22px 22px 0 1px rgba(255,180,120,.9),
+        0 30px 0 1px rgba(255,240,180,.95),
+        -22px 22px 0 1px rgba(255,150,90,.9),
+        -30px 0 0 1px rgba(255,110,70,.88),
+        -22px -22px 0 1px rgba(255,150,90,.9);
+      filter: blur(.2px);
+      animation: sparkBurst .72s ease-out forwards;
+    }
+
+    .blast-sparks::after{
+      box-shadow:
+        0 -18px 0 1px rgba(255,255,220,.95),
+        13px -13px 0 1px rgba(255,220,160,.92),
+        18px 0 0 1px rgba(255,170,100,.9),
+        13px 13px 0 1px rgba(255,220,160,.92),
+        0 18px 0 1px rgba(255,255,220,.95),
+        -13px 13px 0 1px rgba(255,170,100,.9),
+        -18px 0 0 1px rgba(255,120,80,.88),
+        -13px -13px 0 1px rgba(255,170,100,.9);
+      animation-duration: .55s;
     }
 
     @keyframes revealSafe{
@@ -436,34 +511,61 @@
     }
 
     @keyframes revealMine{
-      0%{ transform: scale(.58) rotate(-8deg); opacity:.08; }
-      55%{ transform: scale(1.14) rotate(6deg); opacity:1; }
+      0%{ transform: scale(.48) rotate(-12deg); opacity:.04; }
+      40%{ transform: scale(1.22) rotate(8deg); opacity:1; }
       100%{ transform: scale(1) rotate(0deg); opacity:1; }
+    }
+
+    @keyframes mineShake{
+      0%,100%{ translate:0 0; }
+      20%{ translate:-1px 1px; }
+      40%{ translate:2px -1px; }
+      60%{ translate:-2px 1px; }
+      80%{ translate:1px -1px; }
     }
 
     @keyframes blastCore{
       0%{
         opacity:0;
-        transform:translate(-50%, -50%) scale(.2);
+        transform:translate(-50%, -50%) scale(.15);
       }
-      25%{
+      18%{
         opacity:1;
-        transform:translate(-50%, -50%) scale(2.6);
+        transform:translate(-50%, -50%) scale(2.3);
+      }
+      42%{
+        opacity:1;
+        transform:translate(-50%, -50%) scale(3.8);
       }
       100%{
         opacity:0;
-        transform:translate(-50%, -50%) scale(5.2);
+        transform:translate(-50%, -50%) scale(6.6);
       }
     }
 
     @keyframes blastRing{
       0%{
+        opacity:1;
+        transform:translate(-50%, -50%) scale(.25);
+      }
+      35%{
         opacity:.95;
-        transform:translate(-50%, -50%) scale(.35);
+        transform:translate(-50%, -50%) scale(2.7);
       }
       100%{
         opacity:0;
-        transform:translate(-50%, -50%) scale(4.6);
+        transform:translate(-50%, -50%) scale(5.6);
+      }
+    }
+
+    @keyframes sparkBurst{
+      0%{
+        opacity:1;
+        transform:translate(-50%, -50%) scale(.25) rotate(0deg);
+      }
+      100%{
+        opacity:0;
+        transform:translate(-50%, -50%) scale(1.9) rotate(18deg);
       }
     }
 
@@ -942,8 +1044,9 @@
         </div>
       </div>
 
-      <div class="card board-wrap">
+      <div class="card board-wrap" id="boardWrap">
         <div class="board" id="board"></div>
+        <div class="board-dim"></div>
       </div>
 
       <div class="card panel">
@@ -956,6 +1059,7 @@
               id="betInput"
               type="number"
               min="10"
+              max="5000"
               step="1"
               inputmode="numeric"
               placeholder="Мин. 10"
@@ -1013,6 +1117,7 @@
       <div class="popup-body">
         <p class="rule-line">• Пока игра работает только на <b>LocalStorage</b></p>
         <p class="rule-line">• Если баланса нет, автоматически создаётся <b>1000 VC</b></p>
+        <p class="rule-line">• Максимальная ставка: <b>5000 VC</b></p>
         <p class="rule-line">• Нажми <b>«Начать»</b> — ставка спишется сразу</p>
         <p class="rule-line">• Открывай безопасные клетки и жми <b>«Забрать»</b></p>
         <p class="rule-line">• Если попадёшь на мину — ставка сгорает</p>
@@ -1046,18 +1151,20 @@
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <script>
     const PROFILE_KEY = "tg_profile";
-    const ROUND_KEY = "mines_round_v5";
+    const ROUND_KEY = "mines_round_v6";
 
     const DEFAULT_BALANCE = 1000;
     const MIN_BET = 10;
+    const MAX_BET = 5000;
     const TOTAL_CELLS = 25;
     const HOUSE_EDGE_MULT = 0.56;
 
     const SAFE_ICON_SRC = "https://i.postimg.cc/mDjzbZ5Y/Picsart-26-03-03-12-46-32-641.png";
     const MINE_ICON_SRC = "https://i.postimg.cc/ncBsz1gH/Picsart-26-03-03-12-46-14-937.png";
 
-    const RESET_DELAY_LOSE = 1100;
-    const RESET_DELAY_WIN = 850;
+    const RESET_DELAY_LOSE = 1250;
+    const RESET_DELAY_WIN = 950;
+    const FADE_RELEASE_DELAY = 220;
 
     const FILES = {
       games: "games.html"
@@ -1074,6 +1181,7 @@
     let lastRevealType = "";
     let isResetting = false;
     let resetTimer = null;
+    let fadeTimer = null;
 
     function formatVc(value){
       const n = Number(value ?? 0);
@@ -1103,6 +1211,10 @@
       noticeTimer = setTimeout(() => {
         box.classList.remove("show");
       }, 1700);
+    }
+
+    function setBoardFading(state){
+      $("boardWrap").classList.toggle("is-fading", !!state);
     }
 
     function readProfile(){
@@ -1251,7 +1363,7 @@
     function updateButtons(){
       const bet = getBetAmount();
       const roundActive = !!roundState?.active;
-      const canStart = !roundActive && !isResetting && bet >= MIN_BET && bet <= currentBalance;
+      const canStart = !roundActive && !isResetting && bet >= MIN_BET && bet <= Math.min(currentBalance, MAX_BET);
       const canCash = roundActive && !isResetting && (roundState.safePicks || 0) > 0;
 
       $("startBtn").disabled = !canStart;
@@ -1300,6 +1412,9 @@
           cell.classList.add("mine", "disabled");
           if (i === animatedIndex && animatedType === "mine") {
             cell.classList.add("reveal-mine", "explode");
+            const sparks = document.createElement("span");
+            sparks.className = "blast-sparks";
+            cell.appendChild(sparks);
           }
           cell.appendChild(createImage(MINE_ICON_SRC, "mine-icon"));
           cell.disabled = true;
@@ -1337,26 +1452,32 @@
       return [...used];
     }
 
-    function resetToIdleBoard(){
+    function finishReset(){
       if (resetTimer) {
         clearTimeout(resetTimer);
         resetTimer = null;
       }
 
-      isResetting = false;
       clearRoundState();
       updateStats();
-      updateButtons();
       renderBoard();
+
+      if (fadeTimer) clearTimeout(fadeTimer);
+      fadeTimer = setTimeout(() => {
+        isResetting = false;
+        setBoardFading(false);
+        updateButtons();
+      }, FADE_RELEASE_DELAY);
     }
 
     function scheduleReset(delay){
       isResetting = true;
+      setBoardFading(true);
       updateButtons();
 
       if (resetTimer) clearTimeout(resetTimer);
       resetTimer = setTimeout(() => {
-        resetToIdleBoard();
+        finishReset();
       }, delay);
     }
 
@@ -1378,13 +1499,25 @@
         return;
       }
 
+      if (bet > MAX_BET) {
+        showNotice(`Максимальная ставка ${MAX_BET} VC`);
+        updateButtons();
+        return;
+      }
+
       if (bet > currentBalance) {
         showNotice("Недостаточно средств");
         updateButtons();
         return;
       }
 
+      if (fadeTimer) {
+        clearTimeout(fadeTimer);
+        fadeTimer = null;
+      }
+
       clearRoundState();
+      setBoardFading(false);
 
       currentBalance -= bet;
       saveBalance();
@@ -1521,7 +1654,7 @@
         if (btn.disabled) return;
         const value = Number(btn.getAttribute("data-bet"));
         if (!Number.isFinite(value)) return;
-        $("betInput").value = String(value);
+        $("betInput").value = String(Math.min(value, MAX_BET));
         setQuickVisible(false);
         updateButtons();
       });
@@ -1543,6 +1676,26 @@
     });
 
     $("betInput").addEventListener("input", () => {
+      const input = $("betInput");
+      let value = Number(input.value);
+
+      if (!input.value) {
+        updateButtons();
+        return;
+      }
+
+      if (!Number.isFinite(value)) {
+        input.value = "";
+        updateButtons();
+        return;
+      }
+
+      value = Math.floor(value);
+
+      if (value > MAX_BET) value = MAX_BET;
+      if (value < 0) value = 0;
+
+      input.value = String(value);
       updateButtons();
     });
 
