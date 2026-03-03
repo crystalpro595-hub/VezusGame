@@ -968,7 +968,6 @@
 
   <div class="app">
     <div class="content">
-
       <div class="sticky-top">
         <div class="top-row">
           <button class="icon-btn" id="backBtn" aria-label="Назад">←</button>
@@ -1076,7 +1075,6 @@
           <button class="cash-btn" id="cashBtn" type="button" disabled>Забрать</button>
         </div>
       </div>
-
     </div>
   </div>
 
@@ -1123,14 +1121,11 @@
 
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <script>
-    const PROFILE_KEY = "tg_profile";
-    const ROUND_KEY = "mines_round_v7";
+    const EDGE_FUNCTION_URL = "https://lazrfierfbhwlduqlvws.supabase.co/functions/v1/mines-game";
 
-    const DEFAULT_BALANCE = 1000;
     const MIN_BET = 10;
     const MAX_BET = 5000;
     const TOTAL_CELLS = 25;
-    const HOUSE_EDGE_MULT = 0.56;
 
     const SAFE_ICON_SRC = "https://i.postimg.cc/mDjzbZ5Y/Picsart-26-03-03-12-46-32-641.png";
     const MINE_ICON_SRC = "https://i.postimg.cc/ncBsz1gH/Picsart-26-03-03-12-46-14-937.png";
@@ -1157,6 +1152,7 @@
     let resetTimer = null;
     let fadeTimer = null;
     let lastResetType = "win";
+    let isBusyRequest = false;
 
     function formatVc(value){
       const n = Number(value ?? 0);
@@ -1168,12 +1164,8 @@
       window.location.href = file;
     }
 
-    function openTelegramLinkSafe(url){
-      if (window.Telegram && window.Telegram.WebApp && typeof window.Telegram.WebApp.openTelegramLink === "function") {
-        window.Telegram.WebApp.openTelegramLink(url);
-        return;
-      }
-      window.open(url, "_blank", "noopener");
+    function delay(ms){
+      return new Promise((resolve) => setTimeout(resolve, ms));
     }
 
     function showNotice(text){
@@ -1192,79 +1184,82 @@
       $("boardWrap").classList.toggle("is-fading", !!state);
     }
 
+    function openTelegramLinkSafe(url){
+      if (window.Telegram && window.Telegram.WebApp && typeof window.Telegram.WebApp.openTelegramLink === "function") {
+        window.Telegram.WebApp.openTelegramLink(url);
+        return;
+      }
+      window.open(url, "_blank", "noopener");
+    }
+
     function readProfile(){
       try{
-        return JSON.parse(localStorage.getItem(PROFILE_KEY) || "null");
+        return JSON.parse(localStorage.getItem("tg_profile") || "null");
       } catch {
         return null;
       }
     }
 
-    function writeProfile(profile){
-      localStorage.setItem(PROFILE_KEY, JSON.stringify(profile));
+    function getCurrentUserId(){
+      const profile = readProfile();
+      return profile?.id || profile?.user_id || null;
     }
 
-    function ensureProfile(){
-      const cached = readProfile();
-      if (cached && Number.isFinite(Number(cached.balance))) {
-        currentBalance = Number(cached.balance) || 0;
+    async function api(action, payload = {}){
+      const userId = getCurrentUserId();
+
+      if (!userId) {
+        throw new Error("Сначала войди в аккаунт");
+      }
+
+      const res = await fetch(EDGE_FUNCTION_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          action,
+          user_id: userId,
+          ...payload
+        })
+      });
+
+      const data = await res.json().catch(() => ({}));
+
+      if (!res.ok || !data.ok) {
+        throw new Error(data.message || "Ошибка сервера");
+      }
+
+      return data;
+    }
+
+    function createDisplayRound(base = {}){
+      return {
+        active: !!base.active,
+        crashed: !!base.crashed,
+        bet: Number(base.bet || 0),
+        minesCount: Number(base.minesCount || selectedMines || 3),
+        opened: Array.isArray(base.opened) ? [...base.opened] : [],
+        safePicks: Number(base.safePicks || 0),
+        mineIndexes: Array.isArray(base.mineIndexes) ? [...base.mineIndexes] : []
+      };
+    }
+
+    function setRoundFromServer(round){
+      if (!round) {
+        roundState = null;
         return;
       }
 
-      const profile = { balance: DEFAULT_BALANCE };
-      currentBalance = profile.balance;
-      writeProfile(profile);
-    }
-
-    function saveBalance(){
-      const profile = readProfile() || {};
-      profile.balance = currentBalance;
-      writeProfile(profile);
-    }
-
-    function clearRoundState(){
-      roundState = null;
-      localStorage.removeItem(ROUND_KEY);
-      lastRevealIndex = -1;
-      lastRevealType = "";
-    }
-
-    function loadRoundState(){
-      try{
-        const parsed = JSON.parse(localStorage.getItem(ROUND_KEY) || "null");
-        if (!parsed || typeof parsed !== "object") return null;
-        if (!Array.isArray(parsed.mineIndexes) || !Array.isArray(parsed.opened)) return null;
-
-        const validMines = Number(parsed.minesCount);
-        if (![3,5,7,10].includes(validMines)) return null;
-        if (validMines >= TOTAL_CELLS) return null;
-        if (!parsed.active) return null;
-
-        return parsed;
-      } catch {
-        return null;
-      }
-    }
-
-    function saveRoundState(){
-      if (!roundState || !roundState.active) {
-        localStorage.removeItem(ROUND_KEY);
-        return;
-      }
-      localStorage.setItem(ROUND_KEY, JSON.stringify(roundState));
-    }
-
-    function getBetAmount(){
-      const raw = $("betInput").value;
-      const amount = Number(raw);
-      if (!raw || !Number.isFinite(amount)) return 0;
-      return Math.floor(amount);
-    }
-
-    function setQuickVisible(show){
-      if ($("betToggleBtn").disabled && show) return;
-      quickVisible = !!show;
-      $("quickBets").classList.toggle("show", quickVisible);
+      roundState = createDisplayRound({
+        active: !!round.active,
+        crashed: false,
+        bet: round.bet,
+        minesCount: round.minesCount,
+        opened: round.opened,
+        safePicks: round.safePicks,
+        mineIndexes: []
+      });
     }
 
     function updateBalanceUI(){
@@ -1281,13 +1276,13 @@
         mult *= (TOTAL_CELLS - i) / (safeCells - i);
       }
 
-      mult *= HOUSE_EDGE_MULT;
+      mult *= 0.56;
       return Math.max(1, Number(mult.toFixed(2)));
     }
 
     function getCurrentMultiplier(){
       const safePicks = roundState?.safePicks || 0;
-      const minesCount = roundState?.active ? roundState.minesCount : selectedMines;
+      const minesCount = roundState?.minesCount || selectedMines;
       return calcMultiplier(safePicks, minesCount);
     }
 
@@ -1298,12 +1293,12 @@
     }
 
     function updateMineButtons(){
-      const activeMines = roundState?.active ? roundState.minesCount : selectedMines;
+      const activeMines = roundState?.minesCount || selectedMines;
 
       document.querySelectorAll(".mine-count-btn").forEach((btn) => {
         const mines = Number(btn.getAttribute("data-mines"));
         btn.classList.toggle("active", mines === activeMines);
-        btn.disabled = !!roundState?.active || isResetting;
+        btn.disabled = !!roundState?.active || isResetting || isBusyRequest;
       });
 
       $("minesCountView").textContent = String(activeMines);
@@ -1320,8 +1315,14 @@
       }
     }
 
+    function setQuickVisible(show){
+      if ($("betToggleBtn").disabled && show) return;
+      quickVisible = !!show;
+      $("quickBets").classList.toggle("show", quickVisible);
+    }
+
     function updateControlsState(){
-      const blocked = !!roundState?.active || isResetting;
+      const blocked = !!roundState?.active || isResetting || isBusyRequest;
 
       $("betInput").disabled = blocked;
       $("betToggleBtn").disabled = blocked;
@@ -1338,24 +1339,24 @@
     function updateButtons(){
       const bet = getBetAmount();
       const roundActive = !!roundState?.active;
-      const canStart = !roundActive && !isResetting && bet >= MIN_BET && bet <= Math.min(currentBalance, MAX_BET);
-      const canCash = roundActive && !isResetting && (roundState.safePicks || 0) > 0;
+      const canStart = !roundActive && !isResetting && !isBusyRequest && bet >= MIN_BET && bet <= Math.min(currentBalance, MAX_BET);
+      const canCash = roundActive && !isResetting && !isBusyRequest && (roundState.safePicks || 0) > 0;
 
       $("startBtn").disabled = !canStart;
       $("cashBtn").disabled = !canCash;
 
-      if (roundActive) {
-        $("startBtn").textContent = "Игра идёт";
-      } else {
-        $("startBtn").textContent = "Начать";
-      }
-
-      $("cashBtn").textContent = canCash
-        ? `Забрать ${formatVc(getCurrentCashout())}`
-        : "Забрать";
+      $("startBtn").textContent = roundActive ? "Игра идёт" : "Начать";
+      $("cashBtn").textContent = canCash ? `Забрать ${formatVc(getCurrentCashout())}` : "Забрать";
 
       updateControlsState();
       updateMineButtons();
+    }
+
+    function getBetAmount(){
+      const raw = $("betInput").value;
+      const amount = Number(raw);
+      if (!raw || !Number.isFinite(amount)) return 0;
+      return Math.floor(amount);
     }
 
     function createImage(src, className){
@@ -1380,8 +1381,7 @@
         cell.className = "cell";
 
         const isOpened = !!roundState?.opened?.includes(i);
-        const isMine = !!roundState?.mineIndexes?.includes(i);
-        const showMine = !!(roundState && !roundState.active && roundState.crashed && isMine);
+        const showMine = !!(roundState && !roundState.active && roundState.crashed && roundState.mineIndexes?.includes(i));
 
         if (showMine) {
           cell.classList.add("mine", "disabled");
@@ -1402,7 +1402,7 @@
           cell.disabled = true;
         } else {
           cell.classList.add("locked");
-          cell.disabled = !roundState?.active || isResetting;
+          cell.disabled = !roundState?.active || isResetting || isBusyRequest;
           const dot = document.createElement("span");
           dot.className = "cell-dot";
           cell.appendChild(dot);
@@ -1416,15 +1416,10 @@
       lastRevealType = "";
     }
 
-    function generateMineIndexes(count){
-      const used = new Set();
-
-      while (used.size < count) {
-        const index = Math.floor(Math.random() * TOTAL_CELLS);
-        used.add(index);
-      }
-
-      return [...used];
+    function clearVisualRound(){
+      roundState = null;
+      lastRevealIndex = -1;
+      lastRevealType = "";
     }
 
     function finishReset(){
@@ -1433,7 +1428,7 @@
         resetTimer = null;
       }
 
-      clearRoundState();
+      clearVisualRound();
       updateStats();
       renderBoard();
 
@@ -1461,14 +1456,43 @@
       }, delay);
     }
 
-    function startGame(){
-      if (roundState?.active || isResetting) {
+    async function loadStateFromServer(){
+      try{
+        isBusyRequest = true;
+        updateButtons();
+
+        const data = await api("get_state");
+
+        currentBalance = Number(data.balance || 0);
+        updateBalanceUI();
+
+        setRoundFromServer(data.round);
+
+        if (data.round?.minesCount) {
+          selectedMines = Number(data.round.minesCount) || 3;
+        }
+
+        updateStats();
+        updateButtons();
+        renderBoard();
+      } catch (err) {
+        showNotice(err.message || "Ошибка загрузки");
+        currentBalance = 0;
+        updateBalanceUI();
+        updateStats();
+        updateButtons();
+        renderBoard();
+      } finally {
+        isBusyRequest = false;
+        updateButtons();
+        renderBoard();
+      }
+    }
+
+    async function startGame(){
+      if (roundState?.active || isResetting || isBusyRequest) {
         showNotice("Подожди завершения раунда");
         return;
-      }
-
-      if (![3,5,7,10].includes(selectedMines)) {
-        selectedMines = 3;
       }
 
       const bet = getBetAmount();
@@ -1491,104 +1515,209 @@
         return;
       }
 
-      if (fadeTimer) {
-        clearTimeout(fadeTimer);
-        fadeTimer = null;
+      try{
+        isBusyRequest = true;
+        updateButtons();
+
+        if (fadeTimer) {
+          clearTimeout(fadeTimer);
+          fadeTimer = null;
+        }
+
+        clearVisualRound();
+        setBoardFading(false);
+
+        const data = await api("start_game", {
+          bet,
+          mines_count: selectedMines
+        });
+
+        currentBalance = Number(data.balance || 0);
+        updateBalanceUI();
+
+        setRoundFromServer(data.round);
+
+        updateStats();
+        updateButtons();
+        renderBoard();
+      } catch (err) {
+        showNotice(err.message || "Ошибка старта");
+      } finally {
+        isBusyRequest = false;
+        updateButtons();
+        renderBoard();
       }
-
-      clearRoundState();
-      setBoardFading(false);
-
-      currentBalance -= bet;
-      saveBalance();
-      updateBalanceUI();
-
-      roundState = {
-        active: true,
-        crashed: false,
-        bet,
-        minesCount: selectedMines,
-        mineIndexes: generateMineIndexes(selectedMines),
-        opened: [],
-        safePicks: 0
-      };
-
-      saveRoundState();
-      setQuickVisible(false);
-      updateStats();
-      updateButtons();
-      renderBoard();
     }
 
-    function finishWithMine(triggerIndex){
-      if (!roundState) return;
+    async function finishWithMine(index){
+      try{
+        isBusyRequest = true;
+        updateButtons();
 
-      lastRevealIndex = triggerIndex;
-      lastRevealType = "mine";
+        const safeOpened = Array.isArray(roundState?.opened) ? [...roundState.opened] : [];
+        const minesCount = Number(roundState?.minesCount || selectedMines);
+        const safePicks = Number(roundState?.safePicks || 0);
 
-      roundState.active = false;
-      roundState.crashed = true;
+        const data = await api("reveal_cell", { cell_index: index });
 
-      renderBoard();
-      updateStats();
-      updateButtons();
+        currentBalance = Number(data.balance || currentBalance);
+        updateBalanceUI();
 
-      scheduleReset(RESET_DELAY_LOSE, "lose");
+        lastRevealIndex = Number(data.revealIndex);
+        lastRevealType = "mine";
+
+        roundState = createDisplayRound({
+          active: false,
+          crashed: true,
+          bet: 0,
+          minesCount,
+          opened: safeOpened,
+          safePicks,
+          mineIndexes: Array.isArray(data.revealMines) ? data.revealMines : []
+        });
+
+        renderBoard();
+        updateStats();
+        updateButtons();
+
+        scheduleReset(RESET_DELAY_LOSE, "lose");
+      } catch (err) {
+        showNotice(err.message || "Ошибка");
+        await loadStateFromServer();
+      } finally {
+        isBusyRequest = false;
+        updateButtons();
+        renderBoard();
+      }
     }
 
-    function cashOut(){
-      if (!roundState?.active || isResetting) return;
+    async function cashOut(){
+      if (!roundState?.active || isResetting || isBusyRequest) return;
 
       if ((roundState.safePicks || 0) <= 0) {
         showNotice("Сначала открой безопасную клетку");
         return;
       }
 
-      const payout = getCurrentCashout();
+      try{
+        isBusyRequest = true;
+        updateButtons();
 
-      currentBalance = Number((currentBalance + payout).toFixed(2));
-      saveBalance();
-      updateBalanceUI();
+        const prevOpened = [...(roundState.opened || [])];
+        const prevMinesCount = Number(roundState.minesCount);
+        const prevSafePicks = Number(roundState.safePicks);
 
-      roundState.active = false;
-      roundState.crashed = false;
+        const data = await api("cashout");
 
-      renderBoard();
-      updateStats();
-      updateButtons();
+        currentBalance = Number(data.balance || currentBalance);
+        updateBalanceUI();
 
-      scheduleReset(RESET_DELAY_WIN, "win");
+        roundState = createDisplayRound({
+          active: false,
+          crashed: false,
+          bet: 0,
+          minesCount: prevMinesCount,
+          opened: prevOpened,
+          safePicks: prevSafePicks,
+          mineIndexes: []
+        });
+
+        renderBoard();
+        updateStats();
+        updateButtons();
+
+        scheduleReset(RESET_DELAY_WIN, "win");
+      } catch (err) {
+        showNotice(err.message || "Ошибка");
+        await loadStateFromServer();
+      } finally {
+        isBusyRequest = false;
+        updateButtons();
+        renderBoard();
+      }
     }
 
-    function openCell(index){
-      if (!roundState?.active || isResetting) return;
+    async function openCell(index){
+      if (!roundState?.active || isResetting || isBusyRequest) return;
       if (roundState.opened.includes(index)) return;
 
-      const isMine = roundState.mineIndexes.includes(index);
+      try{
+        isBusyRequest = true;
+        updateButtons();
 
-      if (isMine) {
-        finishWithMine(index);
-        return;
-      }
+        const data = await api("reveal_cell", { cell_index: index });
 
-      lastRevealIndex = index;
-      lastRevealType = "safe";
+        if (data.result === "mine") {
+          currentBalance = Number(data.balance || currentBalance);
+          updateBalanceUI();
 
-      roundState.opened.push(index);
-      roundState.safePicks = roundState.opened.length;
+          lastRevealIndex = Number(data.revealIndex);
+          lastRevealType = "mine";
 
-      const safeCells = TOTAL_CELLS - roundState.minesCount;
+          roundState = createDisplayRound({
+            active: false,
+            crashed: true,
+            bet: 0,
+            minesCount: data.minesCount || selectedMines,
+            opened: Array.isArray(data.opened) ? data.opened : [],
+            safePicks: Number(data.safePicks || 0),
+            mineIndexes: Array.isArray(data.revealMines) ? data.revealMines : []
+          });
 
-      if (roundState.safePicks >= safeCells) {
+          renderBoard();
+          updateStats();
+          updateButtons();
+
+          scheduleReset(RESET_DELAY_LOSE, "lose");
+          return;
+        }
+
+        if (data.result === "auto_cashout") {
+          currentBalance = Number(data.balance || currentBalance);
+          updateBalanceUI();
+
+          lastRevealIndex = Number(data.revealIndex);
+          lastRevealType = "safe";
+
+          roundState = createDisplayRound({
+            active: false,
+            crashed: false,
+            bet: 0,
+            minesCount: data.minesCount || selectedMines,
+            opened: Array.isArray(data.opened) ? data.opened : [],
+            safePicks: Number(data.safePicks || 0),
+            mineIndexes: []
+          });
+
+          renderBoard();
+          updateStats();
+          updateButtons();
+
+          scheduleReset(RESET_DELAY_WIN, "win");
+          return;
+        }
+
+        if (data.result === "safe") {
+          currentBalance = Number(data.balance || currentBalance);
+          updateBalanceUI();
+
+          lastRevealIndex = Number(data.revealIndex);
+          lastRevealType = "safe";
+
+          setRoundFromServer(data.round);
+
+          updateStats();
+          updateButtons();
+          renderBoard();
+        }
+      } catch (err) {
+        showNotice(err.message || "Ошибка");
+        await loadStateFromServer();
+      } finally {
+        isBusyRequest = false;
+        updateButtons();
         renderBoard();
-        cashOut();
-        return;
       }
-
-      saveRoundState();
-      renderBoard();
-      updateStats();
-      updateButtons();
     }
 
     function openOverlay(id){
@@ -1642,10 +1771,9 @@
 
     document.querySelectorAll(".mine-count-btn").forEach((btn) => {
       btn.addEventListener("click", () => {
-        if (roundState?.active || isResetting) return;
+        if (roundState?.active || isResetting || isBusyRequest) return;
 
         const value = Number(btn.getAttribute("data-mines"));
-        if (!Number.isFinite(value)) return;
         if (![3,5,7,10].includes(value)) return;
 
         selectedMines = value;
@@ -1689,23 +1817,17 @@
       }
     });
 
-    function init(){
-      ensureProfile();
-      updateBalanceUI();
-
-      const savedRound = loadRoundState();
-      if (savedRound) {
-        roundState = savedRound;
-        selectedMines = [3,5,7,10].includes(savedRound.minesCount) ? savedRound.minesCount : 3;
-      }
-
+    async function init(){
       updateStats();
       updateButtons();
       renderBoard();
 
-      setTimeout(() => {
-        $("preloader").classList.add("hide");
-      }, 4000);
+      await Promise.allSettled([
+        loadStateFromServer(),
+        delay(4000)
+      ]);
+
+      $("preloader").classList.add("hide");
     }
 
     window.addEventListener("load", init);
