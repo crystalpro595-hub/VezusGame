@@ -13,6 +13,7 @@
   <link rel="preload" as="image" href="https://i.postimg.cc/qvL497mF/Picsart-26-02-27-02-02-37-502.png">
   <link rel="preload" as="image" href="https://i.postimg.cc/mDjzbZ5Y/Picsart-26-03-03-12-46-32-641.png">
   <link rel="preload" as="image" href="https://i.postimg.cc/ncBsz1gH/Picsart-26-03-03-12-46-14-937.png">
+  <link rel="preload" as="image" href="https://i.postimg.cc/Vk3mCytN/Picsart-26-03-03-13-03-22-886.png">
 
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
 
@@ -68,6 +69,60 @@
     }
 
     *::-webkit-scrollbar{ display:none; }
+
+    .preloader{
+      position:fixed;
+      inset:0;
+      z-index:9999;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      gap:18px;
+      background:
+        radial-gradient(700px 360px at 50% 20%, rgba(70,210,255,.18), transparent 55%),
+        radial-gradient(600px 280px at 50% 75%, rgba(42,171,238,.14), transparent 52%),
+        linear-gradient(180deg, rgba(4,14,36,.98), rgba(4,28,58,.98));
+      transition: opacity .45s ease, visibility .45s ease;
+    }
+
+    .preloader.hide{
+      opacity:0;
+      visibility:hidden;
+      pointer-events:none;
+    }
+
+    .pre-logo{
+      width:92px;
+      height:92px;
+      object-fit:contain;
+      display:block;
+      filter: drop-shadow(0 10px 24px rgba(0,0,0,.28));
+    }
+
+    .pre-bar{
+      width:min(220px, calc(100% - 70px));
+      height:7px;
+      border-radius:999px;
+      background: rgba(255,255,255,.10);
+      overflow:hidden;
+      border:1px solid rgba(255,255,255,.08);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.04);
+    }
+
+    .pre-bar-fill{
+      width:0%;
+      height:100%;
+      border-radius:999px;
+      background: linear-gradient(90deg, #55d8ff, #2AABEE, #7dd3fc);
+      box-shadow: 0 0 14px rgba(42,171,238,.35);
+      animation: preloadFill 4s linear forwards;
+    }
+
+    @keyframes preloadFill{
+      from{ width:0%; }
+      to{ width:100%; }
+    }
 
     .app{
       position:relative;
@@ -305,15 +360,12 @@
       box-shadow:
         0 8px 18px rgba(0,0,0,.16),
         inset 0 1px 0 rgba(255,255,255,.04);
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.04));
     }
 
     .cell:active{
       transform:scale(.97);
-    }
-
-    .cell.locked{
-      background:
-        linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.04));
     }
 
     .cell.locked:hover{
@@ -417,11 +469,18 @@
       outline:none;
       box-shadow: inset 0 1px 0 rgba(255,255,255,.04);
       text-align:center;
+      transition: opacity .18s ease, filter .18s ease;
     }
 
     .bet-input::placeholder{
       color: rgba(234,241,255,.42);
       font-weight:800;
+    }
+
+    .bet-input:disabled{
+      opacity:.55;
+      filter:saturate(.7);
+      cursor:not-allowed;
     }
 
     .bet-toggle{
@@ -440,6 +499,7 @@
         inset 0 1px 0 rgba(255,255,255,.08),
         0 6px 14px rgba(0,0,0,.14);
       padding:0;
+      transition: opacity .18s ease, filter .18s ease;
     }
 
     .bet-toggle:active{ transform:scale(.98); }
@@ -449,6 +509,14 @@
       height:19px;
       display:block;
       filter: drop-shadow(0 3px 6px rgba(0,0,0,.18));
+    }
+
+    .bet-toggle:disabled,
+    .quick-btn:disabled{
+      opacity:.55;
+      filter:saturate(.7);
+      cursor:not-allowed;
+      transform:none !important;
     }
 
     .quick-bets{
@@ -593,14 +661,6 @@
     .bottom-notice.show{
       opacity:1;
       transform: translateX(-50%) translateY(0) scale(1);
-    }
-
-    .bottom-notice.win{
-      background: linear-gradient(180deg, rgba(34,197,94,.92), rgba(22,163,74,.92));
-    }
-
-    .bottom-notice.lose{
-      background: linear-gradient(180deg, rgba(239,68,68,.92), rgba(220,38,38,.92));
     }
 
     .bottom-notice.info{
@@ -752,6 +812,7 @@
       .stat-box{ min-height:44px; }
       .stat-label{ font-size:8px; }
       .stat-value{ font-size:11px; }
+      .pre-logo{ width:82px; height:82px; }
     }
 
     @media (prefers-reduced-motion: reduce){
@@ -761,6 +822,13 @@
   </style>
 </head>
 <body>
+  <div class="preloader" id="preloader">
+    <img class="pre-logo" src="https://i.postimg.cc/Vk3mCytN/Picsart-26-03-03-13-03-22-886.png" alt="Loading">
+    <div class="pre-bar">
+      <div class="pre-bar-fill"></div>
+    </div>
+  </div>
+
   <div class="bottom-notice info" id="bottomNotice" aria-live="polite">
     <div class="notice-icon" id="noticeIcon">ℹ</div>
     <div class="notice-text" id="noticeText">Сообщение</div>
@@ -921,12 +989,12 @@
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <script>
     const PROFILE_KEY = "tg_profile";
-    const ROUND_KEY = "mines_round_v2";
+    const ROUND_KEY = "mines_round_v3";
 
     const DEFAULT_BALANCE = 1000;
     const MIN_BET = 10;
     const TOTAL_CELLS = 25;
-    const HOUSE_EDGE_MULT = 0.72;
+    const HOUSE_EDGE_MULT = 0.56;
 
     const SAFE_ICON_SRC = "https://i.postimg.cc/mDjzbZ5Y/Picsart-26-03-03-12-46-32-641.png";
     const MINE_ICON_SRC = "https://i.postimg.cc/ncBsz1gH/Picsart-26-03-03-12-46-14-937.png";
@@ -963,19 +1031,16 @@
       window.open(url, "_blank", "noopener");
     }
 
-    function showNotice(text, type = "info"){
+    function showNotice(text){
       const box = $("bottomNotice");
       $("noticeText").textContent = text;
-      $("noticeIcon").textContent = type === "win" ? "✓" : type === "lose" ? "✕" : "ℹ";
-
-      box.classList.remove("win", "lose", "info");
-      box.classList.add(type);
+      $("noticeIcon").textContent = "ℹ";
       box.classList.add("show");
 
       if (noticeTimer) clearTimeout(noticeTimer);
       noticeTimer = setTimeout(() => {
         box.classList.remove("show");
-      }, 1900);
+      }, 1700);
     }
 
     function readProfile(){
@@ -1008,6 +1073,11 @@
       writeProfile(profile);
     }
 
+    function clearRoundState(){
+      roundState = null;
+      localStorage.removeItem(ROUND_KEY);
+    }
+
     function loadRoundState(){
       try{
         const parsed = JSON.parse(localStorage.getItem(ROUND_KEY) || "null");
@@ -1016,7 +1086,6 @@
 
         const validMines = Number(parsed.minesCount);
         if (![3,5,7,10].includes(validMines)) return null;
-
         if (validMines >= TOTAL_CELLS) return null;
 
         return parsed;
@@ -1041,6 +1110,7 @@
     }
 
     function setQuickVisible(show){
+      if ($("betToggleBtn").disabled && show) return;
       quickVisible = !!show;
       $("quickBets").classList.toggle("show", quickVisible);
     }
@@ -1065,7 +1135,7 @@
 
     function getCurrentMultiplier(){
       const safePicks = roundState?.safePicks || 0;
-      const minesCount = roundState?.minesCount || selectedMines;
+      const minesCount = roundState?.active ? roundState.minesCount : selectedMines;
       return calcMultiplier(safePicks, minesCount);
     }
 
@@ -1076,14 +1146,15 @@
     }
 
     function updateMineButtons(){
+      const activeMines = roundState?.active ? roundState.minesCount : selectedMines;
+
       document.querySelectorAll(".mine-count-btn").forEach((btn) => {
         const mines = Number(btn.getAttribute("data-mines"));
-        const active = mines === selectedMines;
-        btn.classList.toggle("active", active);
+        btn.classList.toggle("active", mines === activeMines);
         btn.disabled = !!roundState?.active;
       });
 
-      $("minesCountView").textContent = String(roundState?.minesCount || selectedMines);
+      $("minesCountView").textContent = String(activeMines);
     }
 
     function updateStats(){
@@ -1092,10 +1163,23 @@
 
       if (roundState?.active && roundState.safePicks > 0) {
         $("cashoutValue").textContent = formatVc(getCurrentCashout());
-      } else if (roundState?.finished && roundState.cashedOut) {
-        $("cashoutValue").textContent = formatVc(roundState.payout || 0);
       } else {
         $("cashoutValue").textContent = "0 VC";
+      }
+    }
+
+    function updateControlsState(){
+      const isActive = !!roundState?.active;
+
+      $("betInput").disabled = isActive;
+      $("betToggleBtn").disabled = isActive;
+
+      document.querySelectorAll(".quick-btn").forEach((btn) => {
+        btn.disabled = isActive;
+      });
+
+      if (isActive) {
+        setQuickVisible(false);
       }
     }
 
@@ -1119,6 +1203,8 @@
       $("cashBtn").textContent = canCash
         ? `Забрать ${formatVc(getCurrentCashout())}`
         : "Забрать";
+
+      updateControlsState();
     }
 
     function createImage(src, className){
@@ -1189,8 +1275,12 @@
 
     function startGame(){
       if (roundState?.active) {
-        showNotice("Сначала закончи текущую игру", "info");
+        showNotice("Сначала закончи текущую игру");
         return;
+      }
+
+      if (roundState?.finished) {
+        clearRoundState();
       }
 
       if (![3,5,7,10].includes(selectedMines)) {
@@ -1200,12 +1290,14 @@
       const bet = getBetAmount();
 
       if (bet < MIN_BET) {
-        showNotice(`Минимальная ставка ${MIN_BET} VC`, "lose");
+        showNotice(`Минимальная ставка ${MIN_BET} VC`);
+        updateButtons();
         return;
       }
 
       if (bet > currentBalance) {
-        showNotice("Недостаточно средств", "lose");
+        showNotice("Недостаточно средств");
+        updateButtons();
         return;
       }
 
@@ -1235,8 +1327,6 @@
       updateStats();
       updateButtons();
       renderBoard();
-
-      showNotice(`Игра началась. Мин: ${selectedMines}`, "info");
     }
 
     function finishWithMine(triggerIndex){
@@ -1253,15 +1343,13 @@
       updateStats();
       updateButtons();
       renderBoard();
-
-      showNotice("Ты попал на мину", "lose");
     }
 
-    function cashOut(isAuto = false){
+    function cashOut(){
       if (!roundState?.active) return;
 
       if ((roundState.safePicks || 0) <= 0) {
-        showNotice("Сначала открой безопасную клетку", "info");
+        showNotice("Сначала открой безопасную клетку");
         return;
       }
 
@@ -1281,13 +1369,6 @@
       updateStats();
       updateButtons();
       renderBoard();
-
-      showNotice(
-        isAuto
-          ? `Все клетки открыты: ${formatVc(payout)}`
-          : `Забрано ${formatVc(payout)}`,
-        "win"
-      );
     }
 
     function openCell(index){
@@ -1314,7 +1395,7 @@
         renderBoard();
         updateStats();
         updateButtons();
-        cashOut(true);
+        cashOut();
         return;
       }
 
@@ -1358,11 +1439,13 @@
     });
 
     $("betToggleBtn").addEventListener("click", () => {
+      if ($("betToggleBtn").disabled) return;
       setQuickVisible(!quickVisible);
     });
 
     document.querySelectorAll(".quick-btn").forEach((btn) => {
       btn.addEventListener("click", () => {
+        if (btn.disabled) return;
         const value = Number(btn.getAttribute("data-bet"));
         if (!Number.isFinite(value)) return;
         $("betInput").value = String(value);
@@ -1379,11 +1462,18 @@
         if (!Number.isFinite(value)) return;
         if (![3,5,7,10].includes(value)) return;
 
+        if (roundState?.finished) {
+          clearRoundState();
+        }
+
         selectedMines = value;
+        lastRevealIndex = -1;
+        lastRevealType = "";
+
         updateMineButtons();
         updateStats();
         updateButtons();
-        showNotice(`Выбрано мин: ${value}`, "info");
+        renderBoard();
       });
     });
 
@@ -1392,7 +1482,7 @@
     });
 
     $("startBtn").addEventListener("click", startGame);
-    $("cashBtn").addEventListener("click", () => cashOut(false));
+    $("cashBtn").addEventListener("click", cashOut);
 
     document.addEventListener("keydown", (e) => {
       if (e.key === "Escape") {
@@ -1415,6 +1505,10 @@
       updateStats();
       updateButtons();
       renderBoard();
+
+      setTimeout(() => {
+        $("preloader").classList.add("hide");
+      }, 4000);
     }
 
     window.addEventListener("load", init);
