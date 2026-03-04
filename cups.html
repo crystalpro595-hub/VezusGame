@@ -360,9 +360,7 @@
       will-change: transform;
     }
 
-    .ball.show{
-      opacity:1;
-    }
+    .ball.show{ opacity:1; }
 
     .cup-wrap{
       position:absolute;
@@ -476,10 +474,7 @@
       font-weight:800;
     }
 
-    .bet-input:disabled{
-      opacity:.55;
-      cursor:not-allowed;
-    }
+    .bet-input:disabled{ opacity:.55; cursor:not-allowed; }
 
     .bet-toggle,
     .count-toggle{
@@ -499,9 +494,7 @@
       padding:0;
     }
 
-    .bet-toggle{
-      width:42px;
-    }
+    .bet-toggle{ width:42px; }
 
     .count-toggle{
       width:78px;
@@ -512,9 +505,7 @@
     }
 
     .bet-toggle:active,
-    .count-toggle:active{
-      transform:scale(.98);
-    }
+    .count-toggle:active{ transform:scale(.98); }
 
     .bet-toggle svg{
       width:19px;
@@ -543,9 +534,7 @@
       transition:max-height .24s ease, opacity .24s ease, margin .24s ease;
     }
 
-    .quick-bets{
-      grid-template-columns:repeat(5, minmax(0,1fr));
-    }
+    .quick-bets{ grid-template-columns:repeat(5, minmax(0,1fr)); }
 
     .quick-bets.show,
     .count-menu.show{
@@ -553,17 +542,11 @@
       margin-top:8px;
     }
 
-    .quick-bets.show{
-      max-height:60px;
-    }
+    .quick-bets.show{ max-height:60px; }
 
-    .count-menu{
-      grid-template-columns:repeat(3, minmax(0,1fr));
-    }
+    .count-menu{ grid-template-columns:repeat(3, minmax(0,1fr)); }
 
-    .count-menu.show{
-      max-height:52px;
-    }
+    .count-menu.show{ max-height:52px; }
 
     .quick-btn,
     .count-btn{
@@ -579,9 +562,7 @@
     }
 
     .quick-btn:active,
-    .count-btn:active{
-      transform:scale(.98);
-    }
+    .count-btn:active{ transform:scale(.98); }
 
     .count-btn.active{
       background:
@@ -927,22 +908,68 @@
 
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <script>
-    const PROFILE_KEY = "tg_profile";
+    // =============================
+    // SUPABASE НАСТРОЙКИ (заполни)
+    // =============================
+    const SUPABASE_URL = "https://YOUR_PROJECT_REF.supabase.co";
+    const SUPABASE_ANON_KEY = "YOUR_SUPABASE_ANON_KEY";
 
+    const FUNCTIONS_URL = SUPABASE_URL.replace(".supabase.co", ".functions.supabase.co");
+
+    async function callCupsGame(payload){
+      const res = await fetch(`${FUNCTIONS_URL}/cups-game`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "apikey": SUPABASE_ANON_KEY,
+          "Authorization": `Bearer ${SUPABASE_ANON_KEY}`
+        },
+        body: JSON.stringify(payload)
+      });
+
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok || !data?.ok) {
+        throw new Error(data?.error || "cups_game_error");
+      }
+      return data;
+    }
+
+    function getTelegramInitData(){
+      try{
+        if (window.Telegram && window.Telegram.WebApp && typeof window.Telegram.WebApp.initData === "string") {
+          return window.Telegram.WebApp.initData || "";
+        }
+      } catch {}
+      return "";
+    }
+
+    async function dbGetBalance(){
+      const initData = getTelegramInitData();
+      if (!initData) return null; // fallback
+
+      const data = await callCupsGame({ action: "get", initData });
+      return Number(data.balance ?? 0);
+    }
+
+    async function dbDeltaBalance(delta){
+      const initData = getTelegramInitData();
+      if (!initData) return null; // fallback
+
+      const data = await callCupsGame({ action: "delta", delta, initData });
+      return Number(data.balance ?? 0);
+    }
+
+    // =============================
+    // ТВОЙ КОД (почти без изменений)
+    // =============================
     const DEFAULT_BALANCE = 1000;
     const TOPUP_THRESHOLD = 100;
     const MIN_BET = 10;
     const MAX_BET = 5000;
 
-    const CUP_MULTIPLIERS = {
-      3: 2.5,
-      4: 3.6,
-      5: 4.7
-    };
+    const CUP_MULTIPLIERS = { 3: 2.5, 4: 3.6, 5: 4.7 };
 
-    const FILES = {
-      games: "games.html"
-    };
+    const FILES = { games: "games.html" };
 
     const $ = (id) => document.getElementById(id);
 
@@ -970,17 +997,9 @@
       4: $("cup4")
     };
 
-    function sleep(ms){
-      return new Promise(resolve => setTimeout(resolve, ms));
-    }
-
-    function rand(min, max){
-      return Math.random() * (max - min) + min;
-    }
-
-    function randInt(min, max){
-      return Math.floor(rand(min, max + 1));
-    }
+    function sleep(ms){ return new Promise(r => setTimeout(r, ms)); }
+    function rand(min, max){ return Math.random() * (max - min) + min; }
+    function randInt(min, max){ return Math.floor(rand(min, max + 1)); }
 
     function formatVc(value){
       const n = Number(value ?? 0);
@@ -989,36 +1008,25 @@
     }
 
     function easeInOutCubic(t){
-      return t < 0.5
-        ? 4 * t * t * t
-        : 1 - Math.pow(-2 * t + 2, 3) / 2;
+      return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
     }
 
     function rafAnimate(duration, draw){
       return new Promise(resolve => {
         const start = performance.now();
-
         function frame(now){
           const elapsed = now - start;
           const raw = Math.min(1, elapsed / duration);
           const eased = easeInOutCubic(raw);
-
           draw(eased, raw);
-
-          if (raw < 1) {
-            requestAnimationFrame(frame);
-          } else {
-            resolve();
-          }
+          if (raw < 1) requestAnimationFrame(frame);
+          else resolve();
         }
-
         requestAnimationFrame(frame);
       });
     }
 
-    function goTo(file){
-      window.location.href = file;
-    }
+    function goTo(file){ window.location.href = file; }
 
     function openTelegramLinkSafe(url){
       if (window.Telegram && window.Telegram.WebApp && typeof window.Telegram.WebApp.openTelegramLink === "function") {
@@ -1041,46 +1049,10 @@
       $("stageHint").textContent = stageMessage || "";
     }
 
-    function readProfile(){
-      try{
-        return JSON.parse(localStorage.getItem(PROFILE_KEY) || "null");
-      } catch {
-        return null;
-      }
-    }
-
-    function writeProfile(profile){
-      localStorage.setItem(PROFILE_KEY, JSON.stringify(profile));
-    }
-
     function normalizeBalance(){
       currentBalance = Number(currentBalance) || 0;
-
-      if (currentBalance < TOPUP_THRESHOLD) {
-        currentBalance = DEFAULT_BALANCE;
-      }
-
+      if (currentBalance < TOPUP_THRESHOLD) currentBalance = DEFAULT_BALANCE;
       currentBalance = Number(currentBalance.toFixed(2));
-    }
-
-    function ensureProfile(){
-      const cached = readProfile();
-
-      if (cached && Number.isFinite(Number(cached.balance))) {
-        currentBalance = Number(cached.balance) || 0;
-      } else {
-        currentBalance = DEFAULT_BALANCE;
-      }
-
-      normalizeBalance();
-      saveBalance();
-    }
-
-    function saveBalance(){
-      normalizeBalance();
-      const profile = readProfile() || {};
-      profile.balance = currentBalance;
-      writeProfile(profile);
     }
 
     function updateBalanceUI(){
@@ -1114,9 +1086,7 @@
 
     function updateCountToggleText(){
       $("cupCountToggleBtn").textContent = `${selectedCupCount} стак.`;
-      if (selectedCupCount === 5) {
-        $("cupCountToggleBtn").textContent = "5 стак.";
-      }
+      if (selectedCupCount === 5) $("cupCountToggleBtn").textContent = "5 стак.";
     }
 
     function updateCountButtons(){
@@ -1128,36 +1098,9 @@
     }
 
     function getLayoutForCount(count){
-      if (count === 5) {
-        return {
-          cupW: 76,
-          cupH: 112,
-          cupBottom: 56,
-          ballSize: 22,
-          ballBottom: 58,
-          sidePad: 0.10
-        };
-      }
-
-      if (count === 4) {
-        return {
-          cupW: 92,
-          cupH: 132,
-          cupBottom: 48,
-          ballSize: 24,
-          ballBottom: 52,
-          sidePad: 0.12
-        };
-      }
-
-      return {
-        cupW: 112,
-        cupH: 156,
-        cupBottom: 42,
-        ballSize: 28,
-        ballBottom: 48,
-        sidePad: 0.16
-      };
+      if (count === 5) return { cupW: 76, cupH: 112, cupBottom: 56, ballSize: 22, ballBottom: 58, sidePad: 0.10 };
+      if (count === 4) return { cupW: 92, cupH: 132, cupBottom: 48, ballSize: 24, ballBottom: 52, sidePad: 0.12 };
+      return { cupW: 112, cupH: 156, cupBottom: 42, ballSize: 28, ballBottom: 48, sidePad: 0.16 };
     }
 
     function applyStageLayout(){
@@ -1200,22 +1143,13 @@
       $("ball").style.transform = `translate3d(${x}px, 0, 0) scale(${scale})`;
     }
 
-    function cupById(id){
-      return cups.find(c => c.id === id);
-    }
-
-    function cupAtSlot(slot){
-      return cups.find(c => c.slot === slot);
-    }
+    function cupById(id){ return cups.find(c => c.id === id); }
+    function cupAtSlot(slot){ return cups.find(c => c.slot === slot); }
 
     function resetCups(){
       applyStageLayout();
 
-      cups = Array.from({ length: selectedCupCount }, (_, i) => ({
-        id: i,
-        slot: i
-      }));
-
+      cups = Array.from({ length: selectedCupCount }, (_, i) => ({ id: i, slot: i }));
       ballCupId = Math.floor((selectedCupCount - 1) / 2);
       pickedCupId = null;
     }
@@ -1225,13 +1159,8 @@
       $("betToggleBtn").disabled = locked;
       $("cupCountToggleBtn").disabled = locked;
 
-      document.querySelectorAll(".quick-btn").forEach(btn => {
-        btn.disabled = locked;
-      });
-
-      document.querySelectorAll(".count-btn").forEach(btn => {
-        btn.disabled = locked;
-      });
+      document.querySelectorAll(".quick-btn").forEach(btn => btn.disabled = locked);
+      document.querySelectorAll(".count-btn").forEach(btn => btn.disabled = locked);
 
       $("playBtn").disabled = locked;
 
@@ -1243,16 +1172,10 @@
 
     function updatePlayButton(){
       const btn = $("playBtn");
-
-      if (gameState === "covering" || gameState === "shuffling") {
-        btn.textContent = "Крутим...";
-      } else if (gameState === "guessing") {
-        btn.textContent = "Выбери стакан";
-      } else if (gameState === "reveal") {
-        btn.textContent = "Проверка...";
-      } else {
-        btn.textContent = "Играть";
-      }
+      if (gameState === "covering" || gameState === "shuffling") btn.textContent = "Крутим...";
+      else if (gameState === "guessing") btn.textContent = "Выбери стакан";
+      else if (gameState === "reveal") btn.textContent = "Проверка...";
+      else btn.textContent = "Играть";
     }
 
     function renderStage(){
@@ -1282,24 +1205,18 @@
         let imgShadow = "drop-shadow(0 12px 14px rgba(0,0,0,.18))";
 
         if (gameState === "idle" && id === ballCupId) {
-          y = -72;
-          scale = 1.03;
-          imgLift = -6;
+          y = -72; scale = 1.03; imgLift = -6;
           shadow = "drop-shadow(0 22px 28px rgba(0,0,0,.26))";
           imgShadow = "drop-shadow(0 18px 20px rgba(0,0,0,.20))";
         }
 
         if (gameState === "reveal" && (id === pickedCupId || (pickedCupId !== ballCupId && id === ballCupId))) {
-          y = -72;
-          scale = 1.03;
-          imgLift = -6;
+          y = -72; scale = 1.03; imgLift = -6;
           shadow = "drop-shadow(0 22px 28px rgba(0,0,0,.26))";
           imgShadow = "drop-shadow(0 18px 20px rgba(0,0,0,.20))";
         }
 
-        if (gameState === "guessing") {
-          el.classList.add("pickable");
-        }
+        if (gameState === "guessing") el.classList.add("pickable");
 
         el.disabled = gameState !== "guessing";
         el.style.filter = shadow;
@@ -1320,35 +1237,22 @@
       updateStageHint();
     }
 
-    function getPairKey(a, b){
-      return [Math.min(a, b), Math.max(a, b)].join("-");
-    }
+    function getPairKey(a, b){ return [Math.min(a,b), Math.max(a,b)].join("-"); }
 
     function randomPairSlots(excludeKey = ""){
-      let slotA = 0;
-      let slotB = 1;
-      let key = "";
-      let tries = 0;
-
+      let slotA = 0, slotB = 1, key = "", tries = 0;
       do {
         slotA = Math.floor(Math.random() * selectedCupCount);
         slotB = Math.floor(Math.random() * selectedCupCount);
-
-        while (slotB === slotA) {
-          slotB = Math.floor(Math.random() * selectedCupCount);
-        }
-
+        while (slotB === slotA) slotB = Math.floor(Math.random() * selectedCupCount);
         key = getPairKey(slotA, slotB);
         tries++;
       } while (excludeKey && key === excludeKey && tries < 8);
-
       return { slotA, slotB, key };
     }
 
     function randomDirection(previous = 0){
-      if (previous && Math.random() < 0.68) {
-        return -previous;
-      }
+      if (previous && Math.random() < 0.68) return -previous;
       return Math.random() > 0.5 ? 1 : -1;
     }
 
@@ -1362,7 +1266,6 @@
         const cup = cupById(id);
         const fromX = getCupLeftForSlot(cup.slot);
         const toX = getCupLeftForSlot(moveMap[id]);
-
         return {
           id,
           fromSlot: cup.slot,
@@ -1382,7 +1285,6 @@
         for (let id = 0; id < 5; id++) {
           const el = cupEls[id];
           const img = el.querySelector(".cup-img");
-
           if (id >= selectedCupCount) continue;
 
           const cup = cupById(id);
@@ -1429,15 +1331,9 @@
       const cupB = cupAtSlot(slotB);
       if (!cupA || !cupB) return;
 
-      const map = {
-        [cupA.id]: slotB,
-        [cupB.id]: slotA
-      };
+      const map = { [cupA.id]: slotB, [cupB.id]: slotA };
 
-      await animateMove(map, moveMs, 18, {
-        wobbleStrength: 10,
-        scaleBoost: 0.045
-      });
+      await animateMove(map, moveMs, 18, { wobbleStrength: 10, scaleBoost: 0.045 });
     }
 
     async function animateCycle(direction, moveMs){
@@ -1448,10 +1344,7 @@
           : (cup.slot + selectedCupCount - 1) % selectedCupCount;
       });
 
-      await animateMove(map, moveMs, 15, {
-        wobbleStrength: 4,
-        scaleBoost: 0.03
-      });
+      await animateMove(map, moveMs, 15, { wobbleStrength: 4, scaleBoost: 0.03 });
     }
 
     async function animateCombo(baseMs, lastPairKey = "", lastDirection = 0){
@@ -1472,9 +1365,7 @@
           await animatePairSwap(pair.slotA, pair.slotB, stepMs);
         }
 
-        if (step < steps - 1) {
-          await sleep(randInt(0, 5));
-        }
+        if (step < steps - 1) await sleep(randInt(0, 5));
       }
 
       return { pairKey, direction };
@@ -1494,11 +1385,7 @@
         if (token !== shuffleToken) return;
 
         const progress = i / Math.max(1, moves - 1);
-        const baseMs = Math.max(
-          155,
-          Math.round(295 - (progress * 120) - rand(0, 18))
-        );
-
+        const baseMs = Math.max(155, Math.round(295 - (progress * 120) - rand(0, 18)));
         const roll = Math.random();
 
         if (roll < 0.22) {
@@ -1513,11 +1400,7 @@
             const follow = randomPairSlots(lastPairKey);
             lastPairKey = follow.key;
             await sleep(randInt(0, 4));
-            await animatePairSwap(
-              follow.slotA,
-              follow.slotB,
-              Math.max(145, baseMs - randInt(18, 32))
-            );
+            await animatePairSwap(follow.slotA, follow.slotB, Math.max(145, baseMs - randInt(18, 32)));
           }
         } else {
           const combo = await animateCombo(baseMs, lastPairKey, lastDirection);
@@ -1530,10 +1413,7 @@
         if (progress > 0.70 && Math.random() < 0.28) {
           lastDirection = randomDirection(lastDirection);
           await sleep(randInt(0, 3));
-          await animateCycle(
-            lastDirection,
-            Math.max(145, baseMs - randInt(12, 22))
-          );
+          await animateCycle(lastDirection, Math.max(145, baseMs - randInt(12, 22)));
         }
 
         await sleep(randInt(0, 6));
@@ -1547,31 +1427,38 @@
       renderStage();
     }
 
+    // =============================
+    // ВАЖНО: баланс теперь через Supabase
+    // =============================
     async function startRound(){
       if (gameState !== "idle") return;
 
       const bet = getBetAmount();
 
-      if (bet < MIN_BET) {
-        setStatus(`Минимальная ставка ${MIN_BET} VC`);
-        return;
-      }
+      if (bet < MIN_BET) { setStatus(`Минимальная ставка ${MIN_BET} VC`); return; }
+      if (bet > MAX_BET) { $("betInput").value = String(MAX_BET); setStatus(`Максимальная ставка ${MAX_BET} VC`); return; }
+      if (bet > currentBalance) { setStatus("Недостаточно средств"); return; }
 
-      if (bet > MAX_BET) {
-        $("betInput").value = String(MAX_BET);
-        setStatus(`Максимальная ставка ${MAX_BET} VC`);
-        return;
-      }
-
-      if (bet > currentBalance) {
-        setStatus("Недостаточно средств");
-        return;
-      }
-
+      // локально сразу списали для UI
       roundBet = bet;
       currentBalance = Number((currentBalance - bet).toFixed(2));
-      saveBalance();
       updateBalanceUI();
+
+      // списали на сервере
+      try{
+        const newBal = await dbDeltaBalance(-bet);
+        if (typeof newBal === "number") {
+          currentBalance = newBal;
+          updateBalanceUI();
+        }
+      } catch (e){
+        // если сервер упал — откатываем
+        currentBalance = Number((currentBalance + bet).toFixed(2));
+        updateBalanceUI();
+        setStatus("Ошибка соединения с базой");
+        roundBet = 0;
+        return;
+      }
 
       resetCups();
 
@@ -1601,13 +1488,24 @@
 
       if (win) {
         const payout = Number((roundBet * getCurrentMultiplier()).toFixed(2));
-        currentBalance = Number((currentBalance + payout).toFixed(2));
-        saveBalance();
+
+        // сначала сервер
+        try{
+          const newBal = await dbDeltaBalance(payout);
+          if (typeof newBal === "number") {
+            currentBalance = newBal;
+          } else {
+            currentBalance = Number((currentBalance + payout).toFixed(2));
+          }
+        } catch {
+          // fallback
+          currentBalance = Number((currentBalance + payout).toFixed(2));
+        }
+
         updateBalanceUI();
         setStatus(`Ты угадал: +${formatVc(payout)}`);
         await sleep(1100);
       } else {
-        saveBalance();
         updateBalanceUI();
         setStatus("Не угадал");
         await sleep(1250);
@@ -1709,19 +1607,11 @@
     $("betInput").addEventListener("input", () => {
       const input = $("betInput");
       let value = Number(input.value);
-
       if (!input.value) return;
-
-      if (!Number.isFinite(value)) {
-        input.value = "";
-        return;
-      }
-
+      if (!Number.isFinite(value)) { input.value = ""; return; }
       value = Math.floor(value);
-
       if (value > MAX_BET) value = MAX_BET;
       if (value < 0) value = 0;
-
       input.value = String(value);
     });
 
@@ -1747,9 +1637,7 @@
         !countToggle.contains(e.target) &&
         e.target !== countMenu &&
         !countMenu.contains(e.target)
-      ) {
-        setCountMenuVisible(false);
-      }
+      ) setCountMenuVisible(false);
 
       if (
         quickVisible &&
@@ -1757,9 +1645,7 @@
         !betToggle.contains(e.target) &&
         e.target !== quickMenu &&
         !quickMenu.contains(e.target)
-      ) {
-        setQuickVisible(false);
-      }
+      ) setQuickVisible(false);
     });
 
     document.addEventListener("keydown", (e) => {
@@ -1772,13 +1658,22 @@
     });
 
     window.addEventListener("resize", () => {
-      if (gameState !== "shuffling") {
-        renderStage();
-      }
+      if (gameState !== "shuffling") renderStage();
     });
 
-    function init(){
-      ensureProfile();
+    async function init(){
+      $("balanceValue").textContent = "...";
+
+      // пытаемся загрузить баланс из Supabase
+      try{
+        const bal = await dbGetBalance();
+        if (typeof bal === "number") currentBalance = bal;
+        else currentBalance = DEFAULT_BALANCE;
+      } catch {
+        currentBalance = DEFAULT_BALANCE;
+      }
+
+      normalizeBalance();
       updateBalanceUI();
       updateStats();
       updateCountButtons();
