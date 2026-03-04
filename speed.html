@@ -918,7 +918,7 @@
           </div>
           <div class="stat-box">
             <div class="stat-label">Состояние</div>
-            <div class="stat-value" id="stateValue">Готов</div>
+            <div class="stat-value" id="stateValue">Загрузка</div>
           </div>
           <div class="stat-box">
             <div class="stat-label">Макс. ставка</div>
@@ -950,7 +950,6 @@
               class="car-img"
               src="https://i.postimg.cc/PxRhZC9x/Picsart-26-03-04-12-36-37-394.png"
               alt="Car"
-              id="carImg"
             >
           </div>
         </div>
@@ -1043,570 +1042,535 @@
     </div>
   </div>
 
-<script src="https://telegram.org/js/telegram-web-app.js"></script>
-<script>
-  const PROFILE_KEY = "tg_profile";
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <script>
+    // speed-play должен поддерживать:
+    // 1) { action: "get_balance", initData } -> { ok:true, balance:number }
+    // 2) { action: "change_balance", initData, delta } -> { ok:true, balance:number }
 
-  const SUPABASE_URL = "https://lazrfierfbhwlduqlvws.supabase.co";
-  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxhenJmaWVyZmJod2xkdXFsdndzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE1NzY2ODIsImV4cCI6MjA4NzE1MjY4Mn0.tJtwFrNPrNyGNedGP1h0bNgr98FnyoliR-13mOqlBJI";
-  const FUNCTIONS_URL = SUPABASE_URL.replace(".supabase.co", ".functions.supabase.co");
+    const SUPABASE_URL = "https://lazrfierfbhwlduqlvws.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxhenJmaWVyZmJod2xkdXFsdndzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE1NzY2ODIsImV4cCI6MjA4NzE1MjY4Mn0.tJtwFrNPrNyGNedGP1h0bNgr98FnyoliR-13mOqlBJI";
+    const FUNCTIONS_URL = SUPABASE_URL.replace(".supabase.co", ".functions.supabase.co");
 
-  const MIN_BET = 10;
-  const MAX_BET = 5000;
+    const MIN_BET = 10;
+    const MAX_BET = 5000;
 
-  const FILES = {
-    games: "games.html"
-  };
+    const FILES = {
+      games: "games.html"
+    };
 
-  const $ = (id) => document.getElementById(id);
+    const $ = (id) => document.getElementById(id);
 
-  let currentBalance = 0;
-  let quickVisible = false;
+    let currentBalance = 0;
+    let balanceReady = false;
+    let requestBusy = false;
+    let quickVisible = false;
 
-  let gameState = "idle"; // idle | running | crashed | cashed
-  let roundBet = 0;
-  let currentMultiplier = 1;
-  let rafId = 0;
-  let localStartPerf = 0;
-  let freezeUntil = 0;
-  let lastResultValue = 0;
+    let gameState = "idle"; // idle | running | crashed | cashed | payout_pending
+    let roundBet = 0;
+    let currentMultiplier = 1;
+    let crashAt = 1.00;
+    let rafId = 0;
+    let startTs = 0;
+    let freezeUntil = 0;
+    let lastResultValue = 0;
+    let pendingPayout = 0;
 
-  let currentRoundId = "";
-  let pollTimer = 0;
-  let requestBusy = false;
-
-  function rand(min, max){
-    return Math.random() * (max - min) + min;
-  }
-
-  function round2(n){
-    return Math.round(n * 100) / 100;
-  }
-
-  function formatVc(value){
-    const n = Number(value ?? 0);
-    if (!Number.isFinite(n)) return "0 VC";
-    return Number.isInteger(n) ? `${n} VC` : `${n.toFixed(2)} VC`;
-  }
-
-  function calcMultiplier(elapsedMs){
-    const t = Math.max(0, elapsedMs) / 1000;
-    return 1 + (t * 0.10) + (t * t * 0.024) + (t * t * t * 0.0021);
-  }
-
-  function goTo(file){
-    window.location.href = file;
-  }
-
-  function openTelegramLinkSafe(url){
-    if (window.Telegram && window.Telegram.WebApp && typeof window.Telegram.WebApp.openTelegramLink === "function") {
-      window.Telegram.WebApp.openTelegramLink(url);
-      return;
+    function rand(min, max){
+      return Math.random() * (max - min) + min;
     }
-    window.open(url, "_blank", "noopener");
-  }
 
-  function readProfile(){
-    try{
-      return JSON.parse(localStorage.getItem(PROFILE_KEY) || "null");
-    } catch {
-      return null;
+    function round2(n){
+      return Math.round(n * 100) / 100;
     }
-  }
 
-  function writeProfile(profile){
-    localStorage.setItem(PROFILE_KEY, JSON.stringify(profile));
-  }
-
-  function syncCachedBalance(balance){
-    const profile = readProfile() || {};
-    profile.balance = round2(Number(balance || 0));
-    writeProfile(profile);
-  }
-
-  function normalizeBalance(){
-    currentBalance = Number(currentBalance);
-    if (!Number.isFinite(currentBalance) || currentBalance < 0) currentBalance = 0;
-    currentBalance = round2(currentBalance);
-  }
-
-  function setBalance(balance){
-    currentBalance = Number(balance ?? 0);
-    normalizeBalance();
-    syncCachedBalance(currentBalance);
-    updateBalanceUI();
-  }
-
-  function updateBalanceUI(){
-    normalizeBalance();
-    $("balanceValue").textContent = formatVc(currentBalance);
-  }
-
-  function setQuickVisible(show){
-    if ($("betToggleBtn").disabled && show) return;
-    quickVisible = !!show;
-    $("quickBets").classList.toggle("show", quickVisible);
-  }
-
-  function setTopState(text){
-    $("stateValue").textContent = text;
-  }
-
-  function getLiveReturnValue(){
-    return round2(roundBet * currentMultiplier);
-  }
-
-  function setMultiplierValue(value){
-    currentMultiplier = Math.max(1, round2(value));
-    $("multiplierChip").textContent = `x${currentMultiplier.toFixed(2)}`;
-    $("topMultiplier").textContent = `x${currentMultiplier.toFixed(2)}`;
-
-    if (gameState === "running") {
-      $("playBtn").textContent = `Забрать (${formatVc(getLiveReturnValue())})`;
+    function formatVc(value){
+      const n = Number(value ?? 0);
+      if (!Number.isFinite(n)) return "0 VC";
+      return Number.isInteger(n) ? `${n} VC` : `${n.toFixed(2)} VC`;
     }
-  }
 
-  function getBetAmount(){
-    const raw = $("betInput").value;
-    const amount = Number(raw);
-    if (!raw || !Number.isFinite(amount)) return 0;
-    return Math.floor(amount);
-  }
-
-  function setTrackMode(mode){
-    const track = $("track");
-    const chip = $("multiplierChip");
-
-    track.classList.remove("running", "crashed", "cashed");
-    chip.classList.remove("win", "lose");
-
-    if (mode === "running") track.classList.add("running");
-    if (mode === "crashed") {
-      track.classList.add("crashed");
-      chip.classList.add("lose");
+    function goTo(file){
+      window.location.href = file;
     }
-    if (mode === "cashed") {
-      track.classList.add("cashed");
-      chip.classList.add("win");
-    }
-  }
 
-  function updateControls(){
-    const playBtn = $("playBtn");
-    const lockInputs = gameState === "running" || performance.now() < freezeUntil || requestBusy;
-
-    $("betInput").disabled = lockInputs;
-    $("betToggleBtn").disabled = lockInputs;
-    document.querySelectorAll(".quick-btn").forEach(btn => btn.disabled = lockInputs);
-
-    if (lockInputs) setQuickVisible(false);
-
-    playBtn.classList.remove("cash-mode", "win-mode", "lose-mode");
-
-    if (gameState === "running") {
-      playBtn.textContent = `Забрать (${formatVc(getLiveReturnValue())})`;
-      playBtn.disabled = requestBusy;
-      playBtn.classList.add("cash-mode");
-    } else if (gameState === "crashed") {
-      playBtn.textContent = "Сгорело";
-      playBtn.disabled = performance.now() < freezeUntil || requestBusy;
-      playBtn.classList.add("lose-mode");
-    } else if (gameState === "cashed") {
-      playBtn.textContent = `Забрано (${formatVc(lastResultValue)})`;
-      playBtn.disabled = performance.now() < freezeUntil || requestBusy;
-      playBtn.classList.add("win-mode");
-    } else {
-      playBtn.textContent = requestBusy ? "Загрузка..." : "Начать";
-      playBtn.disabled = performance.now() < freezeUntil || requestBusy;
-    }
-  }
-
-  function getTelegramInitData(){
-    try{
-      if (window.Telegram && window.Telegram.WebApp) {
-        return String(window.Telegram.WebApp.initData || "");
+    function openTelegramLinkSafe(url){
+      if (window.Telegram && window.Telegram.WebApp && typeof window.Telegram.WebApp.openTelegramLink === "function") {
+        window.Telegram.WebApp.openTelegramLink(url);
+        return;
       }
-    } catch {}
-    return "";
-  }
-
-  async function speedApi(action, payload = {}){
-    const initData = getTelegramInitData();
-    if (!initData) {
-      throw new Error("telegram_auth_required");
+      window.open(url, "_blank", "noopener");
     }
 
-    const res = await fetch(`${FUNCTIONS_URL}/speed-play`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "apikey": SUPABASE_ANON_KEY,
-        "Authorization": `Bearer ${SUPABASE_ANON_KEY}`
-      },
-      body: JSON.stringify({
-        action,
-        initData,
-        ...payload
-      })
-    });
-
-    const data = await res.json().catch(() => ({}));
-
-    if (!res.ok || !data?.ok) {
-      throw new Error(data?.error || "speed_play_error");
+    function getTelegramInitData(){
+      try{
+        if (window.Telegram && window.Telegram.WebApp && typeof window.Telegram.WebApp.initData === "string") {
+          return window.Telegram.WebApp.initData || "";
+        }
+      } catch {}
+      return "";
     }
 
-    return data;
-  }
-
-  function stopLoop(){
-    if (rafId) {
-      cancelAnimationFrame(rafId);
-      rafId = 0;
-    }
-  }
-
-  function stopPolling(){
-    if (pollTimer) {
-      clearTimeout(pollTimer);
-      pollTimer = 0;
-    }
-  }
-
-  function schedulePoll(){
-    stopPolling();
-
-    if (gameState !== "running" || !currentRoundId) return;
-
-    pollTimer = setTimeout(checkRoundStatus, 220);
-  }
-
-  async function checkRoundStatus(){
-    if (gameState !== "running" || !currentRoundId) return;
-
-    try{
-      const data = await speedApi("status", {
-        round_id: currentRoundId
+    async function callSpeedPlay(payload){
+      const res = await fetch(`${FUNCTIONS_URL}/speed-play`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "apikey": SUPABASE_ANON_KEY,
+          "Authorization": `Bearer ${SUPABASE_ANON_KEY}`
+        },
+        body: JSON.stringify(payload)
       });
 
+      const data = await res.json().catch(() => ({}));
+
+      if (!res.ok || !data?.ok) {
+        throw new Error(data?.error || "speed_play_error");
+      }
+
+      return data;
+    }
+
+    async function dbGetBalance(){
+      const initData = getTelegramInitData();
+      if (!initData) throw new Error("telegram_init_data_missing");
+
+      const data = await callSpeedPlay({
+        action: "get_balance",
+        initData
+      });
+
+      const balance = Number(data.balance);
+      if (!Number.isFinite(balance)) throw new Error("invalid_balance");
+
+      return round2(balance);
+    }
+
+    async function dbChangeBalance(delta){
+      const initData = getTelegramInitData();
+      if (!initData) throw new Error("telegram_init_data_missing");
+
+      const data = await callSpeedPlay({
+        action: "change_balance",
+        initData,
+        delta: round2(delta)
+      });
+
+      const balance = Number(data.balance);
+      if (!Number.isFinite(balance)) throw new Error("invalid_balance");
+
+      return round2(balance);
+    }
+
+    function updateBalanceUI(){
+      $("balanceValue").textContent = formatVc(currentBalance);
+    }
+
+    function setQuickVisible(show){
+      if ($("betToggleBtn").disabled && show) return;
+      quickVisible = !!show;
+      $("quickBets").classList.toggle("show", quickVisible);
+    }
+
+    function setTopState(text){
+      $("stateValue").textContent = text;
+    }
+
+    function getLiveReturnValue(){
+      return round2(roundBet * currentMultiplier);
+    }
+
+    function setMultiplierValue(value){
+      currentMultiplier = Math.max(1, round2(value));
+      $("multiplierChip").textContent = `x${currentMultiplier.toFixed(2)}`;
+      $("topMultiplier").textContent = `x${currentMultiplier.toFixed(2)}`;
+
+      if (gameState === "running") {
+        $("playBtn").textContent = `Забрать (${formatVc(getLiveReturnValue())})`;
+      }
+    }
+
+    function getBetAmount(){
+      const raw = $("betInput").value;
+      const amount = Number(raw);
+      if (!raw || !Number.isFinite(amount)) return 0;
+      return Math.floor(amount);
+    }
+
+    function setTrackMode(mode){
+      const track = $("track");
+      const chip = $("multiplierChip");
+
+      track.classList.remove("running", "crashed", "cashed");
+      chip.classList.remove("win", "lose");
+
+      if (mode === "running") track.classList.add("running");
+      if (mode === "crashed") {
+        track.classList.add("crashed");
+        chip.classList.add("lose");
+      }
+      if (mode === "cashed") {
+        track.classList.add("cashed");
+        chip.classList.add("win");
+      }
+    }
+
+    function updateControls(){
+      const playBtn = $("playBtn");
+      const frozen = performance.now() < freezeUntil;
+      const lockInputs = requestBusy || gameState === "running" || frozen || !balanceReady;
+
+      $("betInput").disabled = lockInputs;
+      $("betToggleBtn").disabled = lockInputs;
+      document.querySelectorAll(".quick-btn").forEach(btn => btn.disabled = lockInputs);
+
+      if (lockInputs) setQuickVisible(false);
+
+      playBtn.classList.remove("cash-mode", "win-mode", "lose-mode");
+
+      if (requestBusy) {
+        playBtn.disabled = true;
+
+        if (gameState === "running") {
+          playBtn.textContent = "Выплата...";
+          playBtn.classList.add("cash-mode");
+        } else if (gameState === "payout_pending") {
+          playBtn.textContent = "Повтор выплаты...";
+          playBtn.classList.add("cash-mode");
+        } else {
+          playBtn.textContent = "Загрузка...";
+        }
+        return;
+      }
+
+      if (gameState === "running") {
+        playBtn.textContent = `Забрать (${formatVc(getLiveReturnValue())})`;
+        playBtn.disabled = false;
+        playBtn.classList.add("cash-mode");
+      } else if (gameState === "payout_pending") {
+        playBtn.textContent = `Повторить выплату (${formatVc(pendingPayout)})`;
+        playBtn.disabled = false;
+        playBtn.classList.add("cash-mode");
+      } else if (gameState === "crashed") {
+        playBtn.textContent = "Сгорело";
+        playBtn.disabled = frozen || !balanceReady;
+        playBtn.classList.add("lose-mode");
+      } else if (gameState === "cashed") {
+        playBtn.textContent = `Забрано (${formatVc(lastResultValue)})`;
+        playBtn.disabled = frozen || !balanceReady;
+        playBtn.classList.add("win-mode");
+      } else {
+        playBtn.textContent = "Начать";
+        playBtn.disabled = frozen || !balanceReady;
+      }
+    }
+
+    function calcMultiplier(elapsedMs){
+      const t = elapsedMs / 1000;
+      return 1 + (t * 0.10) + (t * t * 0.024) + (t * t * t * 0.0021);
+    }
+
+    function pickCrashMultiplier(){
+      const r = Math.random();
+
+      if (r < 0.24) return round2(rand(1.00, 1.07));
+      if (r < 0.46) return round2(rand(1.07, 1.28));
+      if (r < 0.68) return round2(rand(1.28, 1.75));
+      if (r < 0.84) return round2(rand(1.75, 2.70));
+      if (r < 0.93) return round2(rand(2.70, 4.20));
+      if (r < 0.98) return round2(rand(4.20, 7.00));
+      return round2(rand(7.00, 12.00));
+    }
+
+    function stopLoop(){
+      if (rafId) {
+        cancelAnimationFrame(rafId);
+        rafId = 0;
+      }
+    }
+
+    function resetToIdleSoon(delayMs){
+      setTimeout(() => {
+        if (gameState === "crashed" || gameState === "cashed") {
+          gameState = "idle";
+          setTopState("Готов");
+          updateControls();
+        }
+      }, delayMs);
+    }
+
+    function finishCrash(){
+      stopLoop();
+
+      lastResultValue = 0;
+      pendingPayout = 0;
+      gameState = "crashed";
+      freezeUntil = performance.now() + 950;
+
+      setTrackMode("crashed");
+      setTopState("Стоп");
+      updateControls();
+
+      resetToIdleSoon(980);
+    }
+
+    async function finishCashout(){
       if (gameState !== "running") return;
 
-      if (data.status === "crashed") {
-        setMultiplierValue(Number(data.crash_multiplier || currentMultiplier));
+      stopLoop();
+
+      const payout = round2(roundBet * currentMultiplier);
+      lastResultValue = payout;
+      pendingPayout = payout;
+      requestBusy = true;
+      updateControls();
+
+      try{
+        currentBalance = await dbChangeBalance(payout);
+        updateBalanceUI();
+
+        pendingPayout = 0;
+        gameState = "cashed";
+        freezeUntil = performance.now() + 900;
+
+        setTrackMode("cashed");
+        setTopState("Забрано");
+        requestBusy = false;
+        updateControls();
+
+        resetToIdleSoon(930);
+      } catch {
+        gameState = "payout_pending";
+        setTopState("Ошибка БД");
+        requestBusy = false;
+        updateControls();
+      }
+    }
+
+    async function retryPendingPayout(){
+      if (gameState !== "payout_pending" || pendingPayout <= 0 || requestBusy) return;
+
+      requestBusy = true;
+      updateControls();
+
+      try{
+        currentBalance = await dbChangeBalance(pendingPayout);
+        updateBalanceUI();
+
+        lastResultValue = pendingPayout;
+        pendingPayout = 0;
+        gameState = "cashed";
+        freezeUntil = performance.now() + 900;
+
+        setTrackMode("cashed");
+        setTopState("Забрано");
+        requestBusy = false;
+        updateControls();
+
+        resetToIdleSoon(930);
+      } catch {
+        setTopState("Ошибка БД");
+        requestBusy = false;
+        updateControls();
+      }
+    }
+
+    function gameLoop(now){
+      if (gameState !== "running") return;
+
+      const elapsed = now - startTs;
+      const nextMultiplier = calcMultiplier(elapsed);
+
+      setMultiplierValue(nextMultiplier);
+
+      if (nextMultiplier >= crashAt) {
+        setMultiplierValue(crashAt);
         finishCrash();
         return;
       }
-    } catch {
-      // тихо игнорим, чтобы анимация не ломалась
-    }
 
-    if (gameState === "running") {
-      schedulePoll();
-    }
-  }
-
-  function finishCrash(){
-    stopLoop();
-    stopPolling();
-
-    currentRoundId = "";
-    lastResultValue = 0;
-    gameState = "crashed";
-    freezeUntil = performance.now() + 950;
-
-    setTrackMode("crashed");
-    setTopState("Стоп");
-    updateControls();
-
-    setTimeout(() => {
-      if (gameState === "crashed") {
-        gameState = "idle";
-        roundBet = 0;
-        currentRoundId = "";
-        setMultiplierValue(1.00);
-        setTrackMode("idle");
-        setTopState("Готов");
-        updateControls();
-      }
-    }, 980);
-  }
-
-  function finishCashout(multiplier, payout, balance){
-    stopLoop();
-    stopPolling();
-
-    currentRoundId = "";
-    lastResultValue = round2(Number(payout || 0));
-    setMultiplierValue(Number(multiplier || currentMultiplier));
-
-    if (typeof balance === "number") {
-      setBalance(balance);
-    }
-
-    gameState = "cashed";
-    freezeUntil = performance.now() + 900;
-
-    setTrackMode("cashed");
-    setTopState("Забрано");
-    updateControls();
-
-    setTimeout(() => {
-      if (gameState === "cashed") {
-        gameState = "idle";
-        roundBet = 0;
-        currentRoundId = "";
-        setMultiplierValue(1.00);
-        setTrackMode("idle");
-        setTopState("Готов");
-        updateControls();
-      }
-    }, 930);
-  }
-
-  function gameLoop(){
-    if (gameState !== "running") return;
-
-    const elapsed = performance.now() - localStartPerf;
-    const nextMultiplier = calcMultiplier(elapsed);
-
-    setMultiplierValue(nextMultiplier);
-
-    rafId = requestAnimationFrame(gameLoop);
-  }
-
-  async function startGame(){
-    if (gameState === "running") return;
-    if (performance.now() < freezeUntil) return;
-    if (requestBusy) return;
-
-    const bet = getBetAmount();
-
-    if (bet < MIN_BET) {
-      setTopState("Мин. 10");
-      setTimeout(() => {
-        if (gameState === "idle") setTopState("Готов");
-      }, 900);
-      return;
-    }
-
-    if (bet > MAX_BET) {
-      $("betInput").value = String(MAX_BET);
-      return;
-    }
-
-    if (bet > currentBalance) {
-      setTopState("Нет VC");
-      setTimeout(() => {
-        if (gameState === "idle") setTopState("Готов");
-      }, 900);
-      return;
-    }
-
-    requestBusy = true;
-    updateControls();
-
-    try{
-      const data = await speedApi("start", { bet });
-
-      roundBet = bet;
-      lastResultValue = 0;
-      currentRoundId = String(data.round_id || "");
-
-      setBalance(Number(data.balance || 0));
-      setMultiplierValue(1.00);
-
-      gameState = "running";
-      localStartPerf = performance.now();
-
-      setTrackMode("running");
-      setTopState("Едет");
-
-      requestBusy = false;
-      updateControls();
-
-      schedulePoll();
       rafId = requestAnimationFrame(gameLoop);
-    } catch (e){
-      requestBusy = false;
-      setTopState("Ошибка");
+    }
+
+    async function startGame(){
+      if (!balanceReady || requestBusy) return;
+      if (gameState === "running") return;
+      if (performance.now() < freezeUntil) return;
+
+      const bet = getBetAmount();
+
+      if (bet < MIN_BET) return;
+      if (bet > MAX_BET) {
+        $("betInput").value = String(MAX_BET);
+        return;
+      }
+      if (bet > currentBalance) return;
+
+      requestBusy = true;
       updateControls();
 
-      setTimeout(() => {
-        if (gameState === "idle") setTopState("Готов");
-      }, 1200);
+      try{
+        currentBalance = await dbChangeBalance(-bet);
+        updateBalanceUI();
+
+        roundBet = bet;
+        lastResultValue = 0;
+        pendingPayout = 0;
+
+        crashAt = pickCrashMultiplier();
+        setMultiplierValue(1.00);
+
+        gameState = "running";
+        startTs = performance.now();
+
+        setTrackMode("running");
+        setTopState("Едет");
+
+        requestBusy = false;
+        updateControls();
+
+        rafId = requestAnimationFrame(gameLoop);
+      } catch {
+        requestBusy = false;
+        setTopState("Ошибка БД");
+        updateControls();
+      }
     }
-  }
 
-  async function cashoutGame(){
-    if (gameState !== "running") return;
-    if (requestBusy) return;
+    async function handleMainAction(){
+      if (requestBusy) return;
 
-    requestBusy = true;
-    updateControls();
+      if (gameState === "running") {
+        await finishCashout();
+      } else if (gameState === "payout_pending") {
+        await retryPendingPayout();
+      } else {
+        await startGame();
+      }
+    }
 
-    try{
-      const data = await speedApi("cashout", {
-        round_id: currentRoundId
-      });
+    function openOverlay(id){
+      const el = $(id);
+      el.classList.add("show");
+      el.setAttribute("aria-hidden", "false");
+      document.body.style.overflow = "hidden";
+    }
 
-      requestBusy = false;
+    function closeOverlay(id){
+      const el = $(id);
+      el.classList.remove("show");
+      el.setAttribute("aria-hidden", "true");
+      document.body.style.overflow = "";
+    }
 
-      if (data.status === "crashed") {
-        setMultiplierValue(Number(data.crash_multiplier || currentMultiplier));
-        if (typeof data.balance === "number") {
-          setBalance(Number(data.balance));
+    async function init(){
+      try{
+        if (window.Telegram && window.Telegram.WebApp) {
+          try{
+            window.Telegram.WebApp.ready();
+            if (typeof window.Telegram.WebApp.expand === "function") {
+              window.Telegram.WebApp.expand();
+            }
+          } catch {}
         }
-        finishCrash();
+
+        setMultiplierValue(1.00);
+        setTrackMode("idle");
+        setTopState("Загрузка");
+        $("balanceValue").textContent = "...";
+        updateControls();
+
+        currentBalance = await dbGetBalance();
+        balanceReady = true;
+        updateBalanceUI();
+        setTopState("Готов");
+      } catch {
+        balanceReady = false;
+        $("balanceValue").textContent = "Ошибка";
+        setTopState("Нет БД");
+      }
+
+      updateControls();
+    }
+
+    $("backBtn").addEventListener("click", () => goTo(FILES.games));
+    $("logoBtn").addEventListener("click", () => openOverlay("channelOverlay"));
+    $("rulesBtn").addEventListener("click", () => openOverlay("rulesOverlay"));
+
+    $("betToggleBtn").addEventListener("click", () => {
+      if ($("betToggleBtn").disabled) return;
+      setQuickVisible(!quickVisible);
+    });
+
+    document.querySelectorAll(".quick-btn").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        if (btn.disabled) return;
+        const value = Number(btn.getAttribute("data-bet"));
+        if (!Number.isFinite(value)) return;
+        $("betInput").value = String(Math.min(value, MAX_BET));
+        setQuickVisible(false);
+      });
+    });
+
+    $("betInput").addEventListener("input", () => {
+      const input = $("betInput");
+      let value = Number(input.value);
+
+      if (!input.value) return;
+
+      if (!Number.isFinite(value)) {
+        input.value = "";
         return;
       }
 
-      finishCashout(
-        Number(data.multiplier || currentMultiplier),
-        Number(data.payout || 0),
-        Number(data.balance || currentBalance)
-      );
-    } catch {
-      requestBusy = false;
-      updateControls();
-    }
-  }
+      value = Math.floor(value);
+      if (value > MAX_BET) value = MAX_BET;
+      if (value < 0) value = 0;
 
-  function handleMainAction(){
-    if (gameState === "running") {
-      cashoutGame();
-    } else {
-      startGame();
-    }
-  }
-
-  async function init(){
-    try{
-      if (window.Telegram && window.Telegram.WebApp) {
-        Telegram.WebApp.ready();
-        if (typeof Telegram.WebApp.expand === "function") {
-          Telegram.WebApp.expand();
-        }
-      }
-    } catch {}
-
-    const cached = readProfile();
-    if (cached && Number.isFinite(Number(cached.balance))) {
-      currentBalance = Number(cached.balance);
-    } else {
-      currentBalance = 0;
-    }
-
-    updateBalanceUI();
-    setMultiplierValue(1.00);
-    setTrackMode("idle");
-    setTopState("Готов");
-    updateControls();
-
-    try{
-      const data = await speedApi("get_balance");
-      setBalance(Number(data.balance || 0));
-    } catch {
-      // оставляем кэш, если сервер недоступен
-    }
-  }
-
-  $("backBtn").addEventListener("click", () => goTo(FILES.games));
-  $("logoBtn").addEventListener("click", () => openOverlay("channelOverlay"));
-  $("rulesBtn").addEventListener("click", () => openOverlay("rulesOverlay"));
-
-  $("betToggleBtn").addEventListener("click", () => {
-    if ($("betToggleBtn").disabled) return;
-    setQuickVisible(!quickVisible);
-  });
-
-  document.querySelectorAll(".quick-btn").forEach((btn) => {
-    btn.addEventListener("click", () => {
-      if (btn.disabled) return;
-      const value = Number(btn.getAttribute("data-bet"));
-      if (!Number.isFinite(value)) return;
-      $("betInput").value = String(Math.min(value, MAX_BET));
-      setQuickVisible(false);
+      input.value = String(value);
     });
-  });
 
-  $("betInput").addEventListener("input", () => {
-    const input = $("betInput");
-    let value = Number(input.value);
+    $("playBtn").addEventListener("click", handleMainAction);
 
-    if (!input.value) return;
+    $("channelClose").addEventListener("click", () => closeOverlay("channelOverlay"));
+    $("rulesClose").addEventListener("click", () => closeOverlay("rulesOverlay"));
 
-    if (!Number.isFinite(value)) {
-      input.value = "";
-      return;
-    }
+    $("channelOverlay").addEventListener("click", (e) => {
+      if (e.target === $("channelOverlay")) closeOverlay("channelOverlay");
+    });
 
-    value = Math.floor(value);
-    if (value > MAX_BET) value = MAX_BET;
-    if (value < 0) value = 0;
+    $("rulesOverlay").addEventListener("click", (e) => {
+      if (e.target === $("rulesOverlay")) closeOverlay("rulesOverlay");
+    });
 
-    input.value = String(value);
-  });
+    $("goChannel").addEventListener("click", () => {
+      openTelegramLinkSafe("https://t.me/vezuspubg");
+    });
 
-  $("playBtn").addEventListener("click", handleMainAction);
+    document.addEventListener("click", (e) => {
+      const betToggle = $("betToggleBtn");
+      const quickMenu = $("quickBets");
 
-  function openOverlay(id){
-    const el = $(id);
-    el.classList.add("show");
-    el.setAttribute("aria-hidden", "false");
-    document.body.style.overflow = "hidden";
-  }
+      if (
+        quickVisible &&
+        e.target !== betToggle &&
+        !betToggle.contains(e.target) &&
+        e.target !== quickMenu &&
+        !quickMenu.contains(e.target)
+      ) {
+        setQuickVisible(false);
+      }
+    });
 
-  function closeOverlay(id){
-    const el = $(id);
-    el.classList.remove("show");
-    el.setAttribute("aria-hidden", "true");
-    document.body.style.overflow = "";
-  }
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") {
+        closeOverlay("channelOverlay");
+        closeOverlay("rulesOverlay");
+        setQuickVisible(false);
+      }
+    });
 
-  $("channelClose").addEventListener("click", () => closeOverlay("channelOverlay"));
-  $("rulesClose").addEventListener("click", () => closeOverlay("rulesOverlay"));
-
-  $("channelOverlay").addEventListener("click", (e) => {
-    if (e.target === $("channelOverlay")) closeOverlay("channelOverlay");
-  });
-
-  $("rulesOverlay").addEventListener("click", (e) => {
-    if (e.target === $("rulesOverlay")) closeOverlay("rulesOverlay");
-  });
-
-  $("goChannel").addEventListener("click", () => {
-    openTelegramLinkSafe("https://t.me/vezuspubg");
-  });
-
-  document.addEventListener("click", (e) => {
-    const betToggle = $("betToggleBtn");
-    const quickMenu = $("quickBets");
-
-    if (
-      quickVisible &&
-      e.target !== betToggle &&
-      !betToggle.contains(e.target) &&
-      e.target !== quickMenu &&
-      !quickMenu.contains(e.target)
-    ) {
-      setQuickVisible(false);
-    }
-  });
-
-  document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape") {
-      closeOverlay("channelOverlay");
-      closeOverlay("rulesOverlay");
-      setQuickVisible(false);
-    }
-  });
-
-  window.addEventListener("beforeunload", () => {
-    stopLoop();
-    stopPolling();
-  });
-
-  window.addEventListener("load", init);
-</script>
+    window.addEventListener("load", init);
+  </script>
 </body>
 </html>
