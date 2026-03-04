@@ -1,0 +1,1612 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Speed</title>
+
+  <link rel="preconnect" href="https://i.postimg.cc" crossorigin>
+  <link rel="dns-prefetch" href="https://i.postimg.cc">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  <link rel="preload" as="image" href="https://i.postimg.cc/qvL497mF/Picsart-26-02-27-02-02-37-502.png">
+  <link rel="preload" as="image" href="https://i.postimg.cc/PxRhZC9x/Picsart-26-03-04-12-36-37-394.png">
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --text:#eaf1ff;
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+      --safe-top: env(safe-area-inset-top, 0px);
+
+      --glass: rgba(12, 14, 20, .80);
+      --stroke: rgba(255,255,255,.08);
+      --shadow: 0 16px 38px rgba(0,0,0,.42);
+      --shadow-soft: 0 10px 22px rgba(0,0,0,.28);
+
+      --tg1:#2AABEE;
+      --tg2:#229ED9;
+      --green1:#22c55e;
+      --green2:#16a34a;
+      --red1:#ef4444;
+      --red2:#dc2626;
+      --yellow1:#f59e0b;
+      --yellow2:#f97316;
+    }
+
+    *{
+      box-sizing:border-box;
+      font-family:'Inter', sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html, body{
+      height:100%;
+      margin:0;
+      overflow:hidden;
+      color:var(--text);
+      background:#020617;
+    }
+
+    body{
+      background-image:url("https://i.postimg.cc/fbJT34yY/076E519D-F095-4957-88BF-5591DEB82533.png");
+      background-size:cover;
+      background-position:center;
+      background-repeat:no-repeat;
+    }
+
+    body::before{
+      content:"";
+      position:fixed;
+      inset:0;
+      background:
+        radial-gradient(900px 600px at 30% 10%, rgba(255,255,255,.05), transparent 60%),
+        linear-gradient(180deg, rgba(0,0,0,.40), rgba(0,0,0,.66));
+      pointer-events:none;
+      z-index:0;
+    }
+
+    *::-webkit-scrollbar{ display:none; }
+
+    .app{
+      position:relative;
+      height:100%;
+      overflow:auto;
+      padding:0 12px calc(20px + var(--safe-bottom)) 12px;
+      z-index:1;
+      overscroll-behavior: contain;
+      scrollbar-width:none;
+    }
+
+    .content{
+      width:100%;
+      max-width:460px;
+      margin:0 auto;
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+      position:relative;
+      z-index:1;
+    }
+
+    .sticky-top{
+      position:sticky;
+      top:0;
+      z-index:40;
+      padding-top: calc(6px + var(--safe-top));
+      padding-bottom:6px;
+      background:
+        linear-gradient(180deg,
+          rgba(2,6,23,.96) 0%,
+          rgba(2,6,23,.86) 72%,
+          rgba(2,6,23,0) 100%);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+    }
+
+    .top-row{
+      width:100%;
+      display:grid;
+      grid-template-columns:36px minmax(0,1fr) 36px 46px;
+      gap:6px;
+      align-items:center;
+    }
+
+    .icon-btn,
+    .rule-btn{
+      width:36px;
+      height:36px;
+      border:none;
+      border-radius:12px;
+      background: var(--glass);
+      border:1px solid var(--stroke);
+      box-shadow: var(--shadow-soft), inset 0 1px 0 rgba(255,255,255,.04);
+      display:grid;
+      place-items:center;
+      color:var(--text);
+      cursor:pointer;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      padding:0;
+    }
+
+    .icon-btn{
+      font-size:16px;
+      font-weight:900;
+    }
+
+    .icon-btn:active,
+    .rule-btn:active{ transform:scale(.98); }
+
+    .rule-btn svg{
+      width:16px;
+      height:16px;
+      stroke: rgba(234,241,255,.92);
+      fill:none;
+      stroke-width:2;
+      stroke-linecap:round;
+      stroke-linejoin:round;
+      display:block;
+    }
+
+    .balance-mini{
+      width:100%;
+      min-width:0;
+      height:38px;
+      border-radius:999px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:6px;
+      padding:5px 6px 5px 10px;
+      position:relative;
+      overflow:hidden;
+      background: var(--glass);
+      border:1px solid var(--stroke);
+      box-shadow: var(--shadow), inset 0 1px 0 rgba(255,255,255,.04);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+
+    .balance-mini::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      background:
+        radial-gradient(140px 50px at 0% 0%, rgba(255,255,255,.05), transparent 55%),
+        radial-gradient(140px 50px at 100% 100%, rgba(255,255,255,.03), transparent 55%);
+      pointer-events:none;
+    }
+
+    .bal-title{
+      position:relative;
+      z-index:1;
+      font-size:11px;
+      font-weight:900;
+      color: rgba(234,241,255,.92);
+      white-space:nowrap;
+    }
+
+    .bal-amount{
+      position:relative;
+      z-index:1;
+      min-width:76px;
+      height:24px;
+      border:none;
+      border-radius:999px;
+      padding:0 8px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background: rgba(255,255,255,.08);
+      border:1px solid rgba(255,255,255,.08);
+      color: rgba(234,241,255,.98);
+      font-weight:900;
+      font-size:12px;
+      white-space:nowrap;
+      pointer-events:none;
+    }
+
+    .logo-btn{
+      width:46px;
+      height:46px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background:transparent;
+      border:none;
+      padding:0;
+      margin:0;
+      cursor:pointer;
+    }
+
+    .logo-btn:active{ transform:scale(.98); }
+
+    .logo-btn img{
+      width:100%;
+      height:100%;
+      object-fit:contain;
+      display:block;
+    }
+
+    .card{
+      border-radius:18px;
+      background: var(--glass);
+      border:1px solid var(--stroke);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      overflow:hidden;
+    }
+
+    .hero-card{
+      padding:8px;
+    }
+
+    .stats-grid{
+      display:grid;
+      grid-template-columns:repeat(3, minmax(0,1fr));
+      gap:6px;
+    }
+
+    .stat-box{
+      min-height:48px;
+      border-radius:12px;
+      padding:6px;
+      background: rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.08);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.04);
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+      gap:3px;
+    }
+
+    .stat-label{
+      font-size:9px;
+      font-weight:800;
+      color:rgba(234,241,255,.62);
+      line-height:1;
+    }
+
+    .stat-value{
+      font-size:12px;
+      font-weight:900;
+      color:#fff;
+      line-height:1.1;
+      word-break:break-word;
+    }
+
+    .track-wrap{
+      padding:10px;
+    }
+
+    .track{
+      position:relative;
+      width:100%;
+      height:266px;
+      border-radius:16px;
+      overflow:hidden;
+      border:1px solid rgba(255,255,255,.06);
+      background:
+        radial-gradient(360px 130px at 50% 8%, rgba(255,255,255,.08), transparent 56%),
+        linear-gradient(180deg, rgba(13,17,38,.92) 0%, rgba(11,16,26,.96) 44%, rgba(8,10,16,.98) 100%);
+      transition: box-shadow .25s ease, border-color .25s ease, filter .25s ease;
+    }
+
+    .track::before{
+      content:"";
+      position:absolute;
+      inset:auto 0 88px 0;
+      height:64px;
+      background:
+        radial-gradient(ellipse at 50% 100%, rgba(42,171,238,.16), transparent 64%);
+      pointer-events:none;
+      z-index:1;
+    }
+
+    .track.running{
+      box-shadow: inset 0 0 44px rgba(42,171,238,.08);
+    }
+
+    .track.cashed{
+      border-color: rgba(34,197,94,.24);
+      box-shadow:
+        inset 0 0 50px rgba(34,197,94,.10),
+        0 0 22px rgba(34,197,94,.06);
+    }
+
+    .track.crashed{
+      border-color: rgba(239,68,68,.22);
+      box-shadow:
+        inset 0 0 64px rgba(239,68,68,.12),
+        0 0 24px rgba(239,68,68,.06);
+    }
+
+    .multiplier-chip{
+      position:absolute;
+      top:12px;
+      left:50%;
+      transform:translateX(-50%);
+      z-index:6;
+      min-width:108px;
+      height:40px;
+      border-radius:999px;
+      padding:0 16px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:18px;
+      font-weight:900;
+      color:#fff;
+      letter-spacing:.2px;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.14), rgba(255,255,255,.06));
+      border:1px solid rgba(255,255,255,.10);
+      box-shadow:
+        0 12px 28px rgba(0,0,0,.22),
+        inset 0 1px 0 rgba(255,255,255,.06);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      transition: box-shadow .2s ease, border-color .2s ease, background .2s ease;
+    }
+
+    .multiplier-chip.win{
+      background: linear-gradient(180deg, rgba(34,197,94,.26), rgba(22,163,74,.16));
+      border-color: rgba(34,197,94,.22);
+      box-shadow:
+        0 12px 28px rgba(0,0,0,.22),
+        0 0 18px rgba(34,197,94,.10);
+    }
+
+    .multiplier-chip.lose{
+      background: linear-gradient(180deg, rgba(239,68,68,.28), rgba(220,38,38,.18));
+      border-color: rgba(239,68,68,.22);
+      box-shadow:
+        0 12px 28px rgba(0,0,0,.22),
+        0 0 18px rgba(239,68,68,.10);
+    }
+
+    .crash-badge{
+      position:absolute;
+      top:60px;
+      left:50%;
+      transform:translateX(-50%) scale(.92);
+      z-index:6;
+      height:28px;
+      border-radius:999px;
+      padding:0 12px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:11px;
+      font-weight:900;
+      letter-spacing:.25px;
+      color:#fff;
+      background: linear-gradient(180deg, rgba(239,68,68,.88), rgba(220,38,38,.88));
+      border:1px solid rgba(255,255,255,.08);
+      opacity:0;
+      transition: opacity .2s ease, transform .2s ease;
+      pointer-events:none;
+    }
+
+    .track.crashed .crash-badge{
+      opacity:1;
+      transform:translateX(-50%) scale(1);
+    }
+
+    .sky-glow{
+      position:absolute;
+      inset:0;
+      background:
+        radial-gradient(260px 100px at 50% 18%, rgba(42,171,238,.10), transparent 65%);
+      pointer-events:none;
+      z-index:1;
+    }
+
+    .wind{
+      position:absolute;
+      inset:0;
+      z-index:2;
+      pointer-events:none;
+      opacity:0;
+      transition: opacity .18s ease;
+    }
+
+    .track.running .wind{ opacity:1; }
+
+    .wind span{
+      position:absolute;
+      left:-34%;
+      height:2px;
+      border-radius:999px;
+      background: linear-gradient(90deg, rgba(255,255,255,0), rgba(255,255,255,.55), rgba(255,255,255,0));
+      animation: windMove linear infinite;
+    }
+
+    .wind span:nth-child(1){ top:60px; width:84px; animation-duration:.62s; animation-delay:-.10s; }
+    .wind span:nth-child(2){ top:88px; width:62px; animation-duration:.56s; animation-delay:-.34s; }
+    .wind span:nth-child(3){ top:116px; width:96px; animation-duration:.72s; animation-delay:-.22s; }
+    .wind span:nth-child(4){ top:144px; width:70px; animation-duration:.60s; animation-delay:-.42s; }
+    .wind span:nth-child(5){ top:172px; width:92px; animation-duration:.66s; animation-delay:-.18s; }
+
+    .road{
+      position:absolute;
+      left:0;
+      right:0;
+      bottom:0;
+      height:118px;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,0) 12%),
+        linear-gradient(180deg, #313a4f 0%, #1d2433 28%, #121722 100%);
+      border-top:1px solid rgba(255,255,255,.06);
+      z-index:2;
+      overflow:hidden;
+      box-shadow:
+        inset 0 10px 16px rgba(255,255,255,.02),
+        inset 0 -16px 24px rgba(0,0,0,.18);
+    }
+
+    .road::before,
+    .road::after{
+      content:"";
+      position:absolute;
+      pointer-events:none;
+      border-radius:50%;
+      filter: blur(18px);
+    }
+
+    .road::before{
+      width:220px;
+      height:160px;
+      left:-70px;
+      top:-30px;
+      background: radial-gradient(circle, rgba(255,255,255,.08), rgba(255,255,255,0) 70%);
+      opacity:.55;
+    }
+
+    .road::after{
+      width:260px;
+      height:180px;
+      right:-90px;
+      bottom:-60px;
+      background: radial-gradient(circle, rgba(42,171,238,.10), rgba(42,171,238,0) 70%);
+      opacity:.45;
+    }
+
+    .track.running .road::before{
+      animation: roadGlowShift 1.15s linear infinite;
+    }
+
+    .track.running .road::after{
+      animation: roadGlowShift2 1.45s linear infinite;
+    }
+
+    .car-wrap{
+      position:absolute;
+      left:50%;
+      bottom:16px;
+      transform:translateX(-50%);
+      width:min(252px, 80%);
+      z-index:5;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      pointer-events:none;
+    }
+
+    .car-shadow{
+      position:absolute;
+      left:50%;
+      bottom:8px;
+      width:68%;
+      height:18px;
+      transform:translateX(-50%);
+      border-radius:999px;
+      background: radial-gradient(ellipse at center, rgba(0,0,0,.48), rgba(0,0,0,0) 72%);
+      transition: transform .18s ease, opacity .18s ease, filter .18s ease;
+    }
+
+    .car-img{
+      width:100%;
+      height:auto;
+      display:block;
+      position:relative;
+      z-index:2;
+      filter: drop-shadow(0 16px 22px rgba(0,0,0,.28));
+      transform-origin:center bottom;
+      transition: filter .2s ease, transform .2s ease;
+    }
+
+    .track.running .car-img{
+      animation: carDrive .18s linear infinite;
+    }
+
+    .track.running .car-shadow{
+      animation: shadowPulse .18s linear infinite;
+    }
+
+    .track.cashed .car-img{
+      filter:
+        drop-shadow(0 16px 22px rgba(0,0,0,.28))
+        drop-shadow(0 0 18px rgba(34,197,94,.18));
+    }
+
+    .track.crashed .car-img{
+      filter:
+        saturate(.9)
+        drop-shadow(0 16px 22px rgba(0,0,0,.28))
+        drop-shadow(0 0 18px rgba(239,68,68,.22));
+      transform: scale(.995);
+    }
+
+    .track.crashed .car-shadow{
+      filter: blur(1px);
+    }
+
+    .panel{
+      padding:10px;
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+    }
+
+    .label{
+      font-size:12px;
+      font-weight:900;
+      color: rgba(234,241,255,.94);
+      margin-bottom:7px;
+    }
+
+    .bet-row{
+      display:grid;
+      grid-template-columns:minmax(0,1fr) 42px;
+      gap:6px;
+      align-items:center;
+    }
+
+    .bet-input{
+      width:100%;
+      height:42px;
+      border-radius:14px;
+      border:1px solid rgba(255,255,255,.08);
+      background: rgba(255,255,255,.06);
+      color:#fff;
+      font-size:15px;
+      font-weight:900;
+      padding:0 12px;
+      outline:none;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.04);
+      text-align:center;
+    }
+
+    .bet-input::placeholder{
+      color: rgba(234,241,255,.42);
+      font-weight:800;
+    }
+
+    .bet-input:disabled{
+      opacity:.55;
+      cursor:not-allowed;
+    }
+
+    .bet-toggle{
+      height:42px;
+      width:42px;
+      border:none;
+      border-radius:14px;
+      cursor:pointer;
+      color:#fff;
+      font-weight:900;
+      display:grid;
+      place-items:center;
+      padding:0;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.14), rgba(255,255,255,.06));
+      border:1px solid rgba(255,255,255,.12);
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.08),
+        0 6px 14px rgba(0,0,0,.14);
+    }
+
+    .bet-toggle svg{
+      width:19px;
+      height:19px;
+      display:block;
+      filter: drop-shadow(0 3px 6px rgba(0,0,0,.18));
+    }
+
+    .bet-toggle:active{ transform:scale(.98); }
+
+    .bet-toggle:disabled,
+    .quick-btn:disabled{
+      opacity:.55;
+      cursor:not-allowed;
+      transform:none !important;
+      box-shadow:none;
+    }
+
+    .quick-bets{
+      display:grid;
+      grid-template-columns:repeat(5, minmax(0,1fr));
+      gap:6px;
+      max-height:0;
+      opacity:0;
+      overflow:hidden;
+      margin-top:0;
+      transition:max-height .24s ease, opacity .24s ease, margin .24s ease;
+    }
+
+    .quick-bets.show{
+      max-height:60px;
+      opacity:1;
+      margin-top:8px;
+    }
+
+    .quick-btn{
+      height:32px;
+      border:none;
+      border-radius:11px;
+      cursor:pointer;
+      background: rgba(255,255,255,.08);
+      border:1px solid rgba(255,255,255,.08);
+      color:#fff;
+      font-size:11px;
+      font-weight:900;
+    }
+
+    .quick-btn:active{ transform:scale(.98); }
+
+    .action-row{
+      display:grid;
+      grid-template-columns:1fr;
+      gap:8px;
+    }
+
+    .play-btn{
+      width:100%;
+      height:44px;
+      border:none;
+      border-radius:14px;
+      cursor:pointer;
+      color:#fff;
+      font-size:13px;
+      font-weight:900;
+      letter-spacing:.2px;
+      background: linear-gradient(180deg, var(--yellow1), var(--yellow2));
+      box-shadow: 0 12px 24px rgba(245,158,11,.18);
+    }
+
+    .play-btn.cash-mode{
+      background: linear-gradient(180deg, var(--green1), var(--green2));
+      box-shadow: 0 12px 24px rgba(34,197,94,.18);
+    }
+
+    .play-btn.win-mode{
+      background: linear-gradient(180deg, var(--green1), var(--green2));
+      box-shadow: 0 12px 24px rgba(34,197,94,.18);
+    }
+
+    .play-btn.lose-mode{
+      background: linear-gradient(180deg, var(--red1), var(--red2));
+      box-shadow: 0 12px 24px rgba(239,68,68,.18);
+    }
+
+    .play-btn:active{ transform: scale(.985); }
+
+    .play-btn:disabled{
+      opacity:.55;
+      cursor:not-allowed;
+      box-shadow:none;
+      transform:none !important;
+    }
+
+    .play-btn.cash-mode:disabled,
+    .play-btn.win-mode:disabled,
+    .play-btn.lose-mode:disabled{
+      opacity:1;
+    }
+
+    .overlay{
+      position:fixed;
+      inset:0;
+      background: rgba(0,0,0,.72);
+      opacity:0;
+      pointer-events:none;
+      transition: opacity .22s ease;
+      z-index:260;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:14px;
+    }
+
+    .overlay.show{
+      opacity:1;
+      pointer-events:auto;
+    }
+
+    .popup{
+      width:min(420px, 100%);
+      border-radius:18px;
+      overflow:hidden;
+      background: rgba(14,16,24,.94);
+      border: 1px solid rgba(255,255,255,.08);
+      box-shadow: 0 28px 70px rgba(0,0,0,.56);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      position:relative;
+      transform: translateY(12px) scale(.98);
+      opacity:.95;
+      transition: transform .22s ease, opacity .22s ease;
+    }
+
+    .overlay.show .popup{
+      transform: translateY(0) scale(1);
+      opacity:1;
+    }
+
+    .popup-head{
+      padding:12px 12px 8px 12px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      background: rgba(255,255,255,.03);
+      border-bottom: 1px solid rgba(255,255,255,.06);
+    }
+
+    .popup-title{
+      font-weight:900;
+      letter-spacing:.25px;
+      font-size:13px;
+      color: rgba(234,241,255,.95);
+    }
+
+    .popup-x{
+      width:34px;
+      height:34px;
+      border-radius:12px;
+      border:1px solid rgba(255,255,255,.08);
+      background: rgba(255,255,255,.05);
+      color: rgba(234,241,255,.92);
+      cursor:pointer;
+      display:grid;
+      place-items:center;
+      box-shadow: 0 10px 20px rgba(0,0,0,.26);
+      padding:0;
+    }
+
+    .popup-x:active{ transform: scale(.98); }
+
+    .popup-body{
+      padding:12px;
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+    }
+
+    .popup-text,
+    .rule-line{
+      margin:0;
+      font-size:12px;
+      line-height:1.4;
+      color: rgba(234,241,255,.88);
+    }
+
+    .tg-btn{
+      border:none;
+      cursor:pointer;
+      width:100%;
+      height:44px;
+      border-radius:14px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:10px;
+      background: linear-gradient(180deg, var(--tg1), var(--tg2));
+      box-shadow:
+        0 12px 24px rgba(34,158,217,.24),
+        inset 0 1px 0 rgba(255,255,255,.14);
+      color:#fff;
+      font-weight:900;
+      letter-spacing:.2px;
+      font-size:13px;
+    }
+
+    .tg-btn:active{ transform: scale(.99); }
+
+    .tg-ico{
+      width:20px;
+      height:20px;
+      display:block;
+      filter: drop-shadow(0 8px 14px rgba(0,0,0,.18));
+    }
+
+    @keyframes roadGlowShift{
+      from{ transform:translateX(-8px); }
+      to{ transform:translateX(18px); }
+    }
+
+    @keyframes roadGlowShift2{
+      from{ transform:translateX(10px); }
+      to{ transform:translateX(-14px); }
+    }
+
+    @keyframes carDrive{
+      0%   { transform: translateY(0px) rotate(0deg); }
+      25%  { transform: translateY(-1px) rotate(.2deg); }
+      50%  { transform: translateY(0px) rotate(0deg); }
+      75%  { transform: translateY(1px) rotate(-.2deg); }
+      100% { transform: translateY(0px) rotate(0deg); }
+    }
+
+    @keyframes shadowPulse{
+      0%   { transform: translateX(-50%) scaleX(1); opacity:.95; }
+      50%  { transform: translateX(-50%) scaleX(1.03); opacity:.88; }
+      100% { transform: translateX(-50%) scaleX(1); opacity:.95; }
+    }
+
+    @keyframes windMove{
+      from{ transform: translateX(0); opacity:0; }
+      15% { opacity:.8; }
+      85% { opacity:.75; }
+      to{ transform: translateX(160vw); opacity:0; }
+    }
+
+    @media (max-width: 360px){
+      .app{ padding:0 10px calc(14px + var(--safe-bottom)) 10px; }
+      .content{ gap:8px; }
+      .track{ height:248px; }
+      .bet-row{ grid-template-columns:minmax(0,1fr) 40px; }
+      .quick-bets{ gap:5px; }
+      .quick-btn{ font-size:10px; }
+      .stat-box{ min-height:44px; }
+      .stat-label{ font-size:8px; }
+      .stat-value{ font-size:11px; }
+      .multiplier-chip{ min-width:96px; font-size:16px; }
+      .car-wrap{ bottom:12px; }
+      .road{ height:110px; }
+    }
+
+    @media (prefers-reduced-motion: reduce){
+      *{ transition:none !important; animation:none !important; }
+      .overlay.show .popup{ transform:none !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <div class="content">
+
+      <div class="sticky-top">
+        <div class="top-row">
+          <button class="icon-btn" id="backBtn" aria-label="Назад">←</button>
+
+          <div class="balance-mini" aria-label="Баланс">
+            <span class="bal-title">Баланс</span>
+            <div class="bal-amount" id="balanceValue">...</div>
+          </div>
+
+          <button class="rule-btn" id="rulesBtn" aria-label="Правила">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M9 9a3 3 0 1 1 5.2 2.1c-.9.9-1.7 1.5-1.7 2.9"></path>
+              <path d="M12 17h.01"></path>
+              <circle cx="12" cy="12" r="9"></circle>
+            </svg>
+          </button>
+
+          <button class="logo-btn" id="logoBtn" aria-label="Открыть Telegram канал">
+            <img
+              src="https://i.postimg.cc/qvL497mF/Picsart-26-02-27-02-02-37-502.png"
+              alt="Vezus"
+              loading="eager"
+              fetchpriority="high"
+              decoding="async"
+            >
+          </button>
+        </div>
+      </div>
+
+      <div class="card hero-card">
+        <div class="stats-grid">
+          <div class="stat-box">
+            <div class="stat-label">Текущий x</div>
+            <div class="stat-value" id="topMultiplier">x1.00</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-label">Состояние</div>
+            <div class="stat-value" id="stateValue">Готов</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-label">Макс. ставка</div>
+            <div class="stat-value">5000 VC</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card track-wrap">
+        <div class="track" id="track">
+          <div class="sky-glow"></div>
+
+          <div class="multiplier-chip" id="multiplierChip">x1.00</div>
+          <div class="crash-badge">ДВИГАТЕЛЬ ВСТАЛ</div>
+
+          <div class="wind">
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+
+          <div class="road"></div>
+
+          <div class="car-wrap">
+            <div class="car-shadow"></div>
+            <img
+              class="car-img"
+              src="https://i.postimg.cc/PxRhZC9x/Picsart-26-03-04-12-36-37-394.png"
+              alt="Car"
+              id="carImg"
+            >
+          </div>
+        </div>
+      </div>
+
+      <div class="card panel">
+        <div>
+          <div class="label">Ставка</div>
+
+          <div class="bet-row">
+            <input
+              class="bet-input"
+              id="betInput"
+              type="number"
+              min="10"
+              max="5000"
+              step="1"
+              inputmode="numeric"
+              placeholder="Мин. 10"
+              value="10"
+            >
+
+            <button class="bet-toggle" id="betToggleBtn" type="button" aria-label="Быстрые ставки">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <g fill="none" stroke="rgba(255,255,255,.96)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="9" cy="12" r="3.7"></circle>
+                  <circle cx="14.8" cy="12" r="3.7"></circle>
+                  <path d="M18.5 6.2v4.2"></path>
+                  <path d="M16.4 8.3h4.2"></path>
+                </g>
+              </svg>
+            </button>
+          </div>
+
+          <div class="quick-bets" id="quickBets">
+            <button class="quick-btn" data-bet="10" type="button">10</button>
+            <button class="quick-btn" data-bet="50" type="button">50</button>
+            <button class="quick-btn" data-bet="100" type="button">100</button>
+            <button class="quick-btn" data-bet="250" type="button">250</button>
+            <button class="quick-btn" data-bet="500" type="button">500</button>
+          </div>
+        </div>
+
+        <div class="action-row">
+          <button class="play-btn" id="playBtn" type="button">Начать</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="overlay" id="rulesOverlay" aria-hidden="true">
+    <div class="popup" role="dialog" aria-modal="true" aria-label="Правила">
+      <div class="popup-head">
+        <div class="popup-title">Правила игры</div>
+        <button class="popup-x" id="rulesClose" aria-label="Закрыть">✕</button>
+      </div>
+
+      <div class="popup-body">
+        <p class="rule-line">• Выбери ставку</p>
+        <p class="rule-line">• Нажми «Начать»</p>
+        <p class="rule-line">• Машина едет, множитель растёт</p>
+        <p class="rule-line">• Кнопка станет зелёной: «Забрать (сумма)»</p>
+        <p class="rule-line">• Если не успеешь нажать — ставка сгорит</p>
+        <p class="rule-line">• Машина может встать очень рано</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="overlay" id="channelOverlay" aria-hidden="true">
+    <div class="popup" role="dialog" aria-modal="true" aria-label="Telegram канал">
+      <div class="popup-head">
+        <div class="popup-title">Наш Telegram канал</div>
+        <button class="popup-x" id="channelClose" aria-label="Закрыть">✕</button>
+      </div>
+
+      <div class="popup-body">
+        <p class="popup-text">
+          Нажми кнопку ниже — откроется наш Telegram канал:
+          <b>@vezuspubg</b>
+        </p>
+
+        <button class="tg-btn" id="goChannel" aria-label="Перейти в Telegram канал">
+          <svg class="tg-ico" viewBox="0 0 240 240" aria-hidden="true">
+            <path fill="#fff" d="M120 0C53.7 0 0 53.7 0 120s53.7 120 120 120 120-53.7 120-120S186.3 0 120 0zm58.7 82.3l-19.7 92.8c-1.5 6.6-5.4 8.2-10.9 5.1l-30.2-22.3-14.6 14c-1.6 1.6-3 3-6.1 3l2.2-31.6 57.5-52c2.5-2.2-.5-3.4-3.9-1.2l-71 44.7-30.6-9.6c-6.6-2.1-6.7-6.6 1.4-9.7l119.6-46.1c5.5-2 10.3 1.3 8.8 9.9z"/>
+          </svg>
+          Перейти в Telegram канал
+        </button>
+      </div>
+    </div>
+  </div>
+
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<script>
+  const PROFILE_KEY = "tg_profile";
+
+  const SUPABASE_URL = "https://lazrfierfbhwlduqlvws.supabase.co";
+  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxhenJmaWVyZmJod2xkdXFsdndzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE1NzY2ODIsImV4cCI6MjA4NzE1MjY4Mn0.tJtwFrNPrNyGNedGP1h0bNgr98FnyoliR-13mOqlBJI";
+  const FUNCTIONS_URL = SUPABASE_URL.replace(".supabase.co", ".functions.supabase.co");
+
+  const MIN_BET = 10;
+  const MAX_BET = 5000;
+
+  const FILES = {
+    games: "games.html"
+  };
+
+  const $ = (id) => document.getElementById(id);
+
+  let currentBalance = 0;
+  let quickVisible = false;
+
+  let gameState = "idle"; // idle | running | crashed | cashed
+  let roundBet = 0;
+  let currentMultiplier = 1;
+  let rafId = 0;
+  let localStartPerf = 0;
+  let freezeUntil = 0;
+  let lastResultValue = 0;
+
+  let currentRoundId = "";
+  let pollTimer = 0;
+  let requestBusy = false;
+
+  function rand(min, max){
+    return Math.random() * (max - min) + min;
+  }
+
+  function round2(n){
+    return Math.round(n * 100) / 100;
+  }
+
+  function formatVc(value){
+    const n = Number(value ?? 0);
+    if (!Number.isFinite(n)) return "0 VC";
+    return Number.isInteger(n) ? `${n} VC` : `${n.toFixed(2)} VC`;
+  }
+
+  function calcMultiplier(elapsedMs){
+    const t = Math.max(0, elapsedMs) / 1000;
+    return 1 + (t * 0.10) + (t * t * 0.024) + (t * t * t * 0.0021);
+  }
+
+  function goTo(file){
+    window.location.href = file;
+  }
+
+  function openTelegramLinkSafe(url){
+    if (window.Telegram && window.Telegram.WebApp && typeof window.Telegram.WebApp.openTelegramLink === "function") {
+      window.Telegram.WebApp.openTelegramLink(url);
+      return;
+    }
+    window.open(url, "_blank", "noopener");
+  }
+
+  function readProfile(){
+    try{
+      return JSON.parse(localStorage.getItem(PROFILE_KEY) || "null");
+    } catch {
+      return null;
+    }
+  }
+
+  function writeProfile(profile){
+    localStorage.setItem(PROFILE_KEY, JSON.stringify(profile));
+  }
+
+  function syncCachedBalance(balance){
+    const profile = readProfile() || {};
+    profile.balance = round2(Number(balance || 0));
+    writeProfile(profile);
+  }
+
+  function normalizeBalance(){
+    currentBalance = Number(currentBalance);
+    if (!Number.isFinite(currentBalance) || currentBalance < 0) currentBalance = 0;
+    currentBalance = round2(currentBalance);
+  }
+
+  function setBalance(balance){
+    currentBalance = Number(balance ?? 0);
+    normalizeBalance();
+    syncCachedBalance(currentBalance);
+    updateBalanceUI();
+  }
+
+  function updateBalanceUI(){
+    normalizeBalance();
+    $("balanceValue").textContent = formatVc(currentBalance);
+  }
+
+  function setQuickVisible(show){
+    if ($("betToggleBtn").disabled && show) return;
+    quickVisible = !!show;
+    $("quickBets").classList.toggle("show", quickVisible);
+  }
+
+  function setTopState(text){
+    $("stateValue").textContent = text;
+  }
+
+  function getLiveReturnValue(){
+    return round2(roundBet * currentMultiplier);
+  }
+
+  function setMultiplierValue(value){
+    currentMultiplier = Math.max(1, round2(value));
+    $("multiplierChip").textContent = `x${currentMultiplier.toFixed(2)}`;
+    $("topMultiplier").textContent = `x${currentMultiplier.toFixed(2)}`;
+
+    if (gameState === "running") {
+      $("playBtn").textContent = `Забрать (${formatVc(getLiveReturnValue())})`;
+    }
+  }
+
+  function getBetAmount(){
+    const raw = $("betInput").value;
+    const amount = Number(raw);
+    if (!raw || !Number.isFinite(amount)) return 0;
+    return Math.floor(amount);
+  }
+
+  function setTrackMode(mode){
+    const track = $("track");
+    const chip = $("multiplierChip");
+
+    track.classList.remove("running", "crashed", "cashed");
+    chip.classList.remove("win", "lose");
+
+    if (mode === "running") track.classList.add("running");
+    if (mode === "crashed") {
+      track.classList.add("crashed");
+      chip.classList.add("lose");
+    }
+    if (mode === "cashed") {
+      track.classList.add("cashed");
+      chip.classList.add("win");
+    }
+  }
+
+  function updateControls(){
+    const playBtn = $("playBtn");
+    const lockInputs = gameState === "running" || performance.now() < freezeUntil || requestBusy;
+
+    $("betInput").disabled = lockInputs;
+    $("betToggleBtn").disabled = lockInputs;
+    document.querySelectorAll(".quick-btn").forEach(btn => btn.disabled = lockInputs);
+
+    if (lockInputs) setQuickVisible(false);
+
+    playBtn.classList.remove("cash-mode", "win-mode", "lose-mode");
+
+    if (gameState === "running") {
+      playBtn.textContent = `Забрать (${formatVc(getLiveReturnValue())})`;
+      playBtn.disabled = requestBusy;
+      playBtn.classList.add("cash-mode");
+    } else if (gameState === "crashed") {
+      playBtn.textContent = "Сгорело";
+      playBtn.disabled = performance.now() < freezeUntil || requestBusy;
+      playBtn.classList.add("lose-mode");
+    } else if (gameState === "cashed") {
+      playBtn.textContent = `Забрано (${formatVc(lastResultValue)})`;
+      playBtn.disabled = performance.now() < freezeUntil || requestBusy;
+      playBtn.classList.add("win-mode");
+    } else {
+      playBtn.textContent = requestBusy ? "Загрузка..." : "Начать";
+      playBtn.disabled = performance.now() < freezeUntil || requestBusy;
+    }
+  }
+
+  function getTelegramInitData(){
+    try{
+      if (window.Telegram && window.Telegram.WebApp) {
+        return String(window.Telegram.WebApp.initData || "");
+      }
+    } catch {}
+    return "";
+  }
+
+  async function speedApi(action, payload = {}){
+    const initData = getTelegramInitData();
+    if (!initData) {
+      throw new Error("telegram_auth_required");
+    }
+
+    const res = await fetch(`${FUNCTIONS_URL}/speed-play`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "apikey": SUPABASE_ANON_KEY,
+        "Authorization": `Bearer ${SUPABASE_ANON_KEY}`
+      },
+      body: JSON.stringify({
+        action,
+        initData,
+        ...payload
+      })
+    });
+
+    const data = await res.json().catch(() => ({}));
+
+    if (!res.ok || !data?.ok) {
+      throw new Error(data?.error || "speed_play_error");
+    }
+
+    return data;
+  }
+
+  function stopLoop(){
+    if (rafId) {
+      cancelAnimationFrame(rafId);
+      rafId = 0;
+    }
+  }
+
+  function stopPolling(){
+    if (pollTimer) {
+      clearTimeout(pollTimer);
+      pollTimer = 0;
+    }
+  }
+
+  function schedulePoll(){
+    stopPolling();
+
+    if (gameState !== "running" || !currentRoundId) return;
+
+    pollTimer = setTimeout(checkRoundStatus, 220);
+  }
+
+  async function checkRoundStatus(){
+    if (gameState !== "running" || !currentRoundId) return;
+
+    try{
+      const data = await speedApi("status", {
+        round_id: currentRoundId
+      });
+
+      if (gameState !== "running") return;
+
+      if (data.status === "crashed") {
+        setMultiplierValue(Number(data.crash_multiplier || currentMultiplier));
+        finishCrash();
+        return;
+      }
+    } catch {
+      // тихо игнорим, чтобы анимация не ломалась
+    }
+
+    if (gameState === "running") {
+      schedulePoll();
+    }
+  }
+
+  function finishCrash(){
+    stopLoop();
+    stopPolling();
+
+    currentRoundId = "";
+    lastResultValue = 0;
+    gameState = "crashed";
+    freezeUntil = performance.now() + 950;
+
+    setTrackMode("crashed");
+    setTopState("Стоп");
+    updateControls();
+
+    setTimeout(() => {
+      if (gameState === "crashed") {
+        gameState = "idle";
+        roundBet = 0;
+        currentRoundId = "";
+        setMultiplierValue(1.00);
+        setTrackMode("idle");
+        setTopState("Готов");
+        updateControls();
+      }
+    }, 980);
+  }
+
+  function finishCashout(multiplier, payout, balance){
+    stopLoop();
+    stopPolling();
+
+    currentRoundId = "";
+    lastResultValue = round2(Number(payout || 0));
+    setMultiplierValue(Number(multiplier || currentMultiplier));
+
+    if (typeof balance === "number") {
+      setBalance(balance);
+    }
+
+    gameState = "cashed";
+    freezeUntil = performance.now() + 900;
+
+    setTrackMode("cashed");
+    setTopState("Забрано");
+    updateControls();
+
+    setTimeout(() => {
+      if (gameState === "cashed") {
+        gameState = "idle";
+        roundBet = 0;
+        currentRoundId = "";
+        setMultiplierValue(1.00);
+        setTrackMode("idle");
+        setTopState("Готов");
+        updateControls();
+      }
+    }, 930);
+  }
+
+  function gameLoop(){
+    if (gameState !== "running") return;
+
+    const elapsed = performance.now() - localStartPerf;
+    const nextMultiplier = calcMultiplier(elapsed);
+
+    setMultiplierValue(nextMultiplier);
+
+    rafId = requestAnimationFrame(gameLoop);
+  }
+
+  async function startGame(){
+    if (gameState === "running") return;
+    if (performance.now() < freezeUntil) return;
+    if (requestBusy) return;
+
+    const bet = getBetAmount();
+
+    if (bet < MIN_BET) {
+      setTopState("Мин. 10");
+      setTimeout(() => {
+        if (gameState === "idle") setTopState("Готов");
+      }, 900);
+      return;
+    }
+
+    if (bet > MAX_BET) {
+      $("betInput").value = String(MAX_BET);
+      return;
+    }
+
+    if (bet > currentBalance) {
+      setTopState("Нет VC");
+      setTimeout(() => {
+        if (gameState === "idle") setTopState("Готов");
+      }, 900);
+      return;
+    }
+
+    requestBusy = true;
+    updateControls();
+
+    try{
+      const data = await speedApi("start", { bet });
+
+      roundBet = bet;
+      lastResultValue = 0;
+      currentRoundId = String(data.round_id || "");
+
+      setBalance(Number(data.balance || 0));
+      setMultiplierValue(1.00);
+
+      gameState = "running";
+      localStartPerf = performance.now();
+
+      setTrackMode("running");
+      setTopState("Едет");
+
+      requestBusy = false;
+      updateControls();
+
+      schedulePoll();
+      rafId = requestAnimationFrame(gameLoop);
+    } catch (e){
+      requestBusy = false;
+      setTopState("Ошибка");
+      updateControls();
+
+      setTimeout(() => {
+        if (gameState === "idle") setTopState("Готов");
+      }, 1200);
+    }
+  }
+
+  async function cashoutGame(){
+    if (gameState !== "running") return;
+    if (requestBusy) return;
+
+    requestBusy = true;
+    updateControls();
+
+    try{
+      const data = await speedApi("cashout", {
+        round_id: currentRoundId
+      });
+
+      requestBusy = false;
+
+      if (data.status === "crashed") {
+        setMultiplierValue(Number(data.crash_multiplier || currentMultiplier));
+        if (typeof data.balance === "number") {
+          setBalance(Number(data.balance));
+        }
+        finishCrash();
+        return;
+      }
+
+      finishCashout(
+        Number(data.multiplier || currentMultiplier),
+        Number(data.payout || 0),
+        Number(data.balance || currentBalance)
+      );
+    } catch {
+      requestBusy = false;
+      updateControls();
+    }
+  }
+
+  function handleMainAction(){
+    if (gameState === "running") {
+      cashoutGame();
+    } else {
+      startGame();
+    }
+  }
+
+  async function init(){
+    try{
+      if (window.Telegram && window.Telegram.WebApp) {
+        Telegram.WebApp.ready();
+        if (typeof Telegram.WebApp.expand === "function") {
+          Telegram.WebApp.expand();
+        }
+      }
+    } catch {}
+
+    const cached = readProfile();
+    if (cached && Number.isFinite(Number(cached.balance))) {
+      currentBalance = Number(cached.balance);
+    } else {
+      currentBalance = 0;
+    }
+
+    updateBalanceUI();
+    setMultiplierValue(1.00);
+    setTrackMode("idle");
+    setTopState("Готов");
+    updateControls();
+
+    try{
+      const data = await speedApi("get_balance");
+      setBalance(Number(data.balance || 0));
+    } catch {
+      // оставляем кэш, если сервер недоступен
+    }
+  }
+
+  $("backBtn").addEventListener("click", () => goTo(FILES.games));
+  $("logoBtn").addEventListener("click", () => openOverlay("channelOverlay"));
+  $("rulesBtn").addEventListener("click", () => openOverlay("rulesOverlay"));
+
+  $("betToggleBtn").addEventListener("click", () => {
+    if ($("betToggleBtn").disabled) return;
+    setQuickVisible(!quickVisible);
+  });
+
+  document.querySelectorAll(".quick-btn").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      if (btn.disabled) return;
+      const value = Number(btn.getAttribute("data-bet"));
+      if (!Number.isFinite(value)) return;
+      $("betInput").value = String(Math.min(value, MAX_BET));
+      setQuickVisible(false);
+    });
+  });
+
+  $("betInput").addEventListener("input", () => {
+    const input = $("betInput");
+    let value = Number(input.value);
+
+    if (!input.value) return;
+
+    if (!Number.isFinite(value)) {
+      input.value = "";
+      return;
+    }
+
+    value = Math.floor(value);
+    if (value > MAX_BET) value = MAX_BET;
+    if (value < 0) value = 0;
+
+    input.value = String(value);
+  });
+
+  $("playBtn").addEventListener("click", handleMainAction);
+
+  function openOverlay(id){
+    const el = $(id);
+    el.classList.add("show");
+    el.setAttribute("aria-hidden", "false");
+    document.body.style.overflow = "hidden";
+  }
+
+  function closeOverlay(id){
+    const el = $(id);
+    el.classList.remove("show");
+    el.setAttribute("aria-hidden", "true");
+    document.body.style.overflow = "";
+  }
+
+  $("channelClose").addEventListener("click", () => closeOverlay("channelOverlay"));
+  $("rulesClose").addEventListener("click", () => closeOverlay("rulesOverlay"));
+
+  $("channelOverlay").addEventListener("click", (e) => {
+    if (e.target === $("channelOverlay")) closeOverlay("channelOverlay");
+  });
+
+  $("rulesOverlay").addEventListener("click", (e) => {
+    if (e.target === $("rulesOverlay")) closeOverlay("rulesOverlay");
+  });
+
+  $("goChannel").addEventListener("click", () => {
+    openTelegramLinkSafe("https://t.me/vezuspubg");
+  });
+
+  document.addEventListener("click", (e) => {
+    const betToggle = $("betToggleBtn");
+    const quickMenu = $("quickBets");
+
+    if (
+      quickVisible &&
+      e.target !== betToggle &&
+      !betToggle.contains(e.target) &&
+      e.target !== quickMenu &&
+      !quickMenu.contains(e.target)
+    ) {
+      setQuickVisible(false);
+    }
+  });
+
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") {
+      closeOverlay("channelOverlay");
+      closeOverlay("rulesOverlay");
+      setQuickVisible(false);
+    }
+  });
+
+  window.addEventListener("beforeunload", () => {
+    stopLoop();
+    stopPolling();
+  });
+
+  window.addEventListener("load", init);
+</script>
+</body>
+</html>
