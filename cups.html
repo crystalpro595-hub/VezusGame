@@ -66,6 +66,70 @@
 
     *::-webkit-scrollbar{ display:none; }
 
+    .loading-screen{
+      position:fixed;
+      inset:0;
+      z-index:999;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:24px;
+      background:rgba(2,6,23,.96);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      transition: opacity .35s ease, visibility .35s ease;
+    }
+
+    .loading-screen.hide{
+      opacity:0;
+      visibility:hidden;
+      pointer-events:none;
+    }
+
+    .loading-box{
+      width:min(300px, 100%);
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      gap:18px;
+    }
+
+    .loading-logo{
+      width:110px;
+      height:110px;
+      object-fit:contain;
+      display:block;
+      filter: drop-shadow(0 14px 26px rgba(0,0,0,.32));
+      user-select:none;
+      pointer-events:none;
+    }
+
+    .loading-bar{
+      width:100%;
+      height:10px;
+      border-radius:999px;
+      overflow:hidden;
+      background:rgba(255,255,255,.08);
+      border:1px solid rgba(255,255,255,.08);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.04);
+    }
+
+    .loading-fill{
+      width:0%;
+      height:100%;
+      border-radius:999px;
+      background:linear-gradient(90deg, var(--tg1), var(--tg2));
+      box-shadow: 0 6px 14px rgba(34,158,217,.28);
+    }
+
+    .loading-text{
+      font-size:12px;
+      font-weight:900;
+      color:rgba(234,241,255,.84);
+      text-align:center;
+      min-height:16px;
+    }
+
     .app{
       position:relative;
       height:100%;
@@ -724,15 +788,31 @@
       .stat-box{ min-height:44px; }
       .stat-label{ font-size:8px; }
       .stat-value{ font-size:11px; }
+      .loading-logo{ width:96px; height:96px; }
     }
 
     @media (prefers-reduced-motion: reduce){
       *{ transition:none !important; animation:none !important; }
       .overlay.show .popup{ transform:none !important; }
+      .loading-screen{ transition:none !important; }
     }
   </style>
 </head>
 <body>
+  <div class="loading-screen" id="loadingScreen">
+    <div class="loading-box">
+      <img
+        class="loading-logo"
+        src="https://i.postimg.cc/qvL497mF/Picsart-26-02-27-02-02-37-502.png"
+        alt="Vezus"
+      >
+      <div class="loading-bar">
+        <div class="loading-fill" id="loadingFill"></div>
+      </div>
+      <div class="loading-text" id="loadingText">Загрузка 0%</div>
+    </div>
+  </div>
+
   <div class="app">
     <div class="content">
 
@@ -909,11 +989,10 @@
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <script>
     // =============================
-    // SUPABASE НАСТРОЙКИ (заполни)
+    // SUPABASE НАСТРОЙКИ
     // =============================
     const SUPABASE_URL = "https://lazrfierfbhwlduqlvws.supabase.co";
     const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxhenJmaWVyZmJod2xkdXFsdndzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE1NzY2ODIsImV4cCI6MjA4NzE1MjY4Mn0.tJtwFrNPrNyGNedGP1h0bNgr98FnyoliR-13mOqlBJI";
-
     const FUNCTIONS_URL = SUPABASE_URL.replace(".supabase.co", ".functions.supabase.co");
 
     async function callCupsGame(payload){
@@ -928,9 +1007,11 @@
       });
 
       const data = await res.json().catch(() => ({}));
+
       if (!res.ok || !data?.ok) {
         throw new Error(data?.error || "cups_game_error");
       }
+
       return data;
     }
 
@@ -945,7 +1026,7 @@
 
     async function dbGetBalance(){
       const initData = getTelegramInitData();
-      if (!initData) return null; // fallback
+      if (!initData) return 0;
 
       const data = await callCupsGame({ action: "get", initData });
       return Number(data.balance ?? 0);
@@ -953,32 +1034,30 @@
 
     async function dbDeltaBalance(delta){
       const initData = getTelegramInitData();
-      if (!initData) return null; // fallback
+      if (!initData) {
+        throw new Error("telegram_init_missing");
+      }
 
       const data = await callCupsGame({ action: "delta", delta, initData });
       return Number(data.balance ?? 0);
     }
 
     // =============================
-    // ТВОЙ КОД (почти без изменений)
+    // ИГРА
     // =============================
-    const DEFAULT_BALANCE = 1000;
-    const TOPUP_THRESHOLD = 100;
     const MIN_BET = 10;
     const MAX_BET = 5000;
 
     const CUP_MULTIPLIERS = { 3: 2.5, 4: 3.6, 5: 4.7 };
-
     const FILES = { games: "games.html" };
-
     const $ = (id) => document.getElementById(id);
 
-    let currentBalance = 1000;
+    let currentBalance = 0;
     let quickVisible = false;
     let countMenuVisible = false;
     let selectedCupCount = 3;
 
-    let gameState = "idle"; // idle | covering | shuffling | guessing | reveal
+    let gameState = "idle"; // idle | processing | covering | shuffling | guessing | reveal
     let roundBet = 0;
     let ballCupId = 1;
     let pickedCupId = null;
@@ -1014,19 +1093,25 @@
     function rafAnimate(duration, draw){
       return new Promise(resolve => {
         const start = performance.now();
+
         function frame(now){
           const elapsed = now - start;
           const raw = Math.min(1, elapsed / duration);
           const eased = easeInOutCubic(raw);
+
           draw(eased, raw);
+
           if (raw < 1) requestAnimationFrame(frame);
           else resolve();
         }
+
         requestAnimationFrame(frame);
       });
     }
 
-    function goTo(file){ window.location.href = file; }
+    function goTo(file){
+      window.location.href = file;
+    }
 
     function openTelegramLinkSafe(url){
       if (window.Telegram && window.Telegram.WebApp && typeof window.Telegram.WebApp.openTelegramLink === "function") {
@@ -1050,8 +1135,10 @@
     }
 
     function normalizeBalance(){
-      currentBalance = Number(currentBalance) || 0;
-      if (currentBalance < TOPUP_THRESHOLD) currentBalance = DEFAULT_BALANCE;
+      currentBalance = Number(currentBalance);
+      if (!Number.isFinite(currentBalance) || currentBalance < 0) {
+        currentBalance = 0;
+      }
       currentBalance = Number(currentBalance.toFixed(2));
     }
 
@@ -1148,7 +1235,6 @@
 
     function resetCups(){
       applyStageLayout();
-
       cups = Array.from({ length: selectedCupCount }, (_, i) => ({ id: i, slot: i }));
       ballCupId = Math.floor((selectedCupCount - 1) / 2);
       pickedCupId = null;
@@ -1172,7 +1258,9 @@
 
     function updatePlayButton(){
       const btn = $("playBtn");
-      if (gameState === "covering" || gameState === "shuffling") btn.textContent = "Крутим...";
+
+      if (gameState === "processing") btn.textContent = "Загрузка...";
+      else if (gameState === "covering" || gameState === "shuffling") btn.textContent = "Крутим...";
       else if (gameState === "guessing") btn.textContent = "Выбери стакан";
       else if (gameState === "reveal") btn.textContent = "Проверка...";
       else btn.textContent = "Играть";
@@ -1205,13 +1293,17 @@
         let imgShadow = "drop-shadow(0 12px 14px rgba(0,0,0,.18))";
 
         if (gameState === "idle" && id === ballCupId) {
-          y = -72; scale = 1.03; imgLift = -6;
+          y = -72;
+          scale = 1.03;
+          imgLift = -6;
           shadow = "drop-shadow(0 22px 28px rgba(0,0,0,.26))";
           imgShadow = "drop-shadow(0 18px 20px rgba(0,0,0,.20))";
         }
 
         if (gameState === "reveal" && (id === pickedCupId || (pickedCupId !== ballCupId && id === ballCupId))) {
-          y = -72; scale = 1.03; imgLift = -6;
+          y = -72;
+          scale = 1.03;
+          imgLift = -6;
           shadow = "drop-shadow(0 22px 28px rgba(0,0,0,.26))";
           imgShadow = "drop-shadow(0 18px 20px rgba(0,0,0,.20))";
         }
@@ -1237,17 +1329,25 @@
       updateStageHint();
     }
 
-    function getPairKey(a, b){ return [Math.min(a,b), Math.max(a,b)].join("-"); }
+    function getPairKey(a, b){
+      return [Math.min(a,b), Math.max(a,b)].join("-");
+    }
 
     function randomPairSlots(excludeKey = ""){
       let slotA = 0, slotB = 1, key = "", tries = 0;
+
       do {
         slotA = Math.floor(Math.random() * selectedCupCount);
         slotB = Math.floor(Math.random() * selectedCupCount);
-        while (slotB === slotA) slotB = Math.floor(Math.random() * selectedCupCount);
+
+        while (slotB === slotA) {
+          slotB = Math.floor(Math.random() * selectedCupCount);
+        }
+
         key = getPairKey(slotA, slotB);
         tries++;
       } while (excludeKey && key === excludeKey && tries < 8);
+
       return { slotA, slotB, key };
     }
 
@@ -1266,6 +1366,7 @@
         const cup = cupById(id);
         const fromX = getCupLeftForSlot(cup.slot);
         const toX = getCupLeftForSlot(moveMap[id]);
+
         return {
           id,
           fromSlot: cup.slot,
@@ -1332,12 +1433,12 @@
       if (!cupA || !cupB) return;
 
       const map = { [cupA.id]: slotB, [cupB.id]: slotA };
-
       await animateMove(map, moveMs, 18, { wobbleStrength: 10, scaleBoost: 0.045 });
     }
 
     async function animateCycle(direction, moveMs){
       const map = {};
+
       cups.forEach(cup => {
         map[cup.id] = direction > 0
           ? (cup.slot + 1) % selectedCupCount
@@ -1378,7 +1479,6 @@
 
       let lastPairKey = "";
       let lastDirection = 0;
-
       const moves = 18 + (selectedCupCount * 3) + randInt(2, 5);
 
       for (let i = 0; i < moves; i++) {
@@ -1400,7 +1500,11 @@
             const follow = randomPairSlots(lastPairKey);
             lastPairKey = follow.key;
             await sleep(randInt(0, 4));
-            await animatePairSwap(follow.slotA, follow.slotB, Math.max(145, baseMs - randInt(18, 32)));
+            await animatePairSwap(
+              follow.slotA,
+              follow.slotB,
+              Math.max(145, baseMs - randInt(18, 32))
+            );
           }
         } else {
           const combo = await animateCombo(baseMs, lastPairKey, lastDirection);
@@ -1427,43 +1531,48 @@
       renderStage();
     }
 
-    // =============================
-    // ВАЖНО: баланс теперь через Supabase
-    // =============================
     async function startRound(){
       if (gameState !== "idle") return;
 
       const bet = getBetAmount();
 
-      if (bet < MIN_BET) { setStatus(`Минимальная ставка ${MIN_BET} VC`); return; }
-      if (bet > MAX_BET) { $("betInput").value = String(MAX_BET); setStatus(`Максимальная ставка ${MAX_BET} VC`); return; }
-      if (bet > currentBalance) { setStatus("Недостаточно средств"); return; }
+      if (bet < MIN_BET) {
+        setStatus(`Минимальная ставка ${MIN_BET} VC`);
+        return;
+      }
 
-      // локально сразу списали для UI
+      if (bet > MAX_BET) {
+        $("betInput").value = String(MAX_BET);
+        setStatus(`Максимальная ставка ${MAX_BET} VC`);
+        return;
+      }
+
+      if (bet > currentBalance) {
+        setStatus("Недостаточно средств");
+        return;
+      }
+
       roundBet = bet;
-      currentBalance = Number((currentBalance - bet).toFixed(2));
-      updateBalanceUI();
+      gameState = "processing";
+      setInputsLocked(true);
+      setStatus("Списываем ставку...");
+      renderStage();
 
-      // списали на сервере
       try{
         const newBal = await dbDeltaBalance(-bet);
-        if (typeof newBal === "number") {
-          currentBalance = newBal;
-          updateBalanceUI();
-        }
-      } catch (e){
-        // если сервер упал — откатываем
-        currentBalance = Number((currentBalance + bet).toFixed(2));
+        currentBalance = newBal;
         updateBalanceUI();
-        setStatus("Ошибка соединения с базой");
+      } catch {
+        gameState = "idle";
         roundBet = 0;
+        setInputsLocked(false);
+        setStatus("Ошибка соединения с базой");
+        renderStage();
         return;
       }
 
       resetCups();
-
       gameState = "covering";
-      setInputsLocked(true);
       setStatus("Перемешиваем...");
       renderStage();
 
@@ -1483,27 +1592,26 @@
       shuffleToken++;
 
       const win = cupId === ballCupId;
-
       renderStage();
 
       if (win) {
         const payout = Number((roundBet * getCurrentMultiplier()).toFixed(2));
+        setStatus("Начисляем выигрыш...");
+        renderStage();
 
-        // сначала сервер
         try{
           const newBal = await dbDeltaBalance(payout);
-          if (typeof newBal === "number") {
-            currentBalance = newBal;
-          } else {
-            currentBalance = Number((currentBalance + payout).toFixed(2));
-          }
+          currentBalance = newBal;
+          updateBalanceUI();
+          setStatus(`Ты угадал: +${formatVc(payout)}`);
         } catch {
-          // fallback
-          currentBalance = Number((currentBalance + payout).toFixed(2));
+          try{
+            currentBalance = await dbGetBalance();
+          } catch {}
+          updateBalanceUI();
+          setStatus("Ошибка начисления");
         }
 
-        updateBalanceUI();
-        setStatus(`Ты угадал: +${formatVc(payout)}`);
         await sleep(1100);
       } else {
         updateBalanceUI();
@@ -1551,6 +1659,36 @@
       el.classList.remove("show");
       el.setAttribute("aria-hidden", "true");
       document.body.style.overflow = "";
+    }
+
+    function setLoadingProgress(value){
+      const percent = Math.max(0, Math.min(100, Math.round(value)));
+      $("loadingFill").style.width = `${percent}%`;
+      $("loadingText").textContent = `Загрузка ${percent}%`;
+    }
+
+    function runLoadingBar(duration = 4000){
+      return new Promise(resolve => {
+        const start = performance.now();
+
+        function tick(now){
+          const progress = Math.min(1, (now - start) / duration);
+          setLoadingProgress(progress * 100);
+
+          if (progress < 1) requestAnimationFrame(tick);
+          else resolve();
+        }
+
+        requestAnimationFrame(tick);
+      });
+    }
+
+    function hideLoading(){
+      const el = $("loadingScreen");
+      el.classList.add("hide");
+      setTimeout(() => {
+        el.style.display = "none";
+      }, 360);
     }
 
     $("backBtn").addEventListener("click", () => goTo(FILES.games));
@@ -1607,11 +1745,17 @@
     $("betInput").addEventListener("input", () => {
       const input = $("betInput");
       let value = Number(input.value);
+
       if (!input.value) return;
-      if (!Number.isFinite(value)) { input.value = ""; return; }
+      if (!Number.isFinite(value)) {
+        input.value = "";
+        return;
+      }
+
       value = Math.floor(value);
       if (value > MAX_BET) value = MAX_BET;
       if (value < 0) value = 0;
+
       input.value = String(value);
     });
 
@@ -1662,22 +1806,28 @@
     });
 
     async function init(){
-      $("balanceValue").textContent = "...";
-
-      // пытаемся загрузить баланс из Supabase
       try{
-        const bal = await dbGetBalance();
-        if (typeof bal === "number") currentBalance = bal;
-        else currentBalance = DEFAULT_BALANCE;
-      } catch {
-        currentBalance = DEFAULT_BALANCE;
-      }
+        if (window.Telegram && window.Telegram.WebApp) {
+          Telegram.WebApp.ready();
+          if (typeof Telegram.WebApp.expand === "function") {
+            Telegram.WebApp.expand();
+          }
+        }
+      } catch {}
 
+      const loaderPromise = runLoadingBar(4000);
+      const balancePromise = dbGetBalance().catch(() => 0);
+
+      const [, dbBalance] = await Promise.all([loaderPromise, balancePromise]);
+
+      currentBalance = Number.isFinite(Number(dbBalance)) ? Number(dbBalance) : 0;
       normalizeBalance();
-      updateBalanceUI();
+
       updateStats();
       updateCountButtons();
       resetToIdle();
+
+      hideLoading();
     }
 
     window.addEventListener("load", init);
