@@ -70,6 +70,100 @@
 
     *::-webkit-scrollbar{ display:none; }
 
+    /* =======================
+       LOADER
+    ======================= */
+    .startup-loader{
+      position:fixed;
+      inset:0;
+      z-index:9999;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:24px;
+      background:
+        radial-gradient(900px 520px at 20% 10%, rgba(196,181,253,.16), transparent 56%),
+        radial-gradient(760px 460px at 80% 20%, rgba(129,140,248,.16), transparent 54%),
+        linear-gradient(180deg, #4c1d95 0%, #2e1065 46%, #14072b 100%);
+      transition: opacity .35s ease, visibility .35s ease;
+    }
+
+    .startup-loader.hide{
+      opacity:0;
+      visibility:hidden;
+      pointer-events:none;
+    }
+
+    .startup-loader-inner{
+      width:min(320px, 86vw);
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      gap:20px;
+    }
+
+    .startup-car-wrap{
+      width:min(230px, 72vw);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      position:relative;
+    }
+
+    .startup-car-wrap::before{
+      content:"";
+      position:absolute;
+      left:50%;
+      bottom:6px;
+      width:70%;
+      height:16px;
+      transform:translateX(-50%);
+      border-radius:999px;
+      background: radial-gradient(ellipse at center, rgba(0,0,0,.36), rgba(0,0,0,0) 72%);
+      animation: loaderShadow 0.22s linear infinite;
+      pointer-events:none;
+    }
+
+    .startup-car{
+      width:100%;
+      height:auto;
+      display:block;
+      position:relative;
+      z-index:2;
+      filter:
+        drop-shadow(0 14px 22px rgba(0,0,0,.28))
+        drop-shadow(0 0 18px rgba(167,139,250,.16));
+      transform-origin:center bottom;
+      animation: loaderCarDrive .22s linear infinite;
+      user-select:none;
+      pointer-events:none;
+    }
+
+    .startup-loader-bar{
+      width:100%;
+      height:12px;
+      padding:2px;
+      border-radius:999px;
+      background: rgba(255,255,255,.10);
+      border:1px solid rgba(255,255,255,.10);
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.05),
+        0 10px 22px rgba(0,0,0,.20);
+      overflow:hidden;
+    }
+
+    .startup-loader-fill{
+      width:0%;
+      height:100%;
+      border-radius:999px;
+      background: linear-gradient(90deg, #c084fc 0%, #8b5cf6 48%, #60a5fa 100%);
+      box-shadow:
+        0 0 14px rgba(192,132,252,.34),
+        0 0 22px rgba(96,165,250,.18);
+      transition: width .18s ease;
+    }
+
     .app{
       position:relative;
       height:100%;
@@ -825,6 +919,20 @@
       filter: drop-shadow(0 8px 14px rgba(0,0,0,.18));
     }
 
+    @keyframes loaderCarDrive{
+      0%   { transform: translateY(0px) translateX(0px) rotate(0deg); }
+      25%  { transform: translateY(-2px) translateX(1px) rotate(.22deg); }
+      50%  { transform: translateY(0px) translateX(0px) rotate(0deg); }
+      75%  { transform: translateY(2px) translateX(-1px) rotate(-.22deg); }
+      100% { transform: translateY(0px) translateX(0px) rotate(0deg); }
+    }
+
+    @keyframes loaderShadow{
+      0%   { transform: translateX(-50%) scaleX(1); opacity:.92; }
+      50%  { transform: translateX(-50%) scaleX(1.04); opacity:.82; }
+      100% { transform: translateX(-50%) scaleX(1); opacity:.92; }
+    }
+
     @keyframes roadGlowShift{
       from{ transform:translateX(-8px); }
       to{ transform:translateX(18px); }
@@ -869,6 +977,8 @@
       .multiplier-chip{ min-width:96px; font-size:16px; }
       .car-wrap{ bottom:12px; }
       .road{ height:110px; }
+      .startup-loader-inner{ width:min(280px, 86vw); }
+      .startup-car-wrap{ width:min(200px, 70vw); }
     }
 
     @media (prefers-reduced-motion: reduce){
@@ -878,6 +988,23 @@
   </style>
 </head>
 <body>
+  <!-- LOADER -->
+  <div class="startup-loader" id="startupLoader" aria-hidden="false">
+    <div class="startup-loader-inner">
+      <div class="startup-car-wrap">
+        <img
+          class="startup-car"
+          src="https://i.postimg.cc/PxRhZC9x/Picsart-26-03-04-12-36-37-394.png"
+          alt="Loading car"
+        >
+      </div>
+
+      <div class="startup-loader-bar">
+        <div class="startup-loader-fill" id="startupLoaderFill"></div>
+      </div>
+    </div>
+  </div>
+
   <div class="app">
     <div class="content">
 
@@ -1054,6 +1181,7 @@
 
     const MIN_BET = 10;
     const MAX_BET = 5000;
+    const LOADER_MIN_MS = 1800;
 
     const FILES = {
       games: "games.html"
@@ -1075,6 +1203,9 @@
     let freezeUntil = 0;
     let lastResultValue = 0;
     let pendingPayout = 0;
+
+    let loaderProgress = 0;
+    let loaderInterval = null;
 
     function rand(min, max){
       return Math.random() * (max - min) + min;
@@ -1160,6 +1291,50 @@
       if (!Number.isFinite(balance)) throw new Error("invalid_balance");
 
       return round2(balance);
+    }
+
+    function setLoaderProgress(value){
+      const fill = $("startupLoaderFill");
+      if (!fill) return;
+
+      loaderProgress = Math.max(0, Math.min(100, value));
+      fill.style.width = `${loaderProgress}%`;
+    }
+
+    function startLoaderAnimation(){
+      setLoaderProgress(4);
+
+      if (loaderInterval) clearInterval(loaderInterval);
+
+      loaderInterval = setInterval(() => {
+        if (loaderProgress >= 90) {
+          clearInterval(loaderInterval);
+          loaderInterval = null;
+          return;
+        }
+
+        if (loaderProgress < 40) setLoaderProgress(loaderProgress + 5);
+        else if (loaderProgress < 65) setLoaderProgress(loaderProgress + 3);
+        else if (loaderProgress < 82) setLoaderProgress(loaderProgress + 2);
+        else setLoaderProgress(loaderProgress + 1);
+      }, 90);
+    }
+
+    function finishLoader(){
+      if (loaderInterval) {
+        clearInterval(loaderInterval);
+        loaderInterval = null;
+      }
+
+      setLoaderProgress(100);
+
+      const loader = $("startupLoader");
+      if (!loader) return;
+
+      setTimeout(() => {
+        loader.classList.add("hide");
+        loader.setAttribute("aria-hidden", "true");
+      }, 220);
     }
 
     function updateBalanceUI(){
@@ -1464,6 +1639,9 @@
     }
 
     async function init(){
+      startLoaderAnimation();
+      const minDelay = new Promise(resolve => setTimeout(resolve, LOADER_MIN_MS));
+
       try{
         if (window.Telegram && window.Telegram.WebApp) {
           try{
@@ -1480,16 +1658,21 @@
         $("balanceValue").textContent = "...";
         updateControls();
 
-        currentBalance = await dbGetBalance();
+        const balancePromise = dbGetBalance();
+        const [balance] = await Promise.all([balancePromise, minDelay]);
+
+        currentBalance = balance;
         balanceReady = true;
         updateBalanceUI();
         setTopState("Готов");
       } catch {
+        await minDelay;
         balanceReady = false;
         $("balanceValue").textContent = "Ошибка";
         setTopState("Нет БД");
       }
 
+      finishLoader();
       updateControls();
     }
 
