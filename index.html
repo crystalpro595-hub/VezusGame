@@ -640,6 +640,39 @@
       filter: drop-shadow(0 8px 14px rgba(0,0,0,.18));
     }
 
+    /* ✅ TOAST (уведомление “в разработке”) */
+    .toast{
+      position:fixed;
+      left:14px;
+      right:14px;
+      bottom: calc(18px + var(--safe-bottom));
+      z-index:999;
+      pointer-events:none;
+      display:flex;
+      justify-content:center;
+      opacity:0;
+      transform: translateY(10px);
+      transition: opacity .18s ease, transform .18s ease;
+    }
+    .toast.show{
+      opacity:1;
+      transform: translateY(0);
+    }
+    .toast .box{
+      width:min(520px, 100%);
+      border-radius:18px;
+      padding:12px 14px;
+      background: rgba(12,14,20,.78);
+      border:1px solid rgba(255,255,255,.12);
+      box-shadow: 0 22px 60px rgba(0,0,0,.50), inset 0 1px 0 rgba(255,255,255,.08);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      text-align:center;
+      font-weight:900;
+      letter-spacing:.2px;
+      color: rgba(234,241,255,.95);
+    }
+
     @media (max-width: 360px){
       .top-row{
         grid-template-columns:36px 36px minmax(0,1fr) 46px;
@@ -931,6 +964,11 @@
     </div>
   </div>
 
+  <!-- ✅ Toast -->
+  <div class="toast" id="toast" aria-live="polite" aria-atomic="true">
+    <div class="box" id="toastText">В разработке</div>
+  </div>
+
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
   <script>
@@ -950,6 +988,26 @@
     const balanceValueEl = document.getElementById('balanceValue');
     const balanceChipEl  = document.getElementById('balanceChip');
     const profileBtnEl   = document.getElementById('profileBtn');
+
+    // ✅ Toast helpers
+    const toastEl = document.getElementById('toast');
+    const toastTextEl = document.getElementById('toastText');
+    let toastTimer = null;
+
+    function showToast(text, ms = 1700){
+      toastTextEl.textContent = text;
+      toastEl.classList.add('show');
+
+      // лёгкая вибра (если TG)
+      try{
+        if (window.Telegram?.WebApp?.HapticFeedback?.impactOccurred) {
+          Telegram.WebApp.HapticFeedback.impactOccurred('light');
+        }
+      }catch{}
+
+      if (toastTimer) clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => toastEl.classList.remove('show'), ms);
+    }
 
     function clamp(n, min, max) {
       return Math.max(min, Math.min(max, n));
@@ -1257,10 +1315,16 @@
           return;
         }
 
+        // ✅ Заглушка на “Реферальная ссылка”
+        if (action === 'ref') {
+          closeMenu();
+          showToast('Реферальная ссылка — в разработке', 1800);
+          return;
+        }
+
         closeMenu();
 
         if (action === 'vouchers') return goTo(FILES.vouchers);
-        if (action === 'ref') return goTo(FILES.referral);
         if (action === 'history') return goTo(FILES.history);
       });
     });
