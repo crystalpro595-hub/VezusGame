@@ -71,7 +71,7 @@
     *::-webkit-scrollbar{ display:none; }
 
     /* =======================
-       LOADER
+       LOADER (НОВЫЙ)
     ======================= */
     .startup-loader{
       position:fixed;
@@ -100,42 +100,43 @@
       flex-direction:column;
       align-items:center;
       justify-content:center;
-      gap:20px;
+      gap:18px;
     }
 
-    .startup-car-wrap{
-      width:min(230px, 72vw);
+    .startup-logo-wrap{
+      width:min(170px, 56vw);
       display:flex;
       align-items:center;
       justify-content:center;
       position:relative;
+      padding:10px;
     }
 
-    .startup-car-wrap::before{
+    .startup-logo-wrap::before{
       content:"";
       position:absolute;
       left:50%;
       bottom:6px;
-      width:70%;
-      height:16px;
+      width:74%;
+      height:18px;
       transform:translateX(-50%);
       border-radius:999px;
-      background: radial-gradient(ellipse at center, rgba(0,0,0,.36), rgba(0,0,0,0) 72%);
-      animation: loaderShadow 0.22s linear infinite;
+      background: radial-gradient(ellipse at center, rgba(0,0,0,.42), rgba(0,0,0,0) 72%);
+      animation: loaderShadow 0.62s ease-in-out infinite;
       pointer-events:none;
     }
 
-    .startup-car{
+    .startup-logo{
       width:100%;
       height:auto;
       display:block;
       position:relative;
       z-index:2;
       filter:
-        drop-shadow(0 14px 22px rgba(0,0,0,.28))
-        drop-shadow(0 0 18px rgba(167,139,250,.16));
+        drop-shadow(0 16px 26px rgba(0,0,0,.30))
+        drop-shadow(0 0 22px rgba(167,139,250,.18));
       transform-origin:center bottom;
-      animation: loaderCarDrive .22s linear infinite;
+      animation: logoBounce 0.62s ease-in-out infinite;
       user-select:none;
       pointer-events:none;
     }
@@ -146,7 +147,7 @@
       padding:2px;
       border-radius:999px;
       background: rgba(255,255,255,.10);
-      border:1px solid rgba(255,255,255,.10);
+      border:1px solid rgba(255,255,255,.12);
       box-shadow:
         inset 0 1px 0 rgba(255,255,255,.05),
         0 10px 22px rgba(0,0,0,.20);
@@ -164,6 +165,32 @@
       transition: width .18s ease;
     }
 
+    .startup-hint{
+      font-size:12px;
+      font-weight:900;
+      letter-spacing:.2px;
+      color: rgba(234,241,255,.86);
+      opacity:.9;
+      text-shadow: 0 10px 18px rgba(0,0,0,.35);
+    }
+
+    @keyframes logoBounce{
+      0%   { transform: translateY(0) scale(1); }
+      40%  { transform: translateY(-10px) scale(1.02); }
+      55%  { transform: translateY(0) scale(1); }
+      70%  { transform: translateY(-4px) scale(1.01); }
+      100% { transform: translateY(0) scale(1); }
+    }
+
+    @keyframes loaderShadow{
+      0%   { transform: translateX(-50%) scaleX(0.96); opacity:.88; filter: blur(0px); }
+      40%  { transform: translateX(-50%) scaleX(1.05); opacity:.78; filter: blur(0.6px); }
+      100% { transform: translateX(-50%) scaleX(0.96); opacity:.88; filter: blur(0px); }
+    }
+
+    /* =======================
+       APP
+    ======================= */
     .app{
       position:relative;
       height:100%;
@@ -919,20 +946,6 @@
       filter: drop-shadow(0 8px 14px rgba(0,0,0,.18));
     }
 
-    @keyframes loaderCarDrive{
-      0%   { transform: translateY(0px) translateX(0px) rotate(0deg); }
-      25%  { transform: translateY(-2px) translateX(1px) rotate(.22deg); }
-      50%  { transform: translateY(0px) translateX(0px) rotate(0deg); }
-      75%  { transform: translateY(2px) translateX(-1px) rotate(-.22deg); }
-      100% { transform: translateY(0px) translateX(0px) rotate(0deg); }
-    }
-
-    @keyframes loaderShadow{
-      0%   { transform: translateX(-50%) scaleX(1); opacity:.92; }
-      50%  { transform: translateX(-50%) scaleX(1.04); opacity:.82; }
-      100% { transform: translateX(-50%) scaleX(1); opacity:.92; }
-    }
-
     @keyframes roadGlowShift{
       from{ transform:translateX(-8px); }
       to{ transform:translateX(18px); }
@@ -977,8 +990,9 @@
       .multiplier-chip{ min-width:96px; font-size:16px; }
       .car-wrap{ bottom:12px; }
       .road{ height:110px; }
+
       .startup-loader-inner{ width:min(280px, 86vw); }
-      .startup-car-wrap{ width:min(200px, 70vw); }
+      .startup-logo-wrap{ width:min(150px, 58vw); }
     }
 
     @media (prefers-reduced-motion: reduce){
@@ -988,20 +1002,24 @@
   </style>
 </head>
 <body>
-  <!-- LOADER -->
+  <!-- LOADER (НОВЫЙ) -->
   <div class="startup-loader" id="startupLoader" aria-hidden="false">
     <div class="startup-loader-inner">
-      <div class="startup-car-wrap">
+      <div class="startup-logo-wrap" aria-hidden="true">
         <img
-          class="startup-car"
-          src="https://i.postimg.cc/PxRhZC9x/Picsart-26-03-04-12-36-37-394.png"
-          alt="Loading car"
+          class="startup-logo"
+          src="https://i.postimg.cc/qvL497mF/Picsart-26-02-27-02-02-37-502.png"
+          alt="Vezus"
+          loading="eager"
+          decoding="async"
         >
       </div>
 
-      <div class="startup-loader-bar">
+      <div class="startup-loader-bar" aria-label="Загрузка">
         <div class="startup-loader-fill" id="startupLoaderFill"></div>
       </div>
+
+      <div class="startup-hint" id="startupHint">Загрузка…</div>
     </div>
   </div>
 
@@ -1062,11 +1080,7 @@
           <div class="crash-badge">ДВИГАТЕЛЬ ВСТАЛ</div>
 
           <div class="wind">
-            <span></span>
-            <span></span>
-            <span></span>
-            <span></span>
-            <span></span>
+            <span></span><span></span><span></span><span></span><span></span>
           </div>
 
           <div class="road"></div>
@@ -1176,17 +1190,14 @@
     // 2) { action: "change_balance", initData, delta } -> { ok:true, balance:number }
 
     const SUPABASE_URL = "https://lazrfierfbhwlduqlvws.supabase.co";
-    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxhenJmaWVyZmJod2xkdXFsdndzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE1NzY2ODIsImV4cCI6MjA4NzE1MjY4Mn0.tJtwFrNPrNyGNedGP1h0bNgr98FnyoliR-13mOqlBJI";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiJzdXBhYmFzZSIsInJlZiI6ImxhenJmaWVyZmJod2xkdXFsdndzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE1NzY2ODIsImV4cCI6MjA4NzE1MjY4Mn0.tJtwFrNPrNyGNedGP1h0bNgr98FnyoliR-13mOqlBJI";
     const FUNCTIONS_URL = SUPABASE_URL.replace(".supabase.co", ".functions.supabase.co");
 
     const MIN_BET = 10;
     const MAX_BET = 5000;
     const LOADER_MIN_MS = 1800;
 
-    const FILES = {
-      games: "games.html"
-    };
-
+    const FILES = { games: "games.html" };
     const $ = (id) => document.getElementById(id);
 
     let currentBalance = 0;
@@ -1207,13 +1218,8 @@
     let loaderProgress = 0;
     let loaderInterval = null;
 
-    function rand(min, max){
-      return Math.random() * (max - min) + min;
-    }
-
-    function round2(n){
-      return Math.round(n * 100) / 100;
-    }
+    function rand(min, max){ return Math.random() * (max - min) + min; }
+    function round2(n){ return Math.round(n * 100) / 100; }
 
     function formatVc(value){
       const n = Number(value ?? 0);
@@ -1221,9 +1227,7 @@
       return Number.isInteger(n) ? `${n} VC` : `${n.toFixed(2)} VC`;
     }
 
-    function goTo(file){
-      window.location.href = file;
-    }
+    function goTo(file){ window.location.href = file; }
 
     function openTelegramLinkSafe(url){
       if (window.Telegram && window.Telegram.WebApp && typeof window.Telegram.WebApp.openTelegramLink === "function") {
@@ -1254,10 +1258,7 @@
       });
 
       const data = await res.json().catch(() => ({}));
-
-      if (!res.ok || !data?.ok) {
-        throw new Error(data?.error || "speed_play_error");
-      }
+      if (!res.ok || !data?.ok) throw new Error(data?.error || "speed_play_error");
 
       return data;
     }
@@ -1266,14 +1267,9 @@
       const initData = getTelegramInitData();
       if (!initData) throw new Error("telegram_init_data_missing");
 
-      const data = await callSpeedPlay({
-        action: "get_balance",
-        initData
-      });
-
+      const data = await callSpeedPlay({ action: "get_balance", initData });
       const balance = Number(data.balance);
       if (!Number.isFinite(balance)) throw new Error("invalid_balance");
-
       return round2(balance);
     }
 
@@ -1281,15 +1277,9 @@
       const initData = getTelegramInitData();
       if (!initData) throw new Error("telegram_init_data_missing");
 
-      const data = await callSpeedPlay({
-        action: "change_balance",
-        initData,
-        delta: round2(delta)
-      });
-
+      const data = await callSpeedPlay({ action: "change_balance", initData, delta: round2(delta) });
       const balance = Number(data.balance);
       if (!Number.isFinite(balance)) throw new Error("invalid_balance");
-
       return round2(balance);
     }
 
@@ -1299,10 +1289,18 @@
 
       loaderProgress = Math.max(0, Math.min(100, value));
       fill.style.width = `${loaderProgress}%`;
+
+      const hint = $("startupHint");
+      if (hint) {
+        if (loaderProgress < 40) hint.textContent = "Загрузка…";
+        else if (loaderProgress < 70) hint.textContent = "Подключение…";
+        else if (loaderProgress < 95) hint.textContent = "Почти готово…";
+        else hint.textContent = "Готово!";
+      }
     }
 
     function startLoaderAnimation(){
-      setLoaderProgress(4);
+      setLoaderProgress(6);
 
       if (loaderInterval) clearInterval(loaderInterval);
 
@@ -1321,10 +1319,7 @@
     }
 
     function finishLoader(){
-      if (loaderInterval) {
-        clearInterval(loaderInterval);
-        loaderInterval = null;
-      }
+      if (loaderInterval) { clearInterval(loaderInterval); loaderInterval = null; }
 
       setLoaderProgress(100);
 
@@ -1347,9 +1342,7 @@
       $("quickBets").classList.toggle("show", quickVisible);
     }
 
-    function setTopState(text){
-      $("stateValue").textContent = text;
-    }
+    function setTopState(text){ $("stateValue").textContent = text; }
 
     function getLiveReturnValue(){
       return round2(roundBet * currentMultiplier);
@@ -1380,14 +1373,8 @@
       chip.classList.remove("win", "lose");
 
       if (mode === "running") track.classList.add("running");
-      if (mode === "crashed") {
-        track.classList.add("crashed");
-        chip.classList.add("lose");
-      }
-      if (mode === "cashed") {
-        track.classList.add("cashed");
-        chip.classList.add("win");
-      }
+      if (mode === "crashed") { track.classList.add("crashed"); chip.classList.add("lose"); }
+      if (mode === "cashed") { track.classList.add("cashed"); chip.classList.add("win"); }
     }
 
     function updateControls(){
@@ -1458,10 +1445,7 @@
     }
 
     function stopLoop(){
-      if (rafId) {
-        cancelAnimationFrame(rafId);
-        rafId = 0;
-      }
+      if (rafId) { cancelAnimationFrame(rafId); rafId = 0; }
     }
 
     function resetToIdleSoon(delayMs){
@@ -1646,9 +1630,7 @@
         if (window.Telegram && window.Telegram.WebApp) {
           try{
             window.Telegram.WebApp.ready();
-            if (typeof window.Telegram.WebApp.expand === "function") {
-              window.Telegram.WebApp.expand();
-            }
+            if (typeof window.Telegram.WebApp.expand === "function") window.Telegram.WebApp.expand();
           } catch {}
         }
 
@@ -1698,13 +1680,9 @@
     $("betInput").addEventListener("input", () => {
       const input = $("betInput");
       let value = Number(input.value);
-
       if (!input.value) return;
 
-      if (!Number.isFinite(value)) {
-        input.value = "";
-        return;
-      }
+      if (!Number.isFinite(value)) { input.value = ""; return; }
 
       value = Math.floor(value);
       if (value > MAX_BET) value = MAX_BET;
@@ -1726,14 +1704,11 @@
       if (e.target === $("rulesOverlay")) closeOverlay("rulesOverlay");
     });
 
-    $("goChannel").addEventListener("click", () => {
-      openTelegramLinkSafe("https://t.me/vezuspubg");
-    });
+    $("goChannel").addEventListener("click", () => openTelegramLinkSafe("https://t.me/vezuspubg"));
 
     document.addEventListener("click", (e) => {
       const betToggle = $("betToggleBtn");
       const quickMenu = $("quickBets");
-
       if (
         quickVisible &&
         e.target !== betToggle &&
