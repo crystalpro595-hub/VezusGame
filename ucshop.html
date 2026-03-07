@@ -5,6 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>UC Shop</title>
 
+  <link rel="preconnect" href="https://i.postimg.cc" crossorigin>
+  <link rel="dns-prefetch" href="https://i.postimg.cc">
+  <link rel="preload" as="image" href="https://i.postimg.cc/qvL497mF/Picsart-26-02-27-02-02-37-502.png">
+
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
 
   <style>
@@ -17,10 +21,12 @@
 
       --glass: rgba(12, 14, 20, .74);
       --glassStrong: rgba(14, 16, 24, .92);
-      --glassBorder: rgba(255,255,255,.08);
-      --glassBorder2: rgba(255,255,255,.06);
+      --stroke: rgba(255,255,255,.08);
       --shadow: 0 18px 42px rgba(0,0,0,.48);
-      --shadowSoft: 0 12px 28px rgba(0,0,0,.34);
+      --shadow-soft: 0 12px 28px rgba(0,0,0,.34);
+
+      --tg1:#2AABEE;
+      --tg2:#229ED9;
     }
 
     *{
@@ -52,59 +58,47 @@
         radial-gradient(900px 600px at 30% 10%, rgba(255,255,255,.05), transparent 60%),
         linear-gradient(180deg, rgba(0,0,0,.40), rgba(0,0,0,.64));
       pointer-events:none;
+      z-index:0;
     }
 
     .app{
       position:relative;
       height:100%;
       overflow:auto;
-      padding: calc(18px + var(--safe-top)) 16px calc(28px + var(--safe-bottom)) 16px;
+      padding: calc(4px + var(--safe-top)) 16px calc(28px + var(--safe-bottom)) 16px;
       z-index:1;
-      scroll-behavior:smooth;
+      overscroll-behavior: contain;
     }
 
     .content{
-      margin-top:18px;
+      width:100%;
+      max-width:520px;
+      margin:0 auto;
       display:flex;
       flex-direction:column;
-      gap:16px;
-      max-width:520px;
-      margin-left:auto;
-      margin-right:auto;
+      gap:14px;
       align-items:center;
       position:relative;
       z-index:1;
     }
 
-    /* ===== Липкая верхняя панель ===== */
+    /* ===== TOP BAR (как на index.html) ===== */
     .top-row{
       width:100%;
-      display:flex;
+      display:grid;
+      grid-template-columns:38px minmax(0,1fr) 54px;
       align-items:center;
-      justify-content:center;
-      gap:16px;
-
-      position:sticky;
-      top:4px;
-      z-index:30;
-
-      padding:6px 8px;
-      border-radius:22px;
-      background: rgba(10,12,18,.38);
-      border:1px solid rgba(255,255,255,.04);
-      box-shadow: 0 10px 30px rgba(0,0,0,.22);
-      backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
+      gap:8px;
     }
 
-    .back-btn-square{
-      width:42px;
-      height:42px;
-      border-radius:14px;
-      border:1px solid var(--glassBorder);
+    .icon-btn{
+      width:38px;
+      height:38px;
+      border-radius:13px;
+      border:1px solid var(--stroke);
       cursor:pointer;
-      background:var(--glass);
-      box-shadow: var(--shadowSoft), inset 0 1px 0 rgba(255,255,255,.04);
+      background: var(--glass);
+      box-shadow: var(--shadow-soft), inset 0 1px 0 rgba(255,255,255,.04);
       display:grid;
       place-items:center;
       backdrop-filter: blur(10px);
@@ -112,34 +106,27 @@
       transition: transform .15s ease, background .15s ease;
       padding:0;
       overflow:hidden;
-      flex:0 0 auto;
+      color: rgba(234,241,255,.92);
+      font-weight:900;
+      font-size:17px;
+      line-height:1;
     }
-    .back-btn-square:active{ transform:scale(.98); }
-
-    .back-svg{
-      width:20px;
-      height:20px;
-      display:block;
-      stroke: rgba(234,241,255,.92);
-      fill:none;
-      stroke-width:2.2;
-      stroke-linecap:round;
-      stroke-linejoin:round;
-    }
+    .icon-btn:active{ transform: scale(.98); }
 
     .balance-mini{
-      width:min(220px, 72%);
-      height:40px;
+      width:100%;
+      min-width:0;
+      height:42px;
       border-radius:999px;
       display:flex;
       align-items:center;
       justify-content:space-between;
-      gap:10px;
+      gap:8px;
       padding:6px 7px 6px 12px;
       position:relative;
       overflow:hidden;
-      background:var(--glass);
-      border:1px solid var(--glassBorder);
+      background: var(--glass);
+      border:1px solid var(--stroke);
       box-shadow: var(--shadow), inset 0 1px 0 rgba(255,255,255,.04);
       backdrop-filter: blur(10px);
       -webkit-backdrop-filter: blur(10px);
@@ -163,12 +150,13 @@
       letter-spacing:.2px;
       color: rgba(234,241,255,.92);
       white-space:nowrap;
+      flex:0 1 auto;
     }
 
     .bal-amount{
       position:relative;
       z-index:1;
-      height:26px;
+      height:28px;
       border:none;
       border-radius:999px;
       cursor:pointer;
@@ -183,114 +171,78 @@
       font-weight:900;
       font-size:13px;
       white-space:nowrap;
+      flex:0 0 auto;
+      min-width:88px;
     }
-
     .bal-amount:active{ transform: scale(.99); }
 
+    .hero-logo{
+      width:54px;
+      height:54px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background:transparent;
+      border:none;
+      box-shadow:none;
+      padding:0;
+      cursor:pointer;
+      margin-right:-2px;
+      flex:0 0 auto;
+    }
+    .hero-logo:active{ transform:scale(.98); }
+
+    .hero-logo img{
+      width:100%;
+      height:100%;
+      object-fit:contain;
+      display:block;
+      filter: drop-shadow(0 10px 16px rgba(0,0,0,.25));
+    }
+
+    /* ===== Title ===== */
     .title-row{
       width:100%;
       display:flex;
-      align-items:center;
+      align-items:flex-start;
       justify-content:space-between;
       gap:12px;
       margin-top:2px;
+      padding: 0 2px;
     }
 
     .page-title{
-      font-size:20px;
-      font-weight:900;
-      letter-spacing:.2px;
       margin:0;
-      text-shadow:0 14px 25px rgba(0,0,0,.55);
-    }
-
-    .page-sub{
-      font-size:12px;
-      font-weight:800;
-      color:var(--muted);
-      margin:2px 0 0 0;
-    }
-
-    .slider{
-      width:100%;
-      border-radius:var(--radius);
-    }
-
-    .slides{
-      display:flex;
-      gap:12px;
-      overflow-x:auto;
-      scroll-snap-type:x mandatory;
-      -webkit-overflow-scrolling: touch;
-      scrollbar-width:none;
-      padding-bottom:4px;
-      border-radius:var(--radius);
-    }
-    .slides::-webkit-scrollbar{ display:none; }
-
-    .slide{
-      scroll-snap-align:start;
-      flex:0 0 100%;
-      border-radius:var(--radius);
+      font-size:28px;
+      font-weight:900;
+      letter-spacing:.6px;
+      line-height:1.02;
+      text-transform:uppercase;
+      color: rgba(234,241,255,.98);
+      text-shadow: 0 18px 34px rgba(0,0,0,.55);
       position:relative;
-      overflow:hidden;
-      background:#000;
-      box-shadow: 0 18px 55px rgba(0,0,0,.40);
-      border:1px solid rgba(255,255,255,.06);
     }
 
-    .slide::before{
-      content:"";
-      display:block;
-      padding-top:33.3333%;
-    }
-
-    .slide img{
-      position:absolute;
-      inset:0;
-      width:100%;
-      height:100%;
-      object-fit:cover;
-      object-position:center;
-      display:block;
-    }
-
-    .slide::after{
+    .page-title::after{
       content:"";
       position:absolute;
-      inset:0;
-      background: linear-gradient(180deg, rgba(0,0,0,.10), rgba(0,0,0,.44));
-      pointer-events:none;
-    }
-
-    .dots{
-      display:flex;
-      justify-content:center;
-      gap:8px;
-      margin-top:10px;
-    }
-
-    .dot{
-      width:8px;
-      height:8px;
+      left:0;
+      bottom:-8px;
+      width:92px;
+      height:3px;
       border-radius:999px;
-      background: rgba(234,241,255,.26);
-      transition: transform .2s ease, background .2s ease, width .2s ease;
-      cursor:pointer;
+      background: rgba(255,255,255,.75);
+      box-shadow: 0 10px 24px rgba(0,0,0,.30);
+      opacity:.9;
     }
 
-    .dot.active{
-      background: rgba(255,255,255,.92);
-      width:18px;
-      transform: translateY(-.5px);
-    }
-
+    /* ===== Section / Cards ===== */
     .section{
       width:100%;
       display:flex;
       flex-direction:column;
       gap:12px;
-      margin-top:2px;
+      margin-top:6px;
     }
 
     .section-head{
@@ -306,6 +258,7 @@
       font-weight:900;
       opacity:.92;
       margin:0;
+      letter-spacing:.2px;
     }
 
     .grid{
@@ -344,10 +297,7 @@
     }
 
     @keyframes cardInUp{
-      to{
-        opacity:1;
-        transform: translateY(0) scale(1);
-      }
+      to{ opacity:1; transform: translateY(0) scale(1); }
     }
 
     .card-main{
@@ -373,12 +323,7 @@
         inset 0 1px 0 rgba(255,255,255,.03);
     }
 
-    .art-box img{
-      width:100%;
-      height:100%;
-      object-fit:cover;
-      display:block;
-    }
+    .art-box img{ width:100%; height:100%; object-fit:cover; display:block; }
 
     .card-info{
       flex:1;
@@ -405,11 +350,7 @@
       color:var(--muted);
     }
 
-    .mini-tags{
-      display:flex;
-      gap:8px;
-      flex-wrap:wrap;
-    }
+    .mini-tags{ display:flex; gap:8px; flex-wrap:wrap; }
 
     .mini-tag{
       height:24px;
@@ -435,11 +376,7 @@
       padding:0 14px 14px 14px;
     }
 
-    .price-box{
-      display:flex;
-      flex-direction:column;
-      gap:2px;
-    }
+    .price-box{ display:flex; flex-direction:column; gap:2px; }
 
     .price-label{
       font-size:11px;
@@ -471,16 +408,15 @@
       transition: transform .15s ease, box-shadow .15s ease;
       white-space:nowrap;
     }
-
     .buy-btn:hover{
       transform: translateY(-1px);
       box-shadow:
         0 22px 38px rgba(37,99,235,.34),
         0 0 18px rgba(59,130,246,.14);
     }
-
     .buy-btn:active{ transform:scale(.98); }
 
+    /* ===== Popups / Toast ===== */
     .popup-overlay{
       position:fixed;
       inset:0;
@@ -494,11 +430,7 @@
       justify-content:center;
       padding:16px;
     }
-
-    .popup-overlay.show{
-      opacity:1;
-      pointer-events:auto;
-    }
+    .popup-overlay.show{ opacity:1; pointer-events:auto; }
 
     .popup{
       width:min(520px, 100%);
@@ -519,10 +451,7 @@
       background: rgba(255,255,255,.04);
     }
 
-    .popup-head .t{
-      font-weight:900;
-      margin:0;
-    }
+    .popup-head .t{ font-weight:900; margin:0; }
 
     .close-x{
       width:38px;
@@ -549,15 +478,9 @@
       font-size:13px;
       opacity:.92;
     }
-
     .popup-line b{ opacity:1; }
 
-    .field{
-      display:flex;
-      flex-direction:column;
-      gap:8px;
-      margin-top:2px;
-    }
+    .field{ display:flex; flex-direction:column; gap:8px; margin-top:2px; }
 
     .field label{
       font-size:12px;
@@ -578,18 +501,9 @@
       letter-spacing:.2px;
       box-shadow: 0 18px 40px rgba(0,0,0,.25);
     }
+    .input::placeholder{ color: rgba(234,241,255,.45); font-weight:800; }
 
-    .input::placeholder{
-      color: rgba(234,241,255,.45);
-      font-weight:800;
-    }
-
-    .hint{
-      font-size:12px;
-      opacity:.72;
-      line-height:1.25;
-      margin-top:-2px;
-    }
+    .hint{ font-size:12px; opacity:.72; line-height:1.25; margin-top:-2px; }
 
     .error{
       display:none;
@@ -598,14 +512,9 @@
       font-weight:900;
       opacity:.95;
     }
-
     .error.show{ display:block; }
 
-    .btn-row{
-      display:flex;
-      gap:10px;
-      margin-top:4px;
-    }
+    .btn-row{ display:flex; gap:10px; margin-top:4px; }
 
     .btn{
       height:44px;
@@ -618,7 +527,6 @@
       transition: transform .15s ease;
       white-space:nowrap;
     }
-
     .btn:active{ transform:scale(.99); }
 
     .btn-primary{
@@ -659,12 +567,7 @@
       font-weight:900;
       font-size:13px;
     }
-
-    .toast.show{
-      opacity:1;
-      transform: translateX(-50%) translateY(0);
-    }
-
+    .toast.show{ opacity:1; transform: translateX(-50%) translateY(0); }
     .toast .ok{
       border:none;
       cursor:pointer;
@@ -677,19 +580,138 @@
       font-weight:900;
     }
 
-    @media (max-width:360px){
-      .balance-mini{ width:min(200px, 70%); height:38px; }
-      .bal-amount{ height:25px; font-size:12px; }
-      .back-btn-square{ width:40px; height:40px; border-radius:13px; }
-      .top-row{ gap:14px; padding:5px 6px; }
+    /* ===== TG overlay (как на главной странице) ===== */
+    .channel-overlay{
+      position:fixed;
+      inset:0;
+      background: rgba(0,0,0,.72);
+      opacity:0;
+      pointer-events:none;
+      transition: opacity .22s ease;
+      z-index:260;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:18px;
+    }
+    .channel-overlay.show{
+      opacity:1;
+      pointer-events:auto;
+    }
+
+    .channel-card{
+      width:min(440px, 100%);
+      border-radius:24px;
+      overflow:hidden;
+      background: rgba(14,16,24,.94);
+      border: 1px solid rgba(255,255,255,.08);
+      box-shadow: 0 34px 90px rgba(0,0,0,.62);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      position:relative;
+      transform: translateY(12px) scale(.98);
+      opacity:.95;
+      transition: transform .22s ease, opacity .22s ease;
+    }
+
+    .channel-overlay.show .channel-card{
+      transform: translateY(0) scale(1);
+      opacity:1;
+    }
+
+    .channel-head{
+      padding:16px 16px 10px 16px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      background: rgba(255,255,255,.03);
+      border-bottom: 1px solid rgba(255,255,255,.06);
+    }
+
+    .channel-title{
+      font-weight:900;
+      letter-spacing:.25px;
+      font-size:14px;
+      color: rgba(234,241,255,.95);
+    }
+
+    .channel-x{
+      width:38px;
+      height:38px;
+      border-radius:14px;
+      border:1px solid rgba(255,255,255,.08);
+      background: rgba(255,255,255,.05);
+      color: rgba(234,241,255,.92);
+      cursor:pointer;
+      display:grid;
+      place-items:center;
+      box-shadow: 0 12px 28px rgba(0,0,0,.32);
+      font-weight:900;
+    }
+    .channel-x:active{ transform: scale(.98); }
+
+    .channel-body{
+      padding:14px 16px 16px 16px;
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+    }
+
+    .channel-text{
+      margin:0;
+      font-size:13px;
+      line-height:1.35;
+      color: rgba(234,241,255,.84);
+    }
+
+    .tg-btn{
+      border:none;
+      cursor:pointer;
+      width:100%;
+      height:50px;
+      border-radius:16px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:10px;
+      background: linear-gradient(180deg, var(--tg1), var(--tg2));
+      box-shadow:
+        0 18px 40px rgba(34,158,217,.28),
+        inset 0 1px 0 rgba(255,255,255,.14);
+      color:#fff;
+      font-weight:900;
+      letter-spacing:.2px;
+      font-size:14px;
+    }
+    .tg-btn:active{ transform: scale(.99); }
+
+    .tg-ico{
+      width:22px;
+      height:22px;
+      display:block;
+      filter: drop-shadow(0 8px 14px rgba(0,0,0,.18));
+    }
+
+    @media (max-width: 360px){
+      .top-row{ grid-template-columns:36px minmax(0,1fr) 46px; gap:6px; }
+      .icon-btn{ width:36px; height:36px; border-radius:12px; }
+      .balance-mini{ height:38px; padding:5px 6px 5px 10px; }
+      .bal-title{ font-size:11px; }
+      .bal-amount{ height:24px; font-size:12px; min-width:70px; padding:0 8px; }
+      .hero-logo{ width:46px; height:46px; margin-right:0; }
+      .page-title{ font-size:26px; }
+      .page-title::after{ width:82px; }
       .art-box{ width:70px; height:70px; border-radius:18px; }
       .card-title{ font-size:15px; }
       .price-value{ font-size:16px; }
+      .tg-btn{ height:48px; border-radius:15px; }
     }
 
     @media (prefers-reduced-motion: reduce){
       *{ transition:none !important; animation:none !important; }
       .product-card{ opacity:1 !important; transform:none !important; }
+      .channel-overlay.show .channel-card{ transform:none !important; }
     }
   </style>
 </head>
@@ -697,14 +719,8 @@
 <body>
   <div class="app">
     <div class="content">
-
       <div class="top-row">
-        <button class="back-btn-square" id="backBtn" aria-label="Назад" title="На главную">
-          <svg class="back-svg" viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M15 18l-6-6 6-6"></path>
-            <path d="M9 12h10"></path>
-          </svg>
-        </button>
+        <button class="icon-btn" id="backBtn" aria-label="Назад">←</button>
 
         <div class="balance-mini" aria-label="Баланс">
           <span class="bal-title">Баланс</span>
@@ -712,28 +728,21 @@
             <span id="balanceValue">...</span>
           </button>
         </div>
+
+        <!-- ЛОГО -> откроем уведомление -->
+        <button class="hero-logo" id="brandLogoBtn" aria-label="Telegram канал">
+          <img
+            src="https://i.postimg.cc/qvL497mF/Picsart-26-02-27-02-02-37-502.png"
+            alt="Vezus"
+            loading="eager"
+            decoding="async"
+          >
+        </button>
       </div>
 
       <div class="title-row">
         <div>
           <h1 class="page-title">UC Shop</h1>
-          <p class="page-sub">Покупка за VC</p>
-        </div>
-      </div>
-
-      <div class="slider" aria-label="Баннеры">
-        <div class="slides" id="slides">
-          <div class="slide">
-            <img src="https://i.postimg.cc/85VtJ6hd/Picsart-26-02-17-16-56-47-885.png" alt="Баннер 1">
-          </div>
-          <div class="slide">
-            <img src="https://i.postimg.cc/YCPP62Bz/Picsart-26-02-15-18-03-19-524.jpg" alt="Баннер 2">
-          </div>
-        </div>
-
-        <div class="dots" id="dots" aria-label="Индикатор баннера">
-          <div class="dot active"></div>
-          <div class="dot"></div>
         </div>
       </div>
 
@@ -743,7 +752,30 @@
         </div>
         <div class="grid" id="productGrid"></div>
       </div>
+    </div>
+  </div>
 
+  <!-- TG overlay (как на главной странице) -->
+  <div class="channel-overlay" id="channelOverlay" aria-hidden="true">
+    <div class="channel-card" role="dialog" aria-modal="true" aria-label="Telegram канал">
+      <div class="channel-head">
+        <div class="channel-title">Перейти в Telegram канал</div>
+        <button class="channel-x" id="channelClose" aria-label="Закрыть">✕</button>
+      </div>
+
+      <div class="channel-body">
+        <p class="channel-text">
+          Нажми кнопку ниже — откроется наш Telegram канал:
+          <b>@vezuspubg</b>
+        </p>
+
+        <button class="tg-btn" id="goChannel" aria-label="Перейти в Telegram канал">
+          <svg class="tg-ico" viewBox="0 0 240 240" aria-hidden="true">
+            <path fill="#fff" d="M120 0C53.7 0 0 53.7 0 120s53.7 120 120 120 120-53.7 120-120S186.3 0 120 0zm58.7 82.3l-19.7 92.8c-1.5 6.6-5.4 8.2-10.9 5.1l-30.2-22.3-14.6 14c-1.6 1.6-3 3-6.1 3l2.2-31.6 57.5-52c2.5-2.2-.5-3.4-3.9-1.2l-71 44.7-30.6-9.6c-6.6-2.1-6.7-6.6 1.4-9.7l119.6-46.1c5.5-2 10.3 1.3 8.8 9.9z"/>
+          </svg>
+          Перейти в Telegram канал
+        </button>
+      </div>
     </div>
   </div>
 
@@ -805,6 +837,7 @@
   <script>
     const VERIFY_URL = "https://lazrfierfbhwlduqlvws.functions.supabase.co/verify-telegram";
     const CREATE_UC_ORDER_URL = "https://lazrfierfbhwlduqlvws.functions.supabase.co/create-uc-order";
+    const TG_CHANNEL_URL = "https://t.me/vezuspubg";
 
     const PRODUCTS = [
       { id:'uc_60',   name:'60 UC',   price:80,   img:'https://i.postimg.cc/L6tCqkN3/Picsart-26-02-15-18-22-50-916.png',   tag:'Стартовый',  sub:'Быстрый заказ' },
@@ -816,9 +849,7 @@
     ];
 
     const STORAGE_KEY = 'pubg_id_last';
-
     const $ = (id) => document.getElementById(id);
-    const clamp = (n, min, max) => Math.max(min, Math.min(max, n));
 
     let current = null;
     let telegramProfile = null;
@@ -882,6 +913,7 @@
       try{
         Telegram.WebApp.ready();
         if (typeof Telegram.WebApp.expand === 'function') Telegram.WebApp.expand();
+        if (typeof Telegram.WebApp.setHeaderColor === 'function') Telegram.WebApp.setHeaderColor('#020617');
       } catch(e){}
 
       const initData = Telegram.WebApp.initData;
@@ -934,14 +966,52 @@
 
     toastOk.addEventListener('click', () => toast.classList.remove('show'));
 
-    $('balanceChip').addEventListener('click', () => {
-      window.location.href = 'wallet.html';
+    function openTelegramLinkSafe(url){
+      if (window.Telegram && window.Telegram.WebApp && typeof window.Telegram.WebApp.openTelegramLink === 'function') {
+        window.Telegram.WebApp.openTelegramLink(url);
+        return;
+      }
+      window.open(url, '_blank', 'noopener');
+    }
+
+    // TOP BAR actions
+    $('balanceChip').addEventListener('click', () => { window.location.href = 'wallet.html'; });
+    $('backBtn').addEventListener('click', () => { window.location.href = 'index.html'; });
+
+    // ===== TG overlay logic =====
+    const brandLogoBtn = $('brandLogoBtn');
+    const channelOverlay = $('channelOverlay');
+    const channelClose = $('channelClose');
+    const goChannel = $('goChannel');
+
+    function openChannel(){
+      channelOverlay.classList.add('show');
+      channelOverlay.setAttribute('aria-hidden', 'false');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeChannel(){
+      channelOverlay.classList.remove('show');
+      channelOverlay.setAttribute('aria-hidden', 'true');
+      document.body.style.overflow = '';
+    }
+
+    brandLogoBtn.addEventListener('click', openChannel);
+    channelClose.addEventListener('click', closeChannel);
+
+    channelOverlay.addEventListener('click', (e) => {
+      if (e.target === channelOverlay) closeChannel();
     });
 
-    $('backBtn').addEventListener('click', () => {
-      window.location.href = 'index.html';
+    goChannel.addEventListener('click', () => {
+      openTelegramLinkSafe(TG_CHANNEL_URL);
     });
 
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeChannel();
+    });
+
+    // Cards
     const grid = $('productGrid');
 
     function createCard(p, index){
@@ -982,6 +1052,7 @@
 
     PRODUCTS.forEach((p, i) => grid.appendChild(createCard(p, i)));
 
+    // Buy flow
     const buyPopup = $('buyPopup');
     const confirmPopup = $('confirmPopup');
     const pubgInput = $('pubgIdInput');
@@ -1132,36 +1203,9 @@
       }
     });
 
-    const slides = $('slides');
-    const dots = Array.from($('dots').querySelectorAll('.dot'));
-
-    function updateDotsByScroll(){
-      const w = slides.clientWidth || 1;
-      const idx = clamp(Math.round(slides.scrollLeft / w), 0, dots.length - 1);
-      dots.forEach((d,i)=>d.classList.toggle('active', i === idx));
-    }
-
-    let rafId = null;
-    slides.addEventListener('scroll', () => {
-      if (rafId) return;
-      rafId = requestAnimationFrame(() => {
-        updateDotsByScroll();
-        rafId = null;
-      });
-    }, { passive:true });
-
-    dots.forEach((dot, i) => {
-      dot.addEventListener('click', () => {
-        slides.scrollTo({ left: i * slides.clientWidth, behavior: 'smooth' });
-      });
-    });
-
     window.addEventListener('load', async () => {
-      updateDotsByScroll();
       await refreshProfile();
     });
-
-    window.addEventListener('resize', updateDotsByScroll);
   </script>
 </body>
 </html>
