@@ -296,7 +296,7 @@
       transform: translateY(-.5px);
     }
 
-    /* ----- Бонусные кнопки (более стеклянные) ----- */
+    /* ----- Бонусные кнопки (новый стиль) ----- */
     .bonus-buttons {
       width: 100%;
       max-width: 520px;
@@ -307,13 +307,12 @@
 
     .bonus-btn {
       flex: 1;
-      height: 52px;
+      height: 54px;
       border: none;
-      border-radius: 14px;
-      background: rgba(255, 255, 255, 0.08);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 16px;
+      background: linear-gradient(135deg, rgba(42,171,238,0.25), rgba(34,158,217,0.15));
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(42,171,238,0.5);
       color: white;
       font-weight: 800;
       font-size: 15px;
@@ -322,23 +321,40 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 8px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      gap: 10px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.1);
+    }
+
+    .bonus-btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+      transition: left 0.5s ease;
+    }
+
+    .bonus-btn:active::before {
+      left: 100%;
     }
 
     .bonus-btn:active {
       transform: scale(0.97);
-      background: rgba(255, 255, 255, 0.12);
-      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+      background: linear-gradient(135deg, rgba(42,171,238,0.35), rgba(34,158,217,0.25));
+      box-shadow: 0 4px 12px rgba(0,0,0,0.4);
     }
 
     .bonus-btn svg {
       width: 22px;
       height: 22px;
       fill: none;
-      stroke: rgba(255,255,255,0.9);
-      stroke-width: 2;
-      filter: drop-shadow(0 0 4px rgba(255,255,255,0.3));
+      stroke: white;
+      stroke-width: 1.8;
+      filter: drop-shadow(0 0 4px rgba(255,255,255,0.5));
     }
 
     /* ----- Games и Slots блоки (без текста) ----- */
@@ -1006,7 +1022,7 @@
         font-size: 13px;
       }
       .bonus-btn {
-        height: 44px;
+        height: 46px;
         font-size: 13px;
       }
     }
@@ -1095,7 +1111,7 @@
         </div>
       </div>
 
-      <!-- Две бонусные кнопки (новый стеклянный дизайн) -->
+      <!-- Две бонусные кнопки (обновленный дизайн) -->
       <div class="bonus-buttons">
         <button class="bonus-btn" id="wheelBtn">
           <svg viewBox="0 0 24 24">
@@ -1119,19 +1135,19 @@
           <span class="games-title">Games</span>
         </div>
         <div class="games-scroll" id="gamesScroll">
-          <div class="game-card" data-game="game1">
+          <div class="game-card" data-game="game1" data-target="coinflip">
             <div class="game-card-inner">
-              <img src="https://i.postimg.cc/8khGybLS/d9e9d314-fd90-4cad-ad74-b2ed14a51f38.png" alt="Game 1" loading="lazy">
+              <img src="https://i.postimg.cc/5yyLd1Z6/Picsart-26-03-20-17-52-44-749.jpg" alt="Game 1" loading="lazy">
             </div>
           </div>
-          <div class="game-card" data-game="game2">
+          <div class="game-card" data-game="game2" data-target="mines">
             <div class="game-card-inner">
               <img src="https://i.postimg.cc/XvWZvSqj/file-0000000059bc72438dd485df46f69309-(1).png" alt="Game 2" loading="lazy">
             </div>
           </div>
-          <div class="game-card" data-game="game3">
+          <div class="game-card" data-game="game3" data-target="cups">
             <div class="game-card-inner">
-              <img src="https://i.postimg.cc/TY9sZp02/46F82521-51BE-4FB1-B831-B19958E9872E.png" alt="Game 3" loading="lazy">
+              <img src="https://i.postimg.cc/htbp88R7/Picsart-26-03-20-17-52-59-502.jpg" alt="Game 3" loading="lazy">
             </div>
           </div>
           <div class="game-card" data-game="game4">
@@ -1341,7 +1357,10 @@
       rules: 'rules.html',
       partner: 'partner.html',
       bonus: 'bonus.html',
-      fortune: 'fortune.html'
+      fortune: 'fortune.html',
+      coinflip: 'coinflip.html',
+      mines: 'mines.html',
+      cups: 'cups.html'
     };
 
     // ---------- Защита паролем ----------
@@ -1551,7 +1570,19 @@
     }
 
     balanceChipEl.addEventListener('click', () => goTo(FILES.wallet));
-    document.querySelectorAll('.game-card, .slot-card').forEach(card => {
+
+    // Обработчики для карточек Games (первые три — на отдельные страницы)
+    const gameCards = document.querySelectorAll('.game-card');
+    if (gameCards.length >= 3) {
+      gameCards[0].addEventListener('click', () => goTo(FILES.coinflip));
+      gameCards[1].addEventListener('click', () => goTo(FILES.mines));
+      gameCards[2].addEventListener('click', () => goTo(FILES.cups));
+      // Остальные карточки Games (с 4 по 6) и все Slots — показываем toast
+      for (let i = 3; i < gameCards.length; i++) {
+        gameCards[i].addEventListener('click', () => showToast('В разработке', 1500));
+      }
+    }
+    document.querySelectorAll('.slot-card').forEach(card => {
       card.addEventListener('click', () => showToast('В разработке', 1500));
     });
 
