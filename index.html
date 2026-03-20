@@ -13,7 +13,7 @@
   <link rel="preload" as="image" href="https://i.postimg.cc/qvL497mF/Picsart-26-02-27-02-02-37-502.png">
   <link rel="preload" as="image" href="https://i.postimg.cc/kgfc4B78/Picsart-26-02-26-17-32-07-162.jpg">
 
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800;900&display=swap" rel="stylesheet">
 
   <style>
     :root{
@@ -86,13 +86,22 @@
       align-items:center;
     }
 
+    /* Верхняя панель: меню, баланс, лого — приклеивается */
     .top-row{
+      position: sticky;
+      top: calc(4px + var(--safe-top));
+      z-index: 10;
       width:100%;
       max-width:520px;
       display:grid;
-      grid-template-columns:38px 38px minmax(0,1fr) 54px;
+      grid-template-columns:38px 1fr 54px;
       align-items:center;
       gap:8px;
+      background: transparent;
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      padding: 0;
+      margin-bottom: 0;
     }
 
     .icon-btn{
@@ -110,7 +119,6 @@
       transition: transform .15s ease, background .15s ease;
       padding:0;
       overflow:hidden;
-      flex:0 0 auto;
     }
 
     .icon-btn:active{ transform: scale(.98); }
@@ -127,17 +135,6 @@
       border-radius:999px;
       background: rgba(234,241,255,.92);
       display:block;
-    }
-
-    .profile-svg{
-      width:18px;
-      height:18px;
-      display:block;
-      stroke: rgba(234,241,255,.92);
-      fill:none;
-      stroke-width:2;
-      stroke-linecap:round;
-      stroke-linejoin:round;
     }
 
     .balance-mini{
@@ -177,7 +174,6 @@
       letter-spacing:.2px;
       color: rgba(234,241,255,.92);
       white-space:nowrap;
-      flex:0 1 auto;
     }
 
     .bal-amount{
@@ -198,7 +194,6 @@
       font-weight:900;
       font-size:13px;
       white-space:nowrap;
-      flex:0 0 auto;
       min-width:88px;
     }
 
@@ -215,8 +210,6 @@
       box-shadow:none;
       padding:0;
       cursor:pointer;
-      margin-right:-2px;
-      flex:0 0 auto;
     }
 
     .hero-logo:active{ transform:scale(.98); }
@@ -228,6 +221,7 @@
       display:block;
     }
 
+    /* Слайдер */
     .slider{
       width:100%;
       max-width:520px;
@@ -302,86 +296,149 @@
       transform: translateY(-.5px);
     }
 
-    .actions{
-      width:100%;
-      max-width:520px;
-      display:grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap:12px;
+    /* ----- Бонусные кнопки ----- */
+    .bonus-buttons {
+      width: 100%;
+      max-width: 520px;
+      display: flex;
+      gap: 12px;
+      justify-content: space-between;
     }
 
-    .action-btn{
-      position:relative;
-      width:100%;
-      aspect-ratio: 1 / 1;
-      border:none;
-      border-radius:22px;
-      overflow:hidden;
-      cursor:pointer;
-      padding:0;
-      background:#0b102a;
-      box-shadow:
-        0 18px 38px rgba(0,0,0,.34),
-        inset 0 1px 0 rgba(255,255,255,.05);
-      border:1px solid rgba(255,255,255,.06);
-      transition: transform .18s ease, box-shadow .18s ease;
+    .bonus-btn {
+      flex: 1;
+      height: 52px;
+      border: none;
+      border-radius: 14px;
+      background: linear-gradient(145deg, rgba(42,171,238,0.25), rgba(34,158,217,0.15));
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(42,171,238,0.5);
+      color: white;
+      font-weight: 800;
+      font-size: 15px;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.1);
     }
 
-    .action-btn:active{ transform: scale(.985); }
-
-    .action-img{
-      position:absolute;
-      inset:0;
-      width:100%;
-      height:100%;
-      object-fit:cover;
-      object-position:center;
-      display:block;
-      transform: scale(1.03);
-      filter: saturate(1.02) contrast(1.02);
+    .bonus-btn:active {
+      transform: scale(0.97);
+      background: linear-gradient(145deg, rgba(42,171,238,0.35), rgba(34,158,217,0.25));
+      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
     }
 
-    .action-btn::before{
-      content:"";
-      position:absolute;
-      inset:0;
-      background:
-        linear-gradient(180deg, rgba(0,0,0,.04), rgba(0,0,0,.52)),
-        radial-gradient(120px 70px at 50% 100%, rgba(255,255,255,.04), transparent 70%);
-      pointer-events:none;
-      z-index:1;
+    .bonus-btn svg {
+      width: 22px;
+      height: 22px;
+      fill: none;
+      stroke: #2AABEE;
+      stroke-width: 2;
+      filter: drop-shadow(0 0 4px rgba(42,171,238,0.5));
     }
 
-    .action-btn .label{
-      position:absolute;
-      left:0;
-      right:0;
-      bottom:0;
-      padding:12px 10px;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      font-weight:900;
-      font-size:13px;
-      letter-spacing:.2px;
-      color: rgba(234,241,255,.96);
-      background: linear-gradient(180deg, rgba(0,0,0,.00), rgba(0,0,0,.64));
-      text-shadow: 0 10px 18px rgba(0,0,0,.55);
-      z-index:2;
+    /* ----- Games и Slots блоки (без текста) ----- */
+    .games-section, .slots-section {
+      width: 100%;
+      max-width: 520px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
     }
 
+    .games-header, .slots-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-left: 4px;
+    }
+
+    .games-title, .slots-title {
+      font-weight: 900;
+      font-size: 18px;
+      letter-spacing: 0.5px;
+      background: linear-gradient(135deg, #fff, #b0c8ff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      text-shadow: 0 2px 5px rgba(0,40,100,0.5);
+    }
+
+    .games-scroll, .slots-scroll {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+      padding-bottom: 4px;
+      padding-left: 2px;
+    }
+
+    .games-scroll::-webkit-scrollbar, .slots-scroll::-webkit-scrollbar {
+      display: none;
+    }
+
+    .game-card, .slot-card {
+      flex: 0 0 auto;
+      width: 95px;
+      scroll-snap-align: start;
+      border-radius: 16px;
+      background: rgba(10, 12, 18, 0.6);
+      backdrop-filter: blur(4px);
+      border: 1px solid rgba(255,255,255,0.06);
+      box-shadow: 0 15px 25px -8px rgba(0,0,0,0.6);
+      overflow: hidden;
+      cursor: pointer;
+      transition: transform 0.18s ease, box-shadow 0.18s ease;
+    }
+
+    .game-card:active, .slot-card:active {
+      transform: scale(0.96);
+    }
+
+    .game-card-inner, .slot-card-inner {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 3/4;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      padding: 8px 5px;
+    }
+
+    .game-card img, .slot-card img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+      z-index: 0;
+    }
+
+    .game-card::after, .slot-card::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.7) 90%);
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    /* ----- Меню (выезжает слева) — компактная версия ----- */
     .menu-overlay{
       position:fixed;
       inset:0;
-      background: rgba(0,0,0,.66);
+      background: rgba(0,0,0,.6);
       opacity:0;
       pointer-events:none;
-      transition: opacity .25s ease;
+      transition: opacity .3s ease;
       z-index:200;
-      display:flex;
-      align-items:flex-end;
-      justify-content:center;
-      padding:16px 16px calc(16px + var(--safe-bottom)) 16px;
+      backdrop-filter: blur(6px);
     }
 
     .menu-overlay.show{
@@ -390,132 +447,275 @@
     }
 
     .menu-sheet{
-      width:min(520px, 100%);
-      border-radius:28px;
-      background: rgba(14,16,24,.95);
-      border:1px solid rgba(255,255,255,.08);
-      box-shadow:
-        0 30px 80px rgba(0,0,0,.58),
-        inset 0 1px 0 rgba(255,255,255,.04);
-      backdrop-filter: blur(14px);
-      -webkit-backdrop-filter: blur(14px);
-      transform: translateY(24px);
-      opacity:0;
-      transition: transform .28s ease, opacity .28s ease;
-      overflow:hidden;
+      position:fixed;
+      top:0;
+      left:0;
+      bottom:0;
+      width:min(320px, 85%);
+      background: linear-gradient(145deg, rgba(12, 14, 20, 0.98), rgba(8, 10, 16, 0.98));
+      backdrop-filter: blur(30px);
+      -webkit-backdrop-filter: blur(30px);
+      border-right: 1px solid rgba(255,255,255,.12);
+      box-shadow: 8px 0 40px rgba(0,0,0,.7);
+      transform: translateX(-100%);
+      transition: transform .4s cubic-bezier(0.2, 0.9, 0.3, 1.1);
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+      z-index:201;
     }
 
     .menu-overlay.show .menu-sheet{
-      transform: translateY(0);
-      opacity:1;
-    }
-
-    .sheet-handle{
-      width:42px;
-      height:5px;
-      border-radius:999px;
-      background: rgba(255,255,255,.16);
-      margin:10px auto 2px auto;
+      transform: translateX(0);
     }
 
     .menu-sheet-head{
       display:flex;
       align-items:center;
       justify-content:space-between;
-      gap:12px;
-      padding:12px 14px 10px 14px;
+      padding: 16px 16px 8px 20px;
+      border-bottom: 1px solid rgba(255,255,255,.12);
+      background: linear-gradient(135deg, rgba(255,255,255,0.04), rgba(255,255,255,0));
     }
 
     .sheet-title{
       margin:0;
-      font-size:16px;
-      font-weight:900;
-      color: rgba(234,241,255,.96);
+      font-size: 20px;
+      font-weight:800;
+      letter-spacing:0.5px;
+      background: linear-gradient(135deg, #fff, #b0c8ff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
     }
 
     .menu-close{
-      width:40px;
-      height:40px;
-      border-radius:14px;
-      border:1px solid rgba(255,255,255,.08);
-      background: rgba(255,255,255,.05);
-      color: rgba(234,241,255,.92);
-      cursor:pointer;
-      display:grid;
-      place-items:center;
-      box-shadow: inset 0 1px 0 rgba(255,255,255,.04);
-      transition: transform .15s ease;
-      flex:0 0 auto;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      border: none;
+      background: rgba(255,255,255,.12);
+      color: rgba(234,241,255,.9);
+      cursor: pointer;
+      display: grid;
+      place-items: center;
+      font-size: 18px;
+      transition: all .25s ease;
     }
 
-    .menu-close:active{ transform: scale(.98); }
+    .menu-close:hover { background: rgba(255,255,255,.22); transform: rotate(90deg) scale(1.05); }
+    .menu-close:active{ transform: scale(.94); }
+
+    /* Блок профиля (компактнее) */
+    .profile-block {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 16px 16px 20px 16px;
+      padding: 10px 14px;
+      background: linear-gradient(145deg, rgba(255,255,255,0.1), rgba(255,255,255,0.02));
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 28px;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      backdrop-filter: blur(8px);
+    }
+
+    .profile-block:active {
+      background: rgba(255,255,255,0.15);
+      transform: scale(0.98);
+      border-color: rgba(255,255,255,0.3);
+    }
+
+    .profile-avatar {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid rgba(255,255,255,0.3);
+      background: linear-gradient(135deg, #2f3542, #1a1e2a);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 18px;
+      color: white;
+      text-transform: uppercase;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+    }
+
+    .profile-info {
+      flex: 1;
+    }
+
+    .profile-name {
+      font-weight: 800;
+      font-size: 15px;
+      color: white;
+      margin-bottom: 2px;
+      letter-spacing: -0.2px;
+    }
+
+    .profile-id {
+      font-size: 11px;
+      font-weight: 500;
+      color: rgba(234,241,255,0.7);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .profile-id span {
+      background: rgba(255,255,255,0.12);
+      padding: 2px 6px;
+      border-radius: 30px;
+      font-size: 9px;
+      font-weight: 600;
+    }
+
+    .profile-chevron {
+      color: rgba(255,255,255,0.5);
+      font-size: 20px;
+      margin-left: auto;
+      padding-right: 2px;
+    }
 
     .menu-grid{
       display:flex;
       flex-direction:column;
-      gap:10px;
-      padding:0 14px 16px 14px;
+      padding:0 16px 12px 16px;
+      gap: 2px;
     }
 
-    .menu-card{
+    .menu-card {
       border:none;
       cursor:pointer;
-      border-radius:20px;
-      overflow:hidden;
-      padding:12px;
-      background:
-        linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02)),
-        rgba(255,255,255,.03);
-      border:1px solid rgba(255,255,255,.06);
-      box-shadow:
-        0 14px 26px rgba(0,0,0,.22),
-        inset 0 1px 0 rgba(255,255,255,.03);
-      transition: transform .18s ease, background .18s ease;
+      background: transparent;
       display:flex;
       align-items:center;
-      gap:12px;
+      gap: 12px;
       width:100%;
-      min-width:0;
+      padding: 8px 10px;
+      border-radius: 20px;
+      transition: all 0.2s ease;
+      border-bottom: 1px solid rgba(255,255,255,.04);
     }
 
-    .menu-card:active{ transform: scale(.985); }
-
-    .menu-icon{
-      width:48px;
-      height:48px;
-      border-radius:16px;
-      flex:0 0 auto;
-      display:grid;
-      place-items:center;
-      background: rgba(255,255,255,.07);
-      border:1px solid rgba(255,255,255,.08);
-      box-shadow:
-        inset 0 1px 0 rgba(255,255,255,.04),
-        0 8px 18px rgba(0,0,0,.18);
+    .menu-card:last-child {
+      border-bottom: none;
     }
 
-    .menu-icon svg{
-      width:22px;
-      height:22px;
-      stroke: rgba(234,241,255,.96);
-      fill:none;
-      stroke-width:2;
-      stroke-linecap:round;
-      stroke-linejoin:round;
-      display:block;
+    .menu-card:hover {
+      background: rgba(255,255,255,.08);
+      transform: translateX(4px);
     }
 
-    .menu-card-title{
-      display:block;
-      text-align:left;
-      font-size:13px;
-      font-weight:900;
-      line-height:1.2;
+    .menu-card:active {
+      transform: scale(0.98);
+      background: rgba(255,255,255,.12);
+    }
+
+    .menu-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 14px;
+      flex: 0 0 auto;
+      display: grid;
+      place-items: center;
+      background: rgba(255,255,255,.08);
+      border: 1px solid rgba(255,255,255,.12);
+      box-shadow: 0 4px 10px -4px rgba(0,0,0,.5);
+    }
+
+    .menu-icon svg {
+      width: 18px;
+      height: 18px;
+      stroke: rgba(234,241,255,.98);
+      fill: none;
+      stroke-width: 2;
+      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+    }
+
+    .menu-card-title {
+      display: block;
+      text-align: left;
+      font-size: 14px;
+      font-weight: 600;
       color: rgba(234,241,255,.96);
-      word-break:break-word;
-      flex:1;
+      letter-spacing: 0.2px;
     }
 
+    /* Блок поддержки внизу меню */
+    .menu-footer {
+      padding: 8px 16px 20px 16px;
+      margin-top: auto;
+    }
+
+    .support-footer-btn {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      width: 100%;
+      padding: 10px 14px;
+      background: linear-gradient(145deg, rgba(42,171,238,0.22), rgba(34,158,217,0.12));
+      border: 1px solid rgba(42,171,238,0.45);
+      border-radius: 28px;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      backdrop-filter: blur(4px);
+    }
+
+    .support-footer-btn:hover {
+      background: rgba(42,171,238,0.3);
+      border-color: rgba(42,171,238,0.7);
+      transform: translateY(-2px);
+    }
+
+    .support-footer-btn:active {
+      transform: scale(0.97);
+    }
+
+    .support-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(42,171,238,0.25);
+      border: 1px solid rgba(42,171,238,0.5);
+      overflow: hidden;
+    }
+
+    .support-icon img {
+      width: 24px;
+      height: 24px;
+      object-fit: contain;
+    }
+
+    .support-footer-text {
+      flex: 1;
+    }
+
+    .support-footer-title {
+      font-weight: 800;
+      font-size: 13px;
+      color: white;
+    }
+
+    .support-footer-sub {
+      font-size: 10px;
+      font-weight: 500;
+      color: rgba(234,241,255,0.75);
+    }
+
+    .support-chevron {
+      color: rgba(255,255,255,0.6);
+      font-size: 20px;
+      margin-left: auto;
+    }
+
+    /* Оверлеи поддержки и канала */
     .support-overlay,
     .channel-overlay{
       position:fixed;
@@ -540,14 +740,13 @@
     .support-card,
     .channel-card{
       width:min(440px, 100%);
-      border-radius:24px;
+      border-radius:28px;
       overflow:hidden;
-      background: rgba(14,16,24,.94);
-      border: 1px solid rgba(255,255,255,.08);
-      box-shadow: 0 34px 90px rgba(0,0,0,.62);
-      backdrop-filter: blur(14px);
-      -webkit-backdrop-filter: blur(14px);
-      position:relative;
+      background: rgba(18,20,28,.96);
+      border: 1px solid rgba(255,255,255,.1);
+      box-shadow: 0 34px 90px rgba(0,0,0,.7), inset 0 1px 0 rgba(255,255,255,.05);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
       transform: translateY(12px) scale(.98);
       opacity:.95;
       transition: transform .22s ease, opacity .22s ease;
@@ -561,35 +760,32 @@
 
     .support-head,
     .channel-head{
-      padding:16px 16px 10px 16px;
+      padding:18px 18px 12px 18px;
       display:flex;
       align-items:center;
       justify-content:space-between;
-      gap:10px;
       background: rgba(255,255,255,.03);
-      border-bottom: 1px solid rgba(255,255,255,.06);
+      border-bottom: 1px solid rgba(255,255,255,.07);
     }
 
     .support-title,
     .channel-title{
       font-weight:900;
-      letter-spacing:.25px;
-      font-size:14px;
-      color: rgba(234,241,255,.95);
+      font-size:15px;
+      color: rgba(234,241,255,.96);
     }
 
     .support-x,
     .channel-x{
-      width:38px;
-      height:38px;
-      border-radius:14px;
+      width:40px;
+      height:40px;
+      border-radius:16px;
       border:1px solid rgba(255,255,255,.08);
-      background: rgba(255,255,255,.05);
-      color: rgba(234,241,255,.92);
+      background: rgba(255,255,255,.06);
+      color: rgba(234,241,255,.96);
       cursor:pointer;
       display:grid;
       place-items:center;
-      box-shadow: 0 12px 28px rgba(0,0,0,.32);
     }
 
     .support-x:active,
@@ -597,38 +793,35 @@
 
     .support-body,
     .channel-body{
-      padding:14px 16px 16px 16px;
+      padding:16px 18px 20px 18px;
       display:flex;
       flex-direction:column;
-      gap:12px;
+      gap:14px;
     }
 
     .support-text,
     .channel-text{
       margin:0;
       font-size:13px;
-      line-height:1.35;
-      color: rgba(234,241,255,.84);
+      line-height:1.4;
+      color: rgba(234,241,255,.86);
     }
 
     .tg-btn{
       border:none;
       cursor:pointer;
       width:100%;
-      height:50px;
-      border-radius:16px;
+      height:52px;
+      border-radius:20px;
       display:flex;
       align-items:center;
       justify-content:center;
       gap:10px;
       background: linear-gradient(180deg, var(--tg1), var(--tg2));
-      box-shadow:
-        0 18px 40px rgba(34,158,217,.28),
-        inset 0 1px 0 rgba(255,255,255,.14);
+      box-shadow: 0 18px 40px rgba(34,158,217,.4), inset 0 1px 0 rgba(255,255,255,.2);
       color:#fff;
       font-weight:900;
-      letter-spacing:.2px;
-      font-size:14px;
+      font-size:15px;
     }
 
     .tg-btn:active{ transform: scale(.99); }
@@ -637,10 +830,10 @@
       width:22px;
       height:22px;
       display:block;
-      filter: drop-shadow(0 8px 14px rgba(0,0,0,.18));
+      filter: drop-shadow(0 8px 14px rgba(0,0,0,.3));
     }
 
-    /* ✅ TOAST (уведомление “в разработке”) */
+    /* Toast */
     .toast{
       position:fixed;
       left:14px;
@@ -660,115 +853,190 @@
     }
     .toast .box{
       width:min(520px, 100%);
-      border-radius:18px;
-      padding:12px 14px;
-      background: rgba(12,14,20,.78);
-      border:1px solid rgba(255,255,255,.12);
-      box-shadow: 0 22px 60px rgba(0,0,0,.50), inset 0 1px 0 rgba(255,255,255,.08);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
+      border-radius:22px;
+      padding:14px 16px;
+      background: rgba(12,14,20,.85);
+      border:1px solid rgba(255,255,255,.15);
+      box-shadow: 0 22px 60px rgba(0,0,0,.6), inset 0 1px 0 rgba(255,255,255,.1);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
       text-align:center;
       font-weight:900;
-      letter-spacing:.2px;
-      color: rgba(234,241,255,.95);
+      font-size:14px;
+      color: white;
+    }
+
+    /* ----- Оверлей для ввода пароля ----- */
+    .password-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.85);
+      backdrop-filter: blur(12px);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: opacity 0.3s ease;
+    }
+
+    .password-container {
+      width: min(340px, 85%);
+      background: rgba(18, 20, 28, 0.95);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 32px;
+      padding: 28px 24px;
+      text-align: center;
+      box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+    }
+
+    .password-container h2 {
+      margin: 0 0 8px 0;
+      font-size: 24px;
+      font-weight: 800;
+      background: linear-gradient(135deg, #fff, #b0c8ff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .password-container p {
+      font-size: 14px;
+      color: rgba(234,241,255,0.8);
+      margin-bottom: 24px;
+    }
+
+    .password-input {
+      width: 100%;
+      padding: 14px 18px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 28px;
+      color: white;
+      font-size: 16px;
+      font-weight: 500;
+      text-align: center;
+      letter-spacing: 2px;
+      outline: none;
+      transition: all 0.2s ease;
+    }
+
+    .password-input:focus {
+      border-color: #2AABEE;
+      box-shadow: 0 0 0 2px rgba(42,171,238,0.3);
+    }
+
+    .password-btn {
+      width: 100%;
+      margin-top: 20px;
+      padding: 14px;
+      background: linear-gradient(145deg, #2AABEE, #229ED9);
+      border: none;
+      border-radius: 28px;
+      color: white;
+      font-weight: 800;
+      font-size: 16px;
+      cursor: pointer;
+      transition: transform 0.15s ease;
+    }
+
+    .password-btn:active {
+      transform: scale(0.97);
+    }
+
+    .error-msg {
+      color: #ff6b6b;
+      font-size: 13px;
+      margin-top: 12px;
+      min-height: 20px;
     }
 
     @media (max-width: 360px){
       .top-row{
-        grid-template-columns:36px 36px minmax(0,1fr) 46px;
+        grid-template-columns:36px 1fr 46px;
         gap:6px;
       }
-
       .icon-btn{
         width:36px;
         height:36px;
         border-radius:12px;
       }
-
-      .profile-svg{
-        width:18px;
-        height:18px;
-      }
-
-      .burger{
-        width:16px;
-        height:12px;
-      }
-
       .balance-mini{
         height:38px;
         padding:5px 6px 5px 10px;
       }
-
       .bal-title{
         font-size:11px;
       }
-
       .bal-amount{
         height:24px;
         font-size:12px;
         min-width:70px;
-        padding:0 8px;
       }
-
       .hero-logo{
         width:46px;
         height:46px;
-        margin-right:0;
       }
-
-      .menu-card{
-        padding:10px;
-        border-radius:18px;
-        gap:10px;
+      .game-card, .slot-card{
+        width: 85px;
       }
-
-      .menu-icon{
-        width:44px;
-        height:44px;
-        border-radius:14px;
+      .menu-sheet{
+        width: min(280px, 85%);
       }
-
-      .menu-icon svg{
-        width:20px;
-        height:20px;
+      .profile-avatar {
+        width: 40px;
+        height: 40px;
+        font-size: 16px;
       }
-
-      .menu-card-title{
-        font-size:12px;
+      .profile-name {
+        font-size: 13px;
       }
-
-      .tg-btn{
-        height:48px;
-        border-radius:15px;
+      .profile-id {
+        font-size: 10px;
+      }
+      .menu-icon {
+        width: 32px;
+        height: 32px;
+      }
+      .menu-card-title {
+        font-size: 13px;
+      }
+      .bonus-btn {
+        height: 44px;
+        font-size: 13px;
       }
     }
 
     @media (prefers-reduced-motion: reduce){
       *{ transition:none !important; }
-      .support-overlay.show .support-card,
-      .menu-overlay.show .menu-sheet,
-      .channel-overlay.show .channel-card{ transform:none !important; }
     }
   </style>
 </head>
 
 <body>
-  <div class="app" id="appRoot">
+  <!-- Оверлей для ввода пароля -->
+  <div class="password-overlay" id="passwordOverlay">
+    <div class="password-container">
+      <h2>Вход</h2>
+      <p>Введите пароль для доступа</p>
+      <input type="password" class="password-input" id="passwordInput" placeholder="•••" maxlength="10" autocomplete="off">
+      <button class="password-btn" id="passwordSubmit">Войти</button>
+      <div class="error-msg" id="passwordError"></div>
+    </div>
+  </div>
+
+  <div class="app" id="appRoot" style="display: none;">
     <div class="content">
 
+      <!-- Верхняя панель: меню + баланс + лого -->
       <div class="top-row">
         <button class="icon-btn" id="menuBtn" aria-label="Открыть меню">
           <div class="burger" aria-hidden="true">
             <span></span><span></span><span></span>
           </div>
-        </button>
-
-        <button class="icon-btn" id="profileBtn" aria-label="Профиль" title="Профиль">
-          <svg class="profile-svg" viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M20 21a8 8 0 0 0-16 0"></path>
-            <circle cx="12" cy="8" r="4"></circle>
-          </svg>
         </button>
 
         <div class="balance-mini" aria-label="Баланс">
@@ -789,6 +1057,7 @@
         </button>
       </div>
 
+      <!-- Слайдер -->
       <div class="slider" aria-label="Баннеры">
         <div class="slides" id="slides">
           <div class="slide">
@@ -825,63 +1094,124 @@
         </div>
       </div>
 
-      <div class="actions" aria-label="Разделы">
-        <button class="action-btn" id="btnGames" type="button">
-          <img
-            class="action-img"
-            src="https://i.postimg.cc/8khGybLS/d9e9d314-fd90-4cad-ad74-b2ed14a51f38.png"
-            alt="Игры"
-            loading="lazy"
-            decoding="async"
-          >
-          <div class="label">Игры</div>
+      <!-- Две бонусные кнопки -->
+      <div class="bonus-buttons">
+        <button class="bonus-btn" id="wheelBtn">
+          <svg viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="10" stroke="currentColor" fill="none"/>
+            <path d="M12 2 L12 6 M12 18 L12 22 M2 12 L6 12 M18 12 L22 12" stroke="currentColor" stroke-width="1.5"/>
+            <circle cx="12" cy="12" r="2" fill="currentColor"/>
+          </svg>
+          Колесо фортуны
         </button>
+        <button class="bonus-btn" id="bonusBtn">
+          <svg viewBox="0 0 24 24">
+            <path d="M12 2 L15 8 L22 9 L17 14 L18 21 L12 17.5 L6 21 L7 14 L2 9 L9 8 L12 2Z" stroke="currentColor" fill="none" stroke-width="1.8"/>
+          </svg>
+          Бонусы
+        </button>
+      </div>
 
-        <button class="action-btn" id="btnShop" type="button">
-          <img
-            class="action-img"
-            src="https://i.postimg.cc/XvWZvSqj/file-0000000059bc72438dd485df46f69309-(1).png"
-            alt="UC Shop"
-            loading="lazy"
-            decoding="async"
-          >
-          <div class="label">UC Shop</div>
-        </button>
+      <!-- Блок Games (без текста) -->
+      <div class="games-section">
+        <div class="games-header">
+          <span class="games-title">Games</span>
+        </div>
+        <div class="games-scroll" id="gamesScroll">
+          <div class="game-card" data-game="game1">
+            <div class="game-card-inner">
+              <img src="https://i.postimg.cc/8khGybLS/d9e9d314-fd90-4cad-ad74-b2ed14a51f38.png" alt="Game 1" loading="lazy">
+            </div>
+          </div>
+          <div class="game-card" data-game="game2">
+            <div class="game-card-inner">
+              <img src="https://i.postimg.cc/XvWZvSqj/file-0000000059bc72438dd485df46f69309-(1).png" alt="Game 2" loading="lazy">
+            </div>
+          </div>
+          <div class="game-card" data-game="game3">
+            <div class="game-card-inner">
+              <img src="https://i.postimg.cc/TY9sZp02/46F82521-51BE-4FB1-B831-B19958E9872E.png" alt="Game 3" loading="lazy">
+            </div>
+          </div>
+          <div class="game-card" data-game="game4">
+            <div class="game-card-inner">
+              <img src="https://i.postimg.cc/8khGybLS/d9e9d314-fd90-4cad-ad74-b2ed14a51f38.png" alt="Game 4" loading="lazy">
+            </div>
+          </div>
+          <div class="game-card" data-game="game5">
+            <div class="game-card-inner">
+              <img src="https://i.postimg.cc/XvWZvSqj/file-0000000059bc72438dd485df46f69309-(1).png" alt="Game 5" loading="lazy">
+            </div>
+          </div>
+          <div class="game-card" data-game="game6">
+            <div class="game-card-inner">
+              <img src="https://i.postimg.cc/TY9sZp02/46F82521-51BE-4FB1-B831-B19958E9872E.png" alt="Game 6" loading="lazy">
+            </div>
+          </div>
+        </div>
+      </div>
 
-        <button class="action-btn" id="btnCustom" type="button">
-          <img
-            class="action-img"
-            src="https://i.postimg.cc/TY9sZp02/46F82521-51BE-4FB1-B831-B19958E9872E.png"
-            alt="Кастомки"
-            loading="lazy"
-            decoding="async"
-          >
-          <div class="label">Кастомки</div>
-        </button>
+      <!-- Блок Slots (без текста) -->
+      <div class="slots-section">
+        <div class="slots-header">
+          <span class="slots-title">Slots</span>
+        </div>
+        <div class="slots-scroll" id="slotsScroll">
+          <div class="slot-card" data-slot="slot1">
+            <div class="slot-card-inner">
+              <img src="https://i.postimg.cc/8khGybLS/d9e9d314-fd90-4cad-ad74-b2ed14a51f38.png" alt="Slot 1" loading="lazy">
+            </div>
+          </div>
+          <div class="slot-card" data-slot="slot2">
+            <div class="slot-card-inner">
+              <img src="https://i.postimg.cc/XvWZvSqj/file-0000000059bc72438dd485df46f69309-(1).png" alt="Slot 2" loading="lazy">
+            </div>
+          </div>
+          <div class="slot-card" data-slot="slot3">
+            <div class="slot-card-inner">
+              <img src="https://i.postimg.cc/TY9sZp02/46F82521-51BE-4FB1-B831-B19958E9872E.png" alt="Slot 3" loading="lazy">
+            </div>
+          </div>
+          <div class="slot-card" data-slot="slot4">
+            <div class="slot-card-inner">
+              <img src="https://i.postimg.cc/8khGybLS/d9e9d314-fd90-4cad-ad74-b2ed14a51f38.png" alt="Slot 4" loading="lazy">
+            </div>
+          </div>
+          <div class="slot-card" data-slot="slot5">
+            <div class="slot-card-inner">
+              <img src="https://i.postimg.cc/XvWZvSqj/file-0000000059bc72438dd485df46f69309-(1).png" alt="Slot 5" loading="lazy">
+            </div>
+          </div>
+          <div class="slot-card" data-slot="slot6">
+            <div class="slot-card-inner">
+              <img src="https://i.postimg.cc/TY9sZp02/46F82521-51BE-4FB1-B831-B19958E9872E.png" alt="Slot 6" loading="lazy">
+            </div>
+          </div>
+        </div>
       </div>
 
     </div>
   </div>
 
+  <!-- Меню (выезжает слева) -->
   <div class="menu-overlay" id="menuOverlay" aria-hidden="true">
     <div class="menu-sheet" role="dialog" aria-modal="true" aria-label="Меню">
-      <div class="sheet-handle" aria-hidden="true"></div>
-
       <div class="menu-sheet-head">
         <p class="sheet-title">Меню</p>
         <button class="menu-close" id="menuClose" aria-label="Закрыть меню">✕</button>
       </div>
 
-      <div class="menu-grid">
-        <button class="menu-card" data-action="support">
-          <span class="menu-icon" aria-hidden="true">
-            <svg viewBox="0 0 24 24">
-              <path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z"></path>
-            </svg>
-          </span>
-          <span class="menu-card-title">Поддержка</span>
-        </button>
+      <!-- Блок профиля -->
+      <div class="profile-block" id="menuProfileBlock">
+        <div class="profile-avatar" id="profileAvatar">?</div>
+        <div class="profile-info">
+          <div class="profile-name" id="profileName">Загрузка...</div>
+          <div class="profile-id" id="profileId">Telegram ID</div>
+        </div>
+        <div class="profile-chevron">›</div>
+      </div>
 
+      <div class="menu-grid">
         <button class="menu-card" data-action="vouchers">
           <span class="menu-icon" aria-hidden="true">
             <svg viewBox="0 0 24 24">
@@ -894,14 +1224,27 @@
           <span class="menu-card-title">Ваучеры</span>
         </button>
 
-        <button class="menu-card" data-action="ref">
+        <button class="menu-card" data-action="partner">
           <span class="menu-icon" aria-hidden="true">
             <svg viewBox="0 0 24 24">
               <path d="M10 13a5 5 0 0 0 7.07 0l2.83-2.83a5 5 0 0 0-7.07-7.07L10.59 5.3"></path>
               <path d="M14 11a5 5 0 0 0-7.07 0L4.1 13.83a5 5 0 1 0 7.07 7.07L13.41 18.7"></path>
             </svg>
           </span>
-          <span class="menu-card-title">Реферальная ссылка</span>
+          <span class="menu-card-title">Партнёрская программа</span>
+        </button>
+
+        <button class="menu-card" data-action="rules">
+          <span class="menu-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+              <line x1="16" y1="13" x2="8" y2="13"></line>
+              <line x1="16" y1="17" x2="8" y2="17"></line>
+              <polyline points="10 9 9 9 8 9"></polyline>
+            </svg>
+          </span>
+          <span class="menu-card-title">Правила</span>
         </button>
 
         <button class="menu-card" data-action="history">
@@ -915,22 +1258,34 @@
           <span class="menu-card-title">История</span>
         </button>
       </div>
+
+      <div class="menu-footer">
+        <div class="support-footer-btn" id="menuSupportBtn">
+          <span class="support-icon" aria-hidden="true">
+            <img src="https://i.postimg.cc/B6Tct9DC/telegram-logo-telegram-social-media-icon-free-png.png" alt="Telegram">
+          </span>
+          <div class="support-footer-text">
+            <span class="support-footer-title">Техническая поддержка</span>
+            <span class="support-footer-sub">24/7 · Telegram</span>
+          </div>
+          <div class="support-chevron">›</div>
+        </div>
+      </div>
     </div>
   </div>
 
+  <!-- Оверлей поддержки -->
   <div class="support-overlay" id="supportOverlay" aria-hidden="true">
     <div class="support-card" role="dialog" aria-modal="true" aria-label="Поддержка">
       <div class="support-head">
         <div class="support-title">Поддержка</div>
         <button class="support-x" id="supportClose" aria-label="Закрыть">✕</button>
       </div>
-
       <div class="support-body">
         <p class="support-text">
           Нажми кнопку ниже — откроется Telegram чат поддержки:
           <b>@vezusmanager</b>
         </p>
-
         <button class="tg-btn" id="goTelegram" aria-label="Перейти в Telegram">
           <svg class="tg-ico" viewBox="0 0 240 240" aria-hidden="true">
             <path fill="#fff" d="M120 0C53.7 0 0 53.7 0 120s53.7 120 120 120 120-53.7 120-120S186.3 0 120 0zm58.7 82.3l-19.7 92.8c-1.5 6.6-5.4 8.2-10.9 5.1l-30.2-22.3-14.6 14c-1.6 1.6-3 3-6.1 3l2.2-31.6 57.5-52c2.5-2.2-.5-3.4-3.9-1.2l-71 44.7-30.6-9.6c-6.6-2.1-6.7-6.6 1.4-9.7l119.6-46.1c5.5-2 10.3 1.3 8.8 9.9z"/>
@@ -941,19 +1296,18 @@
     </div>
   </div>
 
+  <!-- Оверлей канала -->
   <div class="channel-overlay" id="channelOverlay" aria-hidden="true">
     <div class="channel-card" role="dialog" aria-modal="true" aria-label="Telegram канал">
       <div class="channel-head">
         <div class="channel-title">Наш Telegram канал</div>
         <button class="channel-x" id="channelClose" aria-label="Закрыть">✕</button>
       </div>
-
       <div class="channel-body">
         <p class="channel-text">
           Нажми кнопку ниже — откроется наш Telegram канал:
           <b>@vezuspubg</b>
         </p>
-
         <button class="tg-btn" id="goChannel" aria-label="Перейти в Telegram канал">
           <svg class="tg-ico" viewBox="0 0 240 240" aria-hidden="true">
             <path fill="#fff" d="M120 0C53.7 0 0 53.7 0 120s53.7 120 120 120 120-53.7 120-120S186.3 0 120 0zm58.7 82.3l-19.7 92.8c-1.5 6.6-5.4 8.2-10.9 5.1l-30.2-22.3-14.6 14c-1.6 1.6-3 3-6.1 3l2.2-31.6 57.5-52c2.5-2.2-.5-3.4-3.9-1.2l-71 44.7-30.6-9.6c-6.6-2.1-6.7-6.6 1.4-9.7l119.6-46.1c5.5-2 10.3 1.3 8.8 9.9z"/>
@@ -964,7 +1318,7 @@
     </div>
   </div>
 
-  <!-- ✅ Toast -->
+  <!-- Toast уведомление -->
   <div class="toast" id="toast" aria-live="polite" aria-atomic="true">
     <div class="box" id="toastText">В разработке</div>
   </div>
@@ -982,14 +1336,67 @@
       custom: 'custom.html',
       vouchers: 'vouchers.html',
       referral: 'referral.html',
-      history: 'history.html'
+      history: 'history.html',
+      rules: 'rules.html',
+      partner: 'partner.html',
+      bonus: 'bonus.html'
     };
 
+    // ---------- Защита паролем ----------
+    const passwordOverlay = document.getElementById('passwordOverlay');
+    const appRoot = document.getElementById('appRoot');
+    const passwordInput = document.getElementById('passwordInput');
+    const passwordSubmit = document.getElementById('passwordSubmit');
+    const passwordError = document.getElementById('passwordError');
+
+    function checkAuth() {
+      const authenticated = sessionStorage.getItem('authenticated') === 'true';
+      if (authenticated) {
+        passwordOverlay.style.display = 'none';
+        appRoot.style.display = 'block';
+        document.body.style.overflow = 'auto';
+      } else {
+        passwordOverlay.style.display = 'flex';
+        appRoot.style.display = 'none';
+        document.body.style.overflow = 'hidden';
+      }
+    }
+
+    function submitPassword() {
+      const entered = passwordInput.value.trim();
+      if (entered === '228') {
+        sessionStorage.setItem('authenticated', 'true');
+        checkAuth();
+        // после успешного входа запускаем остальную инициализацию
+        initApp();
+      } else {
+        passwordError.textContent = 'Неверный пароль';
+        passwordInput.value = '';
+        passwordInput.focus();
+      }
+    }
+
+    passwordSubmit.addEventListener('click', submitPassword);
+    passwordInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') submitPassword();
+    });
+
+    // Запускаем проверку сразу
+    checkAuth();
+
+    // ---------- Остальная логика приложения ----------
     const balanceValueEl = document.getElementById('balanceValue');
     const balanceChipEl  = document.getElementById('balanceChip');
-    const profileBtnEl   = document.getElementById('profileBtn');
 
-    // ✅ Toast helpers
+    const profileAvatar = document.getElementById('profileAvatar');
+    const profileName = document.getElementById('profileName');
+    const profileId = document.getElementById('profileId');
+    const menuProfileBlock = document.getElementById('menuProfileBlock');
+    const menuSupportBtn = document.getElementById('menuSupportBtn');
+
+    const wheelBtn = document.getElementById('wheelBtn');
+    const bonusBtn = document.getElementById('bonusBtn');
+
     const toastEl = document.getElementById('toast');
     const toastTextEl = document.getElementById('toastText');
     let toastTimer = null;
@@ -997,14 +1404,11 @@
     function showToast(text, ms = 1700){
       toastTextEl.textContent = text;
       toastEl.classList.add('show');
-
-      // лёгкая вибра (если TG)
       try{
         if (window.Telegram?.WebApp?.HapticFeedback?.impactOccurred) {
           Telegram.WebApp.HapticFeedback.impactOccurred('light');
         }
       }catch{}
-
       if (toastTimer) clearTimeout(toastTimer);
       toastTimer = setTimeout(() => toastEl.classList.remove('show'), ms);
     }
@@ -1023,45 +1427,29 @@
       try {
         const raw = localStorage.getItem('tg_profile');
         if (!raw) return null;
-        const parsed = JSON.parse(raw);
-        if (!parsed || typeof parsed !== 'object') return null;
-        return parsed;
-      } catch {
-        return null;
-      }
+        return JSON.parse(raw);
+      } catch { return null; }
     }
 
     function applyProfile(profile) {
       if (!profile) return;
-
       localStorage.setItem('tg_profile', JSON.stringify(profile));
       balanceValueEl.textContent = formatVc(profile.balance);
-
-      const username = profile.username ? `@${profile.username}` : 'Профиль';
-      profileBtnEl.setAttribute('title', username);
-      profileBtnEl.setAttribute('aria-label', username);
     }
 
     function getStartParam() {
       try {
         const tgStart = (window.Telegram?.WebApp?.initDataUnsafe?.start_param || '').trim();
         if (tgStart) return tgStart.toUpperCase();
-
         const url = new URL(window.location.href);
-
         const q1 = (url.searchParams.get('tgWebAppStartParam') || '').trim();
         if (q1) return q1.toUpperCase();
-
         const q2 = (url.searchParams.get('startapp') || '').trim();
         if (q2) return q2.toUpperCase();
-
         const q3 = (url.searchParams.get('ref') || '').trim();
         if (q3) return q3.toUpperCase();
-
         return '';
-      } catch {
-        return '';
-      }
+      } catch { return ''; }
     }
 
     function clearStartParamsFromUrl() {
@@ -1097,58 +1485,79 @@
         const res = await fetch(VERIFY_URL, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            initData,
-            refCode
-          })
+          body: JSON.stringify({ initData, refCode })
         });
-
         const json = await res.json().catch(() => ({}));
-
         if (!res.ok || !json.ok || !json.profile) {
           if (cached) applyProfile(cached);
           else balanceValueEl.textContent = '0 VC';
           return;
         }
-
         applyProfile(json.profile);
-
-        if (json.referral) {
-          localStorage.setItem('tg_referral', JSON.stringify(json.referral));
-        }
-
-        if (refCode) {
-          clearStartParamsFromUrl();
-        }
+        if (json.referral) localStorage.setItem('tg_referral', JSON.stringify(json.referral));
+        if (refCode) clearStartParamsFromUrl();
       } catch {
         if (cached) applyProfile(cached);
         else balanceValueEl.textContent = '0 VC';
       }
     }
 
-    function goTo(file){
-      window.location.href = file;
+    function goTo(file){ window.location.href = file; }
+    function openTelegramLinkSafe(url){
+      if (window.Telegram?.WebApp?.openTelegramLink) window.Telegram.WebApp.openTelegramLink(url);
+      else window.open(url, '_blank', 'noopener');
     }
 
-    function openTelegramLinkSafe(url){
-      if (window.Telegram && window.Telegram.WebApp && typeof window.Telegram.WebApp.openTelegramLink === 'function') {
-        window.Telegram.WebApp.openTelegramLink(url);
+    function updateMenuProfile() {
+      if (!window.Telegram?.WebApp) return;
+      const user = window.Telegram.WebApp.initDataUnsafe?.user;
+      if (!user) {
+        profileAvatar.textContent = '?';
+        profileAvatar.style.background = '#2f3542';
+        profileName.textContent = 'Гость';
+        profileId.innerHTML = '<span>не авторизован</span>';
         return;
       }
-      window.open(url, '_blank', 'noopener');
+      let firstName = user.first_name || '';
+      let lastName = user.last_name || '';
+      let fullName = (firstName + ' ' + lastName).trim() || 'Пользователь';
+      profileName.textContent = fullName;
+      let idText = user.username ? '@' + user.username : 'ID ' + user.id;
+      profileId.innerHTML = `<span>${idText}</span>`;
+      if (user.photo_url) {
+        profileAvatar.innerHTML = '';
+        profileAvatar.style.background = 'transparent';
+        const img = document.createElement('img');
+        img.src = user.photo_url;
+        img.alt = 'avatar';
+        img.style.width = '100%';
+        img.style.height = '100%';
+        img.style.borderRadius = '50%';
+        img.style.objectFit = 'cover';
+        profileAvatar.appendChild(img);
+      } else {
+        profileAvatar.innerHTML = '';
+        profileAvatar.style.background = '#2f3542';
+        let initials = (firstName.charAt(0) + (lastName.charAt(0) || '')).toUpperCase() || '?';
+        profileAvatar.textContent = initials;
+        profileAvatar.style.display = 'flex';
+        profileAvatar.style.alignItems = 'center';
+        profileAvatar.style.justifyContent = 'center';
+      }
     }
 
     balanceChipEl.addEventListener('click', () => goTo(FILES.wallet));
-    profileBtnEl.addEventListener('click', () => goTo(FILES.profile));
+    document.querySelectorAll('.game-card, .slot-card').forEach(card => {
+      card.addEventListener('click', () => showToast('В разработке', 1500));
+    });
 
-    document.getElementById('btnGames').addEventListener('click', () => goTo(FILES.games));
-    document.getElementById('btnShop').addEventListener('click', () => goTo(FILES.shop));
-    document.getElementById('btnCustom').addEventListener('click', () => goTo(FILES.custom));
+    if (wheelBtn) wheelBtn.addEventListener('click', () => showToast('Колесо фортуны — скоро', 1500));
+    if (bonusBtn) bonusBtn.addEventListener('click', () => showToast('Бонусы — скоро', 1500));
 
+    // Слайдер
     const slides = document.getElementById('slides');
     const dotsWrap = document.getElementById('dots');
     const dots = Array.from(dotsWrap.querySelectorAll('.dot'));
-
     function getStep(){
       const first = slides.querySelector('.slide');
       if (!first) return slides.clientWidth || 1;
@@ -1156,184 +1565,97 @@
       const gap = parseFloat(getComputedStyle(slides).gap || '0') || 0;
       return w + gap;
     }
-
     function getCurrentIndex(){
       const step = getStep();
       return clamp(Math.round(slides.scrollLeft / step), 0, dots.length - 1);
     }
-
     function updateDotsByScroll(){
       const idx = getCurrentIndex();
       dots.forEach((d, i) => d.classList.toggle('active', i === idx));
     }
-
     let rafId = null;
     slides.addEventListener('scroll', () => {
       if (rafId) return;
-      rafId = requestAnimationFrame(() => {
-        updateDotsByScroll();
-        rafId = null;
-      });
+      rafId = requestAnimationFrame(() => { updateDotsByScroll(); rafId = null; });
     }, { passive:true });
-
-    dots.forEach((dot, i) => {
-      dot.addEventListener('click', () => {
-        slides.scrollTo({ left: i * getStep(), behavior: 'smooth' });
-      });
-    });
-
+    dots.forEach((dot, i) => dot.addEventListener('click', () => slides.scrollTo({ left: i * getStep(), behavior: 'smooth' })));
     window.addEventListener('resize', updateDotsByScroll);
 
-    const AUTOPLAY_DELAY = 5000;
-    const RESUME_DELAY   = 3500;
-    let autoplayInterval = null;
-    let resumeTimeout = null;
-
-    function stopAutoplay(){
-      if (autoplayInterval) clearInterval(autoplayInterval);
-      autoplayInterval = null;
-    }
-
+    // Автоплей слайдера
+    const AUTOPLAY_DELAY = 5000, RESUME_DELAY = 3500;
+    let autoplayInterval = null, resumeTimeout = null;
+    function stopAutoplay(){ if(autoplayInterval) clearInterval(autoplayInterval); autoplayInterval = null; }
     function startAutoplay(){
-      if (dots.length <= 1) return;
-      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-
+      if(dots.length <= 1 || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
       stopAutoplay();
       autoplayInterval = setInterval(() => {
         const next = (getCurrentIndex() + 1) % dots.length;
         slides.scrollTo({ left: next * getStep(), behavior: 'smooth' });
       }, AUTOPLAY_DELAY);
     }
+    function pauseAndResume(){ stopAutoplay(); if(resumeTimeout) clearTimeout(resumeTimeout); resumeTimeout = setTimeout(startAutoplay, RESUME_DELAY); }
+    ['pointerdown', 'touchstart', 'mousedown', 'wheel'].forEach(evt => slides.addEventListener(evt, pauseAndResume, { passive:true }));
+    document.addEventListener('visibilitychange', () => document.hidden ? stopAutoplay() : startAutoplay());
 
-    function pauseAndResume(){
-      stopAutoplay();
-      if (resumeTimeout) clearTimeout(resumeTimeout);
-      resumeTimeout = setTimeout(startAutoplay, RESUME_DELAY);
-    }
-
-    ['pointerdown', 'touchstart', 'mousedown', 'wheel'].forEach(evt => {
-      slides.addEventListener(evt, pauseAndResume, { passive:true });
-    });
-
-    document.addEventListener('visibilitychange', () => {
-      if (document.hidden) stopAutoplay();
-      else startAutoplay();
-    });
-
+    // Меню
     const menuBtn = document.getElementById('menuBtn');
     const menuOverlay = document.getElementById('menuOverlay');
     const menuClose = document.getElementById('menuClose');
-
-    function openMenu(){
-      menuOverlay.classList.add('show');
-      menuOverlay.setAttribute('aria-hidden', 'false');
-      document.body.style.overflow = 'hidden';
-    }
-
-    function closeMenu(){
-      menuOverlay.classList.remove('show');
-      menuOverlay.setAttribute('aria-hidden', 'true');
-      document.body.style.overflow = '';
-    }
-
+    function openMenu(){ updateMenuProfile(); menuOverlay.classList.add('show'); menuOverlay.setAttribute('aria-hidden', 'false'); document.body.style.overflow = 'hidden'; }
+    function closeMenu(){ menuOverlay.classList.remove('show'); menuOverlay.setAttribute('aria-hidden', 'true'); document.body.style.overflow = ''; }
     menuBtn.addEventListener('click', openMenu);
     menuClose.addEventListener('click', closeMenu);
+    menuOverlay.addEventListener('click', (e) => { if (e.target === menuOverlay) closeMenu(); });
+    menuProfileBlock.addEventListener('click', () => { closeMenu(); goTo(FILES.profile); });
+    menuSupportBtn.addEventListener('click', () => { closeMenu(); openSupport(); });
 
-    menuOverlay.addEventListener('click', (e) => {
-      if (e.target === menuOverlay) closeMenu();
-    });
-
+    // Поддержка
     const supportOverlay = document.getElementById('supportOverlay');
     const supportClose = document.getElementById('supportClose');
     const goTelegram = document.getElementById('goTelegram');
-
-    function openSupport(){
-      supportOverlay.classList.add('show');
-      supportOverlay.setAttribute('aria-hidden', 'false');
-      document.body.style.overflow = 'hidden';
-    }
-
-    function closeSupport(){
-      supportOverlay.classList.remove('show');
-      supportOverlay.setAttribute('aria-hidden', 'true');
-      document.body.style.overflow = '';
-    }
-
+    function openSupport(){ supportOverlay.classList.add('show'); supportOverlay.setAttribute('aria-hidden', 'false'); document.body.style.overflow = 'hidden'; }
+    function closeSupport(){ supportOverlay.classList.remove('show'); supportOverlay.setAttribute('aria-hidden', 'true'); document.body.style.overflow = ''; }
     supportClose.addEventListener('click', closeSupport);
+    supportOverlay.addEventListener('click', (e) => { if (e.target === supportOverlay) closeSupport(); });
+    goTelegram.addEventListener('click', () => openTelegramLinkSafe('https://t.me/vezusmanager'));
 
-    supportOverlay.addEventListener('click', (e) => {
-      if (e.target === supportOverlay) closeSupport();
-    });
-
-    goTelegram.addEventListener('click', () => {
-      openTelegramLinkSafe('https://t.me/vezusmanager');
-    });
-
+    // Канал (логотип)
     const brandLogoBtn = document.getElementById('brandLogoBtn');
     const channelOverlay = document.getElementById('channelOverlay');
     const channelClose = document.getElementById('channelClose');
     const goChannel = document.getElementById('goChannel');
-
-    function openChannel(){
-      channelOverlay.classList.add('show');
-      channelOverlay.setAttribute('aria-hidden', 'false');
-      document.body.style.overflow = 'hidden';
-    }
-
-    function closeChannel(){
-      channelOverlay.classList.remove('show');
-      channelOverlay.setAttribute('aria-hidden', 'true');
-      document.body.style.overflow = '';
-    }
-
+    function openChannel(){ channelOverlay.classList.add('show'); channelOverlay.setAttribute('aria-hidden', 'false'); document.body.style.overflow = 'hidden'; }
+    function closeChannel(){ channelOverlay.classList.remove('show'); channelOverlay.setAttribute('aria-hidden', 'true'); document.body.style.overflow = ''; }
     brandLogoBtn.addEventListener('click', openChannel);
     channelClose.addEventListener('click', closeChannel);
+    channelOverlay.addEventListener('click', (e) => { if (e.target === channelOverlay) closeChannel(); });
+    goChannel.addEventListener('click', () => openTelegramLinkSafe('https://t.me/vezuspubg'));
 
-    channelOverlay.addEventListener('click', (e) => {
-      if (e.target === channelOverlay) closeChannel();
-    });
-
-    goChannel.addEventListener('click', () => {
-      openTelegramLinkSafe('https://t.me/vezuspubg');
-    });
-
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape') {
-        closeSupport();
-        closeMenu();
-        closeChannel();
-      }
-    });
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') { closeSupport(); closeMenu(); closeChannel(); } });
 
     document.querySelectorAll('.menu-card').forEach(btn => {
       btn.addEventListener('click', () => {
         const action = btn.getAttribute('data-action');
-
-        if (action === 'support') {
-          closeMenu();
-          openSupport();
-          return;
-        }
-
-        // ✅ Заглушка на “Реферальная ссылка”
-        if (action === 'ref') {
-          closeMenu();
-          showToast('Реферальная ссылка — в разработке', 1800);
-          return;
-        }
-
+        if (action === 'partner') { closeMenu(); showToast('Партнёрская программа — в разработке', 1800); return; }
+        if (action === 'rules') { closeMenu(); showToast('Правила проекта — в разработке', 1800); return; }
         closeMenu();
-
         if (action === 'vouchers') return goTo(FILES.vouchers);
         if (action === 'history') return goTo(FILES.history);
       });
     });
 
-    window.addEventListener('load', () => {
+    // Функция инициализации, вызываемая после успешного входа
+    function initApp() {
       updateDotsByScroll();
       startAutoplay();
       autoAuthTelegram();
-    });
+      updateMenuProfile();
+    }
+
+    // Если пароль уже был введён ранее (при обновлении), инициализируем сразу
+    if (sessionStorage.getItem('authenticated') === 'true') {
+      initApp();
+    }
   </script>
 </body>
 </html>
