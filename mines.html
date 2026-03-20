@@ -70,61 +70,95 @@
 
     *::-webkit-scrollbar{ display:none; }
 
-    .preloader{
-      position:fixed;
-      inset:0;
-      z-index:9999;
-      display:flex;
-      flex-direction:column;
-      align-items:center;
-      justify-content:center;
-      gap:24px;
-      background:
-        radial-gradient(900px 420px at 50% 18%, rgba(255,255,255,.30), transparent 52%),
-        radial-gradient(700px 340px at 20% 80%, rgba(125,211,252,.28), transparent 56%),
-        radial-gradient(700px 340px at 80% 78%, rgba(56,189,248,.24), transparent 56%),
-        linear-gradient(180deg, #8fe9ff 0%, #4fcfff 40%, #1dafff 100%);
-      transition: opacity .45s ease, visibility .45s ease;
+    /* ----- НОВЫЙ СТАРТОВЫЙ ЛОАДЕР (как в слоте) ----- */
+    .preloader {
+      position: fixed; inset: 0; z-index: 9999;
+      display: flex; align-items: center; justify-content: center; padding: 24px;
+      background: radial-gradient(900px 520px at 20% 10%, rgba(196,181,253,0.16), transparent 56%),
+                  radial-gradient(760px 460px at 80% 20%, rgba(129,140,248,0.16), transparent 54%),
+                  linear-gradient(180deg, #4c1d95 0%, #2e1065 46%, #14072b 100%);
+      transition: opacity 0.35s ease, visibility 0.35s ease;
+    }
+    .preloader.hide {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+    .preloader-inner {
+      width: min(320px, 86vw);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 18px;
+    }
+    .preloader-logo-wrap {
+      width: min(170px, 56vw);
+      display: flex;
+      justify-content: center;
+      position: relative;
+      padding: 10px;
+    }
+    .preloader-logo-wrap::before {
+      content: "";
+      position: absolute;
+      left: 50%;
+      bottom: 6px;
+      width: 74%;
+      height: 18px;
+      transform: translateX(-50%);
+      border-radius: 999px;
+      background: radial-gradient(ellipse at center, rgba(0,0,0,0.42), rgba(0,0,0,0) 72%);
+      animation: loaderShadow 0.62s ease-in-out infinite;
+    }
+    .preloader-logo {
+      width: 100%;
+      height: auto;
+      display: block;
+      position: relative;
+      z-index: 2;
+      filter: drop-shadow(0 16px 26px rgba(0,0,0,0.30)) drop-shadow(0 0 22px rgba(167,139,250,0.18));
+      transform-origin: center bottom;
+      animation: logoBounce 0.62s ease-in-out infinite;
+      user-select: none;
+    }
+    .preloader-bar {
+      width: 100%;
+      height: 12px;
+      padding: 2px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.10);
+      border: 1px solid rgba(255,255,255,0.12);
+      overflow: hidden;
+    }
+    .preloader-fill {
+      width: 0%;
+      height: 100%;
+      border-radius: 999px;
+      background: linear-gradient(90deg, #c084fc, #8b5cf6, #60a5fa);
+      box-shadow: 0 0 14px rgba(192,132,252,0.34);
+      transition: width 0.18s ease;
+    }
+    .preloader-hint {
+      font-size: 12px;
+      font-weight: 900;
+      color: rgba(234,241,255,0.86);
+      text-shadow: 0 10px 18px rgba(0,0,0,0.35);
     }
 
-    .preloader.hide{
-      opacity:0;
-      visibility:hidden;
-      pointer-events:none;
+    @keyframes logoBounce {
+      0% { transform: translateY(0) scale(1); }
+      40% { transform: translateY(-10px) scale(1.02); }
+      55% { transform: translateY(0) scale(1); }
+      70% { transform: translateY(-4px) scale(1.01); }
+      100% { transform: translateY(0) scale(1); }
+    }
+    @keyframes loaderShadow {
+      0% { transform: translateX(-50%) scaleX(0.96); opacity: 0.88; }
+      40% { transform: translateX(-50%) scaleX(1.06); opacity: 0.78; }
+      100% { transform: translateX(-50%) scaleX(0.96); opacity: 0.88; }
     }
 
-    .pre-logo{
-      width:150px;
-      height:150px;
-      object-fit:contain;
-      display:block;
-      filter: drop-shadow(0 12px 30px rgba(0,0,0,.22));
-    }
-
-    .pre-bar{
-      width:min(260px, calc(100% - 60px));
-      height:8px;
-      border-radius:999px;
-      background: rgba(255,255,255,.22);
-      overflow:hidden;
-      border:1px solid rgba(255,255,255,.24);
-      box-shadow: inset 0 1px 0 rgba(255,255,255,.12);
-    }
-
-    .pre-bar-fill{
-      width:0%;
-      height:100%;
-      border-radius:999px;
-      background: linear-gradient(90deg, #ffffff, #dff7ff, #ffffff);
-      box-shadow: 0 0 14px rgba(255,255,255,.55);
-      animation: preloadFill 4s linear forwards;
-    }
-
-    @keyframes preloadFill{
-      from{ width:0%; }
-      to{ width:100%; }
-    }
-
+    /* ----- Остальные стили (без изменений) ----- */
     .app{
       position:relative;
       height:100%;
@@ -944,7 +978,6 @@
       .stat-box{ min-height:44px; }
       .stat-label{ font-size:8px; }
       .stat-value{ font-size:11px; }
-      .pre-logo{ width:124px; height:124px; }
     }
 
     @media (prefers-reduced-motion: reduce){
@@ -955,9 +988,14 @@
 </head>
 <body>
   <div class="preloader" id="preloader">
-    <img class="pre-logo" src="https://i.postimg.cc/Vk3mCytN/Picsart-26-03-03-13-03-22-886.png" alt="Loading">
-    <div class="pre-bar">
-      <div class="pre-bar-fill"></div>
+    <div class="preloader-inner">
+      <div class="preloader-logo-wrap">
+        <img class="preloader-logo" src="https://i.postimg.cc/qvL497mF/Picsart-26-02-27-02-02-37-502.png" alt="Vezus">
+      </div>
+      <div class="preloader-bar">
+        <div class="preloader-fill" id="preloaderFill"></div>
+      </div>
+      <div class="preloader-hint" id="preloaderHint">Загрузка…</div>
     </div>
   </div>
 
@@ -1011,7 +1049,7 @@
 
           <div class="stat-box">
             <div class="stat-label">Забрать</div>
-            <div class="stat-value" id="cashoutValue">0 VC</div>
+            <div class="stat-value" id="cashoutValue">0 ₽</div>
           </div>
         </div>
       </div>
@@ -1086,8 +1124,8 @@
       </div>
 
       <div class="popup-body">
-        <p class="rule-line">• Минимальная ставка: <b>10 VC</b></p>
-        <p class="rule-line">• Максимальная ставка: <b>5000 VC</b></p>
+        <p class="rule-line">• Минимальная ставка: <b>10 ₽</b></p>
+        <p class="rule-line">• Максимальная ставка: <b>5000 ₽</b></p>
         <p class="rule-line">• Выбери ставку и количество мин</p>
         <p class="rule-line">• Нажми <b>«Начать»</b></p>
         <p class="rule-line">• Открывай безопасные клетки</p>
@@ -1127,7 +1165,7 @@
     const MAX_BET = 5000;
     const TOTAL_CELLS = 25;
 
-    const SAFE_ICON_SRC = "https://i.postimg.cc/mDjzbZ5Y/Picsart-26-03-03-12-46-32-641.png";
+    const SAFE_ICON_SRC = "https://i.postimg.cc/x1zwzjQz/Picsart-26-03-20-23-13-12-604.png";
     const MINE_ICON_SRC = "https://i.postimg.cc/ncBsz1gH/Picsart-26-03-03-12-46-14-937.png";
 
     const RESET_DELAY_LOSE = 1650;
@@ -1154,37 +1192,83 @@
     let lastResetType = "win";
     let isBusyRequest = false;
 
-    function formatVc(value){
-      const n = Number(value ?? 0);
-      if (!Number.isFinite(n)) return "0 VC";
-      return Number.isInteger(n) ? `${n} VC` : `${n.toFixed(2)} VC`;
+    // --- Логика прелоадера (как в слоте) ---
+    let loaderProgress = 0;
+    let loaderInterval = null;
+
+    function setLoaderProgress(value) {
+      const fill = $("preloaderFill");
+      const hint = $("preloaderHint");
+      if (!fill) return;
+      loaderProgress = Math.min(100, Math.max(0, value));
+      fill.style.width = loaderProgress + '%';
+      if (hint) {
+        if (loaderProgress < 40) hint.textContent = "Загрузка…";
+        else if (loaderProgress < 70) hint.textContent = "Подготовка…";
+        else if (loaderProgress < 95) hint.textContent = "Почти готово…";
+        else hint.textContent = "Готово!";
+      }
     }
 
-    function goTo(file){
+    function startLoaderAnimation() {
+      setLoaderProgress(6);
+      if (loaderInterval) clearInterval(loaderInterval);
+      loaderInterval = setInterval(() => {
+        if (loaderProgress >= 90) {
+          clearInterval(loaderInterval);
+          loaderInterval = null;
+          return;
+        }
+        if (loaderProgress < 40) setLoaderProgress(loaderProgress + 5);
+        else if (loaderProgress < 65) setLoaderProgress(loaderProgress + 3);
+        else if (loaderProgress < 82) setLoaderProgress(loaderProgress + 2);
+        else setLoaderProgress(loaderProgress + 1);
+      }, 90);
+    }
+
+    function finishLoader() {
+      if (loaderInterval) {
+        clearInterval(loaderInterval);
+        loaderInterval = null;
+      }
+      setLoaderProgress(100);
+      setTimeout(() => {
+        const preloader = $("preloader");
+        if (preloader) preloader.classList.add("hide");
+      }, 220);
+    }
+
+    // --- Вспомогательные функции (VC → ₽) ---
+    function formatCurrency(value) {
+      const n = Number(value ?? 0);
+      if (!Number.isFinite(n)) return "0 ₽";
+      return Number.isInteger(n) ? `${n} ₽` : `${n.toFixed(2)} ₽`;
+    }
+
+    function goTo(file) {
       window.location.href = file;
     }
 
-    function delay(ms){
-      return new Promise((resolve) => setTimeout(resolve, ms));
+    function delay(ms) {
+      return new Promise(resolve => setTimeout(resolve, ms));
     }
 
-    function showNotice(text){
+    function showNotice(text) {
       const box = $("bottomNotice");
       $("noticeText").textContent = text;
       $("noticeIcon").textContent = "ℹ";
       box.classList.add("show");
-
       if (noticeTimer) clearTimeout(noticeTimer);
       noticeTimer = setTimeout(() => {
         box.classList.remove("show");
       }, 1700);
     }
 
-    function setBoardFading(state){
+    function setBoardFading(state) {
       $("boardWrap").classList.toggle("is-fading", !!state);
     }
 
-    function openTelegramLinkSafe(url){
+    function openTelegramLinkSafe(url) {
       if (window.Telegram && window.Telegram.WebApp && typeof window.Telegram.WebApp.openTelegramLink === "function") {
         window.Telegram.WebApp.openTelegramLink(url);
         return;
@@ -1192,22 +1276,21 @@
       window.open(url, "_blank", "noopener");
     }
 
-    function readProfile(){
-      try{
+    function readProfile() {
+      try {
         return JSON.parse(localStorage.getItem("tg_profile") || "null");
       } catch {
         return null;
       }
     }
 
-    function getCurrentUserId(){
+    function getCurrentUserId() {
       const profile = readProfile();
       return profile?.id || profile?.user_id || null;
     }
 
-    async function api(action, payload = {}){
+    async function api(action, payload = {}) {
       const userId = getCurrentUserId();
-
       if (!userId) {
         throw new Error("Сначала войди в аккаунт");
       }
@@ -1225,15 +1308,13 @@
       });
 
       const data = await res.json().catch(() => ({}));
-
       if (!res.ok || !data.ok) {
         throw new Error(data.message || "Ошибка сервера");
       }
-
       return data;
     }
 
-    function createDisplayRound(base = {}){
+    function createDisplayRound(base = {}) {
       return {
         active: !!base.active,
         crashed: !!base.crashed,
@@ -1245,12 +1326,11 @@
       };
     }
 
-    function setRoundFromServer(round){
+    function setRoundFromServer(round) {
       if (!round) {
         roundState = null;
         return;
       }
-
       roundState = createDisplayRound({
         active: !!round.active,
         crashed: false,
@@ -1262,81 +1342,70 @@
       });
     }
 
-    function updateBalanceUI(){
-      $("balanceValue").textContent = formatVc(currentBalance);
+    function updateBalanceUI() {
+      $("balanceValue").textContent = formatCurrency(currentBalance);
     }
 
-    function calcMultiplier(safePicks, minesCount){
+    function calcMultiplier(safePicks, minesCount) {
       const safeCells = TOTAL_CELLS - minesCount;
       if (safePicks <= 0) return 1;
-
       let mult = 1;
-
       for (let i = 0; i < safePicks; i++) {
         mult *= (TOTAL_CELLS - i) / (safeCells - i);
       }
-
       mult *= 0.56;
       return Math.max(1, Number(mult.toFixed(2)));
     }
 
-    function getCurrentMultiplier(){
+    function getCurrentMultiplier() {
       const safePicks = roundState?.safePicks || 0;
       const minesCount = roundState?.minesCount || selectedMines;
       return calcMultiplier(safePicks, minesCount);
     }
 
-    function getCurrentCashout(){
+    function getCurrentCashout() {
       if (!roundState) return 0;
       const multiplier = getCurrentMultiplier();
       return Number((roundState.bet * multiplier).toFixed(2));
     }
 
-    function updateMineButtons(){
+    function updateMineButtons() {
       const activeMines = roundState?.minesCount || selectedMines;
-
       document.querySelectorAll(".mine-count-btn").forEach((btn) => {
         const mines = Number(btn.getAttribute("data-mines"));
         btn.classList.toggle("active", mines === activeMines);
         btn.disabled = !!roundState?.active || isResetting || isBusyRequest;
       });
-
       $("minesCountView").textContent = String(activeMines);
     }
 
-    function updateStats(){
+    function updateStats() {
       const multiplier = getCurrentMultiplier();
       $("multiplierValue").textContent = `x${multiplier.toFixed(2)}`;
-
       if (roundState?.active && roundState.safePicks > 0) {
-        $("cashoutValue").textContent = formatVc(getCurrentCashout());
+        $("cashoutValue").textContent = formatCurrency(getCurrentCashout());
       } else {
-        $("cashoutValue").textContent = "0 VC";
+        $("cashoutValue").textContent = "0 ₽";
       }
     }
 
-    function setQuickVisible(show){
+    function setQuickVisible(show) {
       if ($("betToggleBtn").disabled && show) return;
       quickVisible = !!show;
       $("quickBets").classList.toggle("show", quickVisible);
     }
 
-    function updateControlsState(){
+    function updateControlsState() {
       const blocked = !!roundState?.active || isResetting || isBusyRequest;
-
       $("betInput").disabled = blocked;
       $("betToggleBtn").disabled = blocked;
-
       document.querySelectorAll(".quick-btn").forEach((btn) => {
         btn.disabled = blocked;
       });
-
-      if (blocked) {
-        setQuickVisible(false);
-      }
+      if (blocked) setQuickVisible(false);
     }
 
-    function updateButtons(){
+    function updateButtons() {
       const bet = getBetAmount();
       const roundActive = !!roundState?.active;
       const canStart = !roundActive && !isResetting && !isBusyRequest && bet >= MIN_BET && bet <= Math.min(currentBalance, MAX_BET);
@@ -1346,20 +1415,20 @@
       $("cashBtn").disabled = !canCash;
 
       $("startBtn").textContent = roundActive ? "Игра идёт" : "Начать";
-      $("cashBtn").textContent = canCash ? `Забрать ${formatVc(getCurrentCashout())}` : "Забрать";
+      $("cashBtn").textContent = canCash ? `Забрать ${formatCurrency(getCurrentCashout())}` : "Забрать";
 
       updateControlsState();
       updateMineButtons();
     }
 
-    function getBetAmount(){
+    function getBetAmount() {
       const raw = $("betInput").value;
       const amount = Number(raw);
       if (!raw || !Number.isFinite(amount)) return 0;
       return Math.floor(amount);
     }
 
-    function createImage(src, className){
+    function createImage(src, className) {
       const img = document.createElement("img");
       img.src = src;
       img.alt = "";
@@ -1368,10 +1437,9 @@
       return img;
     }
 
-    function renderBoard(){
+    function renderBoard() {
       const board = $("board");
       board.innerHTML = "";
-
       const animatedIndex = lastRevealIndex;
       const animatedType = lastRevealType;
 
@@ -1416,26 +1484,21 @@
       lastRevealType = "";
     }
 
-    function clearVisualRound(){
+    function clearVisualRound() {
       roundState = null;
       lastRevealIndex = -1;
       lastRevealType = "";
     }
 
-    function finishReset(){
+    function finishReset() {
       if (resetTimer) {
         clearTimeout(resetTimer);
         resetTimer = null;
       }
-
       clearVisualRound();
       updateStats();
       renderBoard();
-
-      const releaseDelay = lastResetType === "lose"
-        ? FADE_RELEASE_DELAY_LOSE
-        : FADE_RELEASE_DELAY_WIN;
-
+      const releaseDelay = lastResetType === "lose" ? FADE_RELEASE_DELAY_LOSE : FADE_RELEASE_DELAY_WIN;
       if (fadeTimer) clearTimeout(fadeTimer);
       fadeTimer = setTimeout(() => {
         isResetting = false;
@@ -1444,34 +1507,29 @@
       }, releaseDelay);
     }
 
-    function scheduleReset(delay, type){
+    function scheduleReset(delay, type) {
       lastResetType = type;
       isResetting = true;
       setBoardFading(true);
       updateButtons();
-
       if (resetTimer) clearTimeout(resetTimer);
       resetTimer = setTimeout(() => {
         finishReset();
       }, delay);
     }
 
-    async function loadStateFromServer(){
-      try{
+    async function loadStateFromServer() {
+      try {
         isBusyRequest = true;
         updateButtons();
 
         const data = await api("get_state");
-
         currentBalance = Number(data.balance || 0);
         updateBalanceUI();
-
         setRoundFromServer(data.round);
-
         if (data.round?.minesCount) {
           selectedMines = Number(data.round.minesCount) || 3;
         }
-
         updateStats();
         updateButtons();
         renderBoard();
@@ -1486,44 +1544,40 @@
         isBusyRequest = false;
         updateButtons();
         renderBoard();
+        // после загрузки данных скрываем прелоадер
+        finishLoader();
       }
     }
 
-    async function startGame(){
+    async function startGame() {
       if (roundState?.active || isResetting || isBusyRequest) {
         showNotice("Подожди завершения раунда");
         return;
       }
-
       const bet = getBetAmount();
-
       if (bet < MIN_BET) {
-        showNotice(`Минимальная ставка ${MIN_BET} VC`);
+        showNotice(`Минимальная ставка ${MIN_BET} ₽`);
         updateButtons();
         return;
       }
-
       if (bet > MAX_BET) {
-        showNotice(`Максимальная ставка ${MAX_BET} VC`);
+        showNotice(`Максимальная ставка ${MAX_BET} ₽`);
         updateButtons();
         return;
       }
-
       if (bet > currentBalance) {
         showNotice("Недостаточно средств");
         updateButtons();
         return;
       }
 
-      try{
+      try {
         isBusyRequest = true;
         updateButtons();
-
         if (fadeTimer) {
           clearTimeout(fadeTimer);
           fadeTimer = null;
         }
-
         clearVisualRound();
         setBoardFading(false);
 
@@ -1534,9 +1588,7 @@
 
         currentBalance = Number(data.balance || 0);
         updateBalanceUI();
-
         setRoundFromServer(data.round);
-
         updateStats();
         updateButtons();
         renderBoard();
@@ -1549,17 +1601,15 @@
       }
     }
 
-    async function finishWithMine(index){
-      try{
+    async function finishWithMine(index) {
+      try {
         isBusyRequest = true;
         updateButtons();
-
         const safeOpened = Array.isArray(roundState?.opened) ? [...roundState.opened] : [];
         const minesCount = Number(roundState?.minesCount || selectedMines);
         const safePicks = Number(roundState?.safePicks || 0);
 
         const data = await api("reveal_cell", { cell_index: index });
-
         currentBalance = Number(data.balance || currentBalance);
         updateBalanceUI();
 
@@ -1579,7 +1629,6 @@
         renderBoard();
         updateStats();
         updateButtons();
-
         scheduleReset(RESET_DELAY_LOSE, "lose");
       } catch (err) {
         showNotice(err.message || "Ошибка");
@@ -1591,24 +1640,21 @@
       }
     }
 
-    async function cashOut(){
+    async function cashOut() {
       if (!roundState?.active || isResetting || isBusyRequest) return;
-
       if ((roundState.safePicks || 0) <= 0) {
         showNotice("Сначала открой безопасную клетку");
         return;
       }
 
-      try{
+      try {
         isBusyRequest = true;
         updateButtons();
-
         const prevOpened = [...(roundState.opened || [])];
         const prevMinesCount = Number(roundState.minesCount);
         const prevSafePicks = Number(roundState.safePicks);
 
         const data = await api("cashout");
-
         currentBalance = Number(data.balance || currentBalance);
         updateBalanceUI();
 
@@ -1625,7 +1671,6 @@
         renderBoard();
         updateStats();
         updateButtons();
-
         scheduleReset(RESET_DELAY_WIN, "win");
       } catch (err) {
         showNotice(err.message || "Ошибка");
@@ -1637,11 +1682,11 @@
       }
     }
 
-    async function openCell(index){
+    async function openCell(index) {
       if (!roundState?.active || isResetting || isBusyRequest) return;
       if (roundState.opened.includes(index)) return;
 
-      try{
+      try {
         isBusyRequest = true;
         updateButtons();
 
@@ -1650,10 +1695,8 @@
         if (data.result === "mine") {
           currentBalance = Number(data.balance || currentBalance);
           updateBalanceUI();
-
           lastRevealIndex = Number(data.revealIndex);
           lastRevealType = "mine";
-
           roundState = createDisplayRound({
             active: false,
             crashed: true,
@@ -1663,11 +1706,9 @@
             safePicks: Number(data.safePicks || 0),
             mineIndexes: Array.isArray(data.revealMines) ? data.revealMines : []
           });
-
           renderBoard();
           updateStats();
           updateButtons();
-
           scheduleReset(RESET_DELAY_LOSE, "lose");
           return;
         }
@@ -1675,10 +1716,8 @@
         if (data.result === "auto_cashout") {
           currentBalance = Number(data.balance || currentBalance);
           updateBalanceUI();
-
           lastRevealIndex = Number(data.revealIndex);
           lastRevealType = "safe";
-
           roundState = createDisplayRound({
             active: false,
             crashed: false,
@@ -1688,11 +1727,9 @@
             safePicks: Number(data.safePicks || 0),
             mineIndexes: []
           });
-
           renderBoard();
           updateStats();
           updateButtons();
-
           scheduleReset(RESET_DELAY_WIN, "win");
           return;
         }
@@ -1700,12 +1737,9 @@
         if (data.result === "safe") {
           currentBalance = Number(data.balance || currentBalance);
           updateBalanceUI();
-
           lastRevealIndex = Number(data.revealIndex);
           lastRevealType = "safe";
-
           setRoundFromServer(data.round);
-
           updateStats();
           updateButtons();
           renderBoard();
@@ -1720,14 +1754,14 @@
       }
     }
 
-    function openOverlay(id){
+    function openOverlay(id) {
       const el = $(id);
       el.classList.add("show");
       el.setAttribute("aria-hidden", "false");
       document.body.style.overflow = "hidden";
     }
 
-    function closeOverlay(id){
+    function closeOverlay(id) {
       const el = $(id);
       el.classList.remove("show");
       el.setAttribute("aria-hidden", "true");
@@ -1772,10 +1806,8 @@
     document.querySelectorAll(".mine-count-btn").forEach((btn) => {
       btn.addEventListener("click", () => {
         if (roundState?.active || isResetting || isBusyRequest) return;
-
         const value = Number(btn.getAttribute("data-mines"));
         if (![3,5,7,10].includes(value)) return;
-
         selectedMines = value;
         updateStats();
         updateButtons();
@@ -1786,23 +1818,18 @@
     $("betInput").addEventListener("input", () => {
       const input = $("betInput");
       let value = Number(input.value);
-
       if (!input.value) {
         updateButtons();
         return;
       }
-
       if (!Number.isFinite(value)) {
         input.value = "";
         updateButtons();
         return;
       }
-
       value = Math.floor(value);
-
       if (value > MAX_BET) value = MAX_BET;
       if (value < 0) value = 0;
-
       input.value = String(value);
       updateButtons();
     });
@@ -1817,17 +1844,13 @@
       }
     });
 
-    async function init(){
+    async function init() {
+      startLoaderAnimation();   // запускаем анимацию прогресса
       updateStats();
       updateButtons();
       renderBoard();
-
-      await Promise.allSettled([
-        loadStateFromServer(),
-        delay(4000)
-      ]);
-
-      $("preloader").classList.add("hide");
+      // загружаем данные и скроем прелоадер после их получения
+      await loadStateFromServer();
     }
 
     window.addEventListener("load", init);
