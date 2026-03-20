@@ -296,7 +296,7 @@
       transform: translateY(-.5px);
     }
 
-    /* ----- Бонусные кнопки ----- */
+    /* ----- Бонусные кнопки (более стеклянные) ----- */
     .bonus-buttons {
       width: 100%;
       max-width: 520px;
@@ -310,9 +310,10 @@
       height: 52px;
       border: none;
       border-radius: 14px;
-      background: linear-gradient(145deg, rgba(42,171,238,0.25), rgba(34,158,217,0.15));
-      backdrop-filter: blur(8px);
-      border: 1px solid rgba(42,171,238,0.5);
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
       color: white;
       font-weight: 800;
       font-size: 15px;
@@ -322,12 +323,12 @@
       align-items: center;
       justify-content: center;
       gap: 8px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.1);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
     }
 
     .bonus-btn:active {
       transform: scale(0.97);
-      background: linear-gradient(145deg, rgba(42,171,238,0.35), rgba(34,158,217,0.25));
+      background: rgba(255, 255, 255, 0.12);
       box-shadow: 0 2px 6px rgba(0,0,0,0.3);
     }
 
@@ -335,9 +336,9 @@
       width: 22px;
       height: 22px;
       fill: none;
-      stroke: #2AABEE;
+      stroke: rgba(255,255,255,0.9);
       stroke-width: 2;
-      filter: drop-shadow(0 0 4px rgba(42,171,238,0.5));
+      filter: drop-shadow(0 0 4px rgba(255,255,255,0.3));
     }
 
     /* ----- Games и Slots блоки (без текста) ----- */
@@ -1094,7 +1095,7 @@
         </div>
       </div>
 
-      <!-- Две бонусные кнопки -->
+      <!-- Две бонусные кнопки (новый стеклянный дизайн) -->
       <div class="bonus-buttons">
         <button class="bonus-btn" id="wheelBtn">
           <svg viewBox="0 0 24 24">
@@ -1339,7 +1340,8 @@
       history: 'history.html',
       rules: 'rules.html',
       partner: 'partner.html',
-      bonus: 'bonus.html'
+      bonus: 'bonus.html',
+      fortune: 'fortune.html'
     };
 
     // ---------- Защита паролем ----------
@@ -1417,10 +1419,12 @@
       return Math.max(min, Math.min(max, n));
     }
 
-    function formatVc(value) {
+    // Форматирование баланса в рублях
+    function formatBalance(value) {
       const num = Number(value ?? 0);
-      if (!Number.isFinite(num)) return '0 VC';
-      return Number.isInteger(num) ? `${num} VC` : `${num.toFixed(2)} VC`;
+      if (!Number.isFinite(num)) return '0 ₽';
+      const formatted = Number.isInteger(num) ? num : num.toFixed(2);
+      return `${formatted} ₽`;
     }
 
     function loadCachedProfile() {
@@ -1434,7 +1438,7 @@
     function applyProfile(profile) {
       if (!profile) return;
       localStorage.setItem('tg_profile', JSON.stringify(profile));
-      balanceValueEl.textContent = formatVc(profile.balance);
+      balanceValueEl.textContent = formatBalance(profile.balance);
     }
 
     function getStartParam() {
@@ -1465,7 +1469,7 @@
     async function autoAuthTelegram() {
       const cached = loadCachedProfile();
       if (cached) applyProfile(cached);
-      else balanceValueEl.textContent = '0 VC';
+      else balanceValueEl.textContent = '0 ₽';
 
       if (!window.Telegram || !window.Telegram.WebApp) return;
 
@@ -1490,7 +1494,7 @@
         const json = await res.json().catch(() => ({}));
         if (!res.ok || !json.ok || !json.profile) {
           if (cached) applyProfile(cached);
-          else balanceValueEl.textContent = '0 VC';
+          else balanceValueEl.textContent = '0 ₽';
           return;
         }
         applyProfile(json.profile);
@@ -1498,7 +1502,7 @@
         if (refCode) clearStartParamsFromUrl();
       } catch {
         if (cached) applyProfile(cached);
-        else balanceValueEl.textContent = '0 VC';
+        else balanceValueEl.textContent = '0 ₽';
       }
     }
 
@@ -1551,8 +1555,15 @@
       card.addEventListener('click', () => showToast('В разработке', 1500));
     });
 
-    if (wheelBtn) wheelBtn.addEventListener('click', () => showToast('Колесо фортуны — скоро', 1500));
-    if (bonusBtn) bonusBtn.addEventListener('click', () => showToast('Бонусы — скоро', 1500));
+    // Переходы на страницы колеса и бонусов
+    if (wheelBtn) wheelBtn.addEventListener('click', () => {
+      if (FILES.fortune) goTo(FILES.fortune);
+      else showToast('Колесо фортуны — скоро', 1500);
+    });
+    if (bonusBtn) bonusBtn.addEventListener('click', () => {
+      if (FILES.bonus) goTo(FILES.bonus);
+      else showToast('Бонусы — скоро', 1500);
+    });
 
     // Слайдер
     const slides = document.getElementById('slides');
