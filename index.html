@@ -274,6 +274,34 @@
       pointer-events:none;
     }
 
+    /* Кнопка на баннере — квадратная, слева, уменьшенная */
+    .slide-btn {
+      position: absolute;
+      bottom: 16px;
+      left: 16px;
+      z-index: 2;
+      background: rgba(255, 255, 255, 0.12);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255,255,255,0.25);
+      border-radius: 12px;
+      padding: 6px 14px;
+      font-size: 12px;
+      font-weight: 800;
+      color: white;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .slide-btn:active {
+      transform: scale(0.96);
+      background: rgba(255, 255, 255, 0.2);
+    }
+
     .dots{
       display:flex;
       justify-content:center;
@@ -294,67 +322,6 @@
       background: rgba(255,255,255,.92);
       width:18px;
       transform: translateY(-.5px);
-    }
-
-    /* ----- Бонусные кнопки (новый стиль) ----- */
-    .bonus-buttons {
-      width: 100%;
-      max-width: 520px;
-      display: flex;
-      gap: 12px;
-      justify-content: space-between;
-    }
-
-    .bonus-btn {
-      flex: 1;
-      height: 54px;
-      border: none;
-      border-radius: 16px;
-      background: linear-gradient(135deg, rgba(42,171,238,0.25), rgba(34,158,217,0.15));
-      backdrop-filter: blur(8px);
-      border: 1px solid rgba(42,171,238,0.5);
-      color: white;
-      font-weight: 800;
-      font-size: 15px;
-      cursor: pointer;
-      transition: all 0.25s ease;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      position: relative;
-      overflow: hidden;
-      box-shadow: 0 8px 20px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.1);
-    }
-
-    .bonus-btn::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: -100%;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-      transition: left 0.5s ease;
-    }
-
-    .bonus-btn:active::before {
-      left: 100%;
-    }
-
-    .bonus-btn:active {
-      transform: scale(0.97);
-      background: linear-gradient(135deg, rgba(42,171,238,0.35), rgba(34,158,217,0.25));
-      box-shadow: 0 4px 12px rgba(0,0,0,0.4);
-    }
-
-    .bonus-btn svg {
-      width: 22px;
-      height: 22px;
-      fill: none;
-      stroke: white;
-      stroke-width: 1.8;
-      filter: drop-shadow(0 0 4px rgba(255,255,255,0.5));
     }
 
     /* ----- Games и Slots блоки (без текста) ----- */
@@ -1021,9 +988,11 @@
       .menu-card-title {
         font-size: 13px;
       }
-      .bonus-btn {
-        height: 46px;
-        font-size: 13px;
+      .slide-btn {
+        padding: 5px 12px;
+        font-size: 10px;
+        left: 12px;
+        bottom: 12px;
       }
     }
 
@@ -1074,7 +1043,7 @@
         </button>
       </div>
 
-      <!-- Слайдер -->
+      <!-- Слайдер с кнопками на баннерах (квадратные, слева, уменьшенные) -->
       <div class="slider" aria-label="Баннеры">
         <div class="slides" id="slides">
           <div class="slide">
@@ -1085,6 +1054,7 @@
               fetchpriority="high"
               decoding="async"
             >
+            <button class="slide-btn" data-banner="fortune">Колесо фортуны</button>
           </div>
           <div class="slide">
             <img
@@ -1093,6 +1063,7 @@
               loading="lazy"
               decoding="async"
             >
+            <button class="slide-btn" data-banner="bonus">Бонусы</button>
           </div>
           <div class="slide">
             <img
@@ -1101,6 +1072,7 @@
               loading="lazy"
               decoding="async"
             >
+            <button class="slide-btn" data-banner="wallet">Пополнить</button>
           </div>
         </div>
 
@@ -1111,24 +1083,6 @@
         </div>
       </div>
 
-      <!-- Две бонусные кнопки (обновленный дизайн) -->
-      <div class="bonus-buttons">
-        <button class="bonus-btn" id="wheelBtn">
-          <svg viewBox="0 0 24 24">
-            <circle cx="12" cy="12" r="10" stroke="currentColor" fill="none"/>
-            <path d="M12 2 L12 6 M12 18 L12 22 M2 12 L6 12 M18 12 L22 12" stroke="currentColor" stroke-width="1.5"/>
-            <circle cx="12" cy="12" r="2" fill="currentColor"/>
-          </svg>
-          Колесо фортуны
-        </button>
-        <button class="bonus-btn" id="bonusBtn">
-          <svg viewBox="0 0 24 24">
-            <path d="M12 2 L15 8 L22 9 L17 14 L18 21 L12 17.5 L6 21 L7 14 L2 9 L9 8 L12 2Z" stroke="currentColor" fill="none" stroke-width="1.8"/>
-          </svg>
-          Бонусы
-        </button>
-      </div>
-
       <!-- Блок Games (без текста) -->
       <div class="games-section">
         <div class="games-header">
@@ -1137,7 +1091,7 @@
         <div class="games-scroll" id="gamesScroll">
           <div class="game-card" data-game="game1" data-target="coinflip">
             <div class="game-card-inner">
-              <img src="https://i.postimg.cc/5yyLd1Z6/Picsart-26-03-20-17-52-44-749.jpg" alt="Game 1" loading="lazy">
+              <img src="https://i.postimg.cc/8khGybLS/d9e9d314-fd90-4cad-ad74-b2ed14a51f38.png" alt="Game 1" loading="lazy">
             </div>
           </div>
           <div class="game-card" data-game="game2" data-target="mines">
@@ -1147,7 +1101,7 @@
           </div>
           <div class="game-card" data-game="game3" data-target="cups">
             <div class="game-card-inner">
-              <img src="https://i.postimg.cc/htbp88R7/Picsart-26-03-20-17-52-59-502.jpg" alt="Game 3" loading="lazy">
+              <img src="https://i.postimg.cc/TY9sZp02/46F82521-51BE-4FB1-B831-B19958E9872E.png" alt="Game 3" loading="lazy">
             </div>
           </div>
           <div class="game-card" data-game="game4">
@@ -1415,9 +1369,6 @@
     const menuProfileBlock = document.getElementById('menuProfileBlock');
     const menuSupportBtn = document.getElementById('menuSupportBtn');
 
-    const wheelBtn = document.getElementById('wheelBtn');
-    const bonusBtn = document.getElementById('bonusBtn');
-
     const toastEl = document.getElementById('toast');
     const toastTextEl = document.getElementById('toastText');
     let toastTimer = null;
@@ -1586,14 +1537,22 @@
       card.addEventListener('click', () => showToast('В разработке', 1500));
     });
 
-    // Переходы на страницы колеса и бонусов
-    if (wheelBtn) wheelBtn.addEventListener('click', () => {
-      if (FILES.fortune) goTo(FILES.fortune);
-      else showToast('Колесо фортуны — скоро', 1500);
-    });
-    if (bonusBtn) bonusBtn.addEventListener('click', () => {
-      if (FILES.bonus) goTo(FILES.bonus);
-      else showToast('Бонусы — скоро', 1500);
+    // Обработчики для кнопок на баннерах
+    const slideBtns = document.querySelectorAll('.slide-btn');
+    slideBtns.forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const bannerType = btn.getAttribute('data-banner');
+        if (bannerType === 'fortune') {
+          if (FILES.fortune) goTo(FILES.fortune);
+          else showToast('Колесо фортуны — скоро', 1500);
+        } else if (bannerType === 'bonus') {
+          if (FILES.bonus) goTo(FILES.bonus);
+          else showToast('Бонусы — скоро', 1500);
+        } else if (bannerType === 'wallet') {
+          goTo(FILES.wallet);
+        }
+      });
     });
 
     // Слайдер
