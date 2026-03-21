@@ -69,6 +69,95 @@
 
     *::-webkit-scrollbar{ display:none; }
 
+    /* ========= НОВЫЙ СТАРТОВЫЙ ЛОАДЕР (как в слоте) ========= */
+    .preloader {
+      position: fixed; inset: 0; z-index: 9999;
+      display: flex; align-items: center; justify-content: center; padding: 24px;
+      background: radial-gradient(900px 520px at 20% 10%, rgba(196,181,253,0.16), transparent 56%),
+                  radial-gradient(760px 460px at 80% 20%, rgba(129,140,248,0.16), transparent 54%),
+                  linear-gradient(180deg, #4c1d95 0%, #2e1065 46%, #14072b 100%);
+      transition: opacity 0.35s ease, visibility 0.35s ease;
+    }
+    .preloader.hide {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+    .preloader-inner {
+      width: min(320px, 86vw);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 18px;
+    }
+    .preloader-logo-wrap {
+      width: min(170px, 56vw);
+      display: flex;
+      justify-content: center;
+      position: relative;
+      padding: 10px;
+    }
+    .preloader-logo-wrap::before {
+      content: "";
+      position: absolute;
+      left: 50%;
+      bottom: 6px;
+      width: 74%;
+      height: 18px;
+      transform: translateX(-50%);
+      border-radius: 999px;
+      background: radial-gradient(ellipse at center, rgba(0,0,0,0.42), rgba(0,0,0,0) 72%);
+      animation: loaderShadow 0.62s ease-in-out infinite;
+    }
+    .preloader-logo {
+      width: 100%;
+      height: auto;
+      display: block;
+      position: relative;
+      z-index: 2;
+      filter: drop-shadow(0 16px 26px rgba(0,0,0,0.30)) drop-shadow(0 0 22px rgba(167,139,250,0.18));
+      transform-origin: center bottom;
+      animation: logoBounce 0.62s ease-in-out infinite;
+      user-select: none;
+    }
+    .preloader-bar {
+      width: 100%;
+      height: 12px;
+      padding: 2px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.10);
+      border: 1px solid rgba(255,255,255,0.12);
+      overflow: hidden;
+    }
+    .preloader-fill {
+      width: 0%;
+      height: 100%;
+      border-radius: 999px;
+      background: linear-gradient(90deg, #c084fc, #8b5cf6, #60a5fa);
+      box-shadow: 0 0 14px rgba(192,132,252,0.34);
+      transition: width 0.18s ease;
+    }
+    .preloader-hint {
+      font-size: 12px;
+      font-weight: 900;
+      color: rgba(234,241,255,0.86);
+      text-shadow: 0 10px 18px rgba(0,0,0,0.35);
+    }
+
+    @keyframes logoBounce {
+      0% { transform: translateY(0) scale(1); }
+      40% { transform: translateY(-10px) scale(1.02); }
+      55% { transform: translateY(0) scale(1); }
+      70% { transform: translateY(-4px) scale(1.01); }
+      100% { transform: translateY(0) scale(1); }
+    }
+    @keyframes loaderShadow {
+      0% { transform: translateX(-50%) scaleX(0.96); opacity: 0.88; }
+      40% { transform: translateX(-50%) scaleX(1.06); opacity: 0.78; }
+      100% { transform: translateX(-50%) scaleX(0.96); opacity: 0.88; }
+    }
+
+    /* ========= ОСНОВНЫЕ СТИЛИ (улучшенные) ========= */
     .app{
       position:relative;
       height:100%;
@@ -812,86 +901,6 @@
       filter: drop-shadow(0 8px 14px rgba(0,0,0,.18));
     }
 
-    .preloader{
-      position:fixed;
-      inset:0;
-      z-index:999;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      padding:24px;
-      background:
-        radial-gradient(1200px 700px at 50% -10%, rgba(255,255,255,.05), transparent 45%),
-        linear-gradient(180deg, #04070d 0%, #0b1020 45%, #121826 100%);
-      transition: opacity .32s ease, visibility .32s ease;
-    }
-
-    .preloader.hide{
-      opacity:0;
-      visibility:hidden;
-      pointer-events:none;
-    }
-
-    .preloader-inner{
-      width:min(320px, 100%);
-      display:flex;
-      flex-direction:column;
-      align-items:center;
-      gap:18px;
-    }
-
-    .pre-logo{
-      width:92px;
-      height:92px;
-      object-fit:contain;
-      display:block;
-      filter: drop-shadow(0 12px 26px rgba(0,0,0,.34));
-    }
-
-    .pre-track{
-      position:relative;
-      width:100%;
-      height:10px;
-      border-radius:999px;
-      overflow:hidden;
-      background: rgba(255,255,255,.08);
-      border:1px solid rgba(255,255,255,.08);
-      box-shadow:
-        inset 0 1px 0 rgba(255,255,255,.04),
-        0 8px 22px rgba(0,0,0,.22);
-    }
-
-    .pre-bar{
-      width:0%;
-      height:100%;
-      border-radius:999px;
-      background:
-        linear-gradient(90deg, rgba(255,255,255,.78), rgba(42,171,238,.95));
-      box-shadow:
-        0 0 16px rgba(42,171,238,.18),
-        inset 0 1px 0 rgba(255,255,255,.25);
-      transition: width 1.5s linear;
-      position:relative;
-    }
-
-    .pre-bar::after{
-      content:"";
-      position:absolute;
-      top:0;
-      right:0;
-      width:46px;
-      height:100%;
-      background: linear-gradient(90deg, transparent, rgba(255,255,255,.42));
-      filter: blur(3px);
-    }
-
-    .pre-text{
-      font-size:12px;
-      font-weight:800;
-      letter-spacing:.3px;
-      color: rgba(234,241,255,.72);
-    }
-
     @media (max-width: 360px){
       .top-row{ grid-template-columns:36px minmax(0,1fr) 36px 46px; gap:6px; }
 
@@ -934,8 +943,6 @@
       .claim-btn{ height:50px; font-size:14px; }
 
       .tg-btn{ height:48px; border-radius:15px; }
-
-      .pre-logo{ width:78px; height:78px; }
     }
 
     @media (prefers-reduced-motion: reduce){
@@ -947,11 +954,13 @@
 <body>
   <div class="preloader" id="preloader">
     <div class="preloader-inner">
-      <img class="pre-logo" src="https://i.postimg.cc/qvL497mF/Picsart-26-02-27-02-02-37-502.png" alt="Vezus">
-      <div class="pre-track" aria-hidden="true">
-        <div class="pre-bar" id="preBar"></div>
+      <div class="preloader-logo-wrap">
+        <img class="preloader-logo" src="https://i.postimg.cc/qvL497mF/Picsart-26-02-27-02-02-37-502.png" alt="Vezus">
       </div>
-      <div class="pre-text">Загрузка...</div>
+      <div class="preloader-bar">
+        <div class="preloader-fill" id="preloaderFill"></div>
+      </div>
+      <div class="preloader-hint" id="preloaderHint">Загрузка…</div>
     </div>
   </div>
 
@@ -1092,7 +1101,7 @@
       </div>
 
       <div class="popup-body">
-        <p class="rule-line">• Минимальная ставка: <b>10 VC</b></p>
+        <p class="rule-line">• Минимальная ставка: <b>10 ₽</b></p>
         <p class="rule-line">• Нажми <b>«Играть»</b></p>
         <p class="rule-line">• Выбери сторону монеты</p>
         <p class="rule-line">• При победе появится кнопка <b>«Забрать»</b></p>
@@ -1134,7 +1143,6 @@
 
     const FLIP_TOTAL_MS = 1500;
     const RESULT_DELAY_MS = 1640;
-    const PRELOADER_HIDE_MS = 1600;
 
     const FILES = {
       games: "games.html"
@@ -1154,10 +1162,10 @@
 
     let audioCtx = null;
 
-    function formatVc(value){
+    function formatCurrency(value){
       const n = Number(value ?? 0);
-      if (!Number.isFinite(n)) return "0 VC";
-      return Number.isInteger(n) ? `${n} VC` : `${n.toFixed(2)} VC`;
+      if (!Number.isFinite(n)) return "0 ₽";
+      return Number.isInteger(n) ? `${n} ₽` : `${n.toFixed(2)} ₽`;
     }
 
     function goTo(file){
@@ -1200,7 +1208,7 @@
     }
 
     function updateBalanceUI(){
-      $("balanceValue").textContent = formatVc(currentBalance);
+      $("balanceValue").textContent = formatCurrency(currentBalance);
     }
 
     function getBetAmount(){
@@ -1312,7 +1320,7 @@
 
     function updateClaimButton(){
       $("claimBtn").textContent = pendingWin > 0
-        ? `Забрать ${formatVc(pendingWin)}`
+        ? `Забрать ${formatCurrency(pendingWin)}`
         : "Забрать";
     }
 
@@ -1440,7 +1448,7 @@
       const bet = getBetAmount();
 
       if (bet < MIN_BET) {
-        showNotice(`Минимум ${MIN_BET} VC`, "lose");
+        showNotice(`Минимум ${MIN_BET} ₽`, "lose");
         return;
       }
 
@@ -1461,7 +1469,7 @@
 
       if (bet < MIN_BET) {
         setChoiceVisible(false);
-        showNotice(`Минимум ${MIN_BET} VC`, "lose");
+        showNotice(`Минимум ${MIN_BET} ₽`, "lose");
         return;
       }
 
@@ -1520,7 +1528,7 @@
             setClaimVisible(true);
             playWinSound();
 
-            showNotice(`Выпал ${sideText}. Выигрыш ${formatVc(pendingWin)}`, "win");
+            showNotice(`Выпал ${sideText}. Выигрыш ${formatCurrency(pendingWin)}`, "win");
           } else {
             pendingWin = 0;
             pendingBalanceAfterClaim = null;
@@ -1532,7 +1540,7 @@
             setClaimVisible(false);
             playLoseSound();
 
-            showNotice(`Выпал ${sideText}. -${formatVc(bet)}`, "lose");
+            showNotice(`Выпал ${sideText}. -${formatCurrency(bet)}`, "lose");
           }
 
           setTimeout(() => {
@@ -1559,7 +1567,7 @@
         saveCachedBalance();
       }
 
-      showNotice(`Забрано ${formatVc(pendingWin)}`, "win");
+      showNotice(`Забрано ${formatCurrency(pendingWin)}`, "win");
 
       pendingWin = 0;
       pendingBalanceAfterClaim = null;
@@ -1581,6 +1589,53 @@
       document.body.style.overflow = "";
     }
 
+    // ========= ЛОГИКА ПРЕЛОАДЕРА =========
+    let loaderProgress = 0;
+    let loaderInterval = null;
+
+    function setLoaderProgress(value) {
+      const fill = $("preloaderFill");
+      const hint = $("preloaderHint");
+      if (!fill) return;
+      loaderProgress = Math.min(100, Math.max(0, value));
+      fill.style.width = loaderProgress + '%';
+      if (hint) {
+        if (loaderProgress < 40) hint.textContent = "Загрузка…";
+        else if (loaderProgress < 70) hint.textContent = "Подготовка…";
+        else if (loaderProgress < 95) hint.textContent = "Почти готово…";
+        else hint.textContent = "Готово!";
+      }
+    }
+
+    function startLoaderAnimation() {
+      setLoaderProgress(6);
+      if (loaderInterval) clearInterval(loaderInterval);
+      loaderInterval = setInterval(() => {
+        if (loaderProgress >= 90) {
+          clearInterval(loaderInterval);
+          loaderInterval = null;
+          return;
+        }
+        if (loaderProgress < 40) setLoaderProgress(loaderProgress + 5);
+        else if (loaderProgress < 65) setLoaderProgress(loaderProgress + 3);
+        else if (loaderProgress < 82) setLoaderProgress(loaderProgress + 2);
+        else setLoaderProgress(loaderProgress + 1);
+      }, 90);
+    }
+
+    function finishLoader() {
+      if (loaderInterval) {
+        clearInterval(loaderInterval);
+        loaderInterval = null;
+      }
+      setLoaderProgress(100);
+      setTimeout(() => {
+        const preloader = $("preloader");
+        if (preloader) preloader.classList.add("hide");
+      }, 220);
+    }
+
+    // ========= ИНИЦИАЛИЗАЦИЯ =========
     $("backBtn").addEventListener("click", () => goTo(FILES.games));
     $("logoBtn").addEventListener("click", () => openOverlay("channelOverlay"));
     $("rulesBtn").addEventListener("click", () => openOverlay("rulesOverlay"));
@@ -1632,19 +1687,17 @@
     });
 
     window.addEventListener("load", () => {
+      startLoaderAnimation();
+
       setCoinFace("silver");
       updateClaimButton();
       updateButtons();
 
-      requestAnimationFrame(() => {
-        $("preBar").style.width = "100%";
+      // Загружаем данные и скрываем прелоадер после загрузки
+      autoAuthTelegram().finally(() => {
+        // Небольшая задержка для плавного исчезновения
+        setTimeout(() => finishLoader(), 400);
       });
-
-      setTimeout(() => {
-        $("preloader").classList.add("hide");
-      }, PRELOADER_HIDE_MS);
-
-      autoAuthTelegram();
     });
   </script>
 </body>
