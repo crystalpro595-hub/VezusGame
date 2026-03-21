@@ -66,70 +66,95 @@
 
     *::-webkit-scrollbar{ display:none; }
 
-    .loading-screen{
-      position:fixed;
-      inset:0;
-      z-index:999;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      padding:24px;
-      background:rgba(2,6,23,.96);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-      transition: opacity .35s ease, visibility .35s ease;
+    /* ========= НОВЫЙ СТАРТОВЫЙ ЛОАДЕР (как в слоте) ========= */
+    .preloader {
+      position: fixed; inset: 0; z-index: 9999;
+      display: flex; align-items: center; justify-content: center; padding: 24px;
+      background: radial-gradient(900px 520px at 20% 10%, rgba(196,181,253,0.16), transparent 56%),
+                  radial-gradient(760px 460px at 80% 20%, rgba(129,140,248,0.16), transparent 54%),
+                  linear-gradient(180deg, #4c1d95 0%, #2e1065 46%, #14072b 100%);
+      transition: opacity 0.35s ease, visibility 0.35s ease;
+    }
+    .preloader.hide {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+    .preloader-inner {
+      width: min(320px, 86vw);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 18px;
+    }
+    .preloader-logo-wrap {
+      width: min(170px, 56vw);
+      display: flex;
+      justify-content: center;
+      position: relative;
+      padding: 10px;
+    }
+    .preloader-logo-wrap::before {
+      content: "";
+      position: absolute;
+      left: 50%;
+      bottom: 6px;
+      width: 74%;
+      height: 18px;
+      transform: translateX(-50%);
+      border-radius: 999px;
+      background: radial-gradient(ellipse at center, rgba(0,0,0,0.42), rgba(0,0,0,0) 72%);
+      animation: loaderShadow 0.62s ease-in-out infinite;
+    }
+    .preloader-logo {
+      width: 100%;
+      height: auto;
+      display: block;
+      position: relative;
+      z-index: 2;
+      filter: drop-shadow(0 16px 26px rgba(0,0,0,0.30)) drop-shadow(0 0 22px rgba(167,139,250,0.18));
+      transform-origin: center bottom;
+      animation: logoBounce 0.62s ease-in-out infinite;
+      user-select: none;
+    }
+    .preloader-bar {
+      width: 100%;
+      height: 12px;
+      padding: 2px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.10);
+      border: 1px solid rgba(255,255,255,0.12);
+      overflow: hidden;
+    }
+    .preloader-fill {
+      width: 0%;
+      height: 100%;
+      border-radius: 999px;
+      background: linear-gradient(90deg, #c084fc, #8b5cf6, #60a5fa);
+      box-shadow: 0 0 14px rgba(192,132,252,0.34);
+      transition: width 0.18s ease;
+    }
+    .preloader-hint {
+      font-size: 12px;
+      font-weight: 900;
+      color: rgba(234,241,255,0.86);
+      text-shadow: 0 10px 18px rgba(0,0,0,0.35);
     }
 
-    .loading-screen.hide{
-      opacity:0;
-      visibility:hidden;
-      pointer-events:none;
+    @keyframes logoBounce {
+      0% { transform: translateY(0) scale(1); }
+      40% { transform: translateY(-10px) scale(1.02); }
+      55% { transform: translateY(0) scale(1); }
+      70% { transform: translateY(-4px) scale(1.01); }
+      100% { transform: translateY(0) scale(1); }
+    }
+    @keyframes loaderShadow {
+      0% { transform: translateX(-50%) scaleX(0.96); opacity: 0.88; }
+      40% { transform: translateX(-50%) scaleX(1.06); opacity: 0.78; }
+      100% { transform: translateX(-50%) scaleX(0.96); opacity: 0.88; }
     }
 
-    .loading-box{
-      width:min(300px, 100%);
-      display:flex;
-      flex-direction:column;
-      align-items:center;
-      gap:18px;
-    }
-
-    .loading-logo{
-      width:110px;
-      height:110px;
-      object-fit:contain;
-      display:block;
-      filter: drop-shadow(0 14px 26px rgba(0,0,0,.32));
-      user-select:none;
-      pointer-events:none;
-    }
-
-    .loading-bar{
-      width:100%;
-      height:10px;
-      border-radius:999px;
-      overflow:hidden;
-      background:rgba(255,255,255,.08);
-      border:1px solid rgba(255,255,255,.08);
-      box-shadow: inset 0 1px 0 rgba(255,255,255,.04);
-    }
-
-    .loading-fill{
-      width:0%;
-      height:100%;
-      border-radius:999px;
-      background:linear-gradient(90deg, var(--tg1), var(--tg2));
-      box-shadow: 0 6px 14px rgba(34,158,217,.28);
-    }
-
-    .loading-text{
-      font-size:12px;
-      font-weight:900;
-      color:rgba(234,241,255,.84);
-      text-align:center;
-      min-height:16px;
-    }
-
+    /* ========= ОСТАЛЬНЫЕ СТИЛИ ========= */
     .app{
       position:relative;
       height:100%;
@@ -788,28 +813,26 @@
       .stat-box{ min-height:44px; }
       .stat-label{ font-size:8px; }
       .stat-value{ font-size:11px; }
-      .loading-logo{ width:96px; height:96px; }
+      .preloader-logo{ width:130px; }
     }
 
     @media (prefers-reduced-motion: reduce){
       *{ transition:none !important; animation:none !important; }
       .overlay.show .popup{ transform:none !important; }
-      .loading-screen{ transition:none !important; }
     }
   </style>
 </head>
 <body>
-  <div class="loading-screen" id="loadingScreen">
-    <div class="loading-box">
-      <img
-        class="loading-logo"
-        src="https://i.postimg.cc/qvL497mF/Picsart-26-02-27-02-02-37-502.png"
-        alt="Vezus"
-      >
-      <div class="loading-bar">
-        <div class="loading-fill" id="loadingFill"></div>
+  <!-- НОВЫЙ ПРЕЛОАДЕР -->
+  <div class="preloader" id="preloader">
+    <div class="preloader-inner">
+      <div class="preloader-logo-wrap">
+        <img class="preloader-logo" src="https://i.postimg.cc/qvL497mF/Picsart-26-02-27-02-02-37-502.png" alt="Vezus">
       </div>
-      <div class="loading-text" id="loadingText">Загрузка 0%</div>
+      <div class="preloader-bar">
+        <div class="preloader-fill" id="preloaderFill"></div>
+      </div>
+      <div class="preloader-hint" id="preloaderHint">Загрузка…</div>
     </div>
   </div>
 
@@ -857,7 +880,7 @@
           </div>
           <div class="stat-box">
             <div class="stat-label">Макс. ставка</div>
-            <div class="stat-value">5000 VC</div>
+            <div class="stat-value">5000 ₽</div>
           </div>
         </div>
       </div>
@@ -1080,10 +1103,10 @@
     function rand(min, max){ return Math.random() * (max - min) + min; }
     function randInt(min, max){ return Math.floor(rand(min, max + 1)); }
 
-    function formatVc(value){
+    function formatCurrency(value){
       const n = Number(value ?? 0);
-      if (!Number.isFinite(n)) return "0 VC";
-      return Number.isInteger(n) ? `${n} VC` : `${n.toFixed(2)} VC`;
+      if (!Number.isFinite(n)) return "0 ₽";
+      return Number.isInteger(n) ? `${n} ₽` : `${n.toFixed(2)} ₽`;
     }
 
     function easeInOutCubic(t){
@@ -1144,7 +1167,7 @@
 
     function updateBalanceUI(){
       normalizeBalance();
-      $("balanceValue").textContent = formatVc(currentBalance);
+      $("balanceValue").textContent = formatCurrency(currentBalance);
     }
 
     function updateStats(){
@@ -1537,13 +1560,13 @@
       const bet = getBetAmount();
 
       if (bet < MIN_BET) {
-        setStatus(`Минимальная ставка ${MIN_BET} VC`);
+        setStatus(`Минимальная ставка ${MIN_BET} ₽`);
         return;
       }
 
       if (bet > MAX_BET) {
         $("betInput").value = String(MAX_BET);
-        setStatus(`Максимальная ставка ${MAX_BET} VC`);
+        setStatus(`Максимальная ставка ${MAX_BET} ₽`);
         return;
       }
 
@@ -1603,7 +1626,7 @@
           const newBal = await dbDeltaBalance(payout);
           currentBalance = newBal;
           updateBalanceUI();
-          setStatus(`Ты угадал: +${formatVc(payout)}`);
+          setStatus(`Ты угадал: +${formatCurrency(payout)}`);
         } catch {
           try{
             currentBalance = await dbGetBalance();
@@ -1661,36 +1684,53 @@
       document.body.style.overflow = "";
     }
 
-    function setLoadingProgress(value){
-      const percent = Math.max(0, Math.min(100, Math.round(value)));
-      $("loadingFill").style.width = `${percent}%`;
-      $("loadingText").textContent = `Загрузка ${percent}%`;
+    // ========= НОВАЯ ЛОГИКА ЗАГРУЗКИ =========
+    let loaderProgress = 0;
+    let loaderInterval = null;
+
+    function setLoaderProgress(value) {
+      const fill = $("preloaderFill");
+      const hint = $("preloaderHint");
+      if (!fill) return;
+      loaderProgress = Math.min(100, Math.max(0, value));
+      fill.style.width = loaderProgress + '%';
+      if (hint) {
+        if (loaderProgress < 40) hint.textContent = "Загрузка…";
+        else if (loaderProgress < 70) hint.textContent = "Подготовка…";
+        else if (loaderProgress < 95) hint.textContent = "Почти готово…";
+        else hint.textContent = "Готово!";
+      }
     }
 
-    function runLoadingBar(duration = 4000){
-      return new Promise(resolve => {
-        const start = performance.now();
-
-        function tick(now){
-          const progress = Math.min(1, (now - start) / duration);
-          setLoadingProgress(progress * 100);
-
-          if (progress < 1) requestAnimationFrame(tick);
-          else resolve();
+    function startLoaderAnimation() {
+      setLoaderProgress(6);
+      if (loaderInterval) clearInterval(loaderInterval);
+      loaderInterval = setInterval(() => {
+        if (loaderProgress >= 90) {
+          clearInterval(loaderInterval);
+          loaderInterval = null;
+          return;
         }
-
-        requestAnimationFrame(tick);
-      });
+        if (loaderProgress < 40) setLoaderProgress(loaderProgress + 5);
+        else if (loaderProgress < 65) setLoaderProgress(loaderProgress + 3);
+        else if (loaderProgress < 82) setLoaderProgress(loaderProgress + 2);
+        else setLoaderProgress(loaderProgress + 1);
+      }, 90);
     }
 
-    function hideLoading(){
-      const el = $("loadingScreen");
-      el.classList.add("hide");
+    function finishLoader() {
+      if (loaderInterval) {
+        clearInterval(loaderInterval);
+        loaderInterval = null;
+      }
+      setLoaderProgress(100);
       setTimeout(() => {
-        el.style.display = "none";
-      }, 360);
+        const preloader = $("preloader");
+        if (preloader) preloader.classList.add("hide");
+      }, 220);
     }
 
+    // ========= ИНИЦИАЛИЗАЦИЯ =========
     $("backBtn").addEventListener("click", () => goTo(FILES.games));
     $("logoBtn").addEventListener("click", () => openOverlay("channelOverlay"));
     $("rulesBtn").addEventListener("click", () => openOverlay("rulesOverlay"));
@@ -1805,8 +1845,8 @@
       if (gameState !== "shuffling") renderStage();
     });
 
-    async function init(){
-      try{
+    async function init() {
+      try {
         if (window.Telegram && window.Telegram.WebApp) {
           Telegram.WebApp.ready();
           if (typeof Telegram.WebApp.expand === "function") {
@@ -1815,19 +1855,25 @@
         }
       } catch {}
 
-      const loaderPromise = runLoadingBar(4000);
-      const balancePromise = dbGetBalance().catch(() => 0);
+      startLoaderAnimation(); // запускаем анимацию прогресса
 
-      const [, dbBalance] = await Promise.all([loaderPromise, balancePromise]);
-
+      // Загружаем баланс
+      let dbBalance = 0;
+      try {
+        dbBalance = await dbGetBalance();
+      } catch (e) {
+        console.warn(e);
+      }
       currentBalance = Number.isFinite(Number(dbBalance)) ? Number(dbBalance) : 0;
       normalizeBalance();
 
+      // Обновляем интерфейс
       updateStats();
       updateCountButtons();
       resetToIdle();
 
-      hideLoading();
+      // Завершаем загрузку после минимальной задержки для плавности
+      setTimeout(() => finishLoader(), 300);
     }
 
     window.addEventListener("load", init);
