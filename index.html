@@ -324,7 +324,7 @@
       transform: translateY(-.5px);
     }
 
-    /* ----- Games и Slots блоки (без текста) ----- */
+    /* ----- Games и Slots блоки (без текста, без затемнения) ----- */
     .games-section, .slots-section {
       width: 100%;
       max-width: 520px;
@@ -378,6 +378,7 @@
       overflow: hidden;
       cursor: pointer;
       transition: transform 0.18s ease, box-shadow 0.18s ease;
+      position: relative;
     }
 
     .game-card:active, .slot-card:active {
@@ -404,13 +405,9 @@
       z-index: 0;
     }
 
+    /* Убираем затемнение на карточках */
     .game-card::after, .slot-card::after {
-      content: "";
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(180deg, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.7) 90%);
-      z-index: 1;
-      pointer-events: none;
+      display: none;
     }
 
     /* ----- Меню (выезжает слева) — компактная версия ----- */
@@ -1106,7 +1103,7 @@
           </div>
           <div class="game-card" data-game="game4">
             <div class="game-card-inner">
-              <img src="https://i.postimg.cc/8khGybLS/d9e9d314-fd90-4cad-ad74-b2ed14a51f38.png" alt="Game 4" loading="lazy">
+              <img src="https://i.postimg.cc/rs0kFF0Y/Picsart-26-03-21-10-57-54-505.jpg" alt="Game 4" loading="lazy">
             </div>
           </div>
           <div class="game-card" data-game="game5">
@@ -1522,14 +1519,15 @@
 
     balanceChipEl.addEventListener('click', () => goTo(FILES.wallet));
 
-    // Обработчики для карточек Games (первые три — на отдельные страницы)
+    // Обработчики для карточек Games
     const gameCards = document.querySelectorAll('.game-card');
-    if (gameCards.length >= 3) {
-      gameCards[0].addEventListener('click', () => goTo(FILES.coinflip));
-      gameCards[1].addEventListener('click', () => goTo(FILES.mines));
-      gameCards[2].addEventListener('click', () => goTo(FILES.cups));
-      // Остальные карточки Games (с 4 по 6) и все Slots — показываем toast
-      for (let i = 3; i < gameCards.length; i++) {
+    if (gameCards.length >= 6) {
+      gameCards[0].addEventListener('click', () => goTo(FILES.coinflip));   // CoinFlip
+      gameCards[1].addEventListener('click', () => goTo(FILES.mines));      // Mines
+      gameCards[2].addEventListener('click', () => goTo(FILES.cups));       // Cups
+      gameCards[3].addEventListener('click', () => goTo('platform.html')); // 4-я карточка -> platform.html
+      // Остальные карточки (5,6) и все Slots — показываем toast
+      for (let i = 4; i < gameCards.length; i++) {
         gameCards[i].addEventListener('click', () => showToast('В разработке', 1500));
       }
     }
