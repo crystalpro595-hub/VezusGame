@@ -363,7 +363,7 @@
     <div class="sticky-top">
       <div class="top-row">
         <button class="icon-btn" id="backBtn">←</button>
-        <div class="balance-mini"><span class="bal-title">Баланс</span><div class="bal-amount" id="balanceValue">1000 VC</div></div>
+        <div class="balance-mini"><span class="bal-title">Баланс</span><div class="bal-amount" id="balanceValue">1000 ₽</div></div>
         <button class="rule-btn" id="rulesBtn"><svg viewBox="0 0 24 24"><path d="M9 9a3 3 0 1 1 5.2 2.1c-.9.9-1.7 1.5-1.7 2.9"/><path d="M12 17h.01"/><circle cx="12" cy="12" r="9"/></svg></button>
         <button class="logo-btn" id="logoBtn"><img src="https://i.postimg.cc/qvL497mF/Picsart-26-02-27-02-02-37-502.png" alt="Vezus"></button>
       </div>
@@ -373,7 +373,7 @@
       <div class="stats-grid">
         <div class="stat-box"><div class="stat-label">Уровень</div><div class="stat-value" id="levelValue">0 / 9</div></div>
         <div class="stat-box"><div class="stat-label">Множитель</div><div class="stat-value" id="multValue">x1.00</div></div>
-        <div class="stat-box"><div class="stat-label">Выигрыш</div><div class="stat-value" id="payoutValue">0 VC</div></div>
+        <div class="stat-box"><div class="stat-label">Выигрыш</div><div class="stat-value" id="payoutValue">0 ₽</div></div>
       </div>
     </div>
 
@@ -448,8 +448,8 @@
     toastOk.onclick = () => toast.classList.remove("show");
 
     function round2(n) { return Math.round(n * 100) / 100; }
-    function formatVc(value) { let n = Number(value ?? 0); return Number.isInteger(n) ? n + ' VC' : n.toFixed(2) + ' VC'; }
-    function updateBalanceUI() { $("balanceValue").textContent = formatVc(currentBalance); }
+    function formatCurrency(value) { let n = Number(value ?? 0); return Number.isInteger(n) ? n + ' ₽' : n.toFixed(2) + ' ₽'; }
+    function updateBalanceUI() { $("balanceValue").textContent = formatCurrency(currentBalance); }
 
     // лоадер
     function setLoaderProgress(value) {
@@ -493,7 +493,7 @@
     function setStatsUI() {
       $("levelValue").textContent = `${Math.min(level, LEVELS_MAX)} / ${LEVELS_MAX}`;
       $("multValue").textContent = 'x' + getTotalMultiplier().toFixed(2);
-      $("payoutValue").textContent = gameActive ? formatVc(getCashoutValue()) : "0 VC";
+      $("payoutValue").textContent = gameActive ? formatCurrency(getCashoutValue()) : "0 ₽";
     }
 
     function lockPicks(lock) { picksLocked = lock; document.querySelectorAll(".platform").forEach(p => { p.classList.toggle("disabled", lock); p.disabled = lock; }); }
@@ -506,7 +506,7 @@
     function setMainButtonMode() {
       let btn = $("mainBtn"); btn.classList.remove("cash"); btn.disabled = false;
       if (!gameActive) { btn.textContent = "Играть"; return; }
-      btn.textContent = `Забрать (${formatVc(getCashoutValue())})`; btn.classList.add("cash");
+      btn.textContent = `Забрать (${formatCurrency(getCashoutValue())})`; btn.classList.add("cash");
     }
 
     function svgSafe() { return '<svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5" stroke="#22c55e" stroke-width="3" fill="none"/></svg>'; }
@@ -553,8 +553,8 @@
     function startGame() {
       if (gameActive) return;
       let bet = getBetAmount();
-      if (bet < MIN_BET) { showToast(`Мин. ставка: ${MIN_BET} VC`); return; }
-      if (bet > MAX_BET) { $("betInput").value = MAX_BET; showToast(`Макс. ставка: ${MAX_BET} VC`); return; }
+      if (bet < MIN_BET) { showToast(`Мин. ставка: ${MIN_BET} ₽`); return; }
+      if (bet > MAX_BET) { $("betInput").value = MAX_BET; showToast(`Макс. ставка: ${MAX_BET} ₽`); return; }
       if (bet > currentBalance) { showToast("Недостаточно средств"); return; }
 
       currentBalance = round2(currentBalance - bet); updateBalanceUI();
@@ -571,7 +571,7 @@
       let payout = getCashoutValue();
       if (payout <= 0) { showToast("Нет суммы"); return; }
       currentBalance = round2(currentBalance + payout); updateBalanceUI();
-      showToast(`Забрано: ${formatVc(payout)}`);
+      showToast(`Забрано: ${formatCurrency(payout)}`);
       setTimeout(() => resetGameUI(), 600);
     }
 
@@ -627,7 +627,7 @@
       btn.addEventListener('click', function(e) { e.preventDefault(); setPlatformCount(Number(this.dataset.platforms)); });
     });
 
-    $("backBtn").addEventListener("click", () => window.location.href = "games.html");
+    $("backBtn").addEventListener("click", () => window.location.href = "index.html");
     $("rulesBtn").addEventListener("click", () => { $("rulesOverlay").classList.add("show"); document.body.style.overflow = "hidden"; });
     $("logoBtn").addEventListener("click", () => { $("channelOverlay").classList.add("show"); document.body.style.overflow = "hidden"; });
     $("rulesClose").addEventListener("click", () => { $("rulesOverlay").classList.remove("show"); document.body.style.overflow = ""; });
