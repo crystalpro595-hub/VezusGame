@@ -695,7 +695,7 @@ body{
   <div class="wallet-card">
     <div class="wallet-info">
       <div class="wallet-label">Баланс</div>
-      <div class="wallet-balance" id="walletBalance">0 VC</div>
+      <div class="wallet-balance" id="walletBalance">0 ₽</div>
     </div>
     <button class="withdraw-in-card-btn" onclick="openWithdrawScreen()">Вывод средств</button>
   </div>
@@ -706,9 +706,9 @@ body{
     <div class="amount-container">
       <div class="amount-row">
         <input id="amountInput" type="number" placeholder="Сумма ₽" oninput="validateForm()" onchange="validateForm()">
-        <div class="vc" id="vcDisplay">0 VC</div>
+        <div class="vc" id="vcDisplay">0 ₽</div>
       </div>
-      <div class="minimum-hint" id="minimumHint">Минимум 100₽</div>
+      <div class="minimum-hint" id="minimumHint">Минимум 500 ₽</div>
     </div>
 
     <div class="sender-name" id="senderNameContainer">
@@ -717,10 +717,10 @@ body{
     </div>
 
     <div class="quick-amounts" id="quickAmounts">
-      <button class="amount-btn" onclick="setAmount(100)">100₽</button>
-      <button class="amount-btn" onclick="setAmount(500)">500₽</button>
-      <button class="amount-btn" onclick="setAmount(1000)">1000₽</button>
-      <button class="amount-btn" onclick="setAmount(2500)">2500₽</button>
+      <button class="amount-btn" onclick="setAmount(500)">500 ₽</button>
+      <button class="amount-btn" onclick="setAmount(1000)">1000 ₽</button>
+      <button class="amount-btn" onclick="setAmount(2500)">2500 ₽</button>
+      <button class="amount-btn" onclick="setAmount(5000)">5000 ₽</button>
     </div>
   </div>
 
@@ -742,7 +742,7 @@ body{
   <div class="wallet-card">
     <div class="wallet-info">
       <div class="wallet-label">Баланс</div>
-      <div class="wallet-balance" id="withdrawBalance">0 VC</div>
+      <div class="wallet-balance" id="withdrawBalance">0 ₽</div>
     </div>
     <div style="width:100px;"></div>
   </div>
@@ -752,9 +752,9 @@ body{
 
     <div class="amount-container">
       <div class="amount-row">
-        <input id="withdrawAmount" type="number" placeholder="Сумма VC" oninput="validateWithdraw()" onchange="validateWithdraw()" style="width:100%;">
+        <input id="withdrawAmount" type="number" placeholder="Сумма ₽" oninput="validateWithdraw()" onchange="validateWithdraw()" style="width:100%;">
       </div>
-      <div class="minimum-hint" id="withdrawMinimumHint">Минимум 1000 VC</div>
+      <div class="minimum-hint" id="withdrawMinimumHint">Минимум 1000 ₽</div>
     </div>
 
     <div class="withdraw-fields" id="withdrawFields">
@@ -938,16 +938,16 @@ function detectDevice(){
   isAndroid = /android/i.test(userAgent);
 }
 
-function formatVc(value){
+function formatCurrency(value){
   const num = Number(value ?? 0);
-  if (!Number.isFinite(num)) return '0 VC';
-  return Number.isInteger(num) ? `${num} VC` : `${num.toFixed(2)} VC`;
+  if (!Number.isFinite(num)) return '0 ₽';
+  return Number.isInteger(num) ? `${num} ₽` : `${num.toFixed(2)} ₽`;
 }
 
 function setBalanceUI(value){
   const num = Number(value ?? 0);
   currentBalance = Number.isFinite(num) ? num : 0;
-  const text = formatVc(currentBalance);
+  const text = formatCurrency(currentBalance);
   $('walletBalance').textContent = text;
   $('withdrawBalance').textContent = text;
 }
@@ -1022,14 +1022,14 @@ async function refreshWalletProfile(){
 function resetDepositForm(){
   $('amountInput').value = '';
   $('senderName').value = '';
-  $('vcDisplay').textContent = '0 VC';
+  $('vcDisplay').textContent = '0 ₽';
   $('popupAmount').textContent = 'Сумма: 0 ₽';
   $('senderNameContainer').classList.remove('show');
   $('senderName').classList.remove('error');
   $('senderError').classList.remove('show');
   $('amountInput').classList.remove('error');
   $('minimumHint').classList.remove('error');
-  $('minimumHint').textContent = 'Минимум 100₽';
+  $('minimumHint').textContent = 'Минимум 500 ₽';
   depositTouched = false;
   updatePayButton(false);
 }
@@ -1042,7 +1042,7 @@ function resetWithdrawForm(){
 
   $('withdrawAmount').classList.remove('error');
   $('withdrawMinimumHint').classList.remove('error');
-  $('withdrawMinimumHint').textContent = 'Минимум 1000 VC';
+  $('withdrawMinimumHint').textContent = 'Минимум 1000 ₽';
   $('withdrawFields').classList.remove('show');
 
   $('requisitesInput').classList.remove('error');
@@ -1147,7 +1147,7 @@ function validateForm(){
   const minHint = $('minimumHint');
 
   const vcVal = hasValue ? amount : 0;
-  $('vcDisplay').textContent = `${vcVal} VC`;
+  $('vcDisplay').textContent = `${vcVal} ₽`;
   $('popupAmount').textContent = `Сумма: ${vcVal} ₽`;
 
   if (!hasValue){
@@ -1160,7 +1160,7 @@ function validateForm(){
     return;
   }
 
-  if (amount >= 100){
+  if (amount >= 500){
     amountEl.classList.remove('error');
     minHint.classList.remove('error');
     senderContainer.classList.add('show');
@@ -1252,7 +1252,7 @@ async function openCheckPopup(){
   const amount = Number($('amountInput').value);
   const senderName = $('senderName').value.trim();
 
-  if (!amount || amount < 100 || !senderName) {
+  if (!amount || amount < 500 || !senderName) {
     validateForm();
     return;
   }
@@ -1273,7 +1273,7 @@ async function openCheckPopup(){
     if (depositCheckTimer) clearTimeout(depositCheckTimer);
     depositCheckTimer = setTimeout(() => {
       $('depositCheckPopup').classList.remove('show');
-      showToast(`Заявка на пополнение ${amount}₽ создана`, '#3b82f6');
+      showToast(`Заявка на пополнение ${amount} ₽ создана`, '#3b82f6');
       resetDepositForm();
     }, 1200);
   } catch(err){
@@ -1337,7 +1337,7 @@ function validateWithdraw(){
   if (!hasValue){
     amountEl.classList.remove('error');
     minHint.classList.remove('error');
-    minHint.textContent = 'Минимум 1000 VC';
+    minHint.textContent = 'Минимум 1000 ₽';
     fields.classList.remove('show');
 
     reqEl.classList.remove('error');  reqErr.classList.remove('show');
@@ -1351,7 +1351,7 @@ function validateWithdraw(){
   if (amount < 1000){
     amountEl.classList.add('error');
     minHint.classList.add('error');
-    minHint.textContent = 'Минимум 1000 VC';
+    minHint.textContent = 'Минимум 1000 ₽';
     fields.classList.remove('show');
 
     reqEl.classList.remove('error');  reqErr.classList.remove('show');
@@ -1365,7 +1365,7 @@ function validateWithdraw(){
   if (amount > currentBalance){
     amountEl.classList.add('error');
     minHint.classList.add('error');
-    minHint.textContent = `Недостаточно средств · Доступно ${formatVc(currentBalance)}`;
+    minHint.textContent = `Недостаточно средств · Доступно ${formatCurrency(currentBalance)}`;
     fields.classList.remove('show');
 
     reqEl.classList.remove('error');  reqErr.classList.remove('show');
@@ -1378,7 +1378,7 @@ function validateWithdraw(){
 
   amountEl.classList.remove('error');
   minHint.classList.remove('error');
-  minHint.textContent = `Доступно ${formatVc(currentBalance)}`;
+  minHint.textContent = `Доступно ${formatCurrency(currentBalance)}`;
   fields.classList.add('show');
 
   const isReq  = reqEl.value.trim().length > 0;
@@ -1440,7 +1440,7 @@ async function processWithdraw(){
         localStorage.setItem('tg_profile', JSON.stringify(cached));
       }
 
-      showToast(`Заявка на вывод ${amount} VC создана`, '#3b82f6');
+      showToast(`Заявка на вывод ${amount} ₽ создана`, '#3b82f6');
 
       isWithdrawProcessing = false;
       backToMain();
