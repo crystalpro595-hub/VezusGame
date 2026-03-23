@@ -324,7 +324,7 @@
       transform: translateY(-.5px);
     }
 
-    /* ----- Games и Slots блоки (без текста, без затемнения) ----- */
+    /* Games, Slots, Card games — общие стили */
     .games-section, .slots-section {
       width: 100%;
       max-width: 520px;
@@ -1040,7 +1040,7 @@
         </button>
       </div>
 
-      <!-- Слайдер с кнопками на баннерах (квадратные, слева, уменьшенные) -->
+      <!-- Слайдер с кнопками на баннерах -->
       <div class="slider" aria-label="Баннеры">
         <div class="slides" id="slides">
           <div class="slide">
@@ -1080,7 +1080,7 @@
         </div>
       </div>
 
-      <!-- Блок Games (без текста) -->
+      <!-- Блок Games -->
       <div class="games-section">
         <div class="games-header">
           <span class="games-title">Games</span>
@@ -1119,7 +1119,31 @@
         </div>
       </div>
 
-      <!-- Блок Slots (без текста) -->
+      <!-- НОВЫЙ БЛОК: Card Games (три карточки, первая ведёт на blackjack.html) -->
+      <div class="games-section">
+        <div class="games-header">
+          <span class="games-title">Card Games</span>
+        </div>
+        <div class="games-scroll" id="cardGamesScroll">
+          <div class="game-card cardgame-card" data-cardgame="blackjack">
+            <div class="game-card-inner">
+              <img src="https://i.postimg.cc/Hx0MvdkG/Picsart-26-03-21-10-36-50-023.jpg" alt="Blackjack" loading="lazy">
+            </div>
+          </div>
+          <div class="game-card cardgame-card" data-cardgame="poker">
+            <div class="game-card-inner">
+              <img src="https://i.postimg.cc/kXqsmY0m/Picsart-26-03-21-10-40-45-084.jpg" alt="Poker" loading="lazy">
+            </div>
+          </div>
+          <div class="game-card cardgame-card" data-cardgame="rummy">
+            <div class="game-card-inner">
+              <img src="https://i.postimg.cc/0NwDm7TL/Picsart-26-03-21-10-37-04-560.jpg" alt="Rummy" loading="lazy">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Блок Slots -->
       <div class="slots-section">
         <div class="slots-header">
           <span class="slots-title">Slots</span>
@@ -1311,7 +1335,8 @@
       fortune: 'fortune.html',
       coinflip: 'coinflip.html',
       mines: 'mines.html',
-      cups: 'cups.html'
+      cups: 'cups.html',
+      blackjack: 'blackjack.html'    // новая карточка ведёт сюда
     };
 
     // ---------- Защита паролем ----------
@@ -1339,7 +1364,6 @@
       if (entered === '228') {
         sessionStorage.setItem('authenticated', 'true');
         checkAuth();
-        // после успешного входа запускаем остальную инициализацию
         initApp();
       } else {
         passwordError.textContent = 'Неверный пароль';
@@ -1353,7 +1377,6 @@
       if (e.key === 'Enter') submitPassword();
     });
 
-    // Запускаем проверку сразу
     checkAuth();
 
     // ---------- Остальная логика приложения ----------
@@ -1386,7 +1409,6 @@
       return Math.max(min, Math.min(max, n));
     }
 
-    // Форматирование баланса в рублях
     function formatBalance(value) {
       const num = Number(value ?? 0);
       if (!Number.isFinite(num)) return '0 ₽';
@@ -1519,21 +1541,32 @@
 
     balanceChipEl.addEventListener('click', () => goTo(FILES.wallet));
 
-    // Обработчики для карточек Games
-    const gameCards = document.querySelectorAll('.game-card');
+    // Обработчики для оригинальных Games (6 карточек)
+    const gameCards = document.querySelectorAll('.games-section:first-of-type .game-card');
     if (gameCards.length >= 6) {
-      gameCards[0].addEventListener('click', () => goTo(FILES.coinflip));   // CoinFlip
-      gameCards[1].addEventListener('click', () => goTo(FILES.mines));      // Mines
-      gameCards[2].addEventListener('click', () => goTo(FILES.cups));       // Cups
-      gameCards[3].addEventListener('click', () => goTo('platform.html')); // 4-я карточка -> platform.html
-      // Остальные карточки (5,6) и все Slots — показываем toast
+      gameCards[0].addEventListener('click', () => goTo(FILES.coinflip));
+      gameCards[1].addEventListener('click', () => goTo(FILES.mines));
+      gameCards[2].addEventListener('click', () => goTo(FILES.cups));
+      gameCards[3].addEventListener('click', () => goTo('platform.html'));
       for (let i = 4; i < gameCards.length; i++) {
         gameCards[i].addEventListener('click', () => showToast('В разработке', 1500));
       }
     }
+    // Slots — все в разработке
     document.querySelectorAll('.slot-card').forEach(card => {
       card.addEventListener('click', () => showToast('В разработке', 1500));
     });
+
+    // ========== НОВЫЕ КАРТОЧКИ CARD GAMES ==========
+    const cardGameItems = document.querySelectorAll('.cardgame-card');
+    if (cardGameItems.length >= 1) {
+      // первая карточка -> blackjack.html
+      cardGameItems[0].addEventListener('click', () => goTo(FILES.blackjack));
+      // остальные -> toast
+      for (let i = 1; i < cardGameItems.length; i++) {
+        cardGameItems[i].addEventListener('click', () => showToast('В разработке', 1500));
+      }
+    }
 
     // Обработчики для кнопок на баннерах
     const slideBtns = document.querySelectorAll('.slide-btn');
@@ -1643,7 +1676,6 @@
       });
     });
 
-    // Функция инициализации, вызываемая после успешного входа
     function initApp() {
       updateDotsByScroll();
       startAutoplay();
@@ -1651,7 +1683,6 @@
       updateMenuProfile();
     }
 
-    // Если пароль уже был введён ранее (при обновлении), инициализируем сразу
     if (sessionStorage.getItem('authenticated') === 'true') {
       initApp();
     }
