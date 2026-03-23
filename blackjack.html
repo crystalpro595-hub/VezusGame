@@ -52,6 +52,7 @@
       --shadow-soft: 0 8px 18px rgba(0,0,0,0.3);
       --dark: #1a1a1a;
       --dark-border: #2a2a2a;
+      --error: #ff4444;
     }
 
     /* ---------- СТАРТОВЫЙ ЛОАДЕР ---------- */
@@ -252,51 +253,22 @@
       border-radius: 60px;
       backdrop-filter: blur(4px);
     }
-
-    /* ФИШКА СТАВКИ (справа снизу) */
-    .bet-chip {
-      position: absolute;
-      bottom: 16px;
-      right: 16px;
-      width: 70px;
-      height: 70px;
-      background: radial-gradient(circle at 30% 30%, #f5b642, #d48d1a);
-      border-radius: 50%;
+    /* Блок с текущей ставкой */
+    .bet-info {
+      display: inline-block;
+      margin-left: 12px;
+      font-size: 12px;
+      font-weight: 800;
+      background: rgba(0,0,0,0.5);
+      padding: 2px 12px;
+      border-radius: 60px;
+      color: #ffd966;
+    }
+    .player-stats {
       display: flex;
-      flex-direction: column;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 8px 16px rgba(0,0,0,0.4), inset 0 1px 2px rgba(255,255,255,0.3);
-      border: 2px solid #ffd966;
-      z-index: 10;
-      transition: transform 0.2s ease, opacity 0.2s;
-      animation: chipPop 0.3s cubic-bezier(0.34, 1.2, 0.64, 1);
-    }
-    @keyframes chipPop {
-      0% { transform: scale(0.5); opacity: 0; }
-      100% { transform: scale(1); opacity: 1; }
-    }
-    .bet-chip.hidden {
-      opacity: 0;
-      transform: scale(0.5);
-      pointer-events: none;
-    }
-    .chip-amount {
-      font-size: 18px;
-      font-weight: 900;
-      color: #2c1a0a;
-      text-shadow: 0 1px 0 rgba(255,255,255,0.3);
-      background: rgba(0,0,0,0.2);
-      padding: 2px 8px;
-      border-radius: 40px;
-      margin-top: 4px;
-    }
-    .chip-label {
-      font-size: 10px;
-      font-weight: 800;
-      color: #fff0c0;
-      text-transform: uppercase;
-      letter-spacing: 1px;
+      gap: 8px;
     }
 
     /* УВЕДОМЛЕНИЕ */
@@ -309,23 +281,22 @@
       backdrop-filter: blur(12px);
       border: 1px solid var(--dark-border);
       border-radius: 40px;
-      padding: 6px 18px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
+      padding: 8px 20px;
       z-index: 250;
       opacity: 0;
       transition: opacity 0.2s ease, transform 0.2s ease;
       pointer-events: none;
       white-space: nowrap;
       box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      font-size: 13px;
+      font-weight: 800;
+      color: #ecd67a;
+      text-align: center;
     }
     .notification.show {
       opacity: 1;
       transform: translateX(-50%) scale(1);
     }
-    .notification-icon { font-size: 18px; }
-    .notification-text { font-size: 13px; font-weight: 800; color: #ecd67a; }
 
     /* панель ставок */
     .bet-panel {
@@ -341,14 +312,35 @@
       flex: 1; height: 42px; border-radius: 28px; background: rgba(0,0,0,0.5);
       border: 1px solid rgba(40,40,40,0.8); color: #fff; font-weight: 800;
       text-align: center; font-size: 16px; padding: 0 10px;
+      transition: border-color 0.2s;
+    }
+    .bet-input::placeholder {
+      color: #aaa;
+      font-weight: 500;
+      font-size: 14px;
+    }
+    .bet-input.error {
+      border-color: var(--error);
+      box-shadow: 0 0 0 1px var(--error);
     }
     .bet-toggle {
       width: 42px; height: 42px; border-radius: 40px; background: rgba(0,0,0,0.5);
       border: 1px solid var(--stroke); cursor: pointer;
-      font-size: 18px;
+      font-size: 20px;
       display: flex;
       align-items: center;
       justify-content: center;
+      font-weight: 700;
+    }
+    .error-message {
+      font-size: 11px;
+      color: var(--error);
+      margin-top: 4px;
+      padding-left: 12px;
+      display: none;
+    }
+    .error-message.show {
+      display: block;
     }
     .quick-bets {
       display: flex; gap: 6px; margin-top: 8px; flex-wrap: wrap;
@@ -398,7 +390,7 @@
       pointer-events: none;
     }
 
-    /* Правила — тёмный стиль */
+    /* Правила — тёмный стиль без золота */
     .popup {
       background: #0c0c0c;
       backdrop-filter: blur(12px);
@@ -418,7 +410,7 @@
     .popup-title {
       font-size: 20px;
       font-weight: 900;
-      color: #ecd67a;
+      color: #ccc;
       letter-spacing: 1px;
       display: flex;
       align-items: center;
@@ -427,6 +419,7 @@
     .popup-title::before {
       content: "♠";
       font-size: 24px;
+      color: #aaa;
     }
     .popup-x {
       width: 32px;
@@ -434,7 +427,7 @@
       border-radius: 20px;
       background: #1a1a1a;
       border: 1px solid var(--dark-border);
-      color: #ecd67a;
+      color: #ccc;
       font-size: 18px;
       cursor: pointer;
       transition: 0.2s;
@@ -450,7 +443,7 @@
       background: #111;
       border-radius: 20px;
       padding: 12px 16px;
-      border-left: 3px solid #ecd67a;
+      border-left: 3px solid #3a3a3a;
       display: flex;
       align-items: center;
       gap: 14px;
@@ -466,19 +459,19 @@
       justify-content: center;
       font-size: 24px;
       font-weight: 900;
-      color: #ecd67a;
+      color: #aaa;
       border: 1px solid var(--dark-border);
     }
     .rule-text { flex: 1; }
     .rule-title {
       font-size: 15px;
       font-weight: 800;
-      color: #ecd67a;
+      color: #ddd;
       margin-bottom: 4px;
     }
     .rule-desc {
       font-size: 12px;
-      color: #aaa;
+      color: #888;
       line-height: 1.3;
     }
 
@@ -493,10 +486,8 @@
       .card-rank { font-size: 24px; }
       .card-suit { font-size: 28px; }
       .game-btn { height: 42px; font-size: 12px; }
-      .notification { padding: 4px 14px; }
-      .notification-text { font-size: 12px; }
-      .bet-chip { width: 60px; height: 60px; bottom: 10px; right: 10px; }
-      .chip-amount { font-size: 14px; }
+      .notification { padding: 6px 16px; font-size: 12px; }
+      .bet-info { font-size: 10px; margin-left: 8px; }
     }
     @media (max-width: 450px) {
       .card { width: 52px; height: 73px; }
@@ -534,28 +525,24 @@
         <div class="player-area">
           <div class="area-label">ИГРОК</div>
           <div class="cards" id="playerCards"></div>
-          <div class="scores" id="playerScore">—</div>
+          <div class="player-stats">
+            <div class="scores" id="playerScore">—</div>
+            <div class="bet-info" id="currentBetDisplay">Ставка: —</div>
+          </div>
         </div>
       </div>
-      <div class="notification" id="notification">
-        <span class="notification-icon"></span>
-        <span class="notification-text"></span>
-      </div>
-      <!-- ФИШКА СТАВКИ -->
-      <div class="bet-chip hidden" id="betChip">
-        <div class="chip-label">ставка</div>
-        <div class="chip-amount" id="chipAmount">0</div>
-      </div>
+      <div class="notification" id="notification"></div>
     </div>
 
     <div class="bet-panel">
       <div class="label">СТАВКА</div>
       <div class="bet-row">
-        <input class="bet-input" id="betInput" type="number" min="10" max="5000" step="1" value="50">
-        <button class="bet-toggle" id="betToggleBtn">💰+</button>
+        <input class="bet-input" id="betInput" type="number" min="30" max="5000" step="1" placeholder="минимум 30">
+        <button class="bet-toggle" id="betToggleBtn">₽</button>
       </div>
+      <div class="error-message" id="betError">минимум 30 ₽</div>
       <div class="quick-bets" id="quickBets">
-        <button class="quick-btn" data-bet="10">10</button>
+        <button class="quick-btn" data-bet="30">30</button>
         <button class="quick-btn" data-bet="50">50</button>
         <button class="quick-btn" data-bet="100">100</button>
         <button class="quick-btn" data-bet="250">250</button>
@@ -579,9 +566,9 @@
     </div>
     <div class="popup-body">
       <div class="rule-card"><div class="rule-icon">♠</div><div class="rule-text"><div class="rule-title">Блэкджек (21)</div><div class="rule-desc">Туз + 10/J/Q/K — выигрыш 3:2</div></div></div>
-      <div class="rule-card"><div class="rule-icon">🃟</div><div class="rule-text"><div class="rule-title">Обычная победа</div><div class="rule-desc">Выигрыш 1:1 (удвоение ставки)</div></div></div>
+      <div class="rule-card"><div class="rule-icon">♣</div><div class="rule-text"><div class="rule-title">Обычная победа</div><div class="rule-desc">Выигрыш 1:1 (удвоение ставки)</div></div></div>
       <div class="rule-card"><div class="rule-icon">♦</div><div class="rule-text"><div class="rule-title">Дилер добирает до 17</div><div class="rule-desc">Мягкие 17 — стоп</div></div></div>
-      <div class="rule-card"><div class="rule-icon">⚡</div><div class="rule-text"><div class="rule-title">Удвоение</div><div class="rule-desc">Только на первых двух картах</div></div></div>
+      <div class="rule-card"><div class="rule-icon">×2</div><div class="rule-text"><div class="rule-title">Удвоение</div><div class="rule-desc">Только на первых двух картах</div></div></div>
       <div class="rule-card"><div class="rule-icon">♥</div><div class="rule-text"><div class="rule-title">Ничья</div><div class="rule-desc">Равные очки — возврат ставки</div></div></div>
     </div>
   </div>
@@ -591,7 +578,7 @@
 <script>
   (function() {
     const VERIFY_URL = "https://lazrfierfbhwlduqlvws.functions.supabase.co/verify-telegram";
-    const MIN_BET = 10, MAX_BET = 5000, START_BALANCE = 1000;
+    const MIN_BET = 30, MAX_BET = 5000, START_BALANCE = 1000;
     const DEAL_DELAY = 400;
     const DEALER_DRAW_DELAY = 550;
 
@@ -608,39 +595,20 @@
     const betInput = $("betInput"), dealBtn = $("dealBtn"), hitBtn = $("hitBtn"), standBtn = $("standBtn"), doubleBtn = $("doubleBtn");
     const balanceSpan = $("balanceValue");
     const notificationDiv = $("notification");
-    const notificationIcon = notificationDiv.querySelector(".notification-icon");
-    const notificationText = notificationDiv.querySelector(".notification-text");
-    const betChip = $("betChip");
-    const chipAmountSpan = $("chipAmount");
+    const currentBetDisplay = $("currentBetDisplay");
+    const betError = $("betError");
 
     function formatMoney(v) { return Math.floor(v) === v ? `${v} ₽` : `${v.toFixed(2)} ₽`; }
     function updateBalanceUI() { balanceSpan.textContent = formatMoney(currentBalance); }
-    function updateChip(amount) {
-      chipAmountSpan.textContent = amount;
-      if (amount > 0 && gameActive) {
-        betChip.classList.remove("hidden");
-        // небольшая анимация при обновлении
-        betChip.style.animation = "none";
-        betChip.offsetHeight;
-        betChip.style.animation = "chipPop 0.3s cubic-bezier(0.34, 1.2, 0.64, 1)";
-      } else {
-        betChip.classList.add("hidden");
-      }
+    function updateBetDisplay() {
+      if (currentBet > 0) currentBetDisplay.textContent = `Ставка: ${currentBet} ₽`;
+      else currentBetDisplay.textContent = `Ставка: —`;
     }
-    function showCustomNotification(icon, text) {
+    function showNotification(text) {
       if (notificationTimeout) clearTimeout(notificationTimeout);
-      notificationIcon.textContent = icon;
-      notificationText.textContent = text;
+      notificationDiv.textContent = text;
       notificationDiv.classList.add("show");
       notificationTimeout = setTimeout(() => notificationDiv.classList.remove("show"), 2000);
-    }
-    // красивые иконки для результатов
-    function showGameResult(type, amount = null) {
-      if (type === 'win') showCustomNotification("🪙", `+${formatMoney(amount)}`);
-      else if (type === 'lose') showCustomNotification("💔", "Ставка проиграна");
-      else if (type === 'draw') showCustomNotification("⚖️", "Ничья");
-      else if (type === 'blackjack') showCustomNotification("♠️", `Блэкджек! +${formatMoney(amount)}`);
-      else if (type === 'dealer_bust') showCustomNotification("🃟", `Дилер перебрал! +${formatMoney(amount)}`);
     }
     function saveBalance() { localStorage.setItem("bj_balance", currentBalance); }
     function loadSavedBalance() {
@@ -742,8 +710,8 @@
 
     async function startRound(betAmount) {
       if (gameActive) return;
-      if (betAmount < MIN_BET || betAmount > MAX_BET) { showCustomNotification("⚠️", `Ставка от ${MIN_BET} до ${MAX_BET}`); return; }
-      if (betAmount > currentBalance) { showCustomNotification("⚠️", "Недостаточно средств"); return; }
+      if (betAmount < MIN_BET || betAmount > MAX_BET) { showNotification(`Ставка от ${MIN_BET} до ${MAX_BET}`); return; }
+      if (betAmount > currentBalance) { showNotification("Недостаточно средств"); return; }
 
       currentBalance -= betAmount;
       updateBalanceUI();
@@ -752,7 +720,7 @@
       doubled = false;
       gameActive = true;
       waitingForDealer = false;
-      updateChip(currentBet);  // показать фишку
+      updateBetDisplay();
 
       deck = buildDeck();
       playerHand = [deck.pop(), deck.pop()];
@@ -801,34 +769,31 @@
       }
 
       let playerScore = getHandScore(playerHand);
-      let payout = 0, messageType = '', messageAmount = null;
+      let payout = 0, message = "";
       const isPlayerBlackjack = (playerHand.length === 2 && playerScore === 21);
       const isDealerBlackjack = (dealerHand.length === 2 && dealerScore === 21);
 
       if (playerScore > 21) {
-        messageType = 'lose';
+        message = "Перебор! Ставка проиграна";
       } else if (dealerScore > 21) {
         payout = currentBet * 2;
-        messageType = 'dealer_bust';
-        messageAmount = payout - currentBet;
+        message = `Дилер перебрал! Вы выиграли ${formatMoney(payout - currentBet)}`;
       } else if (playerScore > dealerScore) {
         payout = currentBet * 2;
-        messageType = 'win';
-        messageAmount = payout - currentBet;
+        message = `Вы выиграли ${formatMoney(payout - currentBet)}`;
       } else if (playerScore === dealerScore) {
         payout = currentBet;
-        messageType = 'draw';
+        message = "Ничья, ставка возвращена";
       } else {
-        messageType = 'lose';
+        message = "Дилер выиграл";
       }
 
       if (isPlayerBlackjack && !isDealerBlackjack) {
         payout = currentBet * 2.5;
-        messageType = 'blackjack';
-        messageAmount = payout - currentBet;
+        message = `Блэкджек! Выигрыш ${formatMoney(payout - currentBet)}`;
       } else if (isPlayerBlackjack && isDealerBlackjack) {
         payout = currentBet;
-        messageType = 'draw';
+        message = "Блэкджек у обоих — ничья";
       }
 
       if (payout > 0) {
@@ -836,18 +801,14 @@
         updateBalanceUI();
         saveBalance();
       }
-
-      if (messageType === 'win') showGameResult('win', messageAmount);
-      else if (messageType === 'lose') showGameResult('lose');
-      else if (messageType === 'draw') showGameResult('draw');
-      else if (messageType === 'blackjack') showGameResult('blackjack', messageAmount);
-      else if (messageType === 'dealer_bust') showGameResult('dealer_bust', messageAmount);
+      showNotification(message);
 
       gameActive = false; waitingForDealer = false;
       dealBtn.disabled = false; hitBtn.disabled = true; standBtn.disabled = true; doubleBtn.disabled = true;
       betInput.disabled = false; document.querySelectorAll(".quick-btn").forEach(b => b.disabled = false);
       updateScores();
-      updateChip(0);  // скрыть фишку после игры
+      currentBet = 0;
+      updateBetDisplay();
     }
 
     async function hit() {
@@ -865,19 +826,43 @@
 
     async function doubleDown() {
       if (!gameActive || doubled || playerHand.length !== 2) return;
-      if (currentBalance < currentBet) { showCustomNotification("⚠️", "Недостаточно для удвоения"); return; }
+      if (currentBalance < currentBet) { showNotification("Недостаточно для удвоения"); return; }
       currentBalance -= currentBet;
       currentBet *= 2;
       doubled = true;
       updateBalanceUI();
       saveBalance();
-      updateChip(currentBet);  // обновить фишку
+      updateBetDisplay();
       let newCard = deck.pop();
       playerHand.push(newCard);
       await addCard(playerCardsDiv, newCard, false, 0);
       updateScores();
       await finishGame();
     }
+
+    // Валидация поля ввода
+    function validateBetInput() {
+      const val = betInput.value.trim();
+      if (val === "") {
+        betInput.classList.remove("error");
+        betError.classList.remove("show");
+        return false;
+      }
+      const num = parseInt(val);
+      if (isNaN(num) || num < MIN_BET || num > MAX_BET) {
+        betInput.classList.add("error");
+        betError.classList.add("show");
+        return false;
+      } else {
+        betInput.classList.remove("error");
+        betError.classList.remove("show");
+        return true;
+      }
+    }
+
+    betInput.addEventListener("input", function() {
+      validateBetInput();
+    });
 
     let quickVisible = false;
     function setQuickVisible(show) {
@@ -890,18 +875,23 @@
       btn.onclick = () => {
         if (dealBtn.disabled) return;
         let val = Number(btn.dataset.bet);
-        if (!isNaN(val)) betInput.value = Math.min(val, MAX_BET);
+        if (!isNaN(val)) {
+          betInput.value = Math.min(val, MAX_BET);
+          validateBetInput();
+        }
         setQuickVisible(false);
       };
     });
-    betInput.addEventListener("input", function() {
-      let v = parseInt(this.value);
-      if (isNaN(v)) this.value = MIN_BET;
-      else if (v > MAX_BET) this.value = MAX_BET;
-      else if (v < MIN_BET && this.value !== "") this.value = MIN_BET;
-    });
 
-    dealBtn.onclick = () => { let bet = parseInt(betInput.value); if (isNaN(bet)) bet = MIN_BET; startRound(bet); };
+    dealBtn.onclick = () => {
+      if (!validateBetInput()) {
+        showNotification(`Минимальная ставка ${MIN_BET} ₽`);
+        return;
+      }
+      let bet = parseInt(betInput.value);
+      if (isNaN(bet)) bet = MIN_BET;
+      startRound(bet);
+    };
     hitBtn.onclick = hit;
     standBtn.onclick = stand;
     doubleBtn.onclick = doubleDown;
@@ -955,7 +945,8 @@
     hitBtn.disabled = true; standBtn.disabled = true; doubleBtn.disabled = true;
     dealBtn.disabled = false; betInput.disabled = false;
     updateBalanceUI();
-    updateChip(0);
+    updateBetDisplay();
+    validateBetInput(); // начальная проверка (поле пустое)
   })();
 </script>
 </body>
