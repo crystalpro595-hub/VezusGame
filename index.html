@@ -16,7 +16,6 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800;900&display=swap" rel="stylesheet">
 
   <style>
-    /* (стили полностью совпадают с вашими — без изменений) */
     :root{
       --text:#eaf1ff;
       --safe-bottom: env(safe-area-inset-bottom, 0px);
@@ -1542,32 +1541,44 @@
 
     balanceChipEl.addEventListener('click', () => goTo(FILES.wallet));
 
-    // Обработчики для оригинальных Games (6 карточек)
-    const gameCards = document.querySelectorAll('.games-section:first-of-type .game-card');
-    if (gameCards.length >= 6) {
-      gameCards[0].addEventListener('click', () => goTo(FILES.coinflip));
-      gameCards[1].addEventListener('click', () => goTo(FILES.mines));
-      gameCards[2].addEventListener('click', () => goTo(FILES.cups));
-      gameCards[3].addEventListener('click', () => goTo('platform.html'));
-      for (let i = 4; i < gameCards.length; i++) {
-        gameCards[i].addEventListener('click', () => showToast('В разработке', 1500));
-      }
-    }
-    // Slots — все в разработке
-    document.querySelectorAll('.slot-card').forEach(card => {
-      card.addEventListener('click', () => showToast('В разработке', 1500));
-    });
+    // ========== ЕДИНЫЙ ОБРАБОТЧИК ДЛЯ ВСЕХ КАРТОЧЕК (делегирование) ==========
+    appRoot.addEventListener('click', (e) => {
+      // Находим ближайшую карточку с классом game-card или slot-card
+      const card = e.target.closest('.game-card, .slot-card');
+      if (!card) return;
 
-    // ========== НОВЫЕ КАРТОЧКИ CARD GAMES ==========
-    const cardGameItems = document.querySelectorAll('.cardgame-card');
-    if (cardGameItems.length >= 1) {
-      // первая карточка -> blackjack.html
-      cardGameItems[0].addEventListener('click', () => goTo(FILES.blackjack));
-      // остальные -> toast
-      for (let i = 1; i < cardGameItems.length; i++) {
-        cardGameItems[i].addEventListener('click', () => showToast('В разработке', 1500));
+      // Определяем, в каком контейнере находится карточка
+      const isGames = card.closest('#gamesScroll') !== null;
+      const isCardGames = card.closest('#cardGamesScroll') !== null;
+      const isSlots = card.closest('#slotsScroll') !== null;
+
+      // --- Блок Games (первые три карточки — конкретные игры, четвёртая — platform.html, остальные в разработке) ---
+      if (isGames) {
+        const allGamesCards = Array.from(document.querySelectorAll('#gamesScroll .game-card'));
+        const index = allGamesCards.indexOf(card);
+        if (index === 0) goTo(FILES.coinflip);
+        else if (index === 1) goTo(FILES.mines);
+        else if (index === 2) goTo(FILES.cups);
+        else if (index === 3) goTo('platform.html');
+        else showToast('В разработке', 1500);
+        return;
       }
-    }
+
+      // --- Блок Card Games (первая карточка — blackjack.html, остальные в разработке) ---
+      if (isCardGames) {
+        const allCardGameCards = Array.from(document.querySelectorAll('#cardGamesScroll .game-card'));
+        const index = allCardGameCards.indexOf(card);
+        if (index === 0) goTo(FILES.blackjack);
+        else showToast('В разработке', 1500);
+        return;
+      }
+
+      // --- Блок Slots (все в разработке) ---
+      if (isSlots) {
+        showToast('В разработке', 1500);
+        return;
+      }
+    });
 
     // Обработчики для кнопок на баннерах
     const slideBtns = document.querySelectorAll('.slide-btn');
