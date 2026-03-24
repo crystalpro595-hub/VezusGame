@@ -53,6 +53,7 @@
       --dark: #1a1a1a;
       --dark-border: #2a2a2a;
       --error: #ff4444;
+      --gold: #d4af37;
     }
 
     /* ---------- СТАРТОВЫЙ ЛОАДЕР ---------- */
@@ -132,38 +133,69 @@
     .logo-btn { width: 40px; height: 40px; background: transparent; border: none; padding: 0; cursor: default; }
     .logo-btn img { width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 4px 8px black); }
 
-    /* игровой стол */
+    /* ----- НОВОЕ РОСКОШНОЕ СУКНО ----- */
     .blackjack-table {
-      background: radial-gradient(ellipse at 50% 30%, #1f5a38, #0a351f);
-      border-radius: 36px 36px 24px 24px;
-      border: 1px solid var(--dark-border);
-      box-shadow: inset 0 0 20px rgba(0,0,0,0.4), 0 20px 35px rgba(0,0,0,0.5);
-      padding: 8px 8px 12px;
+      background: radial-gradient(ellipse at 30% 40%, #1f6a3f, #0a3a20);
+      border-radius: 40px 40px 28px 28px;
+      border: 1px solid rgba(212, 175, 55, 0.5);
+      box-shadow: inset 0 0 20px rgba(0,0,0,0.6), 0 20px 35px rgba(0,0,0,0.5);
+      padding: 12px 8px 16px;
       display: flex;
       justify-content: center;
       position: relative;
+      transition: all 0.2s ease;
+    }
+    /* Золотая окантовка внутри */
+    .blackjack-table::before {
+      content: "";
+      position: absolute;
+      inset: 6px;
+      border-radius: 34px;
+      border: 1px solid rgba(212, 175, 55, 0.35);
+      pointer-events: none;
+      box-shadow: 0 0 6px rgba(212,175,55,0.3);
+    }
+    /* Текстура ткани (мелкий ворс) */
+    .blackjack-table::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: repeating-linear-gradient(45deg, rgba(0,0,0,0.04) 0px, rgba(0,0,0,0.04) 2px, transparent 2px, transparent 8px),
+                        repeating-linear-gradient(135deg, rgba(255,215,0,0.02) 0px, rgba(255,215,0,0.02) 3px, transparent 3px, transparent 12px);
+      border-radius: inherit;
+      pointer-events: none;
     }
     .game-area {
       width: 100%;
+      position: relative;
+      z-index: 2;
     }
     .dealer-area, .player-area {
-      margin-bottom: 12px;
+      margin-bottom: 16px;
       text-align: center;
     }
     .area-label {
-      font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px;
-      color: #ecd67a; text-shadow: 0 2px 3px black; margin-bottom: 6px;
+      font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 1.5px;
+      color: #ecd67a; text-shadow: 0 2px 4px black; margin-bottom: 8px;
+      background: rgba(0,0,0,0.4);
+      display: inline-block;
+      padding: 2px 18px;
+      border-radius: 60px;
+      backdrop-filter: blur(4px);
     }
     .cards {
       display: flex;
       flex-wrap: wrap;
       justify-content: center;
-      gap: 6px;
-      min-height: 96px;
+      gap: 8px;
+      min-height: 106px;
       position: relative;
     }
 
-    /* ----- КАРТЫ ----- */
+    /* ----- КАРТЫ (улучшенный вид) ----- */
     .card {
       width: 64px;
       height: 89px;
@@ -171,6 +203,7 @@
       animation: gentleAppear 0.4s cubic-bezier(0.2, 0.9, 0.4, 1) forwards;
       transform: translateZ(0);
       will-change: transform, opacity;
+      filter: drop-shadow(0 4px 6px rgba(0,0,0,0.3));
     }
     @keyframes gentleAppear {
       0% { transform: scale(0.92) translateZ(0); opacity: 0; }
@@ -183,15 +216,15 @@
       left: 0;
       width: 100%;
       height: 100%;
-      border-radius: 9px;
+      border-radius: 10px;
       backface-visibility: hidden;
       transition: opacity 0.25s ease;
     }
-    /* Рубашка (тёмно-фиолетовая) */
+    /* Рубашка (элегантный тёмно-фиолетовый с золотым отливом) */
     .card-back {
-      background: linear-gradient(135deg, #8b5cf6, #6d28d9, #4c1d95);
-      border: 1px solid var(--dark-border);
-      box-shadow: -2px 2px 8px rgba(0,0,0,0.5);
+      background: linear-gradient(135deg, #7c3aed, #5b21b6, #2e1065);
+      border: 1px solid rgba(212,175,55,0.5);
+      box-shadow: -2px 2px 8px rgba(0,0,0,0.6);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -203,7 +236,7 @@
     .card-back::before {
       content: "";
       position: absolute;
-      inset: 4px;
+      inset: 5px;
       background: url("https://i.postimg.cc/qvL497mF/Picsart-26-02-27-02-02-37-502.png") center/contain no-repeat;
       opacity: 0.85;
       filter: drop-shadow(0 0 3px rgba(0,0,0,0.5));
@@ -212,7 +245,7 @@
       content: "";
       position: absolute;
       inset: 0;
-      background: radial-gradient(circle at 30% 20%, rgba(212,175,55,0.2), transparent 70%);
+      background: radial-gradient(circle at 30% 20%, rgba(212,175,55,0.25), transparent 70%);
       pointer-events: none;
     }
 
@@ -229,46 +262,58 @@
       color: #222;
       opacity: 0;
       z-index: 1;
+      border-radius: 10px;
     }
     .card-face[data-suit="♥"], .card-face[data-suit="♦"] { color: #c33; }
     .card-face[data-suit="♣"], .card-face[data-suit="♠"] { color: #222; }
     .card-rank { font-size: 26px; font-weight: 800; line-height: 1; }
     .card-suit { font-size: 30px; margin-top: 4px; }
 
-    /* Скрытая карта: рубашка видна, лицо скрыто */
     .card.hidden .card-back { opacity: 1; }
     .card.hidden .card-face { opacity: 0; }
-
-    /* Открытая карта: рубашка исчезает, лицо проявляется */
     .card.reveal .card-back { opacity: 0; }
     .card.reveal .card-face { opacity: 1; }
 
+    /* Блок со счётом и ставкой — новая сетка для центровки счёта */
+    .player-stats {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      justify-items: center;
+      margin-top: 8px;
+      gap: 8px;
+    }
+    .stats-left {
+      /* пустой элемент для симметрии */
+    }
+    .score-center {
+      justify-self: center;
+    }
+    .bet-right {
+      justify-self: end;
+    }
     .scores {
-      margin-top: 6px;
       font-weight: 800;
-      font-size: 14px;
-      background: rgba(0,0,0,0.5);
+      font-size: 15px;
+      background: rgba(0,0,0,0.65);
       display: inline-block;
-      padding: 2px 14px;
+      padding: 4px 18px;
       border-radius: 60px;
       backdrop-filter: blur(4px);
+      letter-spacing: 0.5px;
+      color: #ffecb3;
+      box-shadow: inset 0 0 6px rgba(0,0,0,0.2), 0 2px 4px rgba(0,0,0,0.3);
     }
-    /* Блок с текущей ставкой */
     .bet-info {
-      display: inline-block;
-      margin-left: 12px;
-      font-size: 12px;
+      font-size: 13px;
       font-weight: 800;
-      background: rgba(0,0,0,0.5);
-      padding: 2px 12px;
+      background: rgba(0,0,0,0.65);
+      padding: 4px 14px;
       border-radius: 60px;
       color: #ffd966;
-    }
-    .player-stats {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
+      backdrop-filter: blur(4px);
+      white-space: nowrap;
+      box-shadow: inset 0 0 6px rgba(0,0,0,0.2), 0 2px 4px rgba(0,0,0,0.3);
     }
 
     /* УВЕДОМЛЕНИЕ */
@@ -277,20 +322,20 @@
       top: 12px;
       left: 50%;
       transform: translateX(-50%) scale(0.95);
-      background: linear-gradient(135deg, rgba(0,0,0,0.85), rgba(0,0,0,0.7));
+      background: linear-gradient(135deg, rgba(0,0,0,0.9), rgba(0,0,0,0.7));
       backdrop-filter: blur(12px);
-      border: 1px solid var(--dark-border);
+      border: 1px solid var(--gold);
       border-radius: 40px;
-      padding: 8px 20px;
+      padding: 8px 24px;
       z-index: 250;
       opacity: 0;
       transition: opacity 0.2s ease, transform 0.2s ease;
       pointer-events: none;
       white-space: nowrap;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.5);
       font-size: 13px;
       font-weight: 800;
-      color: #ecd67a;
+      color: #ffec9e;
       text-align: center;
     }
     .notification.show {
@@ -302,20 +347,21 @@
     .bet-panel {
       background: var(--glass);
       backdrop-filter: blur(12px);
-      border-radius: 24px;
+      border-radius: 28px;
       border: 1px solid var(--stroke);
-      padding: 10px;
+      padding: 12px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.4);
     }
-    .label { font-size: 11px; font-weight: 800; margin-bottom: 4px; color: #ecd67a; }
-    .bet-row { display: flex; gap: 6px; align-items: center; }
+    .label { font-size: 11px; font-weight: 800; margin-bottom: 6px; color: #ecd67a; letter-spacing: 0.8px; }
+    .bet-row { display: flex; gap: 8px; align-items: center; }
     .bet-input {
-      flex: 1; height: 42px; border-radius: 28px; background: rgba(0,0,0,0.5);
-      border: 1px solid rgba(40,40,40,0.8); color: #fff; font-weight: 800;
-      text-align: center; font-size: 16px; padding: 0 10px;
+      flex: 1; height: 44px; border-radius: 32px; background: rgba(0,0,0,0.6);
+      border: 1px solid rgba(212,175,55,0.5); color: #fff; font-weight: 800;
+      text-align: center; font-size: 16px; padding: 0 12px;
       transition: border-color 0.2s;
     }
     .bet-input::placeholder {
-      color: #aaa;
+      color: #ccc;
       font-weight: 500;
       font-size: 14px;
     }
@@ -324,14 +370,17 @@
       box-shadow: 0 0 0 1px var(--error);
     }
     .bet-toggle {
-      width: 42px; height: 42px; border-radius: 40px; background: rgba(0,0,0,0.5);
-      border: 1px solid var(--stroke); cursor: pointer;
-      font-size: 20px;
+      width: 44px; height: 44px; border-radius: 44px; background: rgba(0,0,0,0.6);
+      border: 1px solid rgba(212,175,55,0.6); cursor: pointer;
+      font-size: 22px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-weight: 700;
+      font-weight: 800;
+      color: white !important;  /* иконка ₽ белая */
+      transition: 0.15s;
     }
+    .bet-toggle:active { transform: scale(0.96); background: rgba(0,0,0,0.8); }
     .error-message {
       font-size: 11px;
       color: var(--error);
@@ -343,45 +392,47 @@
       display: block;
     }
     .quick-bets {
-      display: flex; gap: 6px; margin-top: 8px; flex-wrap: wrap;
+      display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap;
       max-height: 0; opacity: 0; overflow: hidden; transition: 0.2s;
     }
     .quick-bets.show { max-height: 52px; opacity: 1; margin-top: 8px; }
     .quick-btn {
       flex: 1; background: linear-gradient(145deg, #2a2a2a, #1a1a1a);
-      border: 1px solid rgba(40,40,40,0.8);
+      border: 1px solid rgba(212,175,55,0.5);
       border-radius: 40px;
-      padding: 6px;
+      padding: 7px;
       font-weight: 800;
       font-size: 12px;
       color: #ecd67a;
       cursor: pointer;
+      transition: 0.1s;
     }
+    .quick-btn:active { transform: scale(0.96); background: #3a3a3a; }
     .action-buttons {
       display: flex;
-      gap: 8px;
-      margin-top: 10px;
+      gap: 10px;
+      margin-top: 12px;
       flex-wrap: wrap;
     }
     .game-btn {
       flex: 1;
-      height: 46px;
+      height: 48px;
       border: none;
-      border-radius: 40px;
+      border-radius: 44px;
       font-weight: 900;
       font-size: 14px;
       cursor: pointer;
       background: linear-gradient(145deg, #2c2c2c, #1a1a1a);
       color: #ecd67a;
       transition: all 0.15s ease;
-      border: 1px solid rgba(40,40,40,0.8);
+      border: 1px solid rgba(212,175,55,0.5);
       box-shadow: 0 4px 8px rgba(0,0,0,0.2);
     }
     .game-btn:active { transform: scale(0.96); }
     .game-btn.primary {
       background: linear-gradient(145deg, #3a3a3a, #2a2a2a);
-      color: #ecd67a;
-      border: 1px solid #4a4a4a;
+      color: #ffdf8c;
+      border: 1px solid var(--gold);
       box-shadow: 0 4px 12px rgba(0,0,0,0.3);
     }
     .game-btn:disabled {
@@ -390,19 +441,20 @@
       pointer-events: none;
     }
 
-    /* Правила — тёмный стиль без золота */
+    /* Правила — тёмный стиль с золотыми нотками */
     .popup {
-      background: #0c0c0c;
+      background: #0f0f0f;
       backdrop-filter: blur(12px);
-      border-radius: 32px;
-      border: 1px solid var(--dark-border);
+      border-radius: 36px;
+      border: 1px solid rgba(212,175,55,0.4);
       width: min(380px, 90%);
       overflow: hidden;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.6);
     }
     .popup-head {
       padding: 16px 20px;
       background: #111;
-      border-bottom: 1px solid var(--dark-border);
+      border-bottom: 1px solid rgba(212,175,55,0.3);
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -410,7 +462,7 @@
     .popup-title {
       font-size: 20px;
       font-weight: 900;
-      color: #ccc;
+      color: #ecd67a;
       letter-spacing: 1px;
       display: flex;
       align-items: center;
@@ -419,7 +471,7 @@
     .popup-title::before {
       content: "♠";
       font-size: 24px;
-      color: #aaa;
+      color: var(--gold);
     }
     .popup-x {
       width: 32px;
@@ -443,11 +495,10 @@
       background: #111;
       border-radius: 20px;
       padding: 12px 16px;
-      border-left: 3px solid #3a3a3a;
+      border-left: 3px solid var(--gold);
       display: flex;
       align-items: center;
       gap: 14px;
-      transition: 0.2s;
     }
     .rule-icon {
       width: 40px;
@@ -459,8 +510,8 @@
       justify-content: center;
       font-size: 24px;
       font-weight: 900;
-      color: #aaa;
-      border: 1px solid var(--dark-border);
+      color: var(--gold);
+      border: 1px solid rgba(212,175,55,0.4);
     }
     .rule-text { flex: 1; }
     .rule-title {
@@ -471,12 +522,12 @@
     }
     .rule-desc {
       font-size: 12px;
-      color: #888;
+      color: #aaa;
       line-height: 1.3;
     }
 
     .overlay {
-      position: fixed; inset: 0; background: rgba(0,0,0,0.7); opacity: 0; pointer-events: none;
+      position: fixed; inset: 0; background: rgba(0,0,0,0.75); opacity: 0; pointer-events: none;
       transition: 0.2s; z-index: 300; display: flex; align-items: center; justify-content: center;
     }
     .overlay.show { opacity: 1; pointer-events: auto; }
@@ -486,12 +537,14 @@
       .card-rank { font-size: 24px; }
       .card-suit { font-size: 28px; }
       .game-btn { height: 42px; font-size: 12px; }
-      .notification { padding: 6px 16px; font-size: 12px; }
-      .bet-info { font-size: 10px; margin-left: 8px; }
+      .notification { padding: 6px 18px; font-size: 12px; }
+      .bet-info { font-size: 11px; padding: 4px 10px; }
+      .scores { font-size: 13px; padding: 3px 14px; }
+      .player-stats { gap: 4px; }
     }
     @media (max-width: 450px) {
       .card { width: 52px; height: 73px; }
-      .scores { font-size: 12px; padding: 2px 10px; }
+      .scores { font-size: 12px; padding: 2px 12px; }
     }
   </style>
 </head>
@@ -526,8 +579,9 @@
           <div class="area-label">ИГРОК</div>
           <div class="cards" id="playerCards"></div>
           <div class="player-stats">
-            <div class="scores" id="playerScore">—</div>
-            <div class="bet-info" id="currentBetDisplay">Ставка: —</div>
+            <div class="stats-left"></div>
+            <div class="score-center"><div class="scores" id="playerScore">—</div></div>
+            <div class="bet-right"><div class="bet-info" id="currentBetDisplay">Ставка: —</div></div>
           </div>
         </div>
       </div>
@@ -840,7 +894,6 @@
       await finishGame();
     }
 
-    // Валидация поля ввода
     function validateBetInput() {
       const val = betInput.value.trim();
       if (val === "") {
@@ -946,7 +999,7 @@
     dealBtn.disabled = false; betInput.disabled = false;
     updateBalanceUI();
     updateBetDisplay();
-    validateBetInput(); // начальная проверка (поле пустое)
+    validateBetInput();
   })();
 </script>
 </body>
