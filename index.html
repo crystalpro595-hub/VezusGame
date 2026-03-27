@@ -86,7 +86,6 @@
       align-items:center;
     }
 
-    /* Верхняя панель: меню, баланс, лого — приклеивается */
     .top-row{
       position: sticky;
       top: calc(4px + var(--safe-top));
@@ -221,7 +220,6 @@
       display:block;
     }
 
-    /* Слайдер */
     .slider{
       width:100%;
       max-width:520px;
@@ -274,7 +272,6 @@
       pointer-events:none;
     }
 
-    /* Кнопка на баннере — квадратная, слева, уменьшенная */
     .slide-btn {
       position: absolute;
       bottom: 16px;
@@ -324,7 +321,6 @@
       transform: translateY(-.5px);
     }
 
-    /* Games, Slots, Card games — общие стили */
     .games-section, .slots-section {
       width: 100%;
       max-width: 520px;
@@ -405,12 +401,10 @@
       z-index: 0;
     }
 
-    /* Убираем затемнение на карточках */
     .game-card::after, .slot-card::after {
       display: none;
     }
 
-    /* ----- Меню (выезжает слева) — компактная версия ----- */
     .menu-overlay{
       position:fixed;
       inset:0;
@@ -487,7 +481,6 @@
     .menu-close:hover { background: rgba(255,255,255,.22); transform: rotate(90deg) scale(1.05); }
     .menu-close:active{ transform: scale(.94); }
 
-    /* Блок профиля (компактнее) */
     .profile-block {
       display: flex;
       align-items: center;
@@ -626,7 +619,6 @@
       letter-spacing: 0.2px;
     }
 
-    /* Блок поддержки внизу меню */
     .menu-footer {
       padding: 8px 16px 20px 16px;
       margin-top: auto;
@@ -696,7 +688,6 @@
       margin-left: auto;
     }
 
-    /* Оверлеи поддержки и канала */
     .support-overlay,
     .channel-overlay{
       position:fixed;
@@ -814,7 +805,6 @@
       filter: drop-shadow(0 8px 14px rgba(0,0,0,.3));
     }
 
-    /* Toast */
     .toast{
       position:fixed;
       left:14px;
@@ -828,10 +818,12 @@
       transform: translateY(10px);
       transition: opacity .18s ease, transform .18s ease;
     }
+
     .toast.show{
       opacity:1;
       transform: translateY(0);
     }
+
     .toast .box{
       width:min(520px, 100%);
       border-radius:22px;
@@ -847,7 +839,6 @@
       color: white;
     }
 
-    /* ----- Оверлей для ввода пароля ----- */
     .password-overlay {
       position: fixed;
       top: 0;
@@ -1000,7 +991,6 @@
 </head>
 
 <body>
-  <!-- Оверлей для ввода пароля -->
   <div class="password-overlay" id="passwordOverlay">
     <div class="password-container">
       <h2>Вход</h2>
@@ -1014,7 +1004,6 @@
   <div class="app" id="appRoot" style="display: none;">
     <div class="content">
 
-      <!-- Верхняя панель: меню + баланс + лого -->
       <div class="top-row">
         <button class="icon-btn" id="menuBtn" aria-label="Открыть меню">
           <div class="burger" aria-hidden="true">
@@ -1040,7 +1029,6 @@
         </button>
       </div>
 
-      <!-- Слайдер с кнопками на баннерах -->
       <div class="slider" aria-label="Баннеры">
         <div class="slides" id="slides">
           <div class="slide">
@@ -1080,7 +1068,6 @@
         </div>
       </div>
 
-      <!-- Блок Games -->
       <div class="games-section">
         <div class="games-header">
           <span class="games-title">Games</span>
@@ -1119,7 +1106,6 @@
         </div>
       </div>
 
-      <!-- Блок Card Games (три карточки, первая ведёт на blackjack.html) -->
       <div class="games-section">
         <div class="games-header">
           <span class="games-title">Card Games</span>
@@ -1143,7 +1129,6 @@
         </div>
       </div>
 
-      <!-- Блок Slots -->
       <div class="slots-section">
         <div class="slots-header">
           <span class="slots-title">Slots</span>
@@ -1185,7 +1170,6 @@
     </div>
   </div>
 
-  <!-- Меню (выезжает слева) -->
   <div class="menu-overlay" id="menuOverlay" aria-hidden="true">
     <div class="menu-sheet" role="dialog" aria-modal="true" aria-label="Меню">
       <div class="menu-sheet-head">
@@ -1193,7 +1177,6 @@
         <button class="menu-close" id="menuClose" aria-label="Закрыть меню">✕</button>
       </div>
 
-      <!-- Блок профиля -->
       <div class="profile-block" id="menuProfileBlock">
         <div class="profile-avatar" id="profileAvatar">?</div>
         <div class="profile-info">
@@ -1266,7 +1249,6 @@
     </div>
   </div>
 
-  <!-- Оверлей поддержки -->
   <div class="support-overlay" id="supportOverlay" aria-hidden="true">
     <div class="support-card" role="dialog" aria-modal="true" aria-label="Поддержка">
       <div class="support-head">
@@ -1288,7 +1270,6 @@
     </div>
   </div>
 
-  <!-- Оверлей канала -->
   <div class="channel-overlay" id="channelOverlay" aria-hidden="true">
     <div class="channel-card" role="dialog" aria-modal="true" aria-label="Telegram канал">
       <div class="channel-head">
@@ -1310,7 +1291,6 @@
     </div>
   </div>
 
-  <!-- Toast уведомление -->
   <div class="toast" id="toast" aria-live="polite" aria-atomic="true">
     <div class="box" id="toastText">В разработке</div>
   </div>
@@ -1336,10 +1316,10 @@
       coinflip: 'coinflip.html',
       mines: 'mines.html',
       cups: 'cups.html',
-      blackjack: 'blackjack.html'
+      blackjack: 'blackjack.html',
+      candyslot: 'candyslot.html'
     };
 
-    // ---------- Защита паролем ----------
     const passwordOverlay = document.getElementById('passwordOverlay');
     const appRoot = document.getElementById('appRoot');
     const passwordInput = document.getElementById('passwordInput');
@@ -1379,7 +1359,6 @@
 
     checkAuth();
 
-    // ---------- Остальная логика приложения ----------
     const balanceValueEl = document.getElementById('balanceValue');
     const balanceChipEl  = document.getElementById('balanceChip');
 
@@ -1496,6 +1475,7 @@
     }
 
     function goTo(file){ window.location.href = file; }
+
     function openTelegramLinkSafe(url){
       if (window.Telegram?.WebApp?.openTelegramLink) window.Telegram.WebApp.openTelegramLink(url);
       else window.open(url, '_blank', 'noopener');
@@ -1541,51 +1521,56 @@
 
     balanceChipEl.addEventListener('click', () => goTo(FILES.wallet));
 
-    // ========== ЕДИНЫЙ ОБРАБОТЧИК ДЛЯ ВСЕХ КАРТОЧЕК (делегирование) ==========
     appRoot.addEventListener('click', (e) => {
-      // Находим ближайшую карточку с классом game-card или slot-card
       const card = e.target.closest('.game-card, .slot-card');
       if (!card) return;
 
-      // Определяем, в каком контейнере находится карточка
       const isGames = card.closest('#gamesScroll') !== null;
       const isCardGames = card.closest('#cardGamesScroll') !== null;
       const isSlots = card.closest('#slotsScroll') !== null;
 
-      // --- Блок Games (первые три карточки — конкретные игры, четвёртая — platform.html, остальные в разработке) ---
       if (isGames) {
         const allGamesCards = Array.from(document.querySelectorAll('#gamesScroll .game-card'));
         const index = allGamesCards.indexOf(card);
+
         if (index === 0) goTo(FILES.coinflip);
         else if (index === 1) goTo(FILES.mines);
         else if (index === 2) goTo(FILES.cups);
         else if (index === 3) goTo('platform.html');
         else showToast('В разработке', 1500);
+
         return;
       }
 
-      // --- Блок Card Games (первая карточка — blackjack.html, остальные в разработке) ---
       if (isCardGames) {
         const allCardGameCards = Array.from(document.querySelectorAll('#cardGamesScroll .game-card'));
         const index = allCardGameCards.indexOf(card);
+
         if (index === 0) goTo(FILES.blackjack);
         else showToast('В разработке', 1500);
+
         return;
       }
 
-      // --- Блок Slots (все в разработке) ---
       if (isSlots) {
-        showToast('В разработке', 1500);
+        const slotName = card.dataset.slot;
+
+        if (slotName === 'slot1') {
+          goTo(FILES.candyslot);
+        } else {
+          showToast('В разработке', 1500);
+        }
+
         return;
       }
     });
 
-    // Обработчики для кнопок на баннерах
     const slideBtns = document.querySelectorAll('.slide-btn');
     slideBtns.forEach(btn => {
       btn.addEventListener('click', (e) => {
         e.stopPropagation();
         const bannerType = btn.getAttribute('data-banner');
+
         if (bannerType === 'fortune') {
           if (FILES.fortune) goTo(FILES.fortune);
           else showToast('Колесо фортуны — скоро', 1500);
@@ -1598,10 +1583,10 @@
       });
     });
 
-    // Слайдер
     const slides = document.getElementById('slides');
     const dotsWrap = document.getElementById('dots');
     const dots = Array.from(dotsWrap.querySelectorAll('.dot'));
+
     function getStep(){
       const first = slides.querySelector('.slide');
       if (!first) return slides.clientWidth || 1;
@@ -1609,26 +1594,45 @@
       const gap = parseFloat(getComputedStyle(slides).gap || '0') || 0;
       return w + gap;
     }
+
     function getCurrentIndex(){
       const step = getStep();
       return clamp(Math.round(slides.scrollLeft / step), 0, dots.length - 1);
     }
+
     function updateDotsByScroll(){
       const idx = getCurrentIndex();
       dots.forEach((d, i) => d.classList.toggle('active', i === idx));
     }
+
     let rafId = null;
     slides.addEventListener('scroll', () => {
       if (rafId) return;
-      rafId = requestAnimationFrame(() => { updateDotsByScroll(); rafId = null; });
+      rafId = requestAnimationFrame(() => {
+        updateDotsByScroll();
+        rafId = null;
+      });
     }, { passive:true });
-    dots.forEach((dot, i) => dot.addEventListener('click', () => slides.scrollTo({ left: i * getStep(), behavior: 'smooth' })));
+
+    dots.forEach((dot, i) => {
+      dot.addEventListener('click', () => slides.scrollTo({
+        left: i * getStep(),
+        behavior: 'smooth'
+      }));
+    });
+
     window.addEventListener('resize', updateDotsByScroll);
 
-    // Автоплей слайдера
-    const AUTOPLAY_DELAY = 5000, RESUME_DELAY = 3500;
-    let autoplayInterval = null, resumeTimeout = null;
-    function stopAutoplay(){ if(autoplayInterval) clearInterval(autoplayInterval); autoplayInterval = null; }
+    const AUTOPLAY_DELAY = 5000;
+    const RESUME_DELAY = 3500;
+    let autoplayInterval = null;
+    let resumeTimeout = null;
+
+    function stopAutoplay(){
+      if(autoplayInterval) clearInterval(autoplayInterval);
+      autoplayInterval = null;
+    }
+
     function startAutoplay(){
       if(dots.length <= 1 || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
       stopAutoplay();
@@ -1637,52 +1641,126 @@
         slides.scrollTo({ left: next * getStep(), behavior: 'smooth' });
       }, AUTOPLAY_DELAY);
     }
-    function pauseAndResume(){ stopAutoplay(); if(resumeTimeout) clearTimeout(resumeTimeout); resumeTimeout = setTimeout(startAutoplay, RESUME_DELAY); }
-    ['pointerdown', 'touchstart', 'mousedown', 'wheel'].forEach(evt => slides.addEventListener(evt, pauseAndResume, { passive:true }));
-    document.addEventListener('visibilitychange', () => document.hidden ? stopAutoplay() : startAutoplay());
 
-    // Меню
+    function pauseAndResume(){
+      stopAutoplay();
+      if(resumeTimeout) clearTimeout(resumeTimeout);
+      resumeTimeout = setTimeout(startAutoplay, RESUME_DELAY);
+    }
+
+    ['pointerdown', 'touchstart', 'mousedown', 'wheel'].forEach(evt => {
+      slides.addEventListener(evt, pauseAndResume, { passive:true });
+    });
+
+    document.addEventListener('visibilitychange', () => {
+      document.hidden ? stopAutoplay() : startAutoplay();
+    });
+
     const menuBtn = document.getElementById('menuBtn');
     const menuOverlay = document.getElementById('menuOverlay');
     const menuClose = document.getElementById('menuClose');
-    function openMenu(){ updateMenuProfile(); menuOverlay.classList.add('show'); menuOverlay.setAttribute('aria-hidden', 'false'); document.body.style.overflow = 'hidden'; }
-    function closeMenu(){ menuOverlay.classList.remove('show'); menuOverlay.setAttribute('aria-hidden', 'true'); document.body.style.overflow = ''; }
+
+    function openMenu(){
+      updateMenuProfile();
+      menuOverlay.classList.add('show');
+      menuOverlay.setAttribute('aria-hidden', 'false');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeMenu(){
+      menuOverlay.classList.remove('show');
+      menuOverlay.setAttribute('aria-hidden', 'true');
+      document.body.style.overflow = '';
+    }
+
     menuBtn.addEventListener('click', openMenu);
     menuClose.addEventListener('click', closeMenu);
-    menuOverlay.addEventListener('click', (e) => { if (e.target === menuOverlay) closeMenu(); });
-    menuProfileBlock.addEventListener('click', () => { closeMenu(); goTo(FILES.profile); });
-    menuSupportBtn.addEventListener('click', () => { closeMenu(); openSupport(); });
+    menuOverlay.addEventListener('click', (e) => {
+      if (e.target === menuOverlay) closeMenu();
+    });
 
-    // Поддержка
+    menuProfileBlock.addEventListener('click', () => {
+      closeMenu();
+      goTo(FILES.profile);
+    });
+
+    menuSupportBtn.addEventListener('click', () => {
+      closeMenu();
+      openSupport();
+    });
+
     const supportOverlay = document.getElementById('supportOverlay');
     const supportClose = document.getElementById('supportClose');
     const goTelegram = document.getElementById('goTelegram');
-    function openSupport(){ supportOverlay.classList.add('show'); supportOverlay.setAttribute('aria-hidden', 'false'); document.body.style.overflow = 'hidden'; }
-    function closeSupport(){ supportOverlay.classList.remove('show'); supportOverlay.setAttribute('aria-hidden', 'true'); document.body.style.overflow = ''; }
+
+    function openSupport(){
+      supportOverlay.classList.add('show');
+      supportOverlay.setAttribute('aria-hidden', 'false');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeSupport(){
+      supportOverlay.classList.remove('show');
+      supportOverlay.setAttribute('aria-hidden', 'true');
+      document.body.style.overflow = '';
+    }
+
     supportClose.addEventListener('click', closeSupport);
-    supportOverlay.addEventListener('click', (e) => { if (e.target === supportOverlay) closeSupport(); });
+    supportOverlay.addEventListener('click', (e) => {
+      if (e.target === supportOverlay) closeSupport();
+    });
     goTelegram.addEventListener('click', () => openTelegramLinkSafe('https://t.me/vezusmanager'));
 
-    // Канал (логотип)
     const brandLogoBtn = document.getElementById('brandLogoBtn');
     const channelOverlay = document.getElementById('channelOverlay');
     const channelClose = document.getElementById('channelClose');
     const goChannel = document.getElementById('goChannel');
-    function openChannel(){ channelOverlay.classList.add('show'); channelOverlay.setAttribute('aria-hidden', 'false'); document.body.style.overflow = 'hidden'; }
-    function closeChannel(){ channelOverlay.classList.remove('show'); channelOverlay.setAttribute('aria-hidden', 'true'); document.body.style.overflow = ''; }
+
+    function openChannel(){
+      channelOverlay.classList.add('show');
+      channelOverlay.setAttribute('aria-hidden', 'false');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeChannel(){
+      channelOverlay.classList.remove('show');
+      channelOverlay.setAttribute('aria-hidden', 'true');
+      document.body.style.overflow = '';
+    }
+
     brandLogoBtn.addEventListener('click', openChannel);
     channelClose.addEventListener('click', closeChannel);
-    channelOverlay.addEventListener('click', (e) => { if (e.target === channelOverlay) closeChannel(); });
+    channelOverlay.addEventListener('click', (e) => {
+      if (e.target === channelOverlay) closeChannel();
+    });
     goChannel.addEventListener('click', () => openTelegramLinkSafe('https://t.me/vezuspubg'));
 
-    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') { closeSupport(); closeMenu(); closeChannel(); } });
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        closeSupport();
+        closeMenu();
+        closeChannel();
+      }
+    });
 
     document.querySelectorAll('.menu-card').forEach(btn => {
       btn.addEventListener('click', () => {
         const action = btn.getAttribute('data-action');
-        if (action === 'partner') { closeMenu(); showToast('Партнёрская программа — в разработке', 1800); return; }
-        if (action === 'rules') { closeMenu(); showToast('Правила проекта — в разработке', 1800); return; }
+
+        if (action === 'partner') {
+          closeMenu();
+          showToast('Партнёрская программа — в разработке', 1800);
+          return;
+        }
+
+        if (action === 'rules') {
+          closeMenu();
+          showToast('Правила проекта — в разработке', 1800);
+          return;
+        }
+
         closeMenu();
+
         if (action === 'vouchers') return goTo(FILES.vouchers);
         if (action === 'history') return goTo(FILES.history);
       });
