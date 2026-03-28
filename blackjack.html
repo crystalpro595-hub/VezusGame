@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Blackjack · премиум казино</title>
-  <link rel="preconnect" href="https://i.postimg.cc" crossorigin>
-  <link rel="preload" as="image" href="https://i.postimg.cc/qvL497mF/Picsart-26-02-27-02-02-37-502.png">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://i.postimg.cc" crossorigin />
+  <link rel="preload" as="image" href="https://i.postimg.cc/qvL497mF/Picsart-26-02-27-02-02-37-502.png" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet" />
   <style>
     * {
       box-sizing: border-box;
@@ -72,7 +72,6 @@
       --green-deep: #0b2f1d;
     }
 
-    /* ---------- СТАРТОВЫЙ ЛОАДЕР ---------- */
     .startup-loader {
       position: fixed; inset: 0; z-index: 9999;
       display: flex; align-items: center; justify-content: center; padding: 24px;
@@ -134,7 +133,6 @@
       100% { transform: translateX(-50%) scaleX(0.96); opacity: 0.88; }
     }
 
-    /* основной интерфейс */
     .app {
       position: relative;
       height: 100%;
@@ -151,7 +149,6 @@
       gap: 10px;
     }
 
-    /* верхняя панель — НЕ ТРОГАЛ */
     .sticky-top {
       position: sticky; top: 0; z-index: 40;
       padding-top: calc(4px + var(--safe-top)); padding-bottom: 6px;
@@ -176,7 +173,6 @@
     .logo-btn { width: 40px; height: 40px; background: transparent; border: none; padding: 0; cursor: default; }
     .logo-btn img { width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 4px 8px black); }
 
-    /* СТОЛ */
     .blackjack-table {
       position: relative;
       overflow: hidden;
@@ -276,7 +272,6 @@
       padding: 2px 2px 6px;
     }
 
-    /* КАРТЫ */
     .card {
       width: 66px;
       height: 92px;
@@ -390,7 +385,6 @@
     .card.reveal .card-back { opacity: 0; }
     .card.reveal .card-face { opacity: 1; }
 
-    /* счёт и ставка */
     .player-stats {
       display: grid;
       grid-template-columns: 1fr auto 1fr;
@@ -440,7 +434,6 @@
         0 8px 16px rgba(0,0,0,0.18);
     }
 
-    /* УВЕДОМЛЕНИЕ */
     .notification {
       position: absolute;
       top: 14px;
@@ -472,7 +465,6 @@
       transform: translateX(-50%) translateY(0) scale(1);
     }
 
-    /* панель ставок */
     .bet-panel {
       position: relative;
       overflow: hidden;
@@ -665,7 +657,6 @@
       filter: grayscale(0.08);
     }
 
-    /* Правила */
     .popup {
       background:
         linear-gradient(180deg, #0f1511 0%, #0a0d0b 100%);
@@ -852,7 +843,7 @@
     <div class="bet-panel">
       <div class="label">СТАВКА</div>
       <div class="bet-row">
-        <input class="bet-input" id="betInput" type="number" min="30" max="5000" step="1" placeholder="минимум 30">
+        <input class="bet-input" id="betInput" type="number" min="30" max="5000" step="1" placeholder="минимум 30" />
         <button class="bet-toggle" id="betToggleBtn">₽</button>
       </div>
       <div class="error-message" id="betError">минимум 30 ₽</div>
@@ -891,91 +882,168 @@
 
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <script>
-  (function() {
-    const VERIFY_URL = "https://lazrfierfbhwlduqlvws.functions.supabase.co/verify-telegram";
-    const MIN_BET = 30, MAX_BET = 5000, START_BALANCE = 1000;
+  (function () {
+    const WALLET_URL = "https://lazrfierfbhwlduqlvws.functions.supabase.co/blackjack-game";
+    const MIN_BET = 30;
+    const MAX_BET = 5000;
     const DEAL_DELAY = 400;
     const DEALER_DRAW_DELAY = 550;
 
-    let currentBalance = START_BALANCE;
+    let currentBalance = 0;
     let deck = [];
-    let playerHand = [], dealerHand = [];
-    let gameActive = false, currentBet = 0, doubled = false, waitingForDealer = false;
+    let playerHand = [];
+    let dealerHand = [];
+    let gameActive = false;
+    let currentBet = 0;
+    let doubled = false;
+    let waitingForDealer = false;
     let hiddenDealerCardElem = null;
     let notificationTimeout = null;
+    let walletReady = false;
 
-    const $ = id => document.getElementById(id);
-    const dealerCardsDiv = $("dealerCards"), playerCardsDiv = $("playerCards");
-    const dealerScoreSpan = $("dealerScore"), playerScoreSpan = $("playerScore");
-    const betInput = $("betInput"), dealBtn = $("dealBtn"), hitBtn = $("hitBtn"), standBtn = $("standBtn"), doubleBtn = $("doubleBtn");
+    const $ = (id) => document.getElementById(id);
+
+    const dealerCardsDiv = $("dealerCards");
+    const playerCardsDiv = $("playerCards");
+    const dealerScoreSpan = $("dealerScore");
+    const playerScoreSpan = $("playerScore");
+    const betInput = $("betInput");
+    const dealBtn = $("dealBtn");
+    const hitBtn = $("hitBtn");
+    const standBtn = $("standBtn");
+    const doubleBtn = $("doubleBtn");
     const balanceSpan = $("balanceValue");
     const notificationDiv = $("notification");
     const currentBetDisplay = $("currentBetDisplay");
     const betError = $("betError");
 
-    function formatMoney(v) { return Math.floor(v) === v ? `${v} ₽` : `${v.toFixed(2)} ₽`; }
-    function updateBalanceUI() { balanceSpan.textContent = formatMoney(currentBalance); }
+    function formatMoney(v) {
+      const num = Number(v || 0);
+      return Math.floor(num) === num ? `${num} ₽` : `${num.toFixed(2)} ₽`;
+    }
+
+    function updateBalanceUI() {
+      balanceSpan.textContent = formatMoney(currentBalance);
+    }
+
     function updateBetDisplay() {
       if (currentBet > 0) currentBetDisplay.textContent = `Ставка: ${currentBet} ₽`;
       else currentBetDisplay.textContent = `Ставка: —`;
     }
+
     function showNotification(text) {
       if (notificationTimeout) clearTimeout(notificationTimeout);
       notificationDiv.textContent = text;
       notificationDiv.classList.add("show");
-      notificationTimeout = setTimeout(() => notificationDiv.classList.remove("show"), 2000);
+      notificationTimeout = setTimeout(() => {
+        notificationDiv.classList.remove("show");
+      }, 2200);
     }
-    function saveBalance() { localStorage.setItem("bj_balance", currentBalance); }
-    function loadSavedBalance() {
-      const saved = localStorage.getItem("bj_balance");
-      if (saved && !isNaN(parseFloat(saved))) currentBalance = parseFloat(saved);
-      else currentBalance = START_BALANCE;
-      updateBalanceUI();
+
+    function getTelegramInitData() {
+      return window.Telegram?.WebApp?.initData || "";
     }
-    async function syncBalanceFromTelegram() {
-      if (!window.Telegram?.WebApp) return;
-      const initData = Telegram.WebApp.initData;
-      if (!initData) return;
+
+    function initTelegramWebApp() {
+      if (!window.Telegram?.WebApp) return false;
       try {
-        const res = await fetch(VERIFY_URL, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ initData }) });
-        const json = await res.json();
-        if (res.ok && json.ok && json.profile && typeof json.profile.balance === "number") {
-          currentBalance = json.profile.balance;
-          updateBalanceUI();
-          saveBalance();
+        window.Telegram.WebApp.ready();
+        window.Telegram.WebApp.expand();
+      } catch (_) {}
+      return true;
+    }
+
+    async function walletRequest(action, amount = null) {
+      const initData = getTelegramInitData();
+
+      if (!initData) {
+        throw new Error("telegram_init_data_missing");
+      }
+
+      const payload = { initData, action };
+      if (amount !== null) payload.amount = amount;
+
+      const res = await fetch(WALLET_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      let json = {};
+      try {
+        json = await res.json();
+      } catch (_) {}
+
+      if (!res.ok || !json.ok) {
+        throw new Error(json.error || "wallet_error");
+      }
+
+      return json;
+    }
+
+    async function syncBalanceFromTelegram() {
+      try {
+        const json = await walletRequest("get_balance");
+        currentBalance = Number(json.balance || 0);
+        updateBalanceUI();
+        walletReady = true;
+      } catch (e) {
+        console.warn("sync balance error:", e);
+        walletReady = false;
+
+        if (String(e.message) === "telegram_init_data_missing") {
+          showNotification("Открой игру через Telegram");
+        } else {
+          showNotification("Не удалось загрузить баланс");
         }
-      } catch(e) { console.warn(e); }
+      }
     }
 
     function buildDeck() {
-      const suits = ['♥', '♦', '♣', '♠'], ranks = ['2','3','4','5','6','7','8','9','10','J','Q','K','A'];
-      let newDeck = [];
-      for (let suit of suits) {
-        for (let rank of ranks) {
-          let value = (rank === 'A') ? 11 : (['K','Q','J'].includes(rank) ? 10 : parseInt(rank));
+      const suits = ["♥", "♦", "♣", "♠"];
+      const ranks = ["2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A"];
+      const newDeck = [];
+
+      for (const suit of suits) {
+        for (const rank of ranks) {
+          const value = rank === "A" ? 11 : ["K", "Q", "J"].includes(rank) ? 10 : parseInt(rank, 10);
           newDeck.push({ rank, suit, value });
         }
       }
+
       for (let i = newDeck.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
         [newDeck[i], newDeck[j]] = [newDeck[j], newDeck[i]];
       }
+
       return newDeck;
     }
 
     function getHandScore(hand) {
       let sum = hand.reduce((acc, c) => acc + c.value, 0);
-      let aces = hand.filter(c => c.rank === 'A').length;
-      while (sum > 21 && aces > 0) { sum -= 10; aces--; }
+      let aces = hand.filter((c) => c.rank === "A").length;
+
+      while (sum > 21 && aces > 0) {
+        sum -= 10;
+        aces--;
+      }
+
       return sum;
     }
 
     function updateScores() {
       playerScoreSpan.textContent = playerHand.length ? getHandScore(playerHand) : "—";
+
       if (dealerHand.length) {
-        if (!gameActive || waitingForDealer) dealerScoreSpan.textContent = getHandScore(dealerHand);
-        else dealerScoreSpan.textContent = `${dealerHand[0].value} + ?`;
-      } else dealerScoreSpan.textContent = "—";
+        if (!gameActive || waitingForDealer) {
+          dealerScoreSpan.textContent = getHandScore(dealerHand);
+        } else {
+          const firstCardValue = dealerHand[0]?.rank === "A" ? 11 : dealerHand[0]?.value ?? 0;
+          dealerScoreSpan.textContent = `${firstCardValue} + ?`;
+        }
+      } else {
+        dealerScoreSpan.textContent = "—";
+      }
     }
 
     function createSimpleCard(card) {
@@ -1013,7 +1081,10 @@
     }
 
     async function addCard(container, card, isHidden = false, delayMs = 0) {
-      if (delayMs > 0) await new Promise(r => setTimeout(r, delayMs));
+      if (delayMs > 0) {
+        await new Promise((r) => setTimeout(r, delayMs));
+      }
+
       const cardDiv = isHidden ? createHiddenCard(card) : createSimpleCard(card);
       container.appendChild(cardDiv);
       return cardDiv;
@@ -1031,17 +1102,45 @@
       if (!hiddenDealerCardElem) return;
       hiddenDealerCardElem.classList.remove("hidden");
       hiddenDealerCardElem.classList.add("reveal");
-      await new Promise(r => setTimeout(r, 250));
+      await new Promise((r) => setTimeout(r, 250));
     }
 
     async function startRound(betAmount) {
       if (gameActive) return;
-      if (betAmount < MIN_BET || betAmount > MAX_BET) { showNotification(`Ставка от ${MIN_BET} до ${MAX_BET}`); return; }
-      if (betAmount > currentBalance) { showNotification("Недостаточно средств"); return; }
 
-      currentBalance -= betAmount;
-      updateBalanceUI();
-      saveBalance();
+      if (!walletReady) {
+        showNotification("Баланс ещё не загружен");
+        await syncBalanceFromTelegram();
+        return;
+      }
+
+      if (betAmount < MIN_BET || betAmount > MAX_BET) {
+        showNotification(`Ставка от ${MIN_BET} до ${MAX_BET}`);
+        return;
+      }
+
+      if (betAmount > currentBalance) {
+        showNotification("Недостаточно средств");
+        return;
+      }
+
+      try {
+        const json = await walletRequest("debit", betAmount);
+        currentBalance = Number(json.balance || 0);
+        updateBalanceUI();
+      } catch (e) {
+        console.warn("debit error:", e);
+
+        if (String(e.message) === "insufficient_funds") {
+          showNotification("Недостаточно средств");
+        } else if (String(e.message) === "telegram_init_data_missing") {
+          showNotification("Открой игру через Telegram");
+        } else {
+          showNotification("Ошибка списания");
+        }
+        return;
+      }
+
       currentBet = betAmount;
       doubled = false;
       gameActive = true;
@@ -1064,11 +1163,11 @@
       dealBtn.disabled = true;
       hitBtn.disabled = false;
       standBtn.disabled = false;
-      doubleBtn.disabled = (playerHand.length === 2 && currentBalance >= currentBet) ? false : true;
+      doubleBtn.disabled = !(playerHand.length === 2 && currentBalance >= currentBet);
       betInput.disabled = true;
-      document.querySelectorAll(".quick-btn").forEach(b => b.disabled = true);
+      document.querySelectorAll(".quick-btn").forEach((b) => (b.disabled = true));
 
-      let playerScore = getHandScore(playerHand);
+      const playerScore = getHandScore(playerHand);
       if (playerScore === 21) {
         await finishGame();
       }
@@ -1076,6 +1175,7 @@
 
     async function finishGame() {
       if (!gameActive && !waitingForDealer) return;
+
       waitingForDealer = true;
       hitBtn.disabled = true;
       standBtn.disabled = true;
@@ -1083,21 +1183,24 @@
 
       await revealHiddenCard();
       updateScores();
-      await new Promise(r => setTimeout(r, 400));
+      await new Promise((r) => setTimeout(r, 400));
 
       let dealerScore = getHandScore(dealerHand);
+
       while (dealerScore < 17) {
-        let newCard = deck.pop();
+        const newCard = deck.pop();
         dealerHand.push(newCard);
         await addCard(dealerCardsDiv, newCard, false, DEALER_DRAW_DELAY);
         dealerScore = getHandScore(dealerHand);
         updateScores();
       }
 
-      let playerScore = getHandScore(playerHand);
-      let payout = 0, message = "";
-      const isPlayerBlackjack = (playerHand.length === 2 && playerScore === 21);
-      const isDealerBlackjack = (dealerHand.length === 2 && dealerScore === 21);
+      const playerScore = getHandScore(playerHand);
+      let payout = 0;
+      let message = "";
+
+      const isPlayerBlackjack = playerHand.length === 2 && playerScore === 21;
+      const isDealerBlackjack = dealerHand.length === 2 && dealerScore === 21;
 
       if (playerScore > 21) {
         message = "Перебор! Ставка проиграна";
@@ -1123,10 +1226,16 @@
       }
 
       if (payout > 0) {
-        currentBalance += payout;
-        updateBalanceUI();
-        saveBalance();
+        try {
+          const json = await walletRequest("credit", payout);
+          currentBalance = Number(json.balance || 0);
+          updateBalanceUI();
+        } catch (e) {
+          console.warn("credit error:", e);
+          showNotification("Ошибка начисления");
+        }
       }
+
       showNotification(message);
 
       gameActive = false;
@@ -1136,37 +1245,62 @@
       standBtn.disabled = true;
       doubleBtn.disabled = true;
       betInput.disabled = false;
-      document.querySelectorAll(".quick-btn").forEach(b => b.disabled = false);
+      document.querySelectorAll(".quick-btn").forEach((b) => (b.disabled = false));
       updateScores();
+
       currentBet = 0;
       updateBetDisplay();
     }
 
     async function hit() {
       if (!gameActive) return;
-      let newCard = deck.pop();
+
+      const newCard = deck.pop();
       playerHand.push(newCard);
       await addCard(playerCardsDiv, newCard, false, 0);
-      let score = getHandScore(playerHand);
+
+      const score = getHandScore(playerHand);
       updateScores();
       doubleBtn.disabled = true;
-      if (score > 21) await finishGame();
+
+      if (score > 21) {
+        await finishGame();
+      }
     }
 
     function stand() {
-      if (gameActive) finishGame();
+      if (gameActive) {
+        finishGame();
+      }
     }
 
     async function doubleDown() {
       if (!gameActive || doubled || playerHand.length !== 2) return;
-      if (currentBalance < currentBet) { showNotification("Недостаточно для удвоения"); return; }
-      currentBalance -= currentBet;
-      currentBet *= 2;
-      doubled = true;
-      updateBalanceUI();
-      saveBalance();
-      updateBetDisplay();
-      let newCard = deck.pop();
+
+      if (currentBalance < currentBet) {
+        showNotification("Недостаточно для удвоения");
+        return;
+      }
+
+      try {
+        const json = await walletRequest("debit", currentBet);
+        currentBalance = Number(json.balance || 0);
+        currentBet *= 2;
+        doubled = true;
+        updateBalanceUI();
+        updateBetDisplay();
+      } catch (e) {
+        console.warn("double debit error:", e);
+
+        if (String(e.message) === "insufficient_funds") {
+          showNotification("Недостаточно для удвоения");
+        } else {
+          showNotification("Ошибка списания");
+        }
+        return;
+      }
+
+      const newCard = deck.pop();
       playerHand.push(newCard);
       await addCard(playerCardsDiv, newCard, false, 0);
       updateScores();
@@ -1175,28 +1309,32 @@
 
     function validateBetInput() {
       const val = betInput.value.trim();
+
       if (val === "") {
         betInput.classList.remove("error");
         betError.classList.remove("show");
         return false;
       }
-      const num = parseInt(val);
+
+      const num = parseInt(val, 10);
+
       if (isNaN(num) || num < MIN_BET || num > MAX_BET) {
         betInput.classList.add("error");
         betError.classList.add("show");
         return false;
-      } else {
-        betInput.classList.remove("error");
-        betError.classList.remove("show");
-        return true;
       }
+
+      betInput.classList.remove("error");
+      betError.classList.remove("show");
+      return true;
     }
 
-    betInput.addEventListener("input", function() {
+    betInput.addEventListener("input", function () {
       validateBetInput();
     });
 
     let quickVisible = false;
+
     function setQuickVisible(show) {
       if (dealBtn.disabled && show) return;
       quickVisible = show;
@@ -1205,39 +1343,47 @@
 
     $("betToggleBtn").onclick = () => setQuickVisible(!quickVisible);
 
-    document.querySelectorAll(".quick-btn").forEach(btn => {
+    document.querySelectorAll(".quick-btn").forEach((btn) => {
       btn.onclick = () => {
         if (dealBtn.disabled) return;
-        let val = Number(btn.dataset.bet);
+        const val = Number(btn.dataset.bet);
+
         if (!isNaN(val)) {
           betInput.value = Math.min(val, MAX_BET);
           validateBetInput();
         }
+
         setQuickVisible(false);
       };
     });
 
-    dealBtn.onclick = () => {
+    dealBtn.onclick = async () => {
       if (!validateBetInput()) {
         showNotification(`Минимальная ставка ${MIN_BET} ₽`);
         return;
       }
-      let bet = parseInt(betInput.value);
+
+      let bet = parseInt(betInput.value, 10);
       if (isNaN(bet)) bet = MIN_BET;
-      startRound(bet);
+
+      await startRound(bet);
     };
 
     hitBtn.onclick = hit;
     standBtn.onclick = stand;
     doubleBtn.onclick = doubleDown;
 
-    let loaderProgress = 0, loaderInterval;
+    let loaderProgress = 0;
+    let loaderInterval;
 
     function setLoaderProgress(value) {
-      const fill = $("startupLoaderFill"), hint = $("startupHint");
+      const fill = $("startupLoaderFill");
+      const hint = $("startupHint");
       if (!fill) return;
+
       loaderProgress = Math.min(100, Math.max(0, value));
-      fill.style.width = loaderProgress + '%';
+      fill.style.width = loaderProgress + "%";
+
       if (hint) {
         if (loaderProgress < 40) hint.textContent = "Загрузка колоды...";
         else if (loaderProgress < 70) hint.textContent = "Подготовка стола...";
@@ -1249,6 +1395,7 @@
     function startLoaderAnimation() {
       setLoaderProgress(6);
       clearInterval(loaderInterval);
+
       loaderInterval = setInterval(() => {
         if (loaderProgress >= 90) clearInterval(loaderInterval);
         else if (loaderProgress < 40) setLoaderProgress(loaderProgress + 5);
@@ -1264,35 +1411,48 @@
       setTimeout(() => $("startupLoader").classList.add("hide"), 220);
     }
 
-    startLoaderAnimation();
-    setTimeout(() => finishLoader(), 1800);
-
     $("rulesBtn").onclick = () => $("rulesOverlay").classList.add("show");
     $("rulesClose").onclick = () => $("rulesOverlay").classList.remove("show");
-    $("backBtn").onclick = () => window.location.href = "index.html";
+    $("backBtn").onclick = () => (window.location.href = "index.html");
 
     document.addEventListener("click", (e) => {
-      if (quickVisible && !e.target.closest("#betToggleBtn") && !e.target.closest("#quickBets")) setQuickVisible(false);
-      if (e.target === $("rulesOverlay")) $("rulesOverlay").classList.remove("show");
+      if (quickVisible && !e.target.closest("#betToggleBtn") && !e.target.closest("#quickBets")) {
+        setQuickVisible(false);
+      }
+
+      if (e.target === $("rulesOverlay")) {
+        $("rulesOverlay").classList.remove("show");
+      }
     });
 
-    document.addEventListener("keydown", e => {
+    document.addEventListener("keydown", (e) => {
       if (e.key === "Escape") {
         $("rulesOverlay").classList.remove("show");
         setQuickVisible(false);
       }
     });
 
-    loadSavedBalance();
-    syncBalanceFromTelegram();
-    hitBtn.disabled = true;
-    standBtn.disabled = true;
-    doubleBtn.disabled = true;
-    dealBtn.disabled = false;
-    betInput.disabled = false;
-    updateBalanceUI();
-    updateBetDisplay();
-    validateBetInput();
+    async function bootstrap() {
+      startLoaderAnimation();
+
+      initTelegramWebApp();
+
+      hitBtn.disabled = true;
+      standBtn.disabled = true;
+      doubleBtn.disabled = true;
+      dealBtn.disabled = false;
+      betInput.disabled = false;
+
+      updateBalanceUI();
+      updateBetDisplay();
+      validateBetInput();
+
+      await syncBalanceFromTelegram();
+
+      setTimeout(() => finishLoader(), 1800);
+    }
+
+    bootstrap();
   })();
 </script>
 </body>
