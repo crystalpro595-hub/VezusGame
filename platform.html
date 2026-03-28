@@ -58,7 +58,6 @@
       --blue-glow: rgba(59,130,246,0.6);
     }
 
-    /* стартовый лоадер (лого) */
     .startup-loader {
       position: fixed; inset: 0; z-index: 9999;
       display: flex; align-items: center; justify-content: center; padding: 24px;
@@ -100,7 +99,6 @@
       100% { transform: translateX(-50%) scaleX(0.96); opacity: 0.88; }
     }
 
-    /* app */
     .app {
       position: relative; height: 100%; overflow: auto;
       padding: 0 12px calc(20px + var(--safe-bottom)) 12px; z-index: 1;
@@ -144,7 +142,6 @@
     .stat-label { font-size: 9px; font-weight: 800; color: rgba(234,241,255,0.62); }
     .stat-value { font-size: 12px; font-weight: 900; color: #fff; }
 
-    /* выбор количества платформ */
     .platform-selector {
       display: flex; gap: 6px; justify-content: center; margin: 5px 0 10px;
     }
@@ -161,7 +158,6 @@
     }
     .platf-choice small { font-size: 10px; opacity: 0.8; }
 
-    /* ========== ИГРОВОЕ ПОЛЕ — СУПЕР ЭФФЕКТЫ ========== */
     .platforms {
       display: flex;
       flex-direction: row;
@@ -358,15 +354,14 @@
   </div>
 </div>
 
-<div class="overlay" id="rulesOverlay"><div class="popup"><div class="popup-head"><div class="popup-title">Правила</div><button class="popup-x" id="rulesClose">✕</button></div><div class="popup-body"><p class="rule-line">• Выбери кол‑во платформ: 3 (1 ловушка), 4 (2 ловушки) или 5 (3 ловушки).</p><p class="rule-line">• Чем больше платформ, тем выше множитель выигрыша.</p><p class="rule-line">• Эффектное стекло и свечение, идеальное размещение.</p></div></div></div>
+<div class="overlay" id="rulesOverlay"><div class="popup"><div class="popup-head"><div class="popup-title">Правила</div><button class="popup-x" id="rulesClose">✕</button></div><div class="popup-body"><p class="rule-line">• Выбери кол-во платформ: 3 (1 ловушка), 4 (2 ловушки) или 5 (3 ловушки).</p><p class="rule-line">• Чем больше платформ, тем выше множитель выигрыша.</p><p class="rule-line">• Эффектное стекло и свечение, идеальное размещение.</p></div></div></div>
 <div class="overlay" id="channelOverlay"><div class="popup"><div class="popup-head"><div class="popup-title">Telegram канал</div><button class="popup-x" id="channelClose">✕</button></div><div class="popup-body"><p>Наш канал: <b>@vezuspubg</b></p><button class="tg-btn" id="goChannel">Перейти в Telegram</button></div></div></div>
 <div class="toast" id="toast"><span id="toastText">—</span><button class="ok" id="toastOk">Ок</button></div>
 
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <script>
   (function() {
-    // ---------- Конфигурация API ----------
-    const VERIFY_URL = "https://lazrfierfbhwlduqlvws.functions.supabase.co/verify-telegram";
+    const PLATFORM_API_URL = "https://lazrfierfbhwlduqlvws.functions.supabase.co/platform-game";
     const LOGO_URL = "https://i.postimg.cc/qvL497mF/Picsart-26-02-27-02-02-37-502.png";
     const TG_CHANNEL_URL = "https://t.me/vezuspubg";
     const MIN_BET = 10;
@@ -374,11 +369,10 @@
     const LEVELS_MAX = 9;
     const PROFIT_MULTS = [0.4, 0.8, 1.5, 2.5, 3.0, 3.7, 4.0, 5.0, 8.0];
     const PLATFORM_BOOST = { 3: 1.0, 4: 1.25, 5: 1.6 };
-    const START_BALANCE_FALLBACK = 1000;
 
     const $ = id => document.getElementById(id);
 
-    let currentBalance = START_BALANCE_FALLBACK;
+    let currentBalance = 0;
     let quickVisible = false;
     let gameActive = false;
     let betValue = 0;
@@ -387,8 +381,8 @@
     let picksLocked = false;
     let currentPlatformCount = 3;
     let trapIndices = [];
+    let walletReady = false;
 
-    // ---------- Работа с балансом (Telegram + локальное хранилище) ----------
     function formatCurrency(value) {
       const n = Number(value ?? 0);
       if (!Number.isFinite(n)) return "0 ₽";
@@ -397,28 +391,6 @@
 
     function updateBalanceUI() {
       $("balanceValue").textContent = formatCurrency(currentBalance);
-    }
-
-    function saveProfileToLocal(balance) {
-      try {
-        const cached = JSON.parse(localStorage.getItem("tg_profile") || "{}");
-        cached.balance = balance;
-        localStorage.setItem("tg_profile", JSON.stringify(cached));
-      } catch {}
-    }
-
-    function loadCachedProfile() {
-      try {
-        const raw = localStorage.getItem("tg_profile");
-        return raw ? JSON.parse(raw) : null;
-      } catch { return null; }
-    }
-
-    function applyProfile(profile) {
-      if (profile && typeof profile.balance === "number") {
-        currentBalance = profile.balance;
-        updateBalanceUI();
-      }
     }
 
     function getTelegramInitData() {
@@ -430,39 +402,48 @@
       return Telegram.WebApp.initData || "";
     }
 
-    async function refreshBalance() {
-      const cached = loadCachedProfile();
-      if (cached) applyProfile(cached);
-      else {
-        currentBalance = START_BALANCE_FALLBACK;
-        updateBalanceUI();
-      }
-
+    async function apiRequest(action, amount = null) {
       const initData = getTelegramInitData();
-      if (!initData) return;
+      if (!initData) throw new Error("telegram_init_data_missing");
 
+      const payload = { initData, action };
+      if (amount !== null) payload.amount = amount;
+
+      const res = await fetch(PLATFORM_API_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+
+      let json = {};
       try {
-        const res = await fetch(VERIFY_URL, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ initData })
-        });
-        const json = await res.json();
-        if (res.ok && json.ok && json.profile) {
-          applyProfile(json.profile);
-          saveProfileToLocal(json.profile.balance);
-        }
+        json = await res.json();
+      } catch {}
+
+      if (!res.ok || !json.ok) {
+        throw new Error(json.error || "api_error");
+      }
+
+      return json;
+    }
+
+    async function refreshBalance() {
+      try {
+        const json = await apiRequest("get_balance");
+        currentBalance = Number(json.balance || 0);
+        walletReady = true;
+        updateBalanceUI();
       } catch (err) {
+        walletReady = false;
         console.warn("Ошибка загрузки баланса:", err);
+        if (String(err.message) === "telegram_init_data_missing") {
+          showToast("Открой игру через Telegram");
+        } else {
+          showToast("Не удалось загрузить баланс");
+        }
       }
     }
 
-    // Сохраняем баланс локально (серверную синхронизацию можно добавить позже)
-    function syncBalanceToStorage() {
-      saveProfileToLocal(currentBalance);
-    }
-
-    // ---------- Логика игры (без изменений, но с интеграцией баланса) ----------
     function round2(n) { return Math.round(n * 100) / 100; }
 
     function showToast(text) {
@@ -475,7 +456,6 @@
     }
     $("toastOk").onclick = () => $("toast").classList.remove("show");
 
-    // Прелоадер
     let loaderProgress = 0, loaderInterval;
     function setLoaderProgress(value) {
       const fill = $("startupLoaderFill");
@@ -507,7 +487,6 @@
       setTimeout(() => $("startupLoader").classList.add("hide"), 220);
     }
 
-    // Переключение платформ
     function setPlatformCount(count) {
       if (gameActive) { showToast("Нельзя сменить режим во время игры"); return; }
       currentPlatformCount = count;
@@ -534,7 +513,10 @@
       let boost = PLATFORM_BOOST[currentPlatformCount] || 1.0;
       return 1 + (baseProfit * boost);
     }
-    function getCashoutValue() { return gameActive ? round2(betValue * getTotalMultiplier()) : 0; }
+
+    function getCashoutValue() {
+      return gameActive ? round2(betValue * getTotalMultiplier()) : 0;
+    }
 
     function setStatsUI() {
       $("levelValue").textContent = `${Math.min(level, LEVELS_MAX)} / ${LEVELS_MAX}`;
@@ -542,17 +524,37 @@
       $("payoutValue").textContent = gameActive ? formatCurrency(getCashoutValue()) : "0 ₽";
     }
 
-    function lockPicks(lock) { picksLocked = lock; document.querySelectorAll(".platform").forEach(p => { p.classList.toggle("disabled", lock); p.disabled = lock; }); }
+    function lockPicks(lock) {
+      picksLocked = lock;
+      document.querySelectorAll(".platform").forEach(p => {
+        p.classList.toggle("disabled", lock);
+        p.disabled = lock;
+      });
+    }
+
     function lockBetControls(lock) {
-      $("betInput").disabled = lock; $("betToggleBtn").disabled = lock;
+      $("betInput").disabled = lock;
+      $("betToggleBtn").disabled = lock;
       document.querySelectorAll(".quick-btn").forEach(b => b.disabled = lock);
       if (lock) setQuickVisible(false);
     }
-    function setQuickVisible(show) { if ($("betToggleBtn").disabled && show) return; quickVisible = show; $("quickBets").classList.toggle("show", quickVisible); }
+
+    function setQuickVisible(show) {
+      if ($("betToggleBtn").disabled && show) return;
+      quickVisible = show;
+      $("quickBets").classList.toggle("show", quickVisible);
+    }
+
     function setMainButtonMode() {
-      let btn = $("mainBtn"); btn.classList.remove("cash"); btn.disabled = false;
-      if (!gameActive) { btn.textContent = "Играть"; return; }
-      btn.textContent = `Забрать (${formatCurrency(getCashoutValue())})`; btn.classList.add("cash");
+      let btn = $("mainBtn");
+      btn.classList.remove("cash");
+      btn.disabled = false;
+      if (!gameActive) {
+        btn.textContent = "Играть";
+        return;
+      }
+      btn.textContent = `Забрать (${formatCurrency(getCashoutValue())})`;
+      btn.classList.add("cash");
     }
 
     function svgSafe() { return '<svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5" stroke="#22c55e" stroke-width="3" fill="none"/></svg>'; }
@@ -563,13 +565,18 @@
       wrap.innerHTML = "";
       for (let i = 0; i < currentPlatformCount; i++) {
         let btn = document.createElement("button");
-        btn.className = "platform"; btn.type = "button"; btn.dataset.idx = i;
+        btn.className = "platform";
+        btn.type = "button";
+        btn.dataset.idx = i;
         btn.innerHTML = `<div class="inner"><div class="platform-logo-wrap"><img class="platform-logo" src="${LOGO_URL}" alt="P" loading="lazy"></div><div class="result-badge"></div></div>`;
         btn.addEventListener("click", () => onPick(i));
         wrap.appendChild(btn);
       }
       requestAnimationFrame(() => {
-        document.querySelectorAll(".platform").forEach((p, idx) => { if (animateIn) setTimeout(() => p.classList.add("in"), idx * 45); else p.classList.add("in"); });
+        document.querySelectorAll(".platform").forEach((p, idx) => {
+          if (animateIn) setTimeout(() => p.classList.add("in"), idx * 45);
+          else p.classList.add("in");
+        });
       });
       lockPicks(false);
     }
@@ -585,30 +592,63 @@
         btn.classList.add(isTrap ? "reveal-bad" : "reveal-safe");
         let badge = btn.querySelector(".result-badge");
         if (badge) badge.innerHTML = isTrap ? svgBad() : svgSafe();
-        if (idx === pickedIdx) { btn.style.transform = "translateY(0) scale(1.05)"; setTimeout(() => btn.style.transform = "", 180); }
+        if (idx === pickedIdx) {
+          btn.style.transform = "translateY(0) scale(1.05)";
+          setTimeout(() => btn.style.transform = "", 180);
+        }
       });
     }
 
     function resetGameUI() {
-      gameActive = false; picksLocked = false; betValue = 0; level = 0; finishedMax = false;
-      renderPlatforms(true); setStatsUI(); lockBetControls(false); setMainButtonMode();
+      gameActive = false;
+      picksLocked = false;
+      betValue = 0;
+      level = 0;
+      finishedMax = false;
+      renderPlatforms(true);
+      setStatsUI();
+      lockBetControls(false);
+      setMainButtonMode();
     }
 
-    function getBetAmount() { let raw = $("betInput").value; let amount = Number(raw); return (raw && Number.isFinite(amount)) ? Math.floor(amount) : 0; }
+    function getBetAmount() {
+      let raw = $("betInput").value;
+      let amount = Number(raw);
+      return (raw && Number.isFinite(amount)) ? Math.floor(amount) : 0;
+    }
 
-    function startGame() {
+    async function startGame() {
       if (gameActive) return;
+
+      if (!walletReady) {
+        showToast("Баланс ещё не загружен");
+        await refreshBalance();
+        return;
+      }
+
       let bet = getBetAmount();
       if (bet < MIN_BET) { showToast(`Мин. ставка: ${MIN_BET} ₽`); return; }
       if (bet > MAX_BET) { $("betInput").value = MAX_BET; showToast(`Макс. ставка: ${MAX_BET} ₽`); return; }
       if (bet > currentBalance) { showToast("Недостаточно средств"); return; }
 
-      // Списываем ставку
-      currentBalance = round2(currentBalance - bet);
-      updateBalanceUI();
-      syncBalanceToStorage();
+      try {
+        const json = await apiRequest("debit", bet);
+        currentBalance = Number(json.balance || 0);
+        updateBalanceUI();
+      } catch (err) {
+        console.warn("debit error:", err);
+        if (String(err.message) === "insufficient_funds") {
+          showToast("Недостаточно средств");
+        } else {
+          showToast("Ошибка списания");
+        }
+        return;
+      }
 
-      betValue = bet; level = 0; gameActive = true; finishedMax = false;
+      betValue = bet;
+      level = 0;
+      gameActive = true;
+      finishedMax = false;
       pickTraps();
       renderPlatforms(true);
       lockBetControls(true);
@@ -616,19 +656,32 @@
       setMainButtonMode();
     }
 
-    function cashout() {
+    async function cashout() {
       if (!gameActive) return;
+
       let payout = getCashoutValue();
-      if (payout <= 0) { showToast("Нет суммы"); return; }
-      currentBalance = round2(currentBalance + payout);
-      updateBalanceUI();
-      syncBalanceToStorage();
+      if (payout <= 0) {
+        showToast("Нет суммы");
+        return;
+      }
+
+      try {
+        const json = await apiRequest("credit", payout);
+        currentBalance = Number(json.balance || 0);
+        updateBalanceUI();
+      } catch (err) {
+        console.warn("credit error:", err);
+        showToast("Ошибка начисления");
+        return;
+      }
+
       showToast(`Забрано: ${formatCurrency(payout)}`);
       setTimeout(() => resetGameUI(), 600);
     }
 
     function onPick(idx) {
       if (!gameActive || picksLocked || finishedMax) return;
+
       lockPicks(true);
       let isTrap = trapIndices.includes(idx);
       revealAll(idx);
@@ -637,15 +690,27 @@
         showToast("Проигрыш. Ставка сгорела");
         gameActive = false;
         lockBetControls(false);
-        setTimeout(() => { betValue = 0; level = 0; setStatsUI(); renderPlatforms(true); setMainButtonMode(); }, 800);
+        setTimeout(() => {
+          betValue = 0;
+          level = 0;
+          setStatsUI();
+          renderPlatforms(true);
+          setMainButtonMode();
+        }, 800);
         return;
       }
+
       level = Math.min(level + 1, LEVELS_MAX);
       setStatsUI();
+
       if (level >= LEVELS_MAX) {
-        finishedMax = true; showToast("Максимальный уровень! Забирай выигрыш"); lockPicks(true); setMainButtonMode();
+        finishedMax = true;
+        showToast("Максимальный уровень! Забирай выигрыш");
+        lockPicks(true);
+        setMainButtonMode();
         return;
       }
+
       setTimeout(() => {
         pickTraps();
         animateSwapPlatforms();
@@ -654,32 +719,47 @@
       }, 500);
     }
 
-    function handleMain() { if (!gameActive) startGame(); else cashout(); }
+    function handleMain() {
+      if (!gameActive) startGame();
+      else cashout();
+    }
 
-    // ---------- Инициализация с загрузкой баланса ----------
     async function init() {
       startLoaderAnimation();
-
-      // Загружаем баланс из БД / localStorage
       await refreshBalance();
-
-      // Завершаем настройку игрового интерфейса
       renderPlatforms(false);
       resetGameUI();
       finishLoader();
     }
 
-    // ---------- Обработчики ----------
     $("mainBtn").addEventListener("click", handleMain);
     $("betToggleBtn").addEventListener("click", () => { if (!$("betToggleBtn").disabled) setQuickVisible(!quickVisible); });
-    document.querySelectorAll(".quick-btn").forEach(b => b.addEventListener("click", function() { if (this.disabled) return; $("betInput").value = Math.min(Number(this.dataset.bet), MAX_BET); setQuickVisible(false); }));
+    document.querySelectorAll(".quick-btn").forEach(b => b.addEventListener("click", function() {
+      if (this.disabled) return;
+      $("betInput").value = Math.min(Number(this.dataset.bet), MAX_BET);
+      setQuickVisible(false);
+    }));
 
-    $("betInput").addEventListener("input", function() { if (!this.value) return; let v = Math.floor(Number(this.value)); if (!Number.isFinite(v)) this.value = ""; else { if (v > MAX_BET) v = MAX_BET; if (v < 0) v = 0; this.value = v; } });
+    $("betInput").addEventListener("input", function() {
+      if (!this.value) return;
+      let v = Math.floor(Number(this.value));
+      if (!Number.isFinite(v)) this.value = "";
+      else {
+        if (v > MAX_BET) v = MAX_BET;
+        if (v < 0) v = 0;
+        this.value = v;
+      }
+    });
 
-    document.addEventListener("click", (e) => { if (quickVisible && !e.target.closest('#betToggleBtn') && !e.target.closest('#quickBets')) setQuickVisible(false); });
+    document.addEventListener("click", (e) => {
+      if (quickVisible && !e.target.closest('#betToggleBtn') && !e.target.closest('#quickBets')) setQuickVisible(false);
+    });
 
     document.querySelectorAll('.platf-choice').forEach(btn => {
-      btn.addEventListener('click', function(e) { e.preventDefault(); setPlatformCount(Number(this.dataset.platforms)); });
+      btn.addEventListener('click', function(e) {
+        e.preventDefault();
+        setPlatformCount(Number(this.dataset.platforms));
+      });
     });
 
     $("backBtn").addEventListener("click", () => window.location.href = "index.html");
@@ -691,7 +771,14 @@
     $("channelOverlay").addEventListener("click", (e) => { if (e.target === $("channelOverlay")) { $("channelOverlay").classList.remove("show"); document.body.style.overflow = ""; } });
     $("goChannel").addEventListener("click", () => { if (window.Telegram?.WebApp?.openTelegramLink) window.Telegram.WebApp.openTelegramLink(TG_CHANNEL_URL); else window.open(TG_CHANNEL_URL, "_blank"); });
 
-    document.addEventListener("keydown", (e) => { if (e.key === "Escape") { $("rulesOverlay").classList.remove("show"); $("channelOverlay").classList.remove("show"); setQuickVisible(false); document.body.style.overflow = ""; } });
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") {
+        $("rulesOverlay").classList.remove("show");
+        $("channelOverlay").classList.remove("show");
+        setQuickVisible(false);
+        document.body.style.overflow = "";
+      }
+    });
 
     window.addEventListener("load", init);
   })();
