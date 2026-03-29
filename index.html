@@ -329,7 +329,6 @@
       gap:12px;
     }
 
-
     .games-header, .slots-header{
       display:flex;
       align-items:center;
@@ -491,9 +490,6 @@
     }
 
     .card-caption{ display:none !important; }
-
-
-
 
     .project-footer{
       width:100%;
@@ -689,7 +685,6 @@
       font-weight:900;
       letter-spacing:.28px;
     }
-
 
     .menu-overlay{
       position:fixed;
@@ -1434,9 +1429,9 @@
               <img src="https://i.postimg.cc/T1r7DdMY/file-0000000091ec7243af8204a29beee41b.png" alt="Game 4" loading="lazy">
             </div>
           </div>
-          <div class="game-card" data-game="game5">
+          <div class="game-card" data-game="game5" data-target="dice">
             <div class="game-card-inner">
-              <img src="https://i.postimg.cc/XvWZvSqj/file-0000000059bc72438dd485df46f69309-(1).png" alt="Game 5" loading="lazy">
+              <img src="https://i.postimg.cc/W1HKFm58/file-00000000b8cc71fb863990b73d85156f.png" alt="Game 5" loading="lazy">
             </div>
           </div>
           <div class="game-card" data-game="game6">
@@ -1508,7 +1503,6 @@
         </div>
       </div>
 
-
       <div class="project-footer">
         <div class="project-footer-head">
           <div class="project-brand">
@@ -1521,7 +1515,6 @@
             >
             <div class="project-footer-meta">
               <div class="project-footer-title">Vezus Game</div>
-              
             </div>
           </div>
           <div class="project-footer-badge">18+</div>
@@ -1692,7 +1685,8 @@
       mines: 'mines.html',
       cups: 'cups.html',
       blackjack: 'blackjack.html',
-      candyslot: 'candyslot.html'
+      candyslot: 'candyslot.html',
+      dice: 'dice.html'
     };
 
     const passwordOverlay = document.getElementById('passwordOverlay');
@@ -1912,6 +1906,7 @@
         else if (index === 1) goTo(FILES.mines);
         else if (index === 2) goTo(FILES.cups);
         else if (index === 3) goTo('platform.html');
+        else if (index === 4) goTo(FILES.dice);
         else showToast('В разработке', 1500);
 
         return;
