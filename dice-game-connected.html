@@ -1,0 +1,1625 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Dice</title>
+
+  <link rel="preconnect" href="https://i.postimg.cc" crossorigin>
+  <link rel="dns-prefetch" href="https://i.postimg.cc">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preload" as="image" href="https://i.postimg.cc/qvL497mF/Picsart-26-02-27-02-02-37-502.png">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --text:#eaf1ff;
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+      --safe-top: env(safe-area-inset-top, 0px);
+      --glass: rgba(12, 14, 20, .80);
+      --stroke: rgba(255,255,255,.08);
+      --shadow: 0 14px 34px rgba(0,0,0,.40);
+      --shadow-soft: 0 8px 18px rgba(0,0,0,.26);
+      --tg1:#2AABEE;
+      --tg2:#229ED9;
+      --violet1:#8b5cf6;
+      --violet2:#6d28d9;
+    }
+
+    *{
+      box-sizing:border-box;
+      font-family:'Inter', sans-serif;
+      -webkit-tap-highlight-color: transparent;
+      user-select:none;
+    }
+
+    html, body{
+      height:100%;
+      margin:0;
+      overflow:hidden;
+      color:var(--text);
+      background:#020617;
+    }
+
+    body{
+      background-image:url("https://i.postimg.cc/fbJT34yY/076E519D-F095-4957-88BF-5591DEB82533.png");
+      background-size:cover;
+      background-position:center;
+      background-repeat:no-repeat;
+    }
+
+    body::before{
+      content:"";
+      position:fixed;
+      inset:0;
+      background:
+        radial-gradient(720px 380px at 50% 0%, rgba(255,255,255,.06), transparent 58%),
+        radial-gradient(520px 240px at 50% 100%, rgba(255,255,255,.03), transparent 72%),
+        linear-gradient(180deg, rgba(0,0,0,.30), rgba(0,0,0,.64));
+      pointer-events:none;
+      z-index:0;
+    }
+
+    *::-webkit-scrollbar{ display:none; }
+
+    .preloader {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      background:
+        radial-gradient(900px 520px at 20% 10%, rgba(196,181,253,0.16), transparent 56%),
+        radial-gradient(760px 460px at 80% 20%, rgba(129,140,248,0.16), transparent 54%),
+        linear-gradient(180deg, #4c1d95 0%, #2e1065 46%, #14072b 100%);
+      transition: opacity 0.35s ease, visibility 0.35s ease;
+    }
+
+    .preloader.hide {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    .preloader-inner {
+      width: min(320px, 86vw);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .preloader-logo-wrap {
+      width: min(158px, 54vw);
+      display: flex;
+      justify-content: center;
+      position: relative;
+      padding: 10px;
+    }
+
+    .preloader-logo-wrap::before {
+      content: "";
+      position: absolute;
+      left: 50%;
+      bottom: 6px;
+      width: 74%;
+      height: 18px;
+      transform: translateX(-50%);
+      border-radius: 999px;
+      background: radial-gradient(ellipse at center, rgba(0,0,0,0.42), rgba(0,0,0,0) 72%);
+      animation: loaderShadow 0.62s ease-in-out infinite;
+    }
+
+    .preloader-logo {
+      width: 100%;
+      height: auto;
+      display: block;
+      position: relative;
+      z-index: 2;
+      filter: drop-shadow(0 16px 26px rgba(0,0,0,0.30)) drop-shadow(0 0 22px rgba(167,139,250,0.18));
+      transform-origin: center bottom;
+      animation: logoBounce 0.62s ease-in-out infinite;
+      user-select: none;
+    }
+
+    .preloader-bar {
+      width: 100%;
+      height: 12px;
+      padding: 2px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.10);
+      border: 1px solid rgba(255,255,255,0.12);
+      overflow: hidden;
+    }
+
+    .preloader-fill {
+      width: 0%;
+      height: 100%;
+      border-radius: 999px;
+      background: linear-gradient(90deg, #c084fc, #8b5cf6, #60a5fa);
+      box-shadow: 0 0 14px rgba(192,132,252,0.34);
+      transition: width 0.18s ease;
+    }
+
+    .preloader-hint {
+      font-size: 12px;
+      font-weight: 900;
+      color: rgba(234,241,255,0.86);
+      text-shadow: 0 10px 18px rgba(0,0,0,0.35);
+    }
+
+    @keyframes logoBounce {
+      0% { transform: translateY(0) scale(1); }
+      40% { transform: translateY(-10px) scale(1.02); }
+      55% { transform: translateY(0) scale(1); }
+      70% { transform: translateY(-4px) scale(1.01); }
+      100% { transform: translateY(0) scale(1); }
+    }
+
+    @keyframes loaderShadow {
+      0% { transform: translateX(-50%) scaleX(0.96); opacity: 0.88; }
+      40% { transform: translateX(-50%) scaleX(1.06); opacity: 0.78; }
+      100% { transform: translateX(-50%) scaleX(0.96); opacity: 0.88; }
+    }
+
+    .app{
+      position:relative;
+      height:100%;
+      overflow:auto;
+      padding:0 10px calc(14px + var(--safe-bottom)) 10px;
+      z-index:1;
+      overscroll-behavior: contain;
+      scrollbar-width:none;
+    }
+
+    .content{
+      width:100%;
+      max-width:430px;
+      margin:0 auto;
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+      position:relative;
+      z-index:1;
+    }
+
+    .sticky-top{
+      position:sticky;
+      top:0;
+      z-index:40;
+      padding-top: calc(6px + var(--safe-top));
+      padding-bottom:4px;
+      background: linear-gradient(180deg, rgba(2,6,23,.96) 0%, rgba(2,6,23,.86) 72%, rgba(2,6,23,0) 100%);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+    }
+
+    .top-row{
+      width:100%;
+      display:grid;
+      grid-template-columns:34px minmax(0,1fr) 34px 42px;
+      gap:6px;
+      align-items:center;
+    }
+
+    .icon-btn,
+    .rule-btn{
+      width:34px;
+      height:34px;
+      border:none;
+      border-radius:12px;
+      background: linear-gradient(180deg, rgba(16,20,30,.84), rgba(10,14,22,.78));
+      border:1px solid rgba(255,255,255,.07);
+      box-shadow: var(--shadow-soft), inset 0 1px 0 rgba(255,255,255,.05);
+      display:grid;
+      place-items:center;
+      color:var(--text);
+      cursor:pointer;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      padding:0;
+    }
+
+    .icon-btn,
+    .rule-btn,
+    .mode-chip,
+    .play-btn,
+    .bet-toggle,
+    .number-btn,
+    .popup-x,
+    .quick-btn{
+      transition: transform .15s ease, box-shadow .2s ease, background .2s ease;
+    }
+
+    .icon-btn{ font-size:15px; font-weight:900; }
+
+    .mode-chip:hover,
+    .number-btn:hover,
+    .quick-btn:hover,
+    .bet-toggle:hover,
+    .play-btn:hover{
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.08), 0 10px 20px rgba(0,0,0,.18);
+    }
+
+    .icon-btn:active,
+    .rule-btn:active,
+    .mode-chip:active,
+    .play-btn:active,
+    .bet-toggle:active,
+    .number-btn:active,
+    .popup-x:active,
+    .quick-btn:active{ transform:scale(.98); }
+
+    .rule-btn svg{
+      width:15px;
+      height:15px;
+      stroke: rgba(234,241,255,.92);
+      fill:none;
+      stroke-width:2;
+      stroke-linecap:round;
+      stroke-linejoin:round;
+      display:block;
+    }
+
+    .logo-static{
+      width:42px;
+      height:42px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      pointer-events:none;
+      user-select:none;
+    }
+
+    .logo-static img{
+      width:100%;
+      height:100%;
+      object-fit:contain;
+      display:block;
+    }
+
+    .balance-mini{
+      width:100%;
+      min-width:0;
+      height:36px;
+      border-radius:999px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:6px;
+      padding:5px 6px 5px 10px;
+      position:relative;
+      overflow:hidden;
+      background: linear-gradient(180deg, rgba(14,18,28,.86), rgba(10,14,22,.80));
+      border:1px solid rgba(255,255,255,.07);
+      box-shadow: var(--shadow), inset 0 1px 0 rgba(255,255,255,.05);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+
+    .balance-mini::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      background:
+        radial-gradient(140px 50px at 0% 0%, rgba(255,255,255,.05), transparent 55%),
+        radial-gradient(140px 50px at 100% 100%, rgba(255,255,255,.03), transparent 55%);
+      pointer-events:none;
+    }
+
+    .bal-title{
+      position:relative;
+      z-index:1;
+      font-size:10px;
+      font-weight:900;
+      color: rgba(234,241,255,.92);
+      white-space:nowrap;
+    }
+
+    .bal-amount{
+      position:relative;
+      z-index:1;
+      min-width:72px;
+      height:22px;
+      border:none;
+      border-radius:999px;
+      padding:0 8px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background: rgba(255,255,255,.08);
+      border:1px solid rgba(255,255,255,.08);
+      color: rgba(234,241,255,.98);
+      font-weight:900;
+      font-size:11px;
+      white-space:nowrap;
+      pointer-events:none;
+    }
+
+    .card{
+      border-radius:16px;
+      background: linear-gradient(180deg, rgba(13,17,27,.84), rgba(9,13,21,.80));
+      border:1px solid rgba(255,255,255,.07);
+      box-shadow: var(--shadow), inset 0 1px 0 rgba(255,255,255,.04);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      overflow:hidden;
+    }
+
+    .hero-card{ padding:7px; }
+
+    .stats-grid{
+      display:grid;
+      grid-template-columns:repeat(3, minmax(0,1fr));
+      gap:6px;
+    }
+
+    .stat-box{
+      min-height:42px;
+      border-radius:11px;
+      padding:5px 6px;
+      background: linear-gradient(180deg, rgba(255,255,255,.065), rgba(255,255,255,.04));
+      border:1px solid rgba(255,255,255,.07);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.045);
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+      gap:2px;
+    }
+
+    .stat-label{
+      font-size:8px;
+      font-weight:800;
+      color:rgba(234,241,255,.62);
+      line-height:1;
+    }
+
+    .stat-value{
+      font-size:11px;
+      font-weight:900;
+      color:#fff;
+      line-height:1.12;
+      word-break:break-word;
+    }
+
+    .dice-stage-wrap{ padding:8px; }
+
+    .dice-stage{
+      position:relative;
+      width:100%;
+      min-height:270px;
+      border-radius:14px;
+      overflow:hidden;
+      background:
+        radial-gradient(360px 160px at 50% 0%, rgba(255,255,255,.07), transparent 58%),
+        linear-gradient(180deg, rgba(255,255,255,.035), rgba(255,255,255,.018));
+      border:1px solid rgba(255,255,255,.06);
+      padding:14px 12px 12px;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+    }
+
+    .dice-stage::before{
+      content:"";
+      position:absolute;
+      inset:auto 0 0 0;
+      height:86px;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.028), rgba(255,255,255,.008)),
+        radial-gradient(ellipse at 50% 120%, rgba(255,255,255,.06), transparent 62%);
+      border-top:1px solid rgba(255,255,255,.045);
+      pointer-events:none;
+    }
+
+    .dice-stage::after{
+      content:"";
+      position:absolute;
+      left:50%;
+      bottom:22px;
+      width:72%;
+      height:18px;
+      transform:translateX(-50%);
+      border-radius:999px;
+      background: radial-gradient(ellipse at center, rgba(0,0,0,.28), rgba(0,0,0,0) 72%);
+      pointer-events:none;
+    }
+
+    .dice-screen{
+      width:100%;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      gap:10px;
+      position:relative;
+      z-index:1;
+    }
+
+    .dice-shell{
+      width:134px;
+      height:134px;
+      position:relative;
+      display:grid;
+      place-items:center;
+      filter: drop-shadow(0 18px 30px rgba(0,0,0,.30));
+      transform-origin:center bottom;
+      perspective: 900px;
+    }
+
+    .dice-shell::before{
+      content:"";
+      position:absolute;
+      left:50%;
+      bottom:-8px;
+      width:104px;
+      height:20px;
+      transform:translateX(-50%);
+      border-radius:999px;
+      background: radial-gradient(ellipse at center, rgba(0,0,0,.42), rgba(0,0,0,0) 74%);
+      z-index:0;
+      transition: transform .18s ease, opacity .18s ease;
+    }
+
+    .dice-shell::after{
+      content:"";
+      position:absolute;
+      inset:14px;
+      border-radius:28px;
+      background:
+        radial-gradient(circle at 50% 42%, rgba(255,255,255,.16), rgba(255,255,255,.04), transparent 72%),
+        radial-gradient(circle at 50% 60%, rgba(255,255,255,.06), transparent 70%);
+      filter: blur(16px);
+      opacity:.62;
+      z-index:0;
+      pointer-events:none;
+    }
+
+    .dice-shell.rolling{
+      animation: shellHop 1.15s cubic-bezier(.2,.8,.2,1) infinite;
+    }
+
+    .dice-shell.rolling::before{
+      animation: shellShadow 1.15s ease-in-out infinite;
+    }
+
+    .dice{
+      width:110px;
+      height:110px;
+      border-radius:28px;
+      position:relative;
+      background:
+        radial-gradient(circle at 24% 20%, rgba(255,255,255,.98), rgba(255,255,255,.52) 15%, transparent 16%),
+        radial-gradient(circle at 74% 78%, rgba(203,213,225,.24), transparent 28%),
+        linear-gradient(145deg, #ffffff 0%, #f6f9ff 24%, #e7eefb 62%, #d8e2f2 100%);
+      border:1px solid rgba(255,255,255,.92);
+      box-shadow:
+        inset 0 2px 0 rgba(255,255,255,.96),
+        inset 0 -14px 18px rgba(161,176,204,.18),
+        inset 14px 0 18px rgba(255,255,255,.18),
+        inset -12px -8px 16px rgba(153,165,187,.10),
+        0 18px 32px rgba(0,0,0,.24);
+      display:grid;
+      place-items:center;
+      z-index:1;
+      transform-origin:center center;
+      transform-style: preserve-3d;
+      transition: box-shadow .2s ease, filter .2s ease;
+      overflow:hidden;
+    }
+
+    .dice::before{
+      content:"";
+      position:absolute;
+      inset:8px;
+      border-radius:22px;
+      background:
+        linear-gradient(145deg, rgba(255,255,255,.72), rgba(255,255,255,.18) 34%, rgba(255,255,255,0) 52%),
+        linear-gradient(180deg, rgba(255,255,255,.18), rgba(255,255,255,0));
+      border:1px solid rgba(255,255,255,.56);
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.55),
+        inset 0 -8px 12px rgba(148,163,184,.10);
+      pointer-events:none;
+      z-index:0;
+    }
+
+    .dice::after{
+      content:"";
+      position:absolute;
+      top:12px;
+      right:14px;
+      width:26px;
+      height:56px;
+      border-radius:18px;
+      background: linear-gradient(180deg, rgba(255,255,255,.46), rgba(255,255,255,.06));
+      filter: blur(2px);
+      opacity:.62;
+      transform: rotate(14deg);
+      pointer-events:none;
+      z-index:0;
+    }
+
+    .dice.rolling{
+      animation: diceRoll 1.15s cubic-bezier(.22,.74,.17,1) infinite;
+      filter: saturate(1.05);
+    }
+
+    @keyframes shellHop {
+      0% { transform: translateY(0) scale(1); }
+      18% { transform: translateY(-5px) scale(1.01); }
+      36% { transform: translateY(-13px) scale(1.02); }
+      52% { transform: translateY(-3px) scale(.995); }
+      70% { transform: translateY(-10px) scale(1.01); }
+      100% { transform: translateY(0) scale(1); }
+    }
+
+    @keyframes shellShadow {
+      0% { transform: translateX(-50%) scaleX(1); opacity:.40; }
+      36% { transform: translateX(-50%) scaleX(.82); opacity:.24; }
+      52% { transform: translateX(-50%) scaleX(1.06); opacity:.30; }
+      70% { transform: translateX(-50%) scaleX(.88); opacity:.26; }
+      100% { transform: translateX(-50%) scaleX(1); opacity:.40; }
+    }
+
+    @keyframes diceRoll {
+      0%   { transform: rotate(0deg) scale(1); }
+      12%  { transform: rotate(-14deg) scale(1.02); }
+      24%  { transform: rotate(16deg) scale(.99); }
+      38%  { transform: rotate(-18deg) scale(1.03); }
+      52%  { transform: rotate(13deg) scale(.98); }
+      68%  { transform: rotate(-10deg) scale(1.02); }
+      84%  { transform: rotate(7deg) scale(.995); }
+      100% { transform: rotate(0deg) scale(1); }
+    }
+
+    .face{
+      position:relative;
+      width:70px;
+      height:70px;
+      display:grid;
+      grid-template-columns:repeat(3, 1fr);
+      grid-template-rows:repeat(3, 1fr);
+      gap:6px;
+      z-index:1;
+    }
+
+    .face::before{
+      content:"";
+      position:absolute;
+      inset:-6px;
+      border-radius:18px;
+      background: linear-gradient(180deg, rgba(255,255,255,.20), rgba(255,255,255,.05));
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.40),
+        inset 0 -10px 12px rgba(148,163,184,.08);
+      opacity:.55;
+      z-index:-1;
+      pointer-events:none;
+    }
+
+    .face.flicker{
+      animation: facePulse .13s ease-in-out infinite;
+    }
+
+    @keyframes facePulse {
+      0% { transform: scale(.98); opacity:.92; }
+      50% { transform: scale(1.03); opacity:1; }
+      100% { transform: scale(.98); opacity:.92; }
+    }
+
+    .pip{
+      width:13px;
+      height:13px;
+      border-radius:50%;
+      align-self:center;
+      justify-self:center;
+      background:
+        radial-gradient(circle at 34% 30%, rgba(255,255,255,.22), rgba(255,255,255,0) 26%),
+        radial-gradient(circle at 40% 38%, #253244 0%, #0f172a 58%, #020617 100%);
+      box-shadow:
+        inset 0 1px 1px rgba(255,255,255,.14),
+        inset 0 -1px 2px rgba(0,0,0,.25),
+        0 2px 4px rgba(0,0,0,.20);
+      opacity:0;
+      transform:scale(.6);
+      transition: opacity .14s ease, transform .14s ease;
+      position:relative;
+    }
+
+    .pip::after{
+      content:"";
+      position:absolute;
+      top:2px;
+      left:3px;
+      width:4px;
+      height:4px;
+      border-radius:50%;
+      background: rgba(255,255,255,.28);
+      filter: blur(.2px);
+      opacity:.85;
+    }
+
+    .pip.show{
+      opacity:1;
+      transform:scale(1);
+    }
+
+    .result-badge{
+      min-height:32px;
+      min-width:148px;
+      padding:0 12px;
+      border-radius:999px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      text-align:center;
+      background: rgba(255,255,255,.08);
+      border:1px solid rgba(255,255,255,.08);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.05);
+      font-size:11px;
+      font-weight:900;
+      color:rgba(234,241,255,.96);
+    }
+
+    .mode-tabs{
+      width:100%;
+      display:grid;
+      grid-template-columns:repeat(3, minmax(0,1fr));
+      gap:6px;
+      position:relative;
+      z-index:1;
+    }
+
+    .mode-chip{
+      min-height:42px;
+      border:none;
+      border-radius:14px;
+      cursor:pointer;
+      background:
+        radial-gradient(140px 60px at 50% 0%, rgba(255,255,255,.08), transparent 70%),
+        linear-gradient(180deg, rgba(31,37,52,.92), rgba(14,18,28,.88));
+      border:1px solid rgba(255,255,255,.09);
+      color:#fff;
+      font-size:11px;
+      font-weight:900;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      gap:2px;
+      padding:6px 4px;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.06), 0 8px 16px rgba(0,0,0,.16);
+    }
+
+    .mode-chip small{
+      font-size:9px;
+      font-weight:800;
+      color:rgba(234,241,255,.68);
+    }
+
+    .mode-chip.active{
+      background:
+        radial-gradient(120px 54px at 50% 0%, rgba(255,255,255,.14), transparent 70%),
+        linear-gradient(180deg, rgba(93,61,164,.34), rgba(28,34,50,.96));
+      border-color: rgba(197,182,255,.18);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.10), 0 10px 20px rgba(0,0,0,.20);
+    }
+
+    .numbers-wrap{
+      width:100%;
+      display:grid;
+      grid-template-columns:repeat(3, minmax(0,1fr));
+      gap:6px;
+      position:relative;
+      z-index:1;
+    }
+
+    .number-btn{
+      height:42px;
+      border:none;
+      border-radius:14px;
+      cursor:pointer;
+      background:
+        radial-gradient(120px 56px at 50% 0%, rgba(255,255,255,.08), transparent 72%),
+        linear-gradient(180deg, rgba(25,30,43,.92), rgba(12,16,25,.90));
+      border:1px solid rgba(255,255,255,.09);
+      color:#fff;
+      font-size:14px;
+      font-weight:900;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.06), 0 8px 16px rgba(0,0,0,.14);
+    }
+
+    .number-btn.active{
+      background:
+        radial-gradient(120px 56px at 50% 0%, rgba(255,255,255,.16), transparent 72%),
+        linear-gradient(180deg, rgba(52,93,151,.36), rgba(20,26,39,.96));
+      border-color: rgba(174,213,255,.18);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.10), 0 10px 18px rgba(0,0,0,.18);
+    }
+
+    .panel{
+      padding:8px;
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+    }
+
+    .label{
+      font-size:11px;
+      font-weight:900;
+      color: rgba(234,241,255,.94);
+      margin-bottom:6px;
+    }
+
+    .bet-row{
+      display:grid;
+      grid-template-columns:minmax(0,1fr) 40px;
+      gap:6px;
+      align-items:center;
+    }
+
+    .bet-input{
+      width:100%;
+      height:40px;
+      border-radius:13px;
+      border:1px solid rgba(255,255,255,.08);
+      background: rgba(255,255,255,.06);
+      color:#fff;
+      font-size:14px;
+      font-weight:900;
+      padding:0 12px;
+      outline:none;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.04);
+      text-align:center;
+    }
+
+    .bet-input::placeholder{
+      color: rgba(234,241,255,.42);
+      font-weight:800;
+    }
+
+    .bet-input:disabled,
+    .play-btn:disabled,
+    .bet-toggle:disabled,
+    .quick-btn:disabled,
+    .mode-chip:disabled,
+    .number-btn:disabled{
+      opacity:.55;
+      cursor:not-allowed;
+      transform:none !important;
+    }
+
+    .bet-toggle{
+      width:40px;
+      height:40px;
+      border:none;
+      border-radius:14px;
+      cursor:pointer;
+      background:
+        radial-gradient(90px 44px at 50% 0%, rgba(255,255,255,.10), transparent 70%),
+        linear-gradient(180deg, rgba(28,33,46,.94), rgba(13,17,26,.92));
+      border:1px solid rgba(255,255,255,.10);
+      color:#fff;
+      display:grid;
+      place-items:center;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.08), 0 8px 16px rgba(0,0,0,.16);
+      padding:0;
+    }
+
+    .bet-toggle svg{
+      width:18px;
+      height:18px;
+      display:block;
+      filter: drop-shadow(0 3px 6px rgba(0,0,0,.18));
+    }
+
+    .quick-bets{
+      display:grid;
+      grid-template-columns:repeat(5, minmax(0,1fr));
+      gap:6px;
+      max-height:0;
+      opacity:0;
+      overflow:hidden;
+      margin-top:0;
+      transition:max-height .24s ease, opacity .24s ease, margin .24s ease;
+    }
+
+    .quick-bets.show{
+      opacity:1;
+      margin-top:6px;
+      max-height:50px;
+    }
+
+    .quick-btn{
+      height:31px;
+      border:none;
+      border-radius:11px;
+      cursor:pointer;
+      background:
+        radial-gradient(90px 40px at 50% 0%, rgba(255,255,255,.09), transparent 72%),
+        linear-gradient(180deg, rgba(30,35,49,.90), rgba(15,19,28,.88));
+      border:1px solid rgba(255,255,255,.09);
+      color:#fff;
+      font-size:10px;
+      font-weight:900;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.06), 0 7px 14px rgba(0,0,0,.14);
+    }
+
+    .play-btn{
+      width:100%;
+      height:44px;
+      border:none;
+      border-radius:15px;
+      cursor:pointer;
+      color:#fff;
+      font-size:12px;
+      font-weight:900;
+      letter-spacing:.24px;
+      background:
+        radial-gradient(160px 60px at 50% 0%, rgba(255,255,255,.18), transparent 70%),
+        linear-gradient(180deg, #39b8f2, #1f90cf);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.20), 0 12px 24px rgba(34,158,217,.24);
+    }
+
+    .overlay{
+      position:fixed;
+      inset:0;
+      background: rgba(0,0,0,.72);
+      opacity:0;
+      pointer-events:none;
+      transition: opacity .22s ease;
+      z-index:260;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:14px;
+    }
+
+    .overlay.show{
+      opacity:1;
+      pointer-events:auto;
+    }
+
+    .popup{
+      width:min(420px, 100%);
+      border-radius:18px;
+      overflow:hidden;
+      background: rgba(14,16,24,.94);
+      border: 1px solid rgba(255,255,255,.08);
+      box-shadow: 0 28px 70px rgba(0,0,0,.56);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      position:relative;
+      transform: translateY(12px) scale(.98);
+      opacity:.95;
+      transition: transform .22s ease, opacity .22s ease;
+    }
+
+    .overlay.show .popup{
+      transform: translateY(0) scale(1);
+      opacity:1;
+    }
+
+    .popup-head{
+      padding:11px 11px 8px 11px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      background: rgba(255,255,255,.03);
+      border-bottom: 1px solid rgba(255,255,255,.06);
+    }
+
+    .popup-title{
+      font-weight:900;
+      letter-spacing:.25px;
+      font-size:13px;
+      color: rgba(234,241,255,.95);
+    }
+
+    .popup-x{
+      width:32px;
+      height:32px;
+      border-radius:12px;
+      border:1px solid rgba(255,255,255,.08);
+      background: rgba(255,255,255,.05);
+      color: rgba(234,241,255,.92);
+      cursor:pointer;
+      display:grid;
+      place-items:center;
+      box-shadow: 0 10px 20px rgba(0,0,0,.26);
+      padding:0;
+    }
+
+    .popup-body{
+      padding:11px;
+      display:flex;
+      flex-direction:column;
+      gap:7px;
+    }
+
+    .rule-line{
+      margin:0;
+      font-size:12px;
+      line-height:1.35;
+      color: rgba(234,241,255,.88);
+    }
+
+    @media (max-width: 360px){
+      .content{ gap:7px; }
+      .dice-stage{ min-height:256px; padding:13px 10px 11px; }
+      .dice-shell{ width:122px; height:122px; }
+      .dice{ width:100px; height:100px; border-radius:24px; }
+      .face{ width:62px; height:62px; gap:5px; }
+      .pip{ width:11px; height:11px; }
+      .result-badge{ font-size:10px; min-width:140px; }
+      .quick-btn{ font-size:9px; }
+      .stat-box{ min-height:40px; }
+    }
+
+    @media (prefers-reduced-motion: reduce){
+      *{ transition:none !important; animation:none !important; }
+      .overlay.show .popup{ transform:none !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="preloader" id="preloader">
+    <div class="preloader-inner">
+      <div class="preloader-logo-wrap">
+        <img class="preloader-logo" src="https://i.postimg.cc/qvL497mF/Picsart-26-02-27-02-02-37-502.png" alt="Vezus">
+      </div>
+      <div class="preloader-bar">
+        <div class="preloader-fill" id="preloaderFill"></div>
+      </div>
+      <div class="preloader-hint" id="preloaderHint">Загрузка…</div>
+    </div>
+  </div>
+
+  <div class="app">
+    <div class="content">
+      <div class="sticky-top">
+        <div class="top-row">
+          <button class="icon-btn" id="backBtn" aria-label="Назад">←</button>
+
+          <div class="balance-mini" aria-label="Баланс">
+            <span class="bal-title">Баланс</span>
+            <div class="bal-amount" id="balanceValue">...</div>
+          </div>
+
+          <button class="rule-btn" id="rulesBtn" aria-label="Правила">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M9 9a3 3 0 1 1 5.2 2.1c-.9.9-1.7 1.5-1.7 2.9"></path>
+              <path d="M12 17h.01"></path>
+              <circle cx="12" cy="12" r="9"></circle>
+            </svg>
+          </button>
+
+          <div class="logo-static" aria-hidden="true">
+            <img src="https://i.postimg.cc/qvL497mF/Picsart-26-02-27-02-02-37-502.png" alt="Vezus" loading="eager" fetchpriority="high" decoding="async">
+          </div>
+        </div>
+      </div>
+
+      <div class="card hero-card">
+        <div class="stats-grid">
+          <div class="stat-box">
+            <div class="stat-label">Режим</div>
+            <div class="stat-value" id="modeValue">Точное число</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-label">Выплата</div>
+            <div class="stat-value" id="payoutValue">x3.00</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-label">Макс. ставка</div>
+            <div class="stat-value">5000 ₽</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card dice-stage-wrap">
+        <div class="dice-stage">
+          <div class="dice-screen">
+            <div class="dice-shell" id="diceShell">
+              <div class="dice" id="dice">
+                <div class="face" id="diceFace">
+                  <span class="pip" data-pos="1"></span>
+                  <span class="pip" data-pos="2"></span>
+                  <span class="pip" data-pos="3"></span>
+                  <span class="pip" data-pos="4"></span>
+                  <span class="pip" data-pos="5"></span>
+                  <span class="pip" data-pos="6"></span>
+                  <span class="pip" data-pos="7"></span>
+                  <span class="pip" data-pos="8"></span>
+                  <span class="pip" data-pos="9"></span>
+                </div>
+              </div>
+            </div>
+
+            <div class="result-badge" id="resultBadge">Выбери режим и ставку</div>
+          </div>
+
+          <div class="mode-tabs">
+            <button class="mode-chip active" type="button" data-mode="exact">
+              Число
+              <small>x3.00</small>
+            </button>
+            <button class="mode-chip" type="button" data-mode="low">
+              1–3
+              <small>x1.75</small>
+            </button>
+            <button class="mode-chip" type="button" data-mode="high">
+              4–6
+              <small>x1.75</small>
+            </button>
+          </div>
+
+          <div class="numbers-wrap" id="numbersWrap">
+            <button class="number-btn active" type="button" data-number="1">1</button>
+            <button class="number-btn" type="button" data-number="2">2</button>
+            <button class="number-btn" type="button" data-number="3">3</button>
+            <button class="number-btn" type="button" data-number="4">4</button>
+            <button class="number-btn" type="button" data-number="5">5</button>
+            <button class="number-btn" type="button" data-number="6">6</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="card panel">
+        <div>
+          <div class="label">Ставка</div>
+          <div class="bet-row">
+            <input
+              class="bet-input"
+              id="betInput"
+              type="number"
+              min="10"
+              max="5000"
+              step="1"
+              inputmode="numeric"
+              placeholder="Мин. 10"
+              value="10"
+            >
+
+            <button class="bet-toggle" id="betToggleBtn" type="button" aria-label="Быстрые ставки">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <g fill="none" stroke="rgba(255,255,255,.96)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="9" cy="12" r="3.7"></circle>
+                  <circle cx="14.8" cy="12" r="3.7"></circle>
+                  <path d="M18.5 6.2v4.2"></path>
+                  <path d="M16.4 8.3h4.2"></path>
+                </g>
+              </svg>
+            </button>
+          </div>
+
+          <div class="quick-bets" id="quickBets">
+            <button class="quick-btn" data-bet="10" type="button">10</button>
+            <button class="quick-btn" data-bet="50" type="button">50</button>
+            <button class="quick-btn" data-bet="100" type="button">100</button>
+            <button class="quick-btn" data-bet="250" type="button">250</button>
+            <button class="quick-btn" data-bet="500" type="button">500</button>
+          </div>
+        </div>
+
+        <button class="play-btn" id="playBtn" type="button">Бросить кубик</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="overlay" id="rulesOverlay" aria-hidden="true">
+    <div class="popup" role="dialog" aria-modal="true" aria-label="Правила">
+      <div class="popup-head">
+        <div class="popup-title">Правила игры</div>
+        <button class="popup-x" id="rulesClose" aria-label="Закрыть">✕</button>
+      </div>
+
+      <div class="popup-body">
+        <p class="rule-line">• Выбери режим игры</p>
+        <p class="rule-line">• Укажи ставку от 10 ₽ до 5000 ₽</p>
+        <p class="rule-line">• В режиме «Число» выбери число от 1 до 6</p>
+        <p class="rule-line">• Нажми «Бросить кубик»</p>
+        <p class="rule-line">• Если выпал нужный результат — получаешь выигрыш</p>
+        <p class="rule-line">• Точное число — x3.00</p>
+        <p class="rule-line">• 1–3 — x1.75</p>
+        <p class="rule-line">• 4–6 — x1.75</p>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <script>
+    const DICE_API_URL = "https://lazrfierfbhwlduqlvws.functions.supabase.co/dice-game";
+    const MIN_BET = 10;
+    const MAX_BET = 5000;
+
+    const MODES = {
+      exact: { title: "Точное число", multiplier: 3 },
+      low: { title: "1–3", multiplier: 1.75 },
+      high: { title: "4–6", multiplier: 1.75 }
+    };
+
+    const FILES = { games: "index.html" };
+    const $ = (id) => document.getElementById(id);
+
+    let currentBalance = 0;
+    let selectedMode = "exact";
+    let selectedNumber = 1;
+    let isRolling = false;
+    let quickVisible = false;
+    let loaderProgress = 0;
+    let loaderInterval = null;
+    let walletReady = false;
+
+    const PIP_MAP = {
+      1: [5],
+      2: [1, 9],
+      3: [1, 5, 9],
+      4: [1, 3, 7, 9],
+      5: [1, 3, 5, 7, 9],
+      6: [1, 3, 4, 6, 7, 9]
+    };
+
+    function sleep(ms){ return new Promise(r => setTimeout(r, ms)); }
+    function randInt(min, max){ return Math.floor(Math.random() * (max - min + 1)) + min; }
+
+    function formatCurrency(value){
+      const n = Number(value ?? 0);
+      if (!Number.isFinite(n)) return "0 ₽";
+      return Number.isInteger(n) ? `${n} ₽` : `${n.toFixed(2)} ₽`;
+    }
+
+    function normalizeBalance(){
+      currentBalance = Number(currentBalance);
+      if (!Number.isFinite(currentBalance) || currentBalance < 0) currentBalance = 0;
+      currentBalance = Number(currentBalance.toFixed(2));
+    }
+
+    function updateBalanceUI(){
+      normalizeBalance();
+      $("balanceValue").textContent = formatCurrency(currentBalance);
+    }
+
+    function getTelegramInitData() {
+      if (!window.Telegram || !window.Telegram.WebApp) return "";
+      try {
+        Telegram.WebApp.ready();
+        if (typeof Telegram.WebApp.expand === "function") Telegram.WebApp.expand();
+      } catch {}
+      return Telegram.WebApp.initData || "";
+    }
+
+    async function apiRequest(action, amount = null) {
+      const initData = getTelegramInitData();
+      if (!initData) throw new Error("telegram_init_data_missing");
+
+      const payload = { initData, action };
+      if (amount !== null) payload.amount = amount;
+
+      const res = await fetch(DICE_API_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+
+      let json = {};
+      try {
+        json = await res.json();
+      } catch {}
+
+      if (!res.ok || !json.ok) {
+        throw new Error(json.error || "api_error");
+      }
+
+      return json;
+    }
+
+    async function refreshBalance() {
+      try {
+        const json = await apiRequest("get_balance");
+        currentBalance = Number(json.balance || 0);
+        walletReady = true;
+        updateBalanceUI();
+      } catch (err) {
+        walletReady = false;
+        console.warn("Ошибка загрузки баланса:", err);
+        if (String(err.message) === "telegram_init_data_missing") {
+          setResultBadge("Открой игру через Telegram");
+        } else {
+          setResultBadge("Не удалось загрузить баланс");
+        }
+      }
+    }
+
+    function getCurrentModeData(){
+      return MODES[selectedMode] || MODES.exact;
+    }
+
+    function updateStats(){
+      const modeData = getCurrentModeData();
+      $("modeValue").textContent = modeData.title;
+      $("payoutValue").textContent = `x${modeData.multiplier.toFixed(2)}`;
+    }
+
+    function updateModeButtons(){
+      document.querySelectorAll(".mode-chip").forEach((btn) => {
+        btn.classList.toggle("active", btn.getAttribute("data-mode") === selectedMode);
+      });
+      $("numbersWrap").style.display = selectedMode === "exact" ? "grid" : "none";
+      syncNumberButtonsState();
+    }
+
+    function updateNumberButtons(){
+      document.querySelectorAll(".number-btn").forEach((btn) => {
+        btn.classList.toggle("active", Number(btn.getAttribute("data-number")) === selectedNumber);
+      });
+    }
+
+    function setResultBadge(text){
+      $("resultBadge").textContent = text;
+    }
+
+    function getBetAmount(){
+      const raw = $("betInput").value;
+      const amount = Number(raw);
+      if (!raw || !Number.isFinite(amount)) return 0;
+      return Math.floor(amount);
+    }
+
+    function setQuickVisible(show){
+      if ($("betToggleBtn").disabled && show) return;
+      quickVisible = !!show;
+      $("quickBets").classList.toggle("show", quickVisible);
+    }
+
+    function syncNumberButtonsState(){
+      const shouldDisable = isRolling || selectedMode !== "exact";
+      document.querySelectorAll(".number-btn").forEach(btn => {
+        btn.disabled = shouldDisable;
+      });
+    }
+
+    function setInputsLocked(locked){
+      $("betInput").disabled = locked;
+      $("betToggleBtn").disabled = locked;
+      $("playBtn").disabled = locked;
+      document.querySelectorAll(".quick-btn").forEach(btn => btn.disabled = locked);
+      document.querySelectorAll(".mode-chip").forEach(btn => btn.disabled = locked);
+      syncNumberButtonsState();
+      if (locked) setQuickVisible(false);
+      $("playBtn").textContent = locked ? "Бросаем..." : "Бросить кубик";
+    }
+
+    function renderDice(number){
+      const active = new Set(PIP_MAP[number] || []);
+      document.querySelectorAll(".pip").forEach((pip) => {
+        const pos = Number(pip.getAttribute("data-pos"));
+        pip.classList.toggle("show", active.has(pos));
+      });
+    }
+
+    function getRollMessage(number, win, payout){
+      return win
+        ? `Выпало ${number} · Выигрыш +${formatCurrency(payout)}`
+        : `Выпало ${number} · Не повезло`;
+    }
+
+    function checkWin(number){
+      if (selectedMode === "exact") return number === selectedNumber;
+      if (selectedMode === "low") return number >= 1 && number <= 3;
+      if (selectedMode === "high") return number >= 4 && number <= 6;
+      return false;
+    }
+
+    function pickFrom(values){
+      return values[randInt(0, values.length - 1)];
+    }
+
+    function getBiasedRoll(){
+      if (selectedMode === "exact") {
+        const hitChance = 0.12;
+        if (Math.random() < hitChance) return selectedNumber;
+        return pickFrom([1, 2, 3, 4, 5, 6].filter(n => n !== selectedNumber));
+      }
+
+      if (selectedMode === "low") {
+        const hitChance = 0.34;
+        if (Math.random() < hitChance) return pickFrom([1, 2, 3]);
+        return pickFrom([4, 5, 6]);
+      }
+
+      if (selectedMode === "high") {
+        const hitChance = 0.34;
+        if (Math.random() < hitChance) return pickFrom([4, 5, 6]);
+        return pickFrom([1, 2, 3]);
+      }
+
+      return randInt(1, 6);
+    }
+
+    async function animateRoll(finalNumber){
+      const dice = $("dice");
+      const shell = $("diceShell");
+      const face = $("diceFace");
+
+      dice.classList.add("rolling");
+      shell.classList.add("rolling");
+      face.classList.add("flicker");
+
+      const start = performance.now();
+      const duration = 1250;
+
+      return new Promise(resolve => {
+        function frame(now){
+          const elapsed = now - start;
+
+          renderDice(randInt(1, 6));
+
+          if (elapsed < duration) {
+            requestAnimationFrame(frame);
+          } else {
+            dice.classList.remove("rolling");
+            shell.classList.remove("rolling");
+            face.classList.remove("flicker");
+            renderDice(finalNumber);
+            resolve();
+          }
+        }
+        requestAnimationFrame(frame);
+      });
+    }
+
+    async function playRound(){
+      if (isRolling) return;
+
+      if (!walletReady) {
+        setResultBadge("Баланс ещё не загружен");
+        await refreshBalance();
+        return;
+      }
+
+      const bet = getBetAmount();
+      if (bet < MIN_BET) {
+        setResultBadge(`Минимальная ставка ${MIN_BET} ₽`);
+        return;
+      }
+      if (bet > MAX_BET) {
+        $("betInput").value = String(MAX_BET);
+        setResultBadge(`Максимальная ставка ${MAX_BET} ₽`);
+        return;
+      }
+      if (bet > currentBalance) {
+        setResultBadge("Недостаточно средств");
+        return;
+      }
+
+      isRolling = true;
+      setInputsLocked(true);
+
+      try {
+        const json = await apiRequest("debit", bet);
+        currentBalance = Number(json.balance || 0);
+        updateBalanceUI();
+      } catch (err) {
+        isRolling = false;
+        setInputsLocked(false);
+        console.warn("Ошибка списания:", err);
+        if (String(err.message) === "insufficient_funds") {
+          setResultBadge("Недостаточно средств");
+        } else if (String(err.message) === "telegram_init_data_missing") {
+          setResultBadge("Открой игру через Telegram");
+        } else {
+          setResultBadge("Ошибка списания");
+        }
+        return;
+      }
+
+      setResultBadge("Кубик бросается...");
+
+      const rolledNumber = getBiasedRoll();
+      await animateRoll(rolledNumber);
+
+      const win = checkWin(rolledNumber);
+      const payout = Number((bet * getCurrentModeData().multiplier).toFixed(2));
+
+      if (win) {
+        try {
+          const json = await apiRequest("credit", payout);
+          currentBalance = Number(json.balance || 0);
+          updateBalanceUI();
+        } catch (err) {
+          console.warn("Ошибка начисления:", err);
+          setResultBadge("Ошибка начисления выигрыша");
+          await sleep(980);
+          isRolling = false;
+          setInputsLocked(false);
+          return;
+        }
+      }
+
+      setTimeout(() => {
+        setResultBadge(getRollMessage(rolledNumber, win, payout));
+      }, 120);
+
+      await sleep(980);
+      isRolling = false;
+      setInputsLocked(false);
+    }
+
+    function goTo(file){
+      window.location.href = file;
+    }
+
+    function openOverlay(id){
+      const el = $(id);
+      el.classList.add("show");
+      el.setAttribute("aria-hidden", "false");
+      document.body.style.overflow = "hidden";
+    }
+
+    function closeOverlay(id){
+      const el = $(id);
+      el.classList.remove("show");
+      el.setAttribute("aria-hidden", "true");
+      document.body.style.overflow = "";
+    }
+
+    function setLoaderProgress(value) {
+      const fill = $("preloaderFill");
+      const hint = $("preloaderHint");
+      if (!fill) return;
+      loaderProgress = Math.min(100, Math.max(0, value));
+      fill.style.width = loaderProgress + "%";
+      if (hint) {
+        if (loaderProgress < 40) hint.textContent = "Загрузка…";
+        else if (loaderProgress < 70) hint.textContent = "Подготовка…";
+        else if (loaderProgress < 95) hint.textContent = "Почти готово…";
+        else hint.textContent = "Готово!";
+      }
+    }
+
+    function startLoaderAnimation() {
+      setLoaderProgress(6);
+      if (loaderInterval) clearInterval(loaderInterval);
+      loaderInterval = setInterval(() => {
+        if (loaderProgress >= 90) {
+          clearInterval(loaderInterval);
+          loaderInterval = null;
+          return;
+        }
+        if (loaderProgress < 40) setLoaderProgress(loaderProgress + 5);
+        else if (loaderProgress < 65) setLoaderProgress(loaderProgress + 3);
+        else if (loaderProgress < 82) setLoaderProgress(loaderProgress + 2);
+        else setLoaderProgress(loaderProgress + 1);
+      }, 90);
+    }
+
+    function finishLoader() {
+      if (loaderInterval) {
+        clearInterval(loaderInterval);
+        loaderInterval = null;
+      }
+      setLoaderProgress(100);
+      setTimeout(() => {
+        const preloader = $("preloader");
+        if (preloader) preloader.classList.add("hide");
+      }, 220);
+    }
+
+    $("backBtn").addEventListener("click", () => goTo(FILES.games));
+    $("rulesBtn").addEventListener("click", () => openOverlay("rulesOverlay"));
+    $("rulesClose").addEventListener("click", () => closeOverlay("rulesOverlay"));
+
+    $("rulesOverlay").addEventListener("click", (e) => {
+      if (e.target === $("rulesOverlay")) closeOverlay("rulesOverlay");
+    });
+
+    $("betToggleBtn").addEventListener("click", () => {
+      if ($("betToggleBtn").disabled) return;
+      setQuickVisible(!quickVisible);
+    });
+
+    document.querySelectorAll(".quick-btn").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        if (btn.disabled) return;
+        const value = Number(btn.getAttribute("data-bet"));
+        if (!Number.isFinite(value)) return;
+        $("betInput").value = String(Math.min(value, MAX_BET));
+        setQuickVisible(false);
+      });
+    });
+
+    document.querySelectorAll(".mode-chip").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        if (btn.disabled || isRolling) return;
+        selectedMode = btn.getAttribute("data-mode") || "exact";
+        updateStats();
+        updateModeButtons();
+        updateNumberButtons();
+        setResultBadge(selectedMode === "exact"
+          ? `Выбрано число ${selectedNumber}`
+          : `Выбран режим ${getCurrentModeData().title}`);
+      });
+    });
+
+    document.querySelectorAll(".number-btn").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        if (btn.disabled || isRolling || selectedMode !== "exact") return;
+        const value = Number(btn.getAttribute("data-number"));
+        if (!Number.isFinite(value)) return;
+        selectedNumber = value;
+        updateNumberButtons();
+        setResultBadge(`Выбрано число ${selectedNumber}`);
+      });
+    });
+
+    $("betInput").addEventListener("input", () => {
+      const input = $("betInput");
+      let value = Number(input.value);
+      if (!input.value) return;
+      if (!Number.isFinite(value)) {
+        input.value = "";
+        return;
+      }
+      value = Math.floor(value);
+      if (value > MAX_BET) value = MAX_BET;
+      if (value < 0) value = 0;
+      input.value = String(value);
+    });
+
+    $("playBtn").addEventListener("click", playRound);
+
+    document.addEventListener("click", (e) => {
+      const betToggle = $("betToggleBtn");
+      const quickMenu = $("quickBets");
+
+      if (
+        quickVisible &&
+        e.target !== betToggle &&
+        !betToggle.contains(e.target) &&
+        e.target !== quickMenu &&
+        !quickMenu.contains(e.target)
+      ) {
+        setQuickVisible(false);
+      }
+    });
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") {
+        closeOverlay("rulesOverlay");
+        setQuickVisible(false);
+      }
+    });
+
+    async function init() {
+      try {
+        if (window.Telegram && window.Telegram.WebApp) {
+          Telegram.WebApp.ready();
+          if (typeof Telegram.WebApp.expand === "function") Telegram.WebApp.expand();
+        }
+      } catch {}
+
+      startLoaderAnimation();
+      renderDice(1);
+      updateStats();
+      updateModeButtons();
+      updateNumberButtons();
+      updateBalanceUI();
+      setResultBadge("Выбрано число 1");
+
+      await refreshBalance();
+
+      setTimeout(() => finishLoader(), 300);
+    }
+
+    window.addEventListener("load", init);
+  </script>  </script>
+</body>
+</html>
