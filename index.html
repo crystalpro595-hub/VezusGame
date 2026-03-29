@@ -2123,16 +2123,11 @@
           return;
         }
 
-        if (action === 'rules') {
-          closeMenu();
-          showToast('Правила проекта — в разработке', 1800);
-          return;
-        }
-
         closeMenu();
 
         if (action === 'vouchers') return goTo(FILES.vouchers);
         if (action === 'history') return goTo(FILES.history);
+        if (action === 'rules') return goTo(FILES.rules);
       });
     });
 
