@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Vezus · Правила и политика</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    html, body {
+      margin: 0;
+      padding: 0;
+      min-height: 100%;
+      font-family: 'Inter', sans-serif;
+      color: #eef2ff;
+      background: #050816;
+    }
+    body {
+      background:
+        radial-gradient(900px 500px at 10% -10%, rgba(168,85,247,0.18), transparent 55%),
+        radial-gradient(900px 520px at 100% 0%, rgba(59,130,246,0.16), transparent 55%),
+        linear-gradient(180deg, #0b1020 0%, #060915 55%, #04070f 100%);
+    }
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background:
+        radial-gradient(circle at 20% 20%, rgba(255,255,255,.05) 1px, transparent 1.8px),
+        radial-gradient(circle at 70% 60%, rgba(255,255,255,.03) 1px, transparent 1.8px);
+      background-size: 34px 34px, 46px 46px;
+      opacity: .22;
+    }
+    a { color: inherit; text-decoration: none; }
+
+    :root {
+      --glass: rgba(12,16,28,0.72);
+      --stroke: rgba(255,255,255,0.09);
+      --soft: rgba(226,232,240,0.72);
+      --safe-top: env(safe-area-inset-top, 0px);
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+      --shadow-soft: 0 10px 25px rgba(0,0,0,.22);
+    }
+
+    .app {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: calc(8px + var(--safe-top)) 14px calc(28px + var(--safe-bottom));
+      position: relative;
+      z-index: 1;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 2px 0 8px;
+      background: linear-gradient(180deg, rgba(5,8,22,.46), rgba(5,8,22,.18) 72%, transparent);
+      backdrop-filter: blur(5px);
+      -webkit-backdrop-filter: blur(5px);
+    }
+
+    .icon-btn,
+    .top-title,
+    .contact-btn {
+      border: 1px solid var(--stroke);
+      background: var(--glass);
+      color: #fff;
+      border-radius: 14px;
+      box-shadow: var(--shadow-soft), inset 0 1px 0 rgba(255,255,255,.05);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+
+    .icon-btn,
+    .contact-btn {
+      width: 36px;
+      height: 36px;
+      display: grid;
+      place-items: center;
+      flex: 0 0 auto;
+    }
+
+    .icon-btn svg,
+    .contact-btn svg,
+    .section-icon svg,
+    .contact-arrow svg {
+      width: 18px;
+      height: 18px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .top-title {
+      flex: 1;
+      min-width: 0;
+      padding: 8px 12px;
+      text-align: center;
+      font-size: 13px;
+      font-weight: 900;
+      letter-spacing: -.2px;
+    }
+
+    .intro {
+      margin-top: 8px;
+      padding: 14px;
+      border-radius: 20px;
+      border: 1px solid var(--stroke);
+      background: rgba(255,255,255,.05);
+      box-shadow: var(--shadow-soft);
+      color: var(--soft);
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .accordion {
+      display: grid;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    details.section {
+      border: 1px solid rgba(255,255,255,.08);
+      border-radius: 20px;
+      background: var(--glass);
+      box-shadow: var(--shadow-soft);
+      overflow: hidden;
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+    }
+
+    details.section[open] {
+      border-color: rgba(139,92,246,.28);
+      background:
+        radial-gradient(320px 180px at 0% 0%, rgba(139,92,246,.12), transparent 72%),
+        rgba(12,16,28,.78);
+    }
+
+    summary {
+      list-style: none;
+      cursor: pointer;
+      padding: 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      user-select: none;
+    }
+
+    summary::-webkit-details-marker { display: none; }
+
+    .section-icon {
+      width: 38px;
+      height: 38px;
+      border-radius: 14px;
+      flex: 0 0 auto;
+      display: grid;
+      place-items: center;
+      color: #f8fbff;
+      background: rgba(255,255,255,.08);
+      border: 1px solid rgba(255,255,255,.08);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.06);
+    }
+
+    .section-main {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .section-title {
+      font-size: 15px;
+      font-weight: 800;
+      line-height: 1.25;
+    }
+
+    .section-sub {
+      margin-top: 4px;
+      color: var(--soft);
+      font-size: 12px;
+      line-height: 1.45;
+    }
+
+    .section-toggle {
+      width: 30px;
+      height: 30px;
+      border-radius: 12px;
+      flex: 0 0 auto;
+      display: grid;
+      place-items: center;
+      background: rgba(255,255,255,.08);
+      font-size: 18px;
+      font-weight: 700;
+      transition: transform .2s ease;
+    }
+
+    details[open] .section-toggle {
+      transform: rotate(45deg);
+    }
+
+    .content {
+      padding: 0 16px 16px;
+      color: var(--soft);
+      font-size: 13px;
+      line-height: 1.7;
+    }
+
+    .content > * + * { margin-top: 10px; }
+    .content p, .content li { margin: 0; }
+    .content ul { margin: 0; padding-left: 18px; }
+
+    .mini-card {
+      padding: 12px;
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,.08);
+      background: rgba(255,255,255,.045);
+    }
+
+    .mini-card strong {
+      display: block;
+      margin-bottom: 6px;
+      color: #fff;
+      font-size: 13px;
+    }
+
+    .contact-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .contact-link {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 14px;
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,.08);
+      background: rgba(255,255,255,.05);
+    }
+
+    .contact-main { min-width: 0; }
+    .contact-title { font-size: 14px; font-weight: 800; color: #fff; }
+    .contact-sub { margin-top: 4px; font-size: 12px; color: var(--soft); overflow-wrap: anywhere; }
+    .contact-arrow {
+      width: 32px;
+      height: 32px;
+      border-radius: 12px;
+      display: grid;
+      place-items: center;
+      background: rgba(255,255,255,.08);
+      flex: 0 0 auto;
+      color: #fff;
+    }
+
+    .fine {
+      margin-top: 14px;
+      text-align: center;
+      color: rgba(226,232,240,.60);
+      font-size: 12px;
+      line-height: 1.6;
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <div class="topbar">
+      <a class="icon-btn" href="index.html" aria-label="Назад">
+        <svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/><path d="M9 12h10"/></svg>
+      </a>
+      <div class="top-title">Правила и политика</div>
+      <a class="contact-btn" href="#contacts" aria-label="Контакты">
+        <svg viewBox="0 0 24 24"><path d="M4 6h16v12H4z"/><path d="M4 8l8 6 8-6"/></svg>
+      </a>
+    </div>
+
+    <div class="intro">
+      Ниже собраны основные документы и правила проекта. Нажми на нужный раздел, чтобы раскрыть подробную информацию.
+    </div>
+
+    <div class="accordion">
+      <details class="section">
+        <summary>
+          <div class="section-icon">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 10v6"/><path d="M12 7h.01"/></svg>
+          </div>
+          <div class="section-main">
+            <div class="section-title">О проекте</div>
+            <div class="section-sub">Что представляет собой платформа и как работает сервис.</div>
+          </div>
+          <div class="section-toggle">+</div>
+        </summary>
+        <div class="content">
+          <div class="mini-card">
+            <strong>Назначение сервиса</strong>
+            Платформа предоставляет доступ к интерактивным игровым механикам, внутреннему балансу, бонусным режимам и сервисным разделам внутри Mini App.
+          </div>
+          <div class="mini-card">
+            <strong>Формат использования</strong>
+            Доступ к сервису осуществляется через Telegram WebApp. Для корректной работы используются технические данные Telegram, необходимые для идентификации пользователя.
+          </div>
+          <div class="mini-card">
+            <strong>Возрастные ограничения</strong>
+            Сервис предназначен только для совершеннолетних пользователей в соответствии с законодательством страны проживания пользователя.
+          </div>
+        </div>
+      </details>
+
+      <details class="section">
+        <summary>
+          <div class="section-icon">
+            <svg viewBox="0 0 24 24"><path d="M8 3h6l5 5v13H8z"/><path d="M14 3v5h5"/><path d="M10 13h7"/><path d="M10 17h7"/></svg>
+          </div>
+          <div class="section-main">
+            <div class="section-title">Условия и пользовательское соглашение</div>
+            <div class="section-sub">Права и обязанности пользователя при использовании сервиса.</div>
+          </div>
+          <div class="section-toggle">+</div>
+        </summary>
+        <div class="content">
+          <p>Используя платформу, пользователь подтверждает, что ознакомился с правилами сервиса, принимает условия использования и обязуется соблюдать действующие ограничения и политики проекта.</p>
+          <ul>
+            <li>Пользователь несёт ответственность за использование своего Telegram-аккаунта.</li>
+            <li>Запрещено передавать доступ третьим лицам для обхода лимитов или ограничений.</li>
+            <li>Игровой баланс обновляется после игровых действий, бонусов и специальных режимов.</li>
+            <li>Запрещено вмешательство в код, автоматизация игры, подмена запросов и мошенническое поведение.</li>
+            <li>Проект вправе ограничить доступ при подозрении на злоупотребление, мультиаккаунтинг или мошенничество.</li>
+            <li>Проект вправе изменять интерфейс, игровые механики, бонусные правила и внутренние ограничения без предварительного уведомления.</li>
+          </ul>
+        </div>
+      </details>
+
+      <details class="section">
+        <summary>
+          <div class="section-icon">
+            <svg viewBox="0 0 24 24"><rect x="4" y="11" width="16" height="9" rx="2"/><path d="M8 11V8a4 4 0 1 1 8 0v3"/></svg>
+          </div>
+          <div class="section-main">
+            <div class="section-title">Конфиденциальность</div>
+            <div class="section-sub">Какие данные могут обрабатываться и зачем это нужно.</div>
+          </div>
+          <div class="section-toggle">+</div>
+        </summary>
+        <div class="content">
+          <p>Проект может обрабатывать Telegram ID пользователя, username, имя, фамилию, фото профиля, данные внутреннего баланса, игровые действия и технические журналы, необходимые для диагностики ошибок и защиты сервиса.</p>
+          <ul>
+            <li>Данные используются для идентификации пользователя внутри Mini App.</li>
+            <li>Они нужны для отображения и синхронизации баланса, бонусов и игровых операций.</li>
+            <li>Технические журналы могут использоваться для предотвращения мошенничества и ошибок.</li>
+            <li>Пользователь может обратиться с запросом по вопросам конфиденциальности через контакты, указанные ниже.</li>
+          </ul>
+        </div>
+      </details>
+
+      <details class="section">
+        <summary>
+          <div class="section-icon">
+            <svg viewBox="0 0 24 24"><path d="M12 3l9 16H3z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>
+          </div>
+          <div class="section-main">
+            <div class="section-title">Опасность азарта</div>
+            <div class="section-sub">Важные предупреждения о рисках и самоконтроле.</div>
+          </div>
+          <div class="section-toggle">+</div>
+        </summary>
+        <div class="content">
+          <div class="mini-card">
+            <strong>Ответственное отношение</strong>
+            Любая игровая активность должна восприниматься как форма развлечения, а не как гарантированный способ получения дохода.
+          </div>
+          <ul>
+            <li>Не используйте для игры средства, потеря которых может повлиять на ваше финансовое положение.</li>
+            <li>Не пытайтесь отыгрываться после серии неудачных результатов.</li>
+            <li>Устанавливайте личные лимиты по времени и внутреннему балансу.</li>
+            <li>Если вы чувствуете потерю контроля, рекомендуется временно прекратить использование сервиса.</li>
+          </ul>
+        </div>
+      </details>
+
+      <details class="section">
+        <summary>
+          <div class="section-icon">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M12 8v4l3 2"/><path d="M17 4l1.5-1.5"/><path d="M7 4L5.5 2.5"/></svg>
+          </div>
+          <div class="section-main">
+            <div class="section-title">Сроки зачисления и вывода</div>
+            <div class="section-sub">Информация о поступлении депозита и обработке вывода средств.</div>
+          </div>
+          <div class="section-toggle">+</div>
+        </summary>
+        <div class="content">
+          <div class="mini-card">
+            <strong>Зачисление депозита</strong>
+            Депозит поступает на счёт в срок от 1 минуты до 1 часа.
+          </div>
+          <div class="mini-card">
+            <strong>Обработка вывода</strong>
+            Вывод осуществляется в течение 2 рабочих дней.
+          </div>
+          <div class="mini-card">
+            <strong>Дополнительная проверка</strong>
+            В отдельных случаях при технической ошибке, дополнительной проверке или нестандартной ситуации срок вывода может увеличиться до 14 дней.
+          </div>
+        </div>
+      </details>
+
+      <details class="section">
+        <summary>
+          <div class="section-icon">
+            <svg viewBox="0 0 24 24"><path d="M12 3l7 3v6c0 4.5-3 7.7-7 9-4-1.3-7-4.5-7-9V6z"/><path d="M9.5 12.5l1.8 1.8 3.7-3.7"/></svg>
+          </div>
+          <div class="section-main">
+            <div class="section-title">Политики проекта</div>
+            <div class="section-sub">Общие правила безопасности, бонусов и ограничений.</div>
+          </div>
+          <div class="section-toggle">+</div>
+        </summary>
+        <div class="content">
+          <ul>
+            <li>Бонусные механики и акции могут быть ограничены по времени, количеству запусков и условиям участия.</li>
+            <li>При выявлении технических уязвимостей, аномальной активности или попыток злоупотребления проект вправе отменить ошибочные начисления.</li>
+            <li>Проект может временно ограничить доступ к отдельным играм, разделам или функциям для проведения технических работ.</li>
+            <li>Использование ботов, скриптов, автокликеров и любых средств автоматизации запрещено.</li>
+            <li>Нарушение правил может привести к ограничению доступа к аккаунту или внутреннему балансу.</li>
+          </ul>
+        </div>
+      </details>
+
+      <details class="section" id="contacts" open>
+        <summary>
+          <div class="section-icon">
+            <svg viewBox="0 0 24 24"><path d="M4 6h16v12H4z"/><path d="M4 8l8 6 8-6"/></svg>
+          </div>
+          <div class="section-main">
+            <div class="section-title">Контакты и обращения</div>
+            <div class="section-sub">Связь по вопросам поддержки, конфиденциальности и проекта.</div>
+          </div>
+          <div class="section-toggle">+</div>
+        </summary>
+        <div class="content">
+          <div class="contact-list">
+            <a class="contact-link" href="mailto:vezusgame@gmail.com">
+              <div class="contact-main">
+                <div class="contact-title">Почта поддержки</div>
+                <div class="contact-sub">vezusgame@gmail.com</div>
+              </div>
+              <div class="contact-arrow">
+                <svg viewBox="0 0 24 24"><path d="M7 17L17 7"/><path d="M9 7h8v8"/></svg>
+              </div>
+            </a>
+
+            <a class="contact-link" href="https://t.me/VezusGameMan" target="_blank" rel="noopener noreferrer">
+              <div class="contact-main">
+                <div class="contact-title">Telegram</div>
+                <div class="contact-sub">@VezusGameMan</div>
+              </div>
+              <div class="contact-arrow">
+                <svg viewBox="0 0 24 24"><path d="M7 17L17 7"/><path d="M9 7h8v8"/></svg>
+              </div>
+            </a>
+          </div>
+        </div>
+      </details>
+    </div>
+
+    <div class="fine">
+      Используя сервис, пользователь подтверждает ознакомление с правилами платформы и принимает внутренние условия использования проекта.
+    </div>
+  </div>
+</body>
+</html>
