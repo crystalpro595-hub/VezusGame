@@ -3,873 +3,542 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Админ‑панель • Управление заявками</title>
+  <title>Админка • Пополнения и выводы</title>
 
-  <!-- Google Fonts & simple icons via Feather (optional) -->
-  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
-  <!-- Feather Icons CDN (лёгкие иконки) -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
 
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: 'Inter', sans-serif;
-      -webkit-tap-highlight-color: transparent;
+    *{margin:0;padding:0;box-sizing:border-box;font-family:'Inter',sans-serif;-webkit-tap-highlight-color:transparent}
+
+    :root{
+      --bg:#020617;
+      --text:#eaf1ff;
+      --muted:rgba(234,241,255,.72);
+      --stroke:rgba(255,255,255,.08);
+      --glass:rgba(12,14,20,.78);
+      --glass-soft:rgba(12,14,20,.62);
+      --green:#10b981;
+      --red:#ef4444;
+      --yellow:#f59e0b;
+      --blue:#60a5fa;
+      --safe-top:env(safe-area-inset-top,0px);
+      --safe-bottom:env(safe-area-inset-bottom,0px);
+      --shadow:0 18px 48px rgba(0,0,0,.45);
+      --shadow-soft:0 10px 28px rgba(0,0,0,.28);
     }
 
-    :root {
-      --bg-dark: #020617;
-      --glass-bg: rgba(12, 14, 20, 0.78);
-      --glass-border: rgba(255, 255, 255, 0.08);
-      --text-primary: #eaf1ff;
-      --text-muted: rgba(234, 241, 255, 0.7);
-      --accent-blue: #3b82f6;
-      --accent-green: #10b981;
-      --accent-red: #ef4444;
-      --accent-orange: #f59e0b;
-      --safe-top: env(safe-area-inset-top, 0px);
-      --safe-bottom: env(safe-area-inset-bottom, 0px);
-      --shadow-heavy: 0 20px 48px rgba(0, 0, 0, 0.48);
-      --shadow-soft: 0 12px 28px rgba(0, 0, 0, 0.34);
+    html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text)}
+    body{
+      background-image:url("https://i.postimg.cc/fbJT34yY/076E519D-F095-4957-88BF-5591DEB82533.png");
+      background-size:cover;background-position:center;background-repeat:no-repeat;
     }
-
-    html, body {
-      height: 100%;
-      overflow: hidden;
-      color: var(--text-primary);
-      background: var(--bg-dark);
-    }
-
-    body {
-      background-image: url("https://i.postimg.cc/fbJT34yY/076E519D-F095-4957-88BF-5591DEB82533.png");
-      background-size: cover;
-      background-position: center;
-      background-repeat: no-repeat;
-    }
-
-    body::before {
-      content: "";
-      position: fixed;
-      inset: 0;
+    body::before{
+      content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
       background:
-        radial-gradient(900px 600px at 30% 10%, rgba(255, 255, 255, 0.05), transparent 60%),
-        linear-gradient(180deg, rgba(0, 0, 0, 0.42), rgba(0, 0, 0, 0.68));
-      pointer-events: none;
-      z-index: 0;
+        radial-gradient(900px 600px at 30% 10%, rgba(255,255,255,.05), transparent 60%),
+        linear-gradient(180deg, rgba(0,0,0,.40), rgba(0,0,0,.72));
     }
 
-    .app {
-      position: relative;
-      height: 100%;
-      overflow-y: auto;
-      padding: calc(16px + var(--safe-top)) 12px calc(24px + var(--safe-bottom)) 12px;
-      z-index: 1;
-      scroll-behavior: smooth;
-    }
+    .app{position:relative;height:100%;overflow-y:auto;padding:calc(14px + var(--safe-top)) 12px calc(22px + var(--safe-bottom));z-index:1}
+    .content{max-width:980px;margin:0 auto;display:flex;flex-direction:column;gap:14px}
 
-    .content {
-      max-width: 860px;
-      margin: 0 auto;
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
+    .topbar{
+      position:sticky;top:4px;z-index:40;
+      display:flex;align-items:center;justify-content:space-between;gap:12px;
+      padding:12px 14px;border-radius:26px;background:rgba(10,12,18,.56);
+      border:1px solid var(--stroke);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+      box-shadow:var(--shadow-soft);
     }
+    .title-wrap{min-width:0}
+    .title-wrap h1{
+      font-size:1.42rem;font-weight:900;letter-spacing:-.03em;
+      background:linear-gradient(90deg,#fff,#bdd1ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;
+    }
+    .title-wrap p{margin-top:3px;font-size:.78rem;font-weight:700;color:var(--muted)}
+    .topbar-actions{display:flex;gap:8px;flex-shrink:0}
 
-    /* Верхний бар */
-    .topbar {
-      position: sticky;
-      top: 4px;
-      z-index: 30;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 16px;
-      padding: 12px 18px;
-      border-radius: 28px;
-      background: rgba(10, 12, 18, 0.5);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      border: 1px solid var(--glass-border);
-      box-shadow: var(--shadow-soft);
+    .icon-btn{
+      width:44px;height:44px;border:none;border-radius:18px;cursor:pointer;
+      display:grid;place-items:center;color:var(--text);
+      background:rgba(255,255,255,.06);border:1px solid var(--stroke);
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.03);
+      transition:transform .15s ease, background .15s ease;
     }
+    .icon-btn:hover{background:rgba(255,255,255,.12)}
+    .icon-btn:active{transform:scale(.97)}
+    .icon-btn svg{width:20px;height:20px;stroke-width:2}
 
-    .title-wrap h1 {
-      font-size: 1.5rem;
-      font-weight: 800;
-      letter-spacing: -0.02em;
-      background: linear-gradient(to right, #fff, #b0c4ff);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
+    .summary-grid{display:grid;grid-template-columns:1.15fr 1fr 1fr 1fr;gap:12px}
+    .summary-card{
+      border-radius:24px;padding:14px 14px 13px;background:var(--glass);
+      border:1px solid var(--stroke);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+      box-shadow:var(--shadow-soft);
     }
+    .summary-card.primary{
+      background:
+        radial-gradient(280px 110px at 0% 0%, rgba(255,255,255,.09), transparent 60%),
+        linear-gradient(145deg, rgba(27,34,61,.88), rgba(11,14,27,.92));
+    }
+    .summary-label{font-size:.73rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+    .summary-value{margin-top:6px;font-size:1.7rem;line-height:1;font-weight:900;color:#fff}
+    .summary-sub{margin-top:7px;font-size:.78rem;font-weight:700;color:var(--muted)}
 
-    .title-wrap p {
-      font-size: 0.7rem;
-      font-weight: 600;
-      color: var(--text-muted);
-      margin-top: 2px;
+    .filters{
+      display:flex;flex-direction:column;gap:10px;
+      padding:10px;border-radius:24px;background:rgba(14,16,24,.68);
+      border:1px solid var(--stroke);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+      box-shadow:var(--shadow-soft);
     }
+    .tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+    .tab-btn{
+      min-height:46px;border:none;border-radius:18px;cursor:pointer;
+      padding:10px 12px;background:rgba(255,255,255,.04);color:var(--muted);
+      border:1px solid transparent;transition:all .15s ease;text-align:left;
+    }
+    .tab-btn.active{background:rgba(255,255,255,.1);color:#fff;border-color:rgba(255,255,255,.12);box-shadow:0 10px 24px rgba(0,0,0,.16)}
+    .tab-top{display:flex;align-items:center;justify-content:space-between;gap:10px}
+    .tab-name{font-size:.88rem;font-weight:900}
+    .tab-count{font-size:.78rem;font-weight:900;padding:2px 8px;border-radius:999px;background:rgba(255,255,255,.08)}
+    .filter-note{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:2px 4px 0}
+    .filter-note p{font-size:.82rem;font-weight:700;color:var(--muted)}
+    .mini-chip{display:inline-flex;align-items:center;gap:6px;padding:8px 12px;border-radius:999px;background:rgba(255,255,255,.06);border:1px solid var(--stroke);font-size:.78rem;font-weight:800;color:#fff}
 
-    .topbar-actions {
-      display: flex;
-      gap: 10px;
-    }
+    .list{display:flex;flex-direction:column;gap:14px;min-height:180px}
 
-    .icon-btn {
-      height: 44px;
-      width: 44px;
-      border-radius: 18px;
-      border: none;
-      background: rgba(255, 255, 255, 0.06);
-      border: 1px solid var(--glass-border);
-      color: var(--text-primary);
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      transition: all 0.2s ease;
-      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.02);
+    .card{
+      display:flex;gap:14px;align-items:flex-start;padding:16px;border-radius:28px;
+      background:var(--glass);border:1px solid var(--stroke);box-shadow:var(--shadow);
+      backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
     }
+    .card-icon{
+      width:56px;height:56px;flex:0 0 auto;border-radius:20px;display:grid;place-items:center;
+      background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08)
+    }
+    .card-icon svg{width:28px;height:28px;stroke-width:2;color:#fff}
+    .card-content{flex:1;min-width:0;display:flex;flex-direction:column;gap:12px}
 
-    .icon-btn:hover {
-      background: rgba(255, 255, 255, 0.12);
-      transform: scale(0.98);
-    }
+    .card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap}
+    .card-title-wrap{display:flex;flex-direction:column;gap:7px}
+    .card-title{font-size:1.05rem;font-weight:900;color:#fff}
+    .card-sub{display:flex;gap:8px;flex-wrap:wrap}
+    .pill{display:inline-flex;align-items:center;height:28px;padding:0 10px;border-radius:999px;font-size:.74rem;font-weight:900;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.05);color:#fff}
+    .pill.amount{background:rgba(96,165,250,.12);border-color:rgba(96,165,250,.2);color:#dbeafe}
+    .pill.type-deposit{background:rgba(16,185,129,.14);border-color:rgba(16,185,129,.22);color:#a7f3d0}
+    .pill.type-withdraw{background:rgba(239,68,68,.14);border-color:rgba(239,68,68,.22);color:#fecaca}
 
-    .icon-btn svg {
-      width: 20px;
-      height: 20px;
-      stroke: currentColor;
-      stroke-width: 2;
-    }
+    .badge{padding:6px 12px;border-radius:999px;font-size:.72rem;font-weight:900;text-transform:uppercase;letter-spacing:.04em;border:1px solid rgba(255,255,255,.08)}
+    .badge.pending{background:rgba(245,158,11,.18);border-color:rgba(245,158,11,.24);color:#fde68a}
+    .badge.success{background:rgba(16,185,129,.18);border-color:rgba(16,185,129,.24);color:#a7f3d0}
+    .badge.rejected{background:rgba(239,68,68,.18);border-color:rgba(239,68,68,.24);color:#fecaca}
+    .badge.cancelled{background:rgba(148,163,184,.18);border-color:rgba(148,163,184,.24);color:#cbd5e1}
 
-    /* Табы (горизонтальный скролл на мобильных) */
-    .tabs-wrapper {
-      width: 100%;
-      overflow-x: auto;
-      overflow-y: hidden;
-      scrollbar-width: none; /* Firefox */
-      -ms-overflow-style: none; /* IE/Edge */
-      border-radius: 30px;
-      background: rgba(14, 16, 24, 0.6);
-      backdrop-filter: blur(8px);
-      border: 1px solid var(--glass-border);
-      padding: 6px;
-    }
+    .meta-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px 12px}
+    .meta-item{padding:11px 12px;border-radius:16px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.05)}
+    .meta-label{display:block;font-size:.67rem;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);margin-bottom:5px}
+    .meta-value{display:block;font-size:.86rem;font-weight:700;color:#fff;word-break:break-word}
 
-    .tabs-wrapper::-webkit-scrollbar {
-      display: none;
+    .card-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .btn{
+      min-height:46px;border:none;border-radius:18px;cursor:pointer;font-size:.88rem;font-weight:900;
+      transition:transform .15s ease, opacity .15s ease;border:1px solid transparent
     }
+    .btn:active{transform:scale(.98)}
+    .btn:disabled{opacity:.6;cursor:not-allowed}
+    .btn-approve{background:rgba(16,185,129,.18);border-color:rgba(16,185,129,.28);color:#a7f3d0}
+    .btn-reject{background:rgba(239,68,68,.18);border-color:rgba(239,68,68,.28);color:#fecaca}
 
-    .tabs {
-      display: flex;
-      gap: 8px;
-      width: max-content;
-      padding: 0 2px;
+    .skeleton,.empty-state{
+      border-radius:28px;padding:18px;background:var(--glass-soft);border:1px solid var(--stroke);
+      backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);box-shadow:var(--shadow-soft)
     }
+    .skeleton{display:flex;gap:14px;animation:pulse 1.4s infinite}
+    .skeleton-icon{width:56px;height:56px;border-radius:20px;background:rgba(255,255,255,.05)}
+    .skeleton-lines{flex:1;display:flex;flex-direction:column;gap:12px}
+    .skeleton-line{height:16px;background:rgba(255,255,255,.05);border-radius:999px}
+    .skeleton-line.short{width:55%}
+    @keyframes pulse{0%{opacity:.58}50%{opacity:1}100%{opacity:.58}}
+    .empty-state{text-align:center;color:var(--muted);font-weight:800;line-height:1.5}
+    .empty-state svg{width:30px;height:30px;display:block;margin:0 auto 12px;opacity:.9}
 
-    .tab-btn {
-      height: 42px;
-      padding: 0 20px;
-      border-radius: 30px;
-      border: none;
-      background: transparent;
-      color: var(--text-muted);
-      font-weight: 600;
-      font-size: 0.9rem;
-      white-space: nowrap;
-      cursor: pointer;
-      transition: all 0.15s ease;
-      border: 1px solid transparent;
+    .toast{
+      position:fixed;left:50%;bottom:calc(18px + var(--safe-bottom));transform:translateX(-50%) translateY(16px);
+      z-index:1000;max-width:min(92vw,560px);padding:13px 18px;border-radius:18px;
+      background:rgba(14,16,24,.92);border:1px solid rgba(255,255,255,.1);box-shadow:0 24px 48px rgba(0,0,0,.5);
+      color:#fff;font-size:.88rem;font-weight:800;text-align:center;opacity:0;pointer-events:none;
+      transition:opacity .22s ease, transform .22s ease;backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px)
     }
+    .toast.show{opacity:1;pointer-events:auto;transform:translateX(-50%) translateY(0)}
 
-    .tab-btn.active {
-      background: rgba(255, 255, 255, 0.1);
-      color: white;
-      border-color: rgba(255, 255, 255, 0.15);
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    .auth-overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);backdrop-filter:blur(4px);z-index:700;opacity:1;transition:opacity .25s}
+    .auth-overlay.hidden{opacity:0;pointer-events:none}
+    .auth-panel{
+      position:fixed;top:16px;left:16px;bottom:16px;width:min(400px,calc(100% - 32px));z-index:710;
+      display:flex;flex-direction:column;gap:18px;padding:22px;border-radius:32px;
+      background:rgba(14,16,24,.96);border:1px solid rgba(255,255,255,.1);box-shadow:0 40px 80px rgba(0,0,0,.6);
+      transform:translateX(0);transition:transform .3s cubic-bezier(.2,.9,.3,1);
+      backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px)
     }
+    .auth-panel.hidden-left{transform:translateX(calc(-100% - 40px))}
+    .auth-head{display:flex;align-items:center;justify-content:space-between;gap:12px}
+    .auth-title{font-size:1.5rem;font-weight:900;background:linear-gradient(90deg,#fff,#bdd1ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+    .auth-close{width:40px;height:40px;border:none;border-radius:18px;background:rgba(255,255,255,.06);color:#fff;cursor:pointer;font-size:1.35rem}
+    .auth-input{height:54px;border-radius:22px;border:1px solid rgba(255,255,255,.1);background:rgba(0,0,0,.3);padding:0 18px;color:#fff;outline:none;font-size:.95rem;font-weight:600}
+    .auth-input:focus{border-color:var(--blue)}
+    .auth-actions{display:grid;grid-template-columns:1.2fr .8fr;gap:10px}
+    .auth-login,.auth-reset{min-height:50px;border:none;border-radius:18px;cursor:pointer;font-size:.92rem;font-weight:900}
+    .auth-login{background:rgba(96,165,250,.18);border:1px solid rgba(96,165,250,.24);color:#dbeafe}
+    .auth-reset{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);color:#fff}
+    .auth-status{min-height:18px;color:#fecaca;font-size:.84rem;font-weight:700}
+    .auth-tip{padding:14px;border-radius:20px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);font-size:.82rem;font-weight:700;color:var(--muted);line-height:1.45}
 
-    /* Статистика */
-    .stats {
-      display: grid;
-      grid-template-columns: repeat(5, 1fr);
-      gap: 12px;
+    @media (max-width:880px){
+      .summary-grid{grid-template-columns:repeat(2,1fr)}
     }
-
-    .stat-card {
-      background: rgba(12, 14, 20, 0.7);
-      backdrop-filter: blur(8px);
-      border: 1px solid var(--glass-border);
-      border-radius: 24px;
-      padding: 14px 8px;
-      text-align: center;
-      box-shadow: var(--shadow-soft);
-      transition: transform 0.2s;
+    @media (max-width:680px){
+      .topbar{flex-direction:column;align-items:stretch}
+      .summary-grid{grid-template-columns:1fr}
+      .tabs{grid-template-columns:1fr}
+      .meta-grid{grid-template-columns:1fr}
+      .card-top{flex-direction:column;align-items:flex-start}
     }
-
-    .stat-card:hover {
-      transform: translateY(-2px);
-    }
-
-    .stat-label {
-      font-size: 0.7rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.4px;
-      color: var(--text-muted);
-    }
-
-    .stat-value {
-      font-size: 1.6rem;
-      font-weight: 800;
-      line-height: 1.2;
-      color: white;
-    }
-
-    /* Список заявок */
-    .list {
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-      min-height: 200px;
-    }
-
-    /* Карточка */
-    .card {
-      background: rgba(12, 14, 20, 0.75);
-      backdrop-filter: blur(12px);
-      border: 1px solid var(--glass-border);
-      border-radius: 28px;
-      padding: 18px;
-      box-shadow: var(--shadow-heavy);
-      transition: box-shadow 0.2s;
-      display: flex;
-      gap: 16px;
-    }
-
-    .card:hover {
-      box-shadow: 0 24px 56px rgba(0, 0, 0, 0.6);
-    }
-
-    .card-icon {
-      width: 54px;
-      height: 54px;
-      border-radius: 22px;
-      background: rgba(255, 255, 255, 0.04);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-      color: var(--text-primary);
-    }
-
-    .card-icon svg {
-      width: 28px;
-      height: 28px;
-      stroke: currentColor;
-      stroke-width: 1.8;
-    }
-
-    .card-content {
-      flex: 1;
-      min-width: 0;
-    }
-
-    .card-header {
-      display: flex;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 8px 12px;
-      margin-bottom: 12px;
-    }
-
-    .card-title {
-      font-size: 1.1rem;
-      font-weight: 700;
-      color: white;
-    }
-
-    .badge {
-      padding: 4px 14px;
-      border-radius: 40px;
-      font-size: 0.7rem;
-      font-weight: 800;
-      text-transform: uppercase;
-      letter-spacing: 0.3px;
-      background: rgba(255,255,255,0.04);
-      border: 1px solid rgba(255,255,255,0.1);
-      color: var(--text-primary);
-    }
-
-    .badge.pending {
-      background: rgba(245, 158, 11, 0.2);
-      color: #fcd34d;
-      border-color: rgba(245, 158, 11, 0.3);
-    }
-    .badge.approved {
-      background: rgba(16, 185, 129, 0.2);
-      color: #6ee7b7;
-      border-color: rgba(16, 185, 129, 0.3);
-    }
-    .badge.rejected {
-      background: rgba(239, 68, 68, 0.2);
-      color: #fecaca;
-      border-color: rgba(239, 68, 68, 0.3);
-    }
-    .badge.cancelled {
-      background: rgba(148, 163, 184, 0.2);
-      color: #cbd5e1;
-      border-color: rgba(148, 163, 184, 0.3);
-    }
-
-    .meta-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-      gap: 10px 16px;
-      margin-bottom: 16px;
-    }
-
-    .meta-item {
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
-    }
-
-    .meta-label {
-      font-size: 0.65rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      color: var(--text-muted);
-      letter-spacing: 0.2px;
-    }
-
-    .meta-value {
-      font-size: 0.85rem;
-      font-weight: 600;
-      color: white;
-      word-break: break-word;
-    }
-
-    .card-actions {
-      display: flex;
-      gap: 10px;
-      justify-content: flex-end;
-    }
-
-    .btn {
-      height: 38px;
-      padding: 0 22px;
-      border-radius: 40px;
-      border: none;
-      font-weight: 700;
-      font-size: 0.8rem;
-      cursor: pointer;
-      transition: 0.15s ease;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      border: 1px solid transparent;
-    }
-
-    .btn-primary {
-      background: var(--accent-green);
-      color: white;
-      box-shadow: 0 8px 18px rgba(16, 185, 129, 0.3);
-    }
-    .btn-primary:hover {
-      background: #0f9e6e;
-      transform: scale(0.97);
-    }
-    .btn-danger {
-      background: rgba(239, 68, 68, 0.2);
-      color: #fecaca;
-      border-color: rgba(239, 68, 68, 0.3);
-    }
-    .btn-danger:hover {
-      background: rgba(239, 68, 68, 0.3);
-    }
-
-    /* Состояния загрузки / пусто */
-    .skeleton {
-      background: rgba(255, 255, 255, 0.02);
-      border-radius: 28px;
-      padding: 18px;
-      display: flex;
-      gap: 16px;
-      animation: pulse 1.5s infinite;
-    }
-    .skeleton-icon {
-      width: 54px;
-      height: 54px;
-      border-radius: 22px;
-      background: rgba(255,255,255,0.04);
-    }
-    .skeleton-lines {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-    .skeleton-line {
-      height: 16px;
-      width: 100%;
-      background: rgba(255,255,255,0.04);
-      border-radius: 40px;
-    }
-    .skeleton-line.short {
-      width: 60%;
-    }
-
-    @keyframes pulse {
-      0% { opacity: 0.6; }
-      50% { opacity: 1; }
-      100% { opacity: 0.6; }
-    }
-
-    .empty-state {
-      background: rgba(12, 14, 20, 0.7);
-      backdrop-filter: blur(12px);
-      border-radius: 28px;
-      padding: 40px 20px;
-      text-align: center;
-      color: var(--text-muted);
-      font-weight: 500;
-      border: 1px dashed var(--glass-border);
-    }
-
-    /* Тосты */
-    .toast {
-      position: fixed;
-      left: 50%;
-      bottom: calc(24px + var(--safe-bottom));
-      transform: translateX(-50%) translateY(16px);
-      background: rgba(14, 16, 24, 0.9);
-      backdrop-filter: blur(20px);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 40px;
-      padding: 12px 24px;
-      color: white;
-      font-weight: 600;
-      font-size: 0.9rem;
-      box-shadow: 0 24px 48px rgba(0, 0, 0, 0.5);
-      z-index: 1000;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.24s ease, transform 0.24s ease;
-      max-width: 90%;
-      text-align: center;
-    }
-
-    .toast.show {
-      opacity: 1;
-      transform: translateX(-50%) translateY(0);
-      pointer-events: auto;
-    }
-
-    /* Auth overlay & panel */
-    .auth-overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.5);
-      backdrop-filter: blur(4px);
-      z-index: 700;
-      opacity: 1;
-      transition: opacity 0.25s;
-    }
-    .auth-overlay.hidden {
-      opacity: 0;
-      pointer-events: none;
-    }
-
-    .auth-panel {
-      position: fixed;
-      top: 16px;
-      left: 16px;
-      bottom: 16px;
-      width: min(400px, calc(100% - 32px));
-      background: rgba(14, 16, 24, 0.95);
-      backdrop-filter: blur(24px);
-      border: 1px solid rgba(255,255,255,0.1);
-      border-radius: 36px;
-      padding: 24px;
-      z-index: 710;
-      transform: translateX(0);
-      transition: transform 0.3s cubic-bezier(0.2, 0.9, 0.3, 1);
-      box-shadow: 0 40px 80px rgba(0,0,0,0.6);
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
-    }
-    .auth-panel.hidden-left {
-      transform: translateX(calc(-100% - 40px));
-    }
-
-    .auth-head {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .auth-title {
-      font-size: 1.6rem;
-      font-weight: 700;
-      background: linear-gradient(to right, #fff, #9bb7ff);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-    .auth-close {
-      width: 40px;
-      height: 40px;
-      border-radius: 20px;
-      border: none;
-      background: rgba(255,255,255,0.06);
-      color: white;
-      font-size: 1.4rem;
-      cursor: pointer;
-    }
-
-    .auth-input {
-      height: 54px;
-      border-radius: 30px;
-      background: rgba(0,0,0,0.3);
-      border: 1px solid rgba(255,255,255,0.1);
-      padding: 0 22px;
-      color: white;
-      font-weight: 500;
-      outline: none;
-    }
-    .auth-input:focus {
-      border-color: var(--accent-blue);
-    }
-
-    .auth-actions {
-      display: flex;
-      gap: 12px;
-    }
-    .auth-login {
-      flex: 2;
-      height: 52px;
-      border: none;
-      border-radius: 30px;
-      background: var(--accent-blue);
-      color: white;
-      font-weight: 700;
-      cursor: pointer;
-    }
-    .auth-reset {
-      flex: 1;
-      height: 52px;
-      border-radius: 30px;
-      border: 1px solid rgba(255,255,255,0.1);
-      background: transparent;
-      color: white;
-      font-weight: 600;
-      cursor: pointer;
-    }
-
-    .auth-status {
-      font-size: 0.85rem;
-      color: #fecaca;
-      min-height: 20px;
-    }
-
-    /* Адаптация */
-    @media (max-width: 700px) {
-      .stats {
-        grid-template-columns: repeat(2, 1fr);
-      }
-      .meta-grid {
-        grid-template-columns: 1fr;
-      }
-      .card-header {
-        flex-direction: column;
-        align-items: start;
-      }
-      .topbar {
-        flex-direction: column;
-        align-items: stretch;
-      }
-    }
-    @media (max-width: 480px) {
-      .card {
-        flex-direction: column;
-      }
-      .card-icon {
-        align-self: flex-start;
-      }
+    @media (max-width:480px){
+      .card{padding:14px;flex-direction:column}
+      .card-icon{width:50px;height:50px;border-radius:18px}
+      .card-actions{grid-template-columns:1fr}
+      .title-wrap h1{font-size:1.22rem}
+      .summary-value{font-size:1.45rem}
     }
   </style>
 </head>
 <body>
   <div class="app">
     <div class="content">
-      <!-- Верхняя панель -->
       <div class="topbar">
         <div class="title-wrap">
-          <h1>Администрирование</h1>
-          <p>Депозиты, выводы, UC / управление заявками</p>
+          <h1>Админка заявок</h1>
+          <p>Только актуальные пополнения и выводы. Без UC.</p>
         </div>
         <div class="topbar-actions">
-          <button class="icon-btn" id="refreshBtn" aria-label="Обновить данные">
-            <i data-feather="refresh-cw"></i>
-          </button>
-          <button class="icon-btn" id="openAuthBtn" aria-label="Авторизация">
-            <i data-feather="key"></i>
-          </button>
+          <button class="icon-btn" id="refreshBtn" aria-label="Обновить"><i data-feather="refresh-cw"></i></button>
+          <button class="icon-btn" id="openAuthBtn" aria-label="Ключ"><i data-feather="key"></i></button>
         </div>
       </div>
 
-      <!-- Прокручиваемые табы -->
-      <div class="tabs-wrapper">
+      <div class="summary-grid">
+        <div class="summary-card primary">
+          <div class="summary-label">Сейчас требует обработки</div>
+          <div class="summary-value" id="statActive">0</div>
+          <div class="summary-sub">Открывается по умолчанию при входе</div>
+        </div>
+        <div class="summary-card">
+          <div class="summary-label">Пополнения</div>
+          <div class="summary-value" id="statDeposits">0</div>
+          <div class="summary-sub">Все заявки на депозит</div>
+        </div>
+        <div class="summary-card">
+          <div class="summary-label">Выводы</div>
+          <div class="summary-value" id="statWithdrawals">0</div>
+          <div class="summary-sub">Все заявки на вывод</div>
+        </div>
+        <div class="summary-card">
+          <div class="summary-label">В текущем разделе</div>
+          <div class="summary-value" id="statVisible">0</div>
+          <div class="summary-sub" id="visibleHint">Актуальные заявки</div>
+        </div>
+      </div>
+
+      <div class="filters">
         <div class="tabs" id="tabsContainer">
-          <button class="tab-btn active" data-tab="all">Все</button>
-          <button class="tab-btn" data-tab="active">Актуальные</button>
-          <button class="tab-btn" data-tab="deposits">Депозиты</button>
-          <button class="tab-btn" data-tab="withdrawals">Выводы</button>
-          <button class="tab-btn" data-tab="uc">UC</button>
+          <button class="tab-btn active" data-tab="active">
+            <div class="tab-top"><span class="tab-name">Актуальные</span><span class="tab-count" id="tabCountActive">0</span></div>
+          </button>
+          <button class="tab-btn" data-tab="deposits">
+            <div class="tab-top"><span class="tab-name">Пополнения</span><span class="tab-count" id="tabCountDeposits">0</span></div>
+          </button>
+          <button class="tab-btn" data-tab="withdrawals">
+            <div class="tab-top"><span class="tab-name">Выводы</span><span class="tab-count" id="tabCountWithdrawals">0</span></div>
+          </button>
+        </div>
+        <div class="filter-note">
+          <p id="sectionText">Показываются только заявки со статусом «в обработке».</p>
+          <span class="mini-chip"><i data-feather="filter"></i><span id="miniFilterText">Актуальные</span></span>
         </div>
       </div>
 
-      <!-- Блок статистики -->
-      <div class="stats">
-        <div class="stat-card"><div class="stat-label">Всего</div><div class="stat-value" id="statAll">0</div></div>
-        <div class="stat-card"><div class="stat-label">Актуальные</div><div class="stat-value" id="statActive">0</div></div>
-        <div class="stat-card"><div class="stat-label">Депозиты</div><div class="stat-value" id="statDeposits">0</div></div>
-        <div class="stat-card"><div class="stat-label">Выводы</div><div class="stat-value" id="statWithdrawals">0</div></div>
-        <div class="stat-card"><div class="stat-label">UC</div><div class="stat-value" id="statUc">0</div></div>
-      </div>
-
-      <!-- Список заявок -->
       <div class="list" id="adminList"></div>
     </div>
   </div>
 
-  <!-- Оверлей и панель авторизации -->
   <div class="auth-overlay hidden" id="authOverlay"></div>
   <div class="auth-panel hidden-left" id="authPanel">
     <div class="auth-head">
-      <span class="auth-title">доступ</span>
+      <span class="auth-title">Доступ</span>
       <button class="auth-close" id="authCloseBtn" aria-label="Закрыть">✕</button>
     </div>
-    <div style="color: var(--text-muted); font-size: 0.9rem;">Введи <strong>ADMIN_PANEL_KEY</strong>, чтобы управлять заявками</div>
-    <input class="auth-input" id="adminKeyInput" type="password" placeholder="ключ" autocomplete="off">
+    <div style="font-size:.9rem;font-weight:700;color:var(--muted)">Введи <strong>ADMIN_PANEL_KEY</strong>, чтобы управлять пополнениями и выводами</div>
+    <input class="auth-input" id="adminKeyInput" type="password" placeholder="ключ доступа" autocomplete="off">
     <div class="auth-actions">
       <button class="auth-login" id="loginBtn">Войти</button>
       <button class="auth-reset" id="resetAuthBtn">Сброс</button>
     </div>
     <div class="auth-status" id="authStatus"></div>
-    <div style="font-size:0.8rem; color: var(--text-muted); background: rgba(255,255,255,0.02); padding: 16px; border-radius: 24px;">
-      <i data-feather="info" style="width:16px; margin-right:6px;"></i> После сброса ключ удаляется, данные скрываются.
+    <div class="auth-tip">
+      Панель показывает только три раздела: актуальные, пополнения и выводы. Заявки UC скрыты полностью.
     </div>
   </div>
 
-  <!-- Тост-уведомление (без кнопки) -->
   <div class="toast" id="toast" aria-live="polite"></div>
 
   <script>
-    feather.replace(); // заменяет <i> на иконки
+    feather.replace();
 
     const GET_URL = "https://lazrfierfbhwlduqlvws.functions.supabase.co/get-admin-requests";
     const PROCESS_URL = "https://lazrfierfbhwlduqlvws.functions.supabase.co/process-admin-request";
 
-    const $ = id => document.getElementById(id);
+    const $ = (id) => document.getElementById(id);
 
-    let activeTab = "all";
+    let activeTab = "active";
     let adminAuthorized = false;
     let adminKey = "";
+    let state = { deposits: [], withdrawals: [] };
 
-    let state = { deposits: [], withdrawals: [], ucOrders: [] };
-
-    // === Утилиты ===
-    function showToast(text, duration = 3000) {
+    function showToast(text, duration = 2800){
       const toast = $("toast");
       toast.textContent = text;
       toast.classList.add("show");
-      clearTimeout(window.toastTimer);
-      window.toastTimer = setTimeout(() => toast.classList.remove("show"), duration);
-      // клик по тосту скрывает
+      clearTimeout(window.__toastTimer);
+      window.__toastTimer = setTimeout(() => toast.classList.remove("show"), duration);
       toast.onclick = () => toast.classList.remove("show");
     }
 
-    function escapeHtml(str) {
-      return String(str ?? "").replace(/[&<>"]/g, function(m) {
-        if (m === '&') return '&amp;'; if (m === '<') return '&lt;'; if (m === '>') return '&gt;'; if (m === '"') return '&quot;';
-        return m;
-      });
+    function escapeHtml(value){
+      return String(value ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
     }
 
-    function formatVC(value) {
-      let num = Number(value ?? 0);
-      if (!Number.isFinite(num)) return "0 VC";
-      return Number.isInteger(num) ? `${num} VC` : `${num.toFixed(2)} VC`;
+    function normalizePicked(value){
+      if (value === undefined || value === null) return null;
+      const text = String(value).trim();
+      return text || null;
     }
 
-    function getRelativeTime(dateString) {
-      if (!dateString) return "—";
-      const date = new Date(dateString);
-      if (isNaN(date)) return dateString;
-      const now = new Date();
-      const diff = Math.floor((now - date) / 1000); // seconds
+    function getDeepField(obj, paths){
+      for (const path of paths){
+        const parts = path.split('.');
+        let current = obj;
+        for (const part of parts){
+          if (current == null || typeof current !== 'object' || !(part in current)) {
+            current = undefined;
+            break;
+          }
+          current = current[part];
+        }
+        const picked = normalizePicked(current);
+        if (picked !== null) return picked;
+      }
+      return null;
+    }
+
+    function formatMoney(value){
+      const num = Number(value ?? 0);
+      if (!Number.isFinite(num)) return '0 ₽';
+      return Number.isInteger(num) ? `${num} ₽` : `${num.toFixed(2)} ₽`;
+    }
+
+    function formatDate(dateStr){
+      if (!dateStr) return '—';
+      const d = new Date(dateStr);
+      if (Number.isNaN(d.getTime())) return dateStr;
+      return new Intl.DateTimeFormat('ru-RU', {
+        year:'numeric', month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit'
+      }).format(d);
+    }
+
+    function getRelativeTime(dateStr){
+      if (!dateStr) return '—';
+      const date = new Date(dateStr);
+      if (Number.isNaN(date.getTime())) return dateStr;
+      const diff = Math.floor((Date.now() - date.getTime()) / 1000);
       if (diff < 60) return 'только что';
       if (diff < 3600) return `${Math.floor(diff / 60)} мин назад`;
       if (diff < 86400) return `${Math.floor(diff / 3600)} ч назад`;
       return `${Math.floor(diff / 86400)} дн назад`;
     }
 
-    function normalizePicked(val) {
-      if (val === undefined || val === null) return null;
-      let s = String(val).trim();
-      return s || null;
+    function getAmount(item){
+      return item.amount_rub ?? item.price_rub ?? item.amount ?? item.amount_vc ?? item.price_vc ?? 0;
     }
 
-    function getDeepField(obj, paths) {
-      for (let path of paths) {
-        let parts = path.split('.');
-        let cur = obj;
-        for (let p of parts) {
-          if (cur == null || typeof cur !== 'object' || !(p in cur)) { cur = undefined; break; }
-          cur = cur[p];
-        }
-        let picked = normalizePicked(cur);
-        if (picked !== null) return picked;
-      }
-      return null;
-    }
-
-    function getAmount(item) {
-      return item.amount_vc ?? item.price_vc ?? item.amount ?? 0;
-    }
-
-    function normalizeStatus(raw) {
-      let v = String(raw || 'pending').toLowerCase();
-      if (['approved','success','completed','done','sent'].includes(v)) return 'approved';
-      if (['rejected','declined','failed'].includes(v)) return 'rejected';
-      if (['cancelled','canceled','user_cancelled','user_canceled'].includes(v)) return 'cancelled';
+    function normalizeStatus(raw){
+      const value = String(raw || 'pending').toLowerCase();
+      if (['approved','success','completed','done','sent'].includes(value)) return 'success';
+      if (['rejected','declined','failed'].includes(value)) return 'rejected';
+      if (['cancelled','canceled','user_cancelled','user_canceled'].includes(value)) return 'cancelled';
       return 'pending';
     }
 
-    function statusLabel(raw, type) {
-      let v = String(raw || 'pending').toLowerCase();
-      if (['approved','success','completed','done'].includes(v)) return 'Одобрено';
-      if (['sent'].includes(v)) return 'Отправлено';
-      if (['rejected','declined','failed'].includes(v)) return 'Отклонено';
-      if (['cancelled','canceled','user_cancelled','user_canceled'].includes(v)) return type === 'withdraw' ? 'Отменено (польз.)' : 'Отменено';
-      return 'Ожидание';
+    function statusLabel(raw){
+      const value = String(raw || 'pending').toLowerCase();
+      if (['approved','success','completed','done'].includes(value)) return 'Одобрено';
+      if (['sent'].includes(value)) return 'Отправлено';
+      if (['rejected','declined','failed'].includes(value)) return 'Отклонено';
+      if (['cancelled','canceled','user_cancelled','user_canceled'].includes(value)) return 'Отменено';
+      return 'В обработке';
     }
 
-    // Мапперы (аналогичны исходным, но используем getRelativeTime)
-    function mapDeposit(item) {
-      let sender = getDeepField(item, ['sender_name','sender_fio','full_name','fio','name','meta.fio','payload.fio']) ?? '—';
+    function mapDeposit(item){
+      const senderName = getDeepField(item, [
+        'sender_name','sender_fio','full_name','fio','name','meta.fio','payload.fio','data.fio','request_data.fio'
+      ]) ?? '—';
+
       return {
-        id: item.id, type: 'deposit', status: item.status || 'pending', title: 'Пополнение',
+        id: item.id,
+        type: 'deposit',
+        title: 'Пополнение',
+        statusRaw: item.status || 'pending',
         createdAt: item.created_at || '',
+        amountText: formatMoney(getAmount(item)),
         lines: [
           { label: 'TG ID', value: item.user_tg_id ?? '—' },
-          { label: 'Сумма', value: formatVC(getAmount(item)) },
-          { label: 'Отправитель', value: sender },
+          { label: 'ФИО отправителя', value: senderName },
+          { label: 'Дата', value: formatDate(item.created_at) },
           { label: 'Когда', value: getRelativeTime(item.created_at) }
         ]
       };
     }
 
-    function mapWithdraw(item) {
-      let fio = getDeepField(item, ['recipient_fio','fio','receiver_fio','full_name','meta.fio']) ?? '—';
-      let bank = getDeepField(item, ['bank_name','bank','receiver_bank','bank_title','meta.bank']) ?? '—';
-      let req = getDeepField(item, ['requisites','card_number','account_number','details','meta.requisites']) ?? '—';
+    function mapWithdrawal(item){
+      const fioValue = getDeepField(item, [
+        'recipient_fio','fio','receiver_fio','receiver_name','full_name','recipient_name',
+        'withdraw_fio','fio_input','user_fio','meta.fio','payload.fio','data.fio','request_data.fio'
+      ]) ?? '—';
+      const bankValue = getDeepField(item, [
+        'bank_name','bank','receiver_bank','bank_title','meta.bank','payload.bank','data.bank','request_data.bank'
+      ]) ?? '—';
+      const requisitesValue = getDeepField(item, [
+        'requisites','card_number','account_number','details','meta.requisites','payload.requisites','data.requisites','request_data.requisites'
+      ]) ?? '—';
+
       return {
-        id: item.id, type: 'withdraw', status: item.status || 'pending', title: 'Вывод',
+        id: item.id,
+        type: 'withdraw',
+        title: 'Вывод',
+        statusRaw: item.status || 'pending',
         createdAt: item.created_at || '',
+        amountText: formatMoney(getAmount(item)),
         lines: [
           { label: 'TG ID', value: item.user_tg_id ?? '—' },
-          { label: 'Сумма', value: formatVC(getAmount(item)) },
-          { label: 'Реквизиты', value: req },
-          { label: 'Банк', value: bank },
-          { label: 'ФИО', value: fio },
+          { label: 'Реквизиты', value: requisitesValue },
+          { label: 'Банк', value: bankValue },
+          { label: 'ФИО получателя', value: fioValue },
+          { label: 'Дата', value: formatDate(item.created_at) },
           { label: 'Когда', value: getRelativeTime(item.created_at) }
         ]
       };
     }
 
-    function mapUc(item) {
-      let pkg = getDeepField(item, ['package_name','package','title']) ?? '—';
-      return {
-        id: item.id, type: 'uc', status: item.status || 'pending', title: 'Покупка UC',
-        createdAt: item.created_at || '',
-        lines: [
-          { label: 'TG ID', value: item.user_tg_id ?? '—' },
-          { label: 'Пакет', value: pkg },
-          { label: 'PUBG ID', value: item.pubg_id ?? '—' },
-          { label: 'Цена', value: formatVC(getAmount(item)) },
-          { label: 'Когда', value: getRelativeTime(item.created_at) }
-        ]
-      };
+    function getMergedItems(){
+      const deposits = (state.deposits || []).map(mapDeposit);
+      const withdrawals = (state.withdrawals || []).map(mapWithdrawal);
+      return [...deposits, ...withdrawals].sort((a, b) => {
+        const da = new Date(a.createdAt || 0).getTime();
+        const db = new Date(b.createdAt || 0).getTime();
+        return db - da;
+      });
     }
 
-    function getMergedItems() {
-      let d = (state.deposits || []).map(mapDeposit);
-      let w = (state.withdrawals || []).map(mapWithdraw);
-      let u = (state.ucOrders || []).map(mapUc);
-      return [...d, ...w, ...u].sort((a,b) => new Date(b.createdAt||0) - new Date(a.createdAt||0));
-    }
-
-    function getFilteredItems() {
-      let all = getMergedItems();
-      if (activeTab === 'active') return all.filter(i => normalizeStatus(i.status) === 'pending');
-      if (activeTab === 'deposits') return all.filter(i => i.type === 'deposit');
-      if (activeTab === 'withdrawals') return all.filter(i => i.type === 'withdraw');
-      if (activeTab === 'uc') return all.filter(i => i.type === 'uc');
+    function getFilteredItems(){
+      const all = getMergedItems();
+      if (activeTab === 'active') return all.filter(item => normalizeStatus(item.statusRaw) === 'pending');
+      if (activeTab === 'deposits') return all.filter(item => item.type === 'deposit');
+      if (activeTab === 'withdrawals') return all.filter(item => item.type === 'withdraw');
       return all;
     }
 
-    function updateStats() {
-      let all = getMergedItems();
-      $('statAll').textContent = all.length;
-      $('statActive').textContent = all.filter(i => normalizeStatus(i.status) === 'pending').length;
-      $('statDeposits').textContent = all.filter(i => i.type === 'deposit').length;
-      $('statWithdrawals').textContent = all.filter(i => i.type === 'withdraw').length;
-      $('statUc').textContent = all.filter(i => i.type === 'uc').length;
+    function getActiveDepositsCount(){
+      return (state.deposits || []).filter(item => normalizeStatus(item.status) === 'pending').length;
     }
 
-    function renderCard(item) {
-      let statusType = normalizeStatus(item.status);
-      let linesHtml = item.lines.map(l => `
+    function getActiveWithdrawalsCount(){
+      return (state.withdrawals || []).filter(item => normalizeStatus(item.status) === 'pending').length;
+    }
+
+    function updateStats(){
+      const all = getMergedItems();
+      const active = all.filter(item => normalizeStatus(item.statusRaw) === 'pending');
+      const deposits = all.filter(item => item.type === 'deposit');
+      const withdrawals = all.filter(item => item.type === 'withdraw');
+      const visible = getFilteredItems();
+
+      $('statActive').textContent = active.length;
+      $('statDeposits').textContent = deposits.length;
+      $('statWithdrawals').textContent = withdrawals.length;
+      $('statVisible').textContent = visible.length;
+
+      $('tabCountActive').textContent = active.length;
+      $('tabCountDeposits').textContent = deposits.length;
+      $('tabCountWithdrawals').textContent = withdrawals.length;
+
+      const filterMap = {
+        active: { hint: 'Актуальные заявки', text: 'Показываются только заявки со статусом «в обработке».', chip: 'Актуальные' },
+        deposits: { hint: 'Пополнения', text: 'Показываются все заявки на пополнение, включая обработанные.', chip: 'Пополнения' },
+        withdrawals: { hint: 'Выводы', text: 'Показываются все заявки на вывод, включая обработанные.', chip: 'Выводы' }
+      };
+      const meta = filterMap[activeTab] || filterMap.active;
+      $('visibleHint').textContent = meta.hint;
+      $('sectionText').textContent = meta.text;
+      $('miniFilterText').textContent = meta.chip;
+    }
+
+    function iconForType(type){
+      if (type === 'deposit') return '<i data-feather="arrow-down-left"></i>';
+      return '<i data-feather="arrow-up-right"></i>';
+    }
+
+    function renderCard(item){
+      const statusType = normalizeStatus(item.statusRaw);
+      const typeText = item.type === 'deposit' ? 'Пополнение' : 'Вывод';
+      const linesHtml = item.lines.map(line => `
         <div class="meta-item">
-          <span class="meta-label">${escapeHtml(l.label)}</span>
-          <span class="meta-value">${escapeHtml(l.value)}</span>
+          <span class="meta-label">${escapeHtml(line.label)}</span>
+          <span class="meta-value">${escapeHtml(line.value)}</span>
         </div>
       `).join('');
 
-      let actions = statusType === 'pending' ? `
+      const actionsHtml = statusType === 'pending' ? `
         <div class="card-actions">
-          <button class="btn btn-primary" data-action="approve" data-type="${item.type}" data-id="${item.id}">Одобрить</button>
-          <button class="btn btn-danger" data-action="reject" data-type="${item.type}" data-id="${item.id}">Отклонить</button>
+          <button class="btn btn-approve" data-action="approve" data-type="${item.type}" data-id="${escapeHtml(item.id)}">Одобрить</button>
+          <button class="btn btn-reject" data-action="reject" data-type="${item.type}" data-id="${escapeHtml(item.id)}">Отклонить</button>
         </div>
       ` : '';
 
-      // иконка для типа
-      let iconSvg = '';
-      if (item.type === 'deposit') iconSvg = '<i data-feather="arrow-down-left"></i>';
-      else if (item.type === 'withdraw') iconSvg = '<i data-feather="arrow-up-right"></i>';
-      else iconSvg = '<i data-feather="star"></i>';
-
       return `
         <div class="card">
-          <div class="card-icon">${iconSvg}</div>
+          <div class="card-icon">${iconForType(item.type)}</div>
           <div class="card-content">
-            <div class="card-header">
-              <span class="card-title">${escapeHtml(item.title)}</span>
-              <span class="badge ${statusType}">${escapeHtml(statusLabel(item.status, item.type))}</span>
+            <div class="card-top">
+              <div class="card-title-wrap">
+                <div class="card-title">${escapeHtml(item.title)}</div>
+                <div class="card-sub">
+                  <span class="pill amount">${escapeHtml(item.amountText)}</span>
+                  <span class="pill ${item.type === 'deposit' ? 'type-deposit' : 'type-withdraw'}">${escapeHtml(typeText)}</span>
+                </div>
+              </div>
+              <span class="badge ${statusType}">${escapeHtml(statusLabel(item.statusRaw))}</span>
             </div>
             <div class="meta-grid">${linesHtml}</div>
-            ${actions}
+            ${actionsHtml}
           </div>
         </div>
       `;
     }
 
-    function showSkeletons(count = 3) {
+    function showSkeletons(count = 3){
       let html = '';
       for (let i = 0; i < count; i++) {
         html += `
@@ -886,103 +555,122 @@
       $('adminList').innerHTML = html;
     }
 
-    async function renderList(showSkel = false) {
+    function renderList(showSkeleton = false){
       if (!adminAuthorized) {
-        $('adminList').innerHTML = `<div class="empty-state"><i data-feather="lock" style="width:32px; margin-bottom:12px;"></i><br>Войдите, используя ключ.</div>`;
+        $('adminList').innerHTML = `<div class="empty-state"><i data-feather="lock"></i>Войдите через ключ, чтобы увидеть заявки.</div>`;
         feather.replace();
+        updateStats();
         return;
       }
-      if (showSkel) showSkeletons(3);
 
-      let items = getFilteredItems();
+      if (showSkeleton) showSkeletons(3);
+
+      const items = getFilteredItems();
+      updateStats();
+
       if (!items.length) {
-        $('adminList').innerHTML = `<div class="empty-state"><i data-feather="inbox" style="width:32px; margin-bottom:12px;"></i><br>Нет заявок в этом разделе</div>`;
+        $('adminList').innerHTML = `<div class="empty-state"><i data-feather="inbox"></i>В этом разделе сейчас нет заявок.</div>`;
         feather.replace();
         return;
       }
+
       $('adminList').innerHTML = items.map(renderCard).join('');
-      feather.replace(); // обновить иконки в карточках
+      feather.replace();
     }
 
-    // === Работа с API ===
-    async function postJson(url, payload) {
-      let res = await fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
+    async function postJson(url, payload){
+      const res = await fetch(url, {
+        method:'POST',
+        headers:{ 'Content-Type':'application/json' },
+        body:JSON.stringify(payload)
       });
-      let json = await res.json().catch(() => ({}));
+      const json = await res.json().catch(() => ({}));
       if (!res.ok || !json.ok) throw new Error(json.error || json.details || `Ошибка ${res.status}`);
       return json;
     }
 
-    async function loadAdminData(showSkeleton = true) {
-      if (!adminAuthorized || !adminKey) return renderList(false);
+    async function loadAdminData(showSkeleton = true){
+      if (!adminAuthorized || !adminKey) {
+        renderList(false);
+        return null;
+      }
+
       if (showSkeleton) showSkeletons(3);
+
       try {
-        let json = await postJson(GET_URL, { adminKey });
+        const json = await postJson(GET_URL, { adminKey });
         state.deposits = Array.isArray(json.deposits) ? json.deposits : [];
         state.withdrawals = Array.isArray(json.withdrawals) ? json.withdrawals : [];
-        state.ucOrders = Array.isArray(json.ucOrders) ? json.ucOrders : [];
-        updateStats();
         renderList(false);
+        return json;
       } catch (err) {
-        showToast(err.message || 'Ошибка загрузки');
+        state.deposits = [];
+        state.withdrawals = [];
         renderList(false);
+        throw err;
       }
     }
 
-    async function processRequest(type, id, action, btn) {
-      if (!adminAuthorized) { openAuthPanel(); return; }
-      // подтверждение
-      if (!confirm(`${action === 'approve' ? 'Одобрить' : 'Отклонить'} заявку?`)) return;
+    async function processRequest(type, id, action, btn){
+      if (!adminAuthorized) {
+        openAuthPanel();
+        return;
+      }
 
+      const text = action === 'approve' ? 'Одобрить заявку?' : 'Отклонить заявку?';
+      if (!confirm(text)) return;
+
+      const original = btn.textContent;
       btn.disabled = true;
-      let originalText = btn.textContent;
       btn.textContent = '...';
+
       try {
         await postJson(PROCESS_URL, { adminKey, type, requestId: id, action });
         await loadAdminData(false);
-        showToast(`Заявка ${action === 'approve' ? 'одобрена' : 'отклонена'}`);
+        showToast(action === 'approve' ? 'Заявка одобрена' : 'Заявка отклонена');
       } catch (err) {
-        showToast(err.message || 'Ошибка');
         btn.disabled = false;
-        btn.textContent = originalText;
+        btn.textContent = original;
+        showToast(err.message || 'Ошибка обработки');
       }
     }
 
-    // === Управление панелью auth ===
-    function openAuthPanel() {
+    function openAuthPanel(){
       $('authPanel').classList.remove('hidden-left');
       $('authOverlay').classList.remove('hidden');
       $('authStatus').textContent = '';
       setTimeout(() => $('adminKeyInput').focus(), 100);
     }
-    function closeAuthPanel() {
+
+    function closeAuthPanel(){
       $('authPanel').classList.add('hidden-left');
       $('authOverlay').classList.add('hidden');
     }
-    function forceLock() {
+
+    function forceLock(){
       adminAuthorized = false;
       adminKey = '';
-      state = { deposits: [], withdrawals: [], ucOrders: [] };
+      state = { deposits: [], withdrawals: [] };
       $('adminKeyInput').value = '';
       $('authStatus').textContent = '';
-      updateStats();
       renderList(false);
       openAuthPanel();
       showToast('Доступ сброшен');
     }
 
-    // === Авторизация ===
-    async function tryLogin() {
-      let key = $('adminKeyInput').value.trim();
-      if (!key) { $('authStatus').textContent = 'Введите ключ'; return; }
+    async function tryLogin(){
+      const key = $('adminKeyInput').value.trim();
+      if (!key) {
+        $('authStatus').textContent = 'Введите ключ';
+        return;
+      }
+
       $('authStatus').textContent = 'Проверка...';
-      let prevKey = adminKey;
-      let prevAuth = adminAuthorized;
+      const prevKey = adminKey;
+      const prevAuth = adminAuthorized;
       adminKey = key;
       adminAuthorized = true;
+
       try {
         await loadAdminData(true);
         $('authStatus').textContent = '';
@@ -991,44 +679,66 @@
       } catch (err) {
         adminKey = prevKey;
         adminAuthorized = prevAuth;
+        state = { deposits: [], withdrawals: [] };
         $('authStatus').textContent = err.message || 'Неверный ключ';
-        showToast('Ошибка входа');
+        renderList(false);
+        showToast(err.message || 'Ошибка входа');
       }
     }
 
-    // === События ===
+    function setActiveTab(tab){
+      activeTab = tab;
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.tab === tab);
+      });
+      renderList(false);
+    }
+
     $('loginBtn').addEventListener('click', tryLogin);
     $('resetAuthBtn').addEventListener('click', forceLock);
     $('openAuthBtn').addEventListener('click', openAuthPanel);
-    $('authCloseBtn').addEventListener('click', () => { if (adminAuthorized) closeAuthPanel(); else $('authStatus').textContent = 'Сначала войдите'; });
-    $('authOverlay').addEventListener('click', () => { if (adminAuthorized) closeAuthPanel(); });
-    $('refreshBtn').addEventListener('click', () => {
-      if (!adminAuthorized) { openAuthPanel(); showToast('Требуется вход'); return; }
-      loadAdminData(true).then(() => showToast('Обновлено')).catch(() => {});
+    $('authCloseBtn').addEventListener('click', () => {
+      if (adminAuthorized) closeAuthPanel();
+      else $('authStatus').textContent = 'Сначала войдите';
+    });
+    $('authOverlay').addEventListener('click', () => {
+      if (adminAuthorized) closeAuthPanel();
+    });
+
+    $('refreshBtn').addEventListener('click', async () => {
+      if (!adminAuthorized) {
+        openAuthPanel();
+        showToast('Требуется вход');
+        return;
+      }
+      try {
+        await loadAdminData(true);
+        showToast('Данные обновлены');
+      } catch (err) {
+        showToast(err.message || 'Ошибка обновления');
+      }
     });
 
     document.querySelectorAll('.tab-btn').forEach(btn => {
-      btn.addEventListener('click', e => {
-        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        activeTab = btn.dataset.tab;
-        renderList(false);
-      });
+      btn.addEventListener('click', () => setActiveTab(btn.dataset.tab));
     });
 
-    $('adminList').addEventListener('click', e => {
-      let btn = e.target.closest('[data-action]');
+    $('adminList').addEventListener('click', (e) => {
+      const btn = e.target.closest('[data-action]');
       if (!btn) return;
       e.preventDefault();
       processRequest(btn.dataset.type, btn.dataset.id, btn.dataset.action, btn);
     });
 
-    $('adminKeyInput').addEventListener('keypress', e => { if (e.key === 'Enter') tryLogin(); });
+    $('adminKeyInput').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') tryLogin();
+    });
 
-    // Инициализация
     window.addEventListener('load', () => {
-      openAuthPanel();
       renderList(false);
+      updateStats();
+      openAuthPanel();
+      feather.replace();
     });
   </script>
 </body>
