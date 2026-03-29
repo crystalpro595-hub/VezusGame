@@ -204,7 +204,7 @@
     .tabs{
       width:100%;
       display:grid;
-      grid-template-columns: repeat(4, 1fr);
+      grid-template-columns: repeat(3, 1fr);
       gap:8px;
       padding:4px;
       border-radius:20px;
@@ -476,7 +476,7 @@
     }
 
     @media (max-width:480px){
-      .tabs{ grid-template-columns: repeat(2, 1fr); }
+      .tabs{ grid-template-columns: repeat(3, 1fr); }
     }
   </style>
 </head>
@@ -503,14 +503,13 @@
 
       <div class="page-head">
         <h1 class="page-title">История</h1>
-        <p class="page-sub">Пополнения, выводы и покупки UC</p>
+        <p class="page-sub">Пополнения и выводы</p>
       </div>
 
       <div class="tabs" id="tabs">
         <button class="tab-btn active" data-tab="all">Все</button>
         <button class="tab-btn" data-tab="deposits">Пополнения</button>
         <button class="tab-btn" data-tab="withdrawals">Выводы</button>
-        <button class="tab-btn" data-tab="uc">UC</button>
       </div>
 
       <div class="history-list" id="historyList">
@@ -540,14 +539,13 @@
     let state = {
       profile: null,
       deposits: [],
-      withdrawals: [],
-      ucOrders: []
+      withdrawals: []
     };
 
-    function formatVc(value){
+    function formatMoney(value){
       const num = Number(value ?? 0);
-      if (!Number.isFinite(num)) return "0 VC";
-      return Number.isInteger(num) ? `${num} VC` : `${num.toFixed(2)} VC`;
+      if (!Number.isFinite(num)) return "0 ₽";
+      return Number.isInteger(num) ? `${num} ₽` : `${num.toFixed(2)} ₽`;
     }
 
     function formatDate(dateStr){
@@ -610,7 +608,7 @@
     }
 
     function setBalanceUI(value){
-      $("balanceValue").textContent = formatVc(value);
+      $("balanceValue").textContent = formatMoney(value);
     }
 
     function applyProfile(profile){
@@ -672,14 +670,11 @@
       if (type === "deposit") {
         return `<svg viewBox="0 0 24 24"><path d="M12 3v14"></path><path d="M7 12l5 5 5-5"></path><path d="M5 21h14"></path></svg>`;
       }
-      if (type === "withdrawal") {
-        return `<svg viewBox="0 0 24 24"><path d="M12 21V7"></path><path d="M17 12l-5-5-5 5"></path><path d="M5 3h14"></path></svg>`;
-      }
-      return `<svg viewBox="0 0 24 24"><path d="M12 3l2.8 5.7L21 9.6l-4.5 4.4 1.1 6.2L12 17.3 6.4 20.2 7.5 14 3 9.6l6.2-.9z"></path></svg>`;
+      return `<svg viewBox="0 0 24 24"><path d="M12 21V7"></path><path d="M17 12l-5-5-5 5"></path><path d="M5 3h14"></path></svg>`;
     }
 
     function getAmount(item){
-      return item.amount_vc ?? item.price_vc ?? item.amount ?? 0;
+      return item.amount_rub ?? item.price_rub ?? item.amount ?? item.amount_vc ?? item.price_vc ?? 0;
     }
 
     function mapDeposit(item){
@@ -703,7 +698,7 @@
         createdAt: item.created_at || "",
         canCancel: false,
         lines: [
-          ["Сумма", formatVc(getAmount(item))],
+          ["Сумма", formatMoney(getAmount(item))],
           ["ФИО отправителя", senderName],
           ["Дата", formatDate(item.created_at)]
         ]
@@ -757,7 +752,7 @@
         createdAt: item.created_at || "",
         canCancel: String(item.status || "").toLowerCase() === "pending",
         lines: [
-          ["Сумма", formatVc(getAmount(item))],
+          ["Сумма", formatMoney(getAmount(item))],
           ["Реквизиты", requisitesValue],
           ["Банк", bankValue],
           ["ФИО получателя", fioValue],
@@ -766,39 +761,14 @@
       };
     }
 
-    function mapUc(item){
-      const packageName = getDeepField(item, [
-        "package_name",
-        "package",
-        "title"
-      ]) ?? "—";
-
-      return {
-        id: item.id,
-        type: "uc",
-        title: "Покупка UC",
-        statusRaw: item.status || "pending",
-        createdAt: item.created_at || "",
-        canCancel: false,
-        lines: [
-          ["Пакет", packageName],
-          ["PUBG ID", item.pubg_id ?? "—"],
-          ["Стоимость", formatVc(getAmount(item))],
-          ["Дата", formatDate(item.created_at)]
-        ]
-      };
-    }
-
     function getItemsForTab(){
       const deposits = (state.deposits || []).map(mapDeposit);
       const withdrawals = (state.withdrawals || []).map(mapWithdrawal);
-      const uc = (state.ucOrders || []).map(mapUc);
 
       if (activeTab === "deposits") return deposits;
       if (activeTab === "withdrawals") return withdrawals;
-      if (activeTab === "uc") return uc;
 
-      return [...deposits, ...withdrawals, ...uc].sort((a, b) => {
+      return [...deposits, ...withdrawals].sort((a, b) => {
         const da = new Date(a.createdAt || 0).getTime();
         const db = new Date(b.createdAt || 0).getTime();
         return db - da;
@@ -880,7 +850,6 @@
 
         state.deposits = Array.isArray(json.deposits) ? json.deposits : [];
         state.withdrawals = Array.isArray(json.withdrawals) ? json.withdrawals : [];
-        state.ucOrders = Array.isArray(json.ucOrders) ? json.ucOrders : [];
 
         renderHistory();
       } catch(err){
