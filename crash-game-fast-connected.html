@@ -1,0 +1,2058 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Crash X · премиум эффекты</title>
+
+  <link rel="preconnect" href="https://i.postimg.cc" crossorigin>
+  <link rel="preload" as="image" href="https://i.postimg.cc/qvL497mF/Picsart-26-02-27-02-02-37-502.png">
+  <link rel="preload" as="image" href="https://i.postimg.cc/MZF73FR5/Picsart-26-03-30-19-53-12-606.png">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
+
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: 'Inter', sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html, body {
+      height: 100%;
+      margin: 0;
+      overflow: hidden;
+      color: #eaf1ff;
+      background: #020617;
+    }
+
+    body {
+      background-image: url("https://i.postimg.cc/fbJT34yY/076E519D-F095-4957-88BF-5591DEB82533.png");
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(900px 600px at 30% 10%, rgba(255,255,255,0.05), transparent 60%),
+        radial-gradient(700px 520px at 80% 20%, rgba(59,130,246,0.10), transparent 60%),
+        linear-gradient(180deg, rgba(0,0,0,0.42), rgba(0,0,0,0.70));
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    *::-webkit-scrollbar { display: none; }
+
+    :root {
+      --text: #eaf1ff;
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+      --safe-top: env(safe-area-inset-top, 0px);
+      --glass: rgba(12, 14, 20, 0.80);
+      --stroke: rgba(255,255,255,0.08);
+      --shadow: 0 16px 38px rgba(0,0,0,0.42);
+      --shadow-soft: 0 10px 22px rgba(0,0,0,0.28);
+
+      --green1: #22c55e;
+      --green2: #16a34a;
+      --red1: #ef4444;
+      --red2: #dc2626;
+      --amber1: #f59e0b;
+      --amber2: #f97316;
+      --purple1: #a855f7;
+      --purple2: #7e22ce;
+      --blue1: #60a5fa;
+      --blue2: #2563eb;
+    }
+
+    .startup-loader {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      background:
+        radial-gradient(900px 520px at 20% 10%, rgba(196,181,253,0.16), transparent 56%),
+        radial-gradient(760px 460px at 80% 20%, rgba(129,140,248,0.16), transparent 54%),
+        linear-gradient(180deg, #4c1d95 0%, #2e1065 46%, #14072b 100%);
+      transition: opacity 0.35s ease, visibility 0.35s ease;
+    }
+
+    .startup-loader.hide {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    .startup-loader-inner {
+      width: min(320px, 86vw);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 18px;
+    }
+
+    .startup-logo-wrap {
+      width: min(170px, 56vw);
+      display: flex;
+      justify-content: center;
+      position: relative;
+      padding: 10px;
+    }
+
+    .startup-logo-wrap::before {
+      content: "";
+      position: absolute;
+      left: 50%;
+      bottom: 6px;
+      width: 74%;
+      height: 18px;
+      transform: translateX(-50%);
+      border-radius: 999px;
+      background: radial-gradient(ellipse at center, rgba(0,0,0,0.42), rgba(0,0,0,0) 72%);
+      animation: loaderShadow 0.62s ease-in-out infinite;
+    }
+
+    .startup-logo {
+      width: 100%;
+      height: auto;
+      display: block;
+      position: relative;
+      z-index: 2;
+      filter: drop-shadow(0 16px 26px rgba(0,0,0,0.30)) drop-shadow(0 0 22px rgba(167,139,250,0.18));
+      transform-origin: center bottom;
+      animation: logoBounce 0.62s ease-in-out infinite;
+      user-select: none;
+    }
+
+    .startup-loader-bar {
+      width: 100%;
+      height: 12px;
+      padding: 2px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.10);
+      border: 1px solid rgba(255,255,255,0.12);
+      overflow: hidden;
+    }
+
+    .startup-loader-fill {
+      width: 0%;
+      height: 100%;
+      border-radius: 999px;
+      background: linear-gradient(90deg, #c084fc, #8b5cf6, #60a5fa);
+      box-shadow: 0 0 14px rgba(192,132,252,0.34);
+      transition: width 0.18s ease;
+    }
+
+    .startup-hint {
+      font-size: 12px;
+      font-weight: 900;
+      color: rgba(234,241,255,0.86);
+      text-shadow: 0 10px 18px rgba(0,0,0,0.35);
+    }
+
+    @keyframes logoBounce {
+      0% { transform: translateY(0) scale(1); }
+      40% { transform: translateY(-10px) scale(1.02); }
+      55% { transform: translateY(0) scale(1); }
+      70% { transform: translateY(-4px) scale(1.01); }
+      100% { transform: translateY(0) scale(1); }
+    }
+
+    @keyframes loaderShadow {
+      0% { transform: translateX(-50%) scaleX(0.96); opacity: 0.88; }
+      40% { transform: translateX(-50%) scaleX(1.06); opacity: 0.78; }
+      100% { transform: translateX(-50%) scaleX(0.96); opacity: 0.88; }
+    }
+
+    .app {
+      position: relative;
+      height: 100%;
+      overflow: auto;
+      padding: 0 12px calc(20px + var(--safe-bottom)) 12px;
+      z-index: 1;
+    }
+
+    .content {
+      width: 100%;
+      max-width: 640px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .sticky-top {
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      padding-top: calc(6px + var(--safe-top));
+      padding-bottom: 6px;
+      background: linear-gradient(180deg, rgba(2,6,23,0.96) 0%, rgba(2,6,23,0.86) 72%, rgba(2,6,23,0) 100%);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+    }
+
+    .top-row {
+      display: grid;
+      grid-template-columns: 36px 1fr 36px 46px;
+      gap: 6px;
+      align-items: center;
+    }
+
+    .icon-btn, .rule-btn {
+      width: 36px;
+      height: 36px;
+      border: none;
+      border-radius: 12px;
+      background: var(--glass);
+      border: 1px solid var(--stroke);
+      box-shadow: var(--shadow-soft), inset 0 1px 0 rgba(255,255,255,0.04);
+      display: grid;
+      place-items: center;
+      color: var(--text);
+      cursor: pointer;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+
+    .icon-btn:active, .rule-btn:active { transform: scale(0.98); }
+
+    .rule-btn svg {
+      width: 16px;
+      height: 16px;
+      stroke: rgba(234,241,255,0.92);
+      fill: none;
+      stroke-width: 2;
+    }
+
+    .balance-mini {
+      min-width: 0;
+      height: 38px;
+      border-radius: 999px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+      padding: 5px 6px 5px 10px;
+      background: var(--glass);
+      border: 1px solid var(--stroke);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+
+    .bal-title {
+      font-size: 11px;
+      font-weight: 900;
+      color: rgba(234,241,255,0.92);
+    }
+
+    .bal-amount {
+      min-width: 76px;
+      height: 24px;
+      border: none;
+      border-radius: 999px;
+      padding: 0 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255,255,255,0.08);
+      color: rgba(234,241,255,0.98);
+      font-weight: 900;
+      font-size: 12px;
+      white-space: nowrap;
+    }
+
+    .logo-btn {
+      width: 46px;
+      height: 46px;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      padding: 0;
+    }
+
+    .logo-btn:active { transform: scale(0.98); }
+
+    .logo-btn img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      filter: drop-shadow(0 10px 16px rgba(0,0,0,0.25));
+    }
+
+    .card {
+      border-radius: 18px;
+      background: var(--glass);
+      border: 1px solid var(--stroke);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      overflow: hidden;
+    }
+
+    .hero-card { display: none !important; }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 6px;
+    }
+
+    .stat-box {
+      min-height: 54px;
+      border-radius: 12px;
+      padding: 8px;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.08);
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      justify-content: center;
+    }
+
+    .stat-label {
+      font-size: 9px;
+      font-weight: 800;
+      color: rgba(234,241,255,0.62);
+    }
+
+    .stat-value {
+      font-size: 14px;
+      font-weight: 900;
+      color: #fff;
+    }
+
+    .graph-card {
+      position: relative;
+      padding: 0;
+      overflow: hidden;
+    }
+
+    .graph-header {
+      padding: 10px 12px 0 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .graph-title {
+      font-size: 12px;
+      font-weight: 900;
+      color: rgba(234,241,255,0.92);
+    }
+
+    .round-pill {
+      height: 28px;
+      padding: 0 12px;
+      border-radius: 999px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.08);
+      font-size: 11px;
+      font-weight: 900;
+      color: rgba(234,241,255,0.86);
+      white-space: nowrap;
+    }
+
+    .graph-wrap {
+      position: relative;
+      height: 340px;
+      margin-top: 8px;
+      overflow: hidden;
+      background:
+        radial-gradient(520px 220px at 20% 12%, rgba(96,165,250,0.12), transparent 60%),
+        radial-gradient(460px 240px at 78% 18%, rgba(168,85,247,0.16), transparent 62%),
+        radial-gradient(620px 300px at 50% 100%, rgba(14,165,233,0.08), transparent 70%),
+        linear-gradient(180deg, #07101f 0%, #050c18 48%, #020611 100%);
+      isolation: isolate;
+    }
+
+    .graph-wrap.crashed {
+      animation: crashFlash 0.55s ease;
+    }
+
+    .graph-wrap::before,
+    .graph-wrap::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+    }
+
+    .graph-wrap::before {
+      z-index: 0;
+      background:
+        radial-gradient(2px 2px at 10% 18%, rgba(255,255,255,0.95), transparent 70%),
+        radial-gradient(1.5px 1.5px at 24% 36%, rgba(255,255,255,0.85), transparent 72%),
+        radial-gradient(2px 2px at 38% 22%, rgba(255,255,255,0.88), transparent 72%),
+        radial-gradient(1.5px 1.5px at 52% 42%, rgba(255,255,255,0.72), transparent 72%),
+        radial-gradient(2px 2px at 68% 26%, rgba(255,255,255,0.88), transparent 72%),
+        radial-gradient(1.5px 1.5px at 82% 18%, rgba(255,255,255,0.74), transparent 72%),
+        radial-gradient(2px 2px at 90% 38%, rgba(255,255,255,0.90), transparent 72%);
+      opacity: 0.55;
+    }
+
+    .graph-wrap::after {
+      z-index: 1;
+      background:
+        radial-gradient(420px 160px at 74% 8%, rgba(168,85,247,0.10), transparent 70%),
+        radial-gradient(360px 140px at 18% 20%, rgba(59,130,246,0.10), transparent 70%);
+      mix-blend-mode: screen;
+      opacity: 0.9;
+    }
+
+    @keyframes crashFlash {
+      0% { box-shadow: inset 0 0 0 rgba(239,68,68,0); }
+      25% { box-shadow: inset 0 0 120px rgba(239,68,68,0.32); }
+      100% { box-shadow: inset 0 0 0 rgba(239,68,68,0); }
+    }
+
+    .graph-canvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      display: block;
+      z-index: 2;
+    }
+
+    .mult-display {
+      position: absolute;
+      left: 50%;
+      top: 34%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+      z-index: 5;
+      pointer-events: none;
+      width: min(86%, 420px);
+    }
+
+    .mult-value {
+      font-size: clamp(34px, 8vw, 68px);
+      font-weight: 900;
+      letter-spacing: -0.03em;
+      color: #fff;
+      text-shadow:
+        0 0 18px rgba(168,85,247,0.35),
+        0 12px 28px rgba(0,0,0,0.45);
+      transition: color 0.18s ease, transform 0.18s ease;
+      line-height: 1;
+    }
+
+    .mult-value.good {
+      color: #6ee7b7;
+      text-shadow:
+        0 0 18px rgba(34,197,94,0.38),
+        0 12px 28px rgba(0,0,0,0.45);
+    }
+
+    .mult-value.bad {
+      color: #fda4af;
+      text-shadow:
+        0 0 18px rgba(239,68,68,0.38),
+        0 12px 28px rgba(0,0,0,0.45);
+    }
+
+    .mult-sub {
+      margin-top: 6px;
+      font-size: 12px;
+      font-weight: 900;
+      color: rgba(234,241,255,0.72);
+      text-shadow: 0 8px 20px rgba(0,0,0,0.35);
+    }
+
+    .rocket {
+      position: absolute;
+      z-index: 6;
+      width: 90px;
+      height: 90px;
+      display: grid;
+      place-items: center;
+      transform: translate(-50%, -50%) rotate(0deg);
+      transition: opacity 0.18s ease, transform 0.08s linear, filter 0.12s linear;
+      pointer-events: none;
+      filter: drop-shadow(0 16px 28px rgba(0,0,0,0.50)) drop-shadow(0 0 20px rgba(168,85,247,0.18));
+      will-change: transform, opacity, filter;
+    }
+
+    .rocket::before {
+      content: "";
+      position: absolute;
+      inset: 12px 14px 20px 14px;
+      border-radius: 999px;
+      background: radial-gradient(circle at 50% 42%, rgba(168,85,247,0.22), rgba(96,165,250,0.10), transparent 74%);
+      filter: blur(12px);
+      z-index: 0;
+    }
+
+    .rocket::after {
+      content: "";
+      position: absolute;
+      left: 50%;
+      top: 73%;
+      width: 26px;
+      height: 78px;
+      transform: translateX(-50%);
+      transform-origin: top center;
+      border-radius: 999px;
+      background:
+        radial-gradient(ellipse at 50% 0%, rgba(255,255,255,0.96) 0%, rgba(255,244,214,0.95) 14%, rgba(250,204,21,0.96) 34%, rgba(249,115,22,0.90) 58%, rgba(239,68,68,0.48) 80%, rgba(239,68,68,0) 100%);
+      filter: blur(4px);
+      opacity: 0;
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    .rocket.flying::after {
+      opacity: 0.98;
+      animation: rocketFlame 0.12s ease-in-out infinite alternate;
+    }
+
+    @keyframes rocketFlame {
+      0% { transform: translateX(-50%) scaleY(0.82) scaleX(0.86); filter: blur(3px); }
+      100% { transform: translateX(-50%) scaleY(1.20) scaleX(1.08); filter: blur(5px); }
+    }
+
+    .rocket img {
+      position: relative;
+      z-index: 2;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: block;
+      user-select: none;
+      -webkit-user-drag: none;
+      filter: drop-shadow(0 10px 16px rgba(0,0,0,0.34));
+    }
+
+    .rocket.hidden {
+      opacity: 0;
+    }
+
+    .rocket.boom {
+      opacity: 0;
+      transform: translate(-50%, -50%) scale(0.78) !important;
+      filter: drop-shadow(0 0 38px rgba(239,68,68,0.42));
+    }
+
+    .panel {
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .label {
+      font-size: 12px;
+      font-weight: 900;
+      color: rgba(234,241,255,0.94);
+      margin-bottom: 4px;
+    }
+
+    .bet-row {
+      display: grid;
+      grid-template-columns: 1fr 42px;
+      gap: 6px;
+      align-items: center;
+    }
+
+    .bet-input {
+      width: 100%;
+      height: 44px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.06);
+      color: #fff;
+      font-size: 15px;
+      font-weight: 900;
+      padding: 0 12px;
+      outline: none;
+      text-align: center;
+    }
+
+    .bet-toggle {
+      height: 44px;
+      width: 42px;
+      border: none;
+      border-radius: 14px;
+      cursor: pointer;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(180deg, rgba(255,255,255,0.14), rgba(255,255,255,0.06));
+      border: 1px solid rgba(255,255,255,0.12);
+    }
+
+    .bet-toggle svg {
+      width: 19px;
+      height: 19px;
+    }
+
+    .quick-bets {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 6px;
+      max-height: 0;
+      opacity: 0;
+      overflow: hidden;
+      transition: max-height 0.24s ease, opacity 0.24s;
+    }
+
+    .quick-bets.show {
+      max-height: 60px;
+      opacity: 1;
+      margin-top: 8px;
+    }
+
+    .quick-btn {
+      height: 34px;
+      border: none;
+      border-radius: 11px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.08);
+      color: #fff;
+      font-size: 11px;
+      font-weight: 900;
+      cursor: pointer;
+    }
+
+    .bet-tools {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+      margin-top: 8px;
+    }
+
+    .bet-tools .mini-btn {
+      height: 38px;
+      font-size: 12px;
+      border-radius: 12px;
+    }
+
+    .action-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 8px;
+      margin-top: 2px;
+    }
+
+    .mini-btn, .main-btn {
+      width: 100%;
+      height: 46px;
+      border: none;
+      border-radius: 14px;
+      cursor: pointer;
+      color: #fff;
+      font-size: 13px;
+      font-weight: 900;
+      transition: transform 0.15s, opacity 0.15s;
+    }
+
+    .main-btn {
+      background: linear-gradient(180deg, var(--amber1), var(--amber2));
+      box-shadow: 0 12px 24px rgba(245,158,11,0.18);
+    }
+
+    .main-btn.cash {
+      background: linear-gradient(180deg, var(--green1), var(--green2));
+      box-shadow: 0 12px 24px rgba(34,197,94,0.18);
+    }
+
+    .mini-btn {
+      background: linear-gradient(180deg, rgba(255,255,255,0.12), rgba(255,255,255,0.06));
+      border: 1px solid rgba(255,255,255,0.10);
+    }
+
+    .main-btn:active, .mini-btn:active {
+      transform: scale(0.97);
+    }
+
+    .main-btn:disabled, .mini-btn:disabled {
+      opacity: 0.55;
+      transform: none !important;
+    }
+    .history-card {
+      padding: 12px;
+      margin-top: 2px;
+      position: relative;
+      overflow: hidden;
+      background:
+        radial-gradient(420px 120px at 8% 0%, rgba(96,165,250,0.12), transparent 60%),
+        radial-gradient(420px 140px at 100% 0%, rgba(168,85,247,0.14), transparent 62%),
+        var(--glass);
+    }
+
+    .history-card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0));
+    }
+
+    .history-head {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+      gap: 8px;
+    }
+
+    .history-title {
+      font-size: 12px;
+      font-weight: 900;
+      color: rgba(234,241,255,0.96);
+      letter-spacing: 0.02em;
+    }
+
+    .history-head::after {
+      content: "последние x";
+      height: 26px;
+      padding: 0 10px;
+      border-radius: 999px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.10);
+      color: rgba(234,241,255,0.72);
+      font-size: 10px;
+      font-weight: 900;
+      white-space: nowrap;
+      flex: 0 0 auto;
+    }
+
+    .history-list {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      overflow-y: hidden;
+      flex-wrap: nowrap;
+      padding-bottom: 2px;
+      -webkit-overflow-scrolling: touch;
+      scroll-snap-type: x proximity;
+    }
+
+    .history-item {
+      min-width: 82px;
+      height: 52px;
+      border-radius: 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 2px;
+      padding: 0 12px;
+      position: relative;
+      overflow: hidden;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.10);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.06), 0 10px 18px rgba(0,0,0,0.18);
+      color: rgba(234,241,255,0.95);
+      scroll-snap-align: start;
+      flex: 0 0 auto;
+    }
+
+    .history-item::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(130deg, rgba(255,255,255,0.16), rgba(255,255,255,0.02) 36%, transparent 60%);
+      pointer-events: none;
+    }
+
+    .history-item.latest {
+      min-width: 96px;
+      transform: translateY(-1px);
+      box-shadow: 0 14px 28px rgba(0,0,0,0.24), 0 0 18px rgba(168,85,247,0.12);
+    }
+
+    .history-mult {
+      position: relative;
+      z-index: 1;
+      font-size: 15px;
+      font-weight: 900;
+      line-height: 1;
+      letter-spacing: -0.02em;
+    }
+
+    .history-note {
+      position: relative;
+      z-index: 1;
+      font-size: 9px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      opacity: 0.84;
+    }
+
+    .history-item.low {
+      background: linear-gradient(180deg, rgba(239,68,68,0.18), rgba(239,68,68,0.08));
+      border-color: rgba(239,68,68,0.26);
+      color: #fecaca;
+    }
+
+    .history-item.mid {
+      background: linear-gradient(180deg, rgba(245,158,11,0.18), rgba(245,158,11,0.08));
+      border-color: rgba(245,158,11,0.26);
+      color: #fde68a;
+    }
+
+    .history-item.high {
+      background: linear-gradient(180deg, rgba(34,197,94,0.18), rgba(34,197,94,0.08));
+      border-color: rgba(34,197,94,0.28);
+      color: #bbf7d0;
+    }
+
+    .overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.72);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.22s;
+      z-index: 260;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 14px;
+    }
+
+    .overlay.show {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .popup {
+      width: min(420px, 100%);
+      border-radius: 18px;
+      background: rgba(14,16,24,0.94);
+      border: 1px solid rgba(255,255,255,0.08);
+      backdrop-filter: blur(14px);
+      transform: translateY(12px) scale(0.98);
+      transition: transform 0.22s;
+      overflow: hidden;
+    }
+
+    .overlay.show .popup {
+      transform: translateY(0) scale(1);
+    }
+
+    .popup-head {
+      padding: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+
+    .popup-title {
+      font-size: 14px;
+      font-weight: 900;
+      color: #fff;
+    }
+
+    .popup-x {
+      width: 34px;
+      height: 34px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.05);
+      color: #fff;
+      cursor: pointer;
+    }
+
+    .popup-body {
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      color: rgba(234,241,255,0.88);
+      font-size: 13px;
+      line-height: 1.45;
+    }
+
+    .popup-body p {
+      margin: 0;
+    }
+
+    .tg-btn, .danger-btn {
+      height: 44px;
+      border: none;
+      border-radius: 14px;
+      cursor: pointer;
+      color: #fff;
+      font-weight: 900;
+      font-size: 13px;
+    }
+
+    .tg-btn {
+      background: linear-gradient(180deg, #2AABEE, #229ED9);
+    }
+
+    .danger-btn {
+      background: linear-gradient(180deg, var(--red1), var(--red2));
+    }
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: calc(18px + var(--safe-bottom));
+      transform: translateX(-50%) translateY(14px);
+      background: rgba(14,16,24,0.92);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 18px;
+      padding: 12px 14px;
+      width: min(520px, calc(100% - 32px));
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.22s, transform 0.22s;
+      z-index: 300;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-weight: 900;
+      font-size: 13px;
+      color: rgba(234,241,255,0.95);
+      gap: 12px;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+      pointer-events: auto;
+    }
+
+    .toast .ok {
+      border: none;
+      border-radius: 14px;
+      height: 34px;
+      padding: 0 12px;
+      background: rgba(255,255,255,0.08);
+      color: #fff;
+      font-weight: 900;
+      cursor: pointer;
+      flex: 0 0 auto;
+    }
+
+    @media (max-width: 460px) {
+      .graph-wrap { height: 300px; }
+      .action-grid { grid-template-columns: 1fr; }
+      .stats-grid { grid-template-columns: repeat(3, 1fr); }
+    }
+  </style>
+</head>
+<body>
+
+<div class="startup-loader" id="startupLoader">
+  <div class="startup-loader-inner">
+    <div class="startup-logo-wrap">
+      <img class="startup-logo" src="https://i.postimg.cc/qvL497mF/Picsart-26-02-27-02-02-37-502.png" alt="Vezus">
+    </div>
+    <div class="startup-loader-bar">
+      <div class="startup-loader-fill" id="startupLoaderFill"></div>
+    </div>
+    <div class="startup-hint" id="startupHint">Загрузка…</div>
+  </div>
+</div>
+
+<div class="app">
+  <div class="content">
+
+    <div class="sticky-top">
+      <div class="top-row">
+        <button class="icon-btn" id="backBtn">←</button>
+
+        <div class="balance-mini">
+          <span class="bal-title">Баланс</span>
+          <div class="bal-amount" id="balanceValue">1000 ₽</div>
+        </div>
+
+        <button class="rule-btn" id="rulesBtn">
+          <svg viewBox="0 0 24 24">
+            <path d="M9 9a3 3 0 1 1 5.2 2.1c-.9.9-1.7 1.5-1.7 2.9"/>
+            <path d="M12 17h.01"/>
+            <circle cx="12" cy="12" r="9"/>
+          </svg>
+        </button>
+
+        <button class="logo-btn" id="logoBtn">
+          <img src="https://i.postimg.cc/qvL497mF/Picsart-26-02-27-02-02-37-502.png" alt="Vezus">
+        </button>
+      </div>
+    </div>
+
+    <div class="card hero-card">
+      <div class="stats-grid">
+        <div class="stat-box">
+          <div class="stat-label">ТЕКУЩИЙ X</div>
+          <div class="stat-value" id="currentMultValue">x1.00</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-label">ПОТЕНЦ. ВЫИГРЫШ</div>
+          <div class="stat-value" id="potentialWinValue">0 ₽</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-label">СТАВКА</div>
+          <div class="stat-value" id="currentBetValue">0 ₽</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card graph-card">
+      <div class="graph-header">
+        <div class="graph-title">Crash X</div>
+        <div class="round-pill" id="roundStatePill">Ожидание раунда</div>
+      </div>
+
+      <div class="graph-wrap" id="graphWrap">
+        <canvas class="graph-canvas" id="graphCanvas"></canvas>
+
+        <div class="mult-display">
+          <div class="mult-value" id="mainMultiplier">x1.00</div>
+          <div class="mult-sub" id="mainSubtext">Сделай ставку и запускай раунд</div>
+        </div>
+
+        <div class="rocket hidden" id="rocket"><img src="https://i.postimg.cc/MZF73FR5/Picsart-26-03-30-19-53-12-606.png" alt="Rocket" loading="lazy"></div>
+      </div>
+    </div>
+
+    <div class="card panel">
+      <div>
+        <div class="label">Ставка</div>
+        <div class="bet-row">
+          <input class="bet-input" id="betInput" type="number" min="10" max="5000" step="1" value="10" placeholder="Мин. 10">
+          <button class="bet-toggle" id="betToggleBtn">
+            <svg viewBox="0 0 24 24">
+              <g fill="none" stroke="rgba(255,255,255,.96)" stroke-width="1.7">
+                <circle cx="9" cy="12" r="3.7"/>
+                <circle cx="14.8" cy="12" r="3.7"/>
+                <path d="M18.5 6.2v4.2"/>
+                <path d="M16.4 8.3h4.2"/>
+              </g>
+            </svg>
+          </button>
+        </div>
+
+        <div class="quick-bets" id="quickBets">
+          <button class="quick-btn" data-bet="10">10</button>
+          <button class="quick-btn" data-bet="50">50</button>
+          <button class="quick-btn" data-bet="100">100</button>
+          <button class="quick-btn" data-bet="250">250</button>
+          <button class="quick-btn" data-bet="500">500</button>
+        </div>
+
+        <div class="bet-tools">
+          <button class="mini-btn" id="halfBtn">1/2 ставки</button>
+          <button class="mini-btn" id="doubleBtn">x2 ставки</button>
+        </div>
+      </div>
+
+      <div class="action-grid">
+        <button class="main-btn" id="mainBtn">Играть</button>
+      </div>
+    </div>
+
+    <div class="card history-card">
+      <div class="history-head">
+        <div class="history-title">История раундов</div>
+      </div>
+      <div class="history-list" id="historyList"></div>
+    </div>
+
+  </div>
+</div>
+
+<div class="overlay" id="rulesOverlay">
+  <div class="popup">
+    <div class="popup-head">
+      <div class="popup-title">Правила</div>
+      <button class="popup-x" id="rulesClose">✕</button>
+    </div>
+    <div class="popup-body">
+      <p>• Укажи ставку и нажми <b>Играть</b>.</p>
+      <p>• После старта множитель растёт от <b>x1.00</b> до момента краша.</p>
+      <p>• Нажми <b>Забрать</b> до краша, чтобы получить выигрыш: <b>ставка × текущий множитель</b>.</p>
+      <p>• Если раунд крашнется раньше кешаута — ставка проигрывается полностью.</p>
+      <p>• Минимальная ставка — <b>10 ₽</b>, максимальная — <b>5000 ₽</b>.</p>
+      <p>• Баланс загружается из аккаунта Telegram через сервер и обновляется после списания и выигрыша.</p>
+      <p>• История раундов сохраняет последние результаты для удобства просмотра.</p>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="channelOverlay">
+  <div class="popup">
+    <div class="popup-head">
+      <div class="popup-title">Telegram канал</div>
+      <button class="popup-x" id="channelClose">✕</button>
+    </div>
+    <div class="popup-body">
+      <p>Наш канал: <b>@vezuspubg</b></p>
+      <button class="tg-btn" id="goChannel">Перейти в Telegram</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast">
+  <span id="toastText">—</span>
+  <button class="ok" id="toastOk">Ок</button>
+</div>
+
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<script>
+(function() {
+  const TG_CHANNEL_URL = "https://t.me/vezuspubg";
+  const CRASH_API_URL = "https://lazrfierfbhwlduqlvws.functions.supabase.co/crash-game";
+  const HISTORY_KEY = "crash_x_history_v3";
+  const MIN_BET = 10;
+  const MAX_BET = 5000;
+  const GRID_SIZE = 56;
+
+  const $ = (id) => document.getElementById(id);
+
+  let currentBalance = 0;
+  let walletReady = false;
+  let quickVisible = false;
+
+  let gameState = "idle"; // idle, countdown, flying, settling
+  let currentBet = 0;
+  let currentMultiplier = 1;
+  let crashPoint = 1;
+  let loopFrame = null;
+  let startTime = 0;
+  let countdownTimer = null;
+  let countValue = 3;
+  let worldPoints = [];
+  let roundProfit = 0;
+  let history = [];
+  let canvas, ctx, dpr = Math.max(1, window.devicePixelRatio || 1);
+  let lastWorldPoint = { x: 0, y: 0 };
+  let anchorPoint = { x: 0, y: 0 };
+  let explosion = null;
+  let crashAnimFrame = null;
+  let farStars = [];
+  let midStars = [];
+  let nearStars = [];
+  let settleTimer = null;
+  let activeRoundId = 0;
+
+  function formatCurrency(value) {
+    const n = Number(value || 0);
+    if (!Number.isFinite(n)) return "0 ₽";
+    return Number.isInteger(n) ? `${n} ₽` : `${n.toFixed(2)} ₽`;
+  }
+
+  function round2(n) {
+    return Math.round(n * 100) / 100;
+  }
+
+  function setBalance(value) {
+    currentBalance = Math.max(0, round2(value));
+    updateBalanceUI();
+  }
+
+  let telegramInitData = "";
+
+  function getTelegramInitData() {
+    if (telegramInitData) return telegramInitData;
+    if (!window.Telegram || !window.Telegram.WebApp) return "";
+    try {
+      Telegram.WebApp.ready();
+      if (typeof Telegram.WebApp.expand === "function") Telegram.WebApp.expand();
+    } catch {}
+    telegramInitData = Telegram.WebApp.initData || "";
+    return telegramInitData;
+  }
+
+  async function apiRequest(action, amount = null, timeoutMs = 1800) {
+    const initData = telegramInitData || getTelegramInitData();
+    if (!initData) throw new Error("telegram_init_data_missing");
+
+    const payload = { initData, action };
+    if (amount !== null) payload.amount = amount;
+
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+
+    try {
+      const res = await fetch(CRASH_API_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+        signal: controller.signal,
+        keepalive: true,
+      });
+
+      let json = {};
+      try {
+        json = await res.json();
+      } catch {}
+
+      if (!res.ok || !json.ok) {
+        throw new Error(json.error || "api_error");
+      }
+
+      return json;
+    } finally {
+      clearTimeout(timeoutId);
+    }
+  }
+
+  async function refreshBalance(options = {}) {
+    const { silent = false } = options;
+    try {
+      const json = await apiRequest("get_balance", null, 2200);
+      currentBalance = Number(json.balance || 0);
+      walletReady = true;
+      updateBalanceUI();
+    } catch (err) {
+      walletReady = false;
+      console.warn("Ошибка загрузки баланса:", err);
+      if (!silent) {
+        if (String(err.message) === "telegram_init_data_missing") {
+          showToast("Открой игру через Telegram");
+        } else {
+          showToast("Не удалось загрузить баланс");
+        }
+      }
+    }
+  }
+
+  function saveHistory() {
+    localStorage.setItem(HISTORY_KEY, JSON.stringify(history.slice(0, 12)));
+  }
+
+  function loadHistory() {
+    try {
+      const raw = JSON.parse(localStorage.getItem(HISTORY_KEY) || "[]");
+      if (Array.isArray(raw)) history = raw.filter(v => Number.isFinite(v)).slice(0, 12);
+    } catch {
+      history = [];
+    }
+    if (!history.length) {
+      history = [1.24, 2.71, 1.08, 4.35, 1.62, 8.14];
+      saveHistory();
+    }
+  }
+
+  function renderHistory() {
+    const wrap = $("historyList");
+    wrap.innerHTML = "";
+    history.forEach((value, idx) => {
+      const item = document.createElement("div");
+      const tier = value < 1.5 ? "low" : value < 3 ? "mid" : "high";
+      const note = idx === 0 ? "последний" : (tier === "low" ? "низкий" : tier === "mid" ? "средний" : "высокий");
+      item.className = "history-item " + tier + (idx === 0 ? " latest" : "");
+      item.innerHTML = `<span class="history-mult">x${Number(value).toFixed(2)}</span><span class="history-note">${note}</span>`;
+      wrap.appendChild(item);
+    });
+  }
+
+  function updateBalanceUI() {
+    $("balanceValue").textContent = formatCurrency(currentBalance);
+  }
+
+  function updateStatsUI() {
+    const currentMultEl = $("currentMultValue");
+    const potentialWinEl = $("potentialWinValue");
+    const currentBetEl = $("currentBetValue");
+    if (currentMultEl) currentMultEl.textContent = "x" + currentMultiplier.toFixed(2);
+    if (potentialWinEl) potentialWinEl.textContent = currentBet > 0 ? formatCurrency(round2(currentBet * currentMultiplier)) : "0 ₽";
+    if (currentBetEl) currentBetEl.textContent = currentBet > 0 ? formatCurrency(currentBet) : "0 ₽";
+  }
+
+  function showToast(text) {
+    const toast = $("toast");
+    $("toastText").textContent = text;
+    toast.classList.add("show");
+    clearTimeout(window.toastTimer);
+    window.toastTimer = setTimeout(() => {
+      toast.classList.remove("show");
+    }, 3200);
+  }
+
+  $("toastOk").onclick = () => $("toast").classList.remove("show");
+
+  let loaderProgress = 0;
+  let loaderInterval;
+
+  function setLoaderProgress(value) {
+    const fill = $("startupLoaderFill");
+    const hint = $("startupHint");
+    if (!fill) return;
+
+    loaderProgress = Math.min(100, Math.max(0, value));
+    fill.style.width = loaderProgress + "%";
+
+    if (hint) {
+      if (loaderProgress < 40) hint.textContent = "Загрузка…";
+      else if (loaderProgress < 70) hint.textContent = "Подготовка…";
+      else if (loaderProgress < 95) hint.textContent = "Почти готово…";
+      else hint.textContent = "Готово!";
+    }
+  }
+
+  function startLoaderAnimation() {
+    setLoaderProgress(6);
+    clearInterval(loaderInterval);
+
+    loaderInterval = setInterval(() => {
+      if (loaderProgress >= 90) clearInterval(loaderInterval);
+      else if (loaderProgress < 40) setLoaderProgress(loaderProgress + 5);
+      else if (loaderProgress < 65) setLoaderProgress(loaderProgress + 3);
+      else if (loaderProgress < 82) setLoaderProgress(loaderProgress + 2);
+      else setLoaderProgress(loaderProgress + 1);
+    }, 90);
+  }
+
+  function finishLoader() {
+    clearInterval(loaderInterval);
+    setLoaderProgress(100);
+    setTimeout(() => $("startupLoader").classList.add("hide"), 220);
+  }
+
+  function setQuickVisible(show) {
+    if ($("betToggleBtn").disabled && show) return;
+    quickVisible = show;
+    $("quickBets").classList.toggle("show", quickVisible);
+  }
+
+  function lockBetControls(lock) {
+    $("betInput").disabled = lock;
+    $("betToggleBtn").disabled = lock;
+    document.querySelectorAll(".quick-btn").forEach(btn => btn.disabled = lock);
+    $("halfBtn").disabled = lock;
+    $("doubleBtn").disabled = lock;
+    if (lock) setQuickVisible(false);
+  }
+
+  function setRoundState(text) {
+    $("roundStatePill").textContent = text;
+  }
+
+  function setMainText(multText, subText, stateClass = "") {
+    const mult = $("mainMultiplier");
+    mult.textContent = multText;
+    mult.classList.remove("good", "bad");
+    if (stateClass) mult.classList.add(stateClass);
+    $("mainSubtext").textContent = subText;
+  }
+
+  function setMainButtonMode() {
+    const btn = $("mainBtn");
+    btn.classList.remove("cash");
+    btn.disabled = false;
+
+    if (gameState === "idle") {
+      btn.textContent = "Играть";
+      return;
+    }
+
+    if (gameState === "countdown") {
+      btn.textContent = "Подготовка...";
+      btn.disabled = true;
+      return;
+    }
+
+    if (gameState === "flying") {
+      btn.textContent = `Забрать (${formatCurrency(round2(currentBet * currentMultiplier))})`;
+      btn.classList.add("cash");
+      return;
+    }
+
+    if (gameState === "settling") {
+      btn.textContent = "Завершение...";
+      btn.disabled = true;
+      return;
+    }
+  }
+
+  function getBetAmount() {
+    const raw = $("betInput").value;
+    const amount = Number(raw);
+    return (raw && Number.isFinite(amount)) ? Math.floor(amount) : 0;
+  }
+
+  function clampBetValue(value) {
+    let v = Math.floor(Number(value) || 0);
+    if (!Number.isFinite(v)) v = 0;
+    if (v < 0) v = 0;
+    if (v > MAX_BET) v = MAX_BET;
+    return v;
+  }
+
+  function generateCrashPoint() {
+    const r = Math.random();
+
+    if (r < 0.34) return round2(1.00 + Math.random() * 0.55);
+    if (r < 0.64) return round2(1.55 + Math.random() * 1.30);
+    if (r < 0.84) return round2(2.85 + Math.random() * 2.80);
+    if (r < 0.95) return round2(5.65 + Math.random() * 7.50);
+    return round2(13.15 + Math.random() * 22.00);
+  }
+
+  function initCanvas() {
+    canvas = $("graphCanvas");
+    ctx = canvas.getContext("2d");
+    generateStarField();
+
+    resizeCanvas();
+    window.addEventListener("resize", resizeCanvas);
+  }
+
+  function createStarLayer(count, sizeMin, sizeMax, alphaMin, alphaMax) {
+    return Array.from({ length: count }, () => ({
+      x: Math.random() * 2200,
+      y: Math.random() * 1200,
+      size: sizeMin + Math.random() * (sizeMax - sizeMin),
+      alpha: alphaMin + Math.random() * (alphaMax - alphaMin),
+      phase: Math.random() * Math.PI * 2
+    }));
+  }
+
+  function generateStarField() {
+    farStars = createStarLayer(70, 0.7, 1.4, 0.20, 0.55);
+    midStars = createStarLayer(46, 1.0, 2.0, 0.35, 0.75);
+    nearStars = createStarLayer(22, 1.6, 2.8, 0.50, 0.95);
+  }
+
+  function resizeCanvas() {
+    const rect = canvas.getBoundingClientRect();
+    dpr = Math.max(1, window.devicePixelRatio || 1);
+    canvas.width = Math.floor(rect.width * dpr);
+    canvas.height = Math.floor(rect.height * dpr);
+    canvas.style.width = rect.width + "px";
+    canvas.style.height = rect.height + "px";
+    anchorPoint = { x: rect.width * 0.50, y: rect.height * 0.64 };
+    drawScene(gameState === "crashed");
+  }
+
+  function getWorldPoint(multiplier) {
+    const progress = Math.max(0, multiplier - 1);
+    const x = Math.sin(progress * 0.58) * Math.min(10, progress * 2.4);
+    const y = -Math.pow(progress, 1.04) * 66;
+
+    return { x, y };
+  }
+
+  function getViewportOffset() {
+    return {
+      x: lastWorldPoint.x - anchorPoint.x,
+      y: lastWorldPoint.y - anchorPoint.y
+    };
+  }
+
+  function worldToScreen(point, offset) {
+    return {
+      x: point.x - offset.x,
+      y: point.y - offset.y
+    };
+  }
+
+  function drawStarLayer(stars, offset, w, h, parallax, now) {
+    const worldW = 2200;
+    const worldH = 1200;
+    const speedBoost = gameState === "flying" ? 2.65 : 1;
+    const driftX = offset.x * parallax * speedBoost;
+    const driftY = offset.y * parallax * speedBoost;
+
+    stars.forEach(star => {
+      let x = ((star.x - driftX) % worldW + worldW) % worldW;
+      let y = ((star.y - driftY) % worldH + worldH) % worldH;
+      x = (x / worldW) * w;
+      y = (y / worldH) * h;
+
+      const twinkle = 0.72 + 0.28 * Math.sin(now / 650 + star.phase);
+      ctx.save();
+      ctx.globalAlpha = star.alpha * twinkle;
+      ctx.fillStyle = "#ffffff";
+      ctx.shadowBlur = star.size * 5;
+      ctx.shadowColor = "rgba(255,255,255,0.35)";
+      ctx.beginPath();
+      ctx.arc(x, y, star.size, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    });
+  }
+
+  function drawSpaceBackground(offset, w, h, now = performance.now()) {
+    const bg = ctx.createLinearGradient(0, 0, 0, h);
+    bg.addColorStop(0, "#08111f");
+    bg.addColorStop(0.52, "#050b17");
+    bg.addColorStop(1, "#030711");
+    ctx.fillStyle = bg;
+    ctx.fillRect(0, 0, w, h);
+
+    const nebulaA = ctx.createRadialGradient(w * 0.22 - offset.x * 0.03, h * 0.20 - offset.y * 0.02, 10, w * 0.22 - offset.x * 0.03, h * 0.20 - offset.y * 0.02, 180);
+    nebulaA.addColorStop(0, "rgba(59,130,246,0.14)");
+    nebulaA.addColorStop(0.55, "rgba(59,130,246,0.07)");
+    nebulaA.addColorStop(1, "rgba(59,130,246,0)");
+    ctx.fillStyle = nebulaA;
+    ctx.fillRect(0, 0, w, h);
+
+    const nebulaB = ctx.createRadialGradient(w * 0.78 - offset.x * 0.04, h * 0.18 - offset.y * 0.03, 10, w * 0.78 - offset.x * 0.04, h * 0.18 - offset.y * 0.03, 220);
+    nebulaB.addColorStop(0, "rgba(168,85,247,0.16)");
+    nebulaB.addColorStop(0.55, "rgba(168,85,247,0.07)");
+    nebulaB.addColorStop(1, "rgba(168,85,247,0)");
+    ctx.fillStyle = nebulaB;
+    ctx.fillRect(0, 0, w, h);
+
+    drawStarLayer(farStars, offset, w, h, 0.16, now);
+    drawStarLayer(midStars, offset, w, h, 0.32, now);
+    drawStarLayer(nearStars, offset, w, h, 0.56, now);
+  }
+
+  function drawIdleGlow(w, h) {
+
+    const grad = ctx.createRadialGradient(w * 0.52, h * 0.45, 20, w * 0.52, h * 0.45, 180);
+    grad.addColorStop(0, "rgba(168,85,247,0.24)");
+    grad.addColorStop(0.45, "rgba(96,165,250,0.12)");
+    grad.addColorStop(1, "rgba(0,0,0,0)");
+
+    ctx.save();
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, w, h);
+    ctx.restore();
+  }
+
+  function drawPath(points, crashed = false) {
+    return;
+  }
+
+  function drawCrashMark(point) {
+    if (!point) return;
+
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(point.x, point.y, 10, 0, Math.PI * 2);
+    ctx.fillStyle = "rgba(239,68,68,0.96)";
+    ctx.shadowBlur = 20;
+    ctx.shadowColor = "rgba(239,68,68,0.45)";
+    ctx.fill();
+
+    ctx.beginPath();
+    ctx.arc(point.x, point.y, 4.5, 0, Math.PI * 2);
+    ctx.fillStyle = "#fff";
+    ctx.shadowBlur = 0;
+    ctx.fill();
+    ctx.restore();
+  }
+
+  function setRocketVisible(show) {
+    const rocket = $("rocket");
+    rocket.classList.toggle("hidden", !show);
+    rocket.classList.toggle("flying", !!show && gameState === "flying");
+    if (show) rocket.classList.remove("boom");
+  }
+
+  function positionRocketAtAnchor(progress = 0, time = performance.now()) {
+    const rocket = $("rocket");
+    const swayX = Math.sin(time / 260) * 0.9;
+    const wobbleY = Math.sin(time / 190) * 0.7;
+    const tilt = Math.sin(time / 280) * 1.1;
+    const scale = 1 + Math.min(0.05, progress * 0.035);
+
+    rocket.style.left = anchorPoint.x + swayX + "px";
+    rocket.style.top = anchorPoint.y + wobbleY + "px";
+    rocket.style.transform = `translate(-50%, -50%) rotate(${tilt}deg) scale(${scale})`;
+  }
+
+  function makeExplosion(point) {
+    explosion = {
+      start: performance.now(),
+      duration: 760,
+      center: { x: point.x, y: point.y }
+    };
+
+    const rocket = $("rocket");
+    rocket.classList.remove("flying");
+    rocket.classList.add("boom");
+  }
+
+  function drawExplosion(now) {
+    if (!explosion) return false;
+
+    const t = Math.min(1, (now - explosion.start) / explosion.duration);
+    const easeOut = 1 - Math.pow(1 - t, 3);
+    const { center } = explosion;
+
+    ctx.save();
+    const flashRadius = 20 + easeOut * 92;
+    const flash = ctx.createRadialGradient(center.x, center.y, 0, center.x, center.y, flashRadius);
+    flash.addColorStop(0, `rgba(255,255,255,${0.95 * (1 - t)})`);
+    flash.addColorStop(0.15, `rgba(255,223,128,${0.78 * (1 - t)})`);
+    flash.addColorStop(0.42, `rgba(251,146,60,${0.42 * (1 - t)})`);
+    flash.addColorStop(0.72, `rgba(239,68,68,${0.22 * (1 - t)})`);
+    flash.addColorStop(1, "rgba(239,68,68,0)");
+    ctx.fillStyle = flash;
+    ctx.beginPath();
+    ctx.arc(center.x, center.y, flashRadius, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(center.x, center.y, 12 + easeOut * 64, 0, Math.PI * 2);
+    ctx.strokeStyle = `rgba(255,244,214,${0.7 * (1 - t)})`;
+    ctx.lineWidth = 3.4 - t * 1.8;
+    ctx.shadowBlur = 20;
+    ctx.shadowColor = "rgba(255,255,255,0.28)";
+    ctx.stroke();
+    ctx.restore();
+
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(center.x, center.y, 5 + easeOut * 26, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(255,255,255,${0.82 * (1 - t)})`;
+    ctx.shadowBlur = 26;
+    ctx.shadowColor = "rgba(255,255,255,0.38)";
+    ctx.fill();
+    ctx.restore();
+
+    return t < 1;
+  }
+
+  function animateCrashEffect() {
+    cancelAnimationFrame(crashAnimFrame);
+
+    const tick = (now) => {
+      drawScene(true, now);
+      if (explosion && now - explosion.start < explosion.duration) {
+        crashAnimFrame = requestAnimationFrame(tick);
+      } else {
+        crashAnimFrame = null;
+      }
+    };
+
+    crashAnimFrame = requestAnimationFrame(tick);
+  }
+
+  function clearExplosion() {
+    cancelAnimationFrame(crashAnimFrame);
+    crashAnimFrame = null;
+    explosion = null;
+    $("rocket").classList.remove("boom", "flying");
+  }
+
+  function drawScene(crashed = false, now = performance.now()) {
+    if (!ctx || !canvas) return;
+
+    const w = canvas.width / dpr;
+    const h = canvas.height / dpr;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.clearRect(0, 0, w, h);
+
+    drawIdleGlow(w, h);
+
+    if (!worldPoints.length) {
+      drawSpaceBackground({ x: 0, y: 0 }, w, h, now);
+      setRocketVisible(false);
+      return;
+    }
+
+    const offset = getViewportOffset();
+    drawSpaceBackground(offset, w, h, now);
+
+    const screenPoints = worldPoints
+      .map(point => worldToScreen(point, offset))
+      .filter(point => point.x >= -120 && point.x <= w + 120 && point.y >= -120 && point.y <= h + 120);
+
+    drawPath(screenPoints, crashed);
+
+    const currentPoint = worldToScreen(lastWorldPoint, offset);
+
+    if (crashed) {
+      setRocketVisible(false);
+      drawExplosion(now);
+    } else {
+      const progress = Math.max(0, Math.min(1, (currentMultiplier - 1) / 7.5));
+      positionRocketAtAnchor(progress, now);
+      setRocketVisible(true);
+    }
+  }
+
+  function resetGraph() {
+    clearExplosion();
+    worldPoints = [];
+    currentMultiplier = 1;
+    lastWorldPoint = { x: 0, y: 0 };
+    $("graphWrap").classList.remove("crashed");
+    setMainText("x1.00", "Сделай ставку и запускай раунд");
+    updateStatsUI();
+    drawScene(false);
+  }
+
+  function clearSettleTimer() {
+    if (settleTimer) {
+      clearTimeout(settleTimer);
+      settleTimer = null;
+    }
+  }
+
+  function finalizeRoundAfter(delay, roundId) {
+    clearSettleTimer();
+    gameState = "settling";
+    setMainButtonMode();
+
+    settleTimer = setTimeout(() => {
+      if (roundId !== activeRoundId) return;
+      settleTimer = null;
+      resetGraph();
+      resetRoundSoft();
+      gameState = "idle";
+      setRoundState("Ожидание раунда");
+      setMainButtonMode();
+    }, delay);
+  }
+
+  function resetRoundSoft() {
+    cancelAnimationFrame(loopFrame);
+    loopFrame = null;
+    clearExplosion();
+    clearInterval(countdownTimer);
+    countdownTimer = null;
+    currentBet = 0;
+    roundProfit = 0;
+    currentMultiplier = 1;
+    updateStatsUI();
+    setMainButtonMode();
+    lockBetControls(false);
+  }
+
+  function addToHistory(mult) {
+    history.unshift(round2(mult));
+    history = history.slice(0, 12);
+    saveHistory();
+    renderHistory();
+  }
+
+  function startCountdown() {
+    gameState = "countdown";
+    lockBetControls(true);
+    setMainButtonMode();
+    setRoundState("Запуск...");
+    setMainText("x1.00", "Подготовка старта");
+
+    clearInterval(countdownTimer);
+    countdownTimer = setTimeout(() => {
+      countdownTimer = null;
+      launchRound();
+    }, 180);
+  }
+
+  function launchRound() {
+    gameState = "flying";
+    currentMultiplier = 1;
+    startTime = performance.now();
+    lastWorldPoint = getWorldPoint(1);
+    worldPoints = [lastWorldPoint];
+    setRoundState("Раунд идёт");
+    setMainText("x1.00", "Жми «Забрать» вовремя", "good");
+    setMainButtonMode();
+    positionRocketAtAnchor(0, performance.now());
+    setRocketVisible(true);
+    animate();
+  }
+
+  function animate(now) {
+    if (gameState !== "flying") return;
+
+    const elapsed = ((now || performance.now()) - startTime) / 1000;
+    currentMultiplier = 1 + (Math.pow(elapsed + 0.15, 1.42) * 0.62);
+
+    if (currentMultiplier >= crashPoint) {
+      currentMultiplier = crashPoint;
+      lastWorldPoint = getWorldPoint(currentMultiplier);
+      worldPoints.push(lastWorldPoint);
+
+      $("graphWrap").classList.add("crashed");
+      gameState = "settling";
+      addToHistory(crashPoint);
+      setRoundState("Краш на x" + crashPoint.toFixed(2));
+      setMainText("x" + crashPoint.toFixed(2), "Поздно. Ставка сгорела", "bad");
+      updateStatsUI();
+      const crashOffset = getViewportOffset();
+      makeExplosion(worldToScreen(lastWorldPoint, crashOffset));
+      drawScene(true);
+      animateCrashEffect();
+      setMainButtonMode();
+      showToast("Краш на x" + crashPoint.toFixed(2));
+
+      finalizeRoundAfter(1050, activeRoundId);
+
+
+      return;
+    }
+
+    lastWorldPoint = getWorldPoint(currentMultiplier);
+    worldPoints.push(lastWorldPoint);
+    if (worldPoints.length > 220) worldPoints.shift();
+
+    setMainText("x" + currentMultiplier.toFixed(2), "Жми «Забрать» вовремя", "good");
+    updateStatsUI();
+    drawScene(false);
+    setMainButtonMode();
+
+    loopFrame = requestAnimationFrame(animate);
+  }
+
+  async function startGame() {
+    if (gameState !== "idle") return;
+
+    clearSettleTimer();
+
+    if (!walletReady) {
+      await refreshBalance({ silent: true });
+      if (!walletReady) {
+        showToast("Баланс ещё не загружен");
+        return;
+      }
+    }
+
+    const bet = getBetAmount();
+
+    if (bet < MIN_BET) {
+      showToast(`Мин. ставка: ${MIN_BET} ₽`);
+      return;
+    }
+
+    if (bet > MAX_BET) {
+      $("betInput").value = MAX_BET;
+      showToast(`Макс. ставка: ${MAX_BET} ₽`);
+      return;
+    }
+
+    if (bet > currentBalance) {
+      showToast("Недостаточно средств");
+      return;
+    }
+
+    activeRoundId += 1;
+    const roundId = activeRoundId;
+    currentBet = bet;
+    crashPoint = generateCrashPoint();
+    setBalance(currentBalance - bet);
+    updateStatsUI();
+    startCountdown();
+
+    apiRequest("debit", bet, 1600)
+      .then((json) => {
+        if (roundId !== activeRoundId) return;
+        walletReady = true;
+        if (typeof json.balance === "number") {
+          currentBalance = Number(json.balance || 0);
+          updateBalanceUI();
+        }
+      })
+      .catch((err) => {
+        if (roundId !== activeRoundId) return;
+        console.warn("debit error:", err);
+
+        cancelAnimationFrame(loopFrame);
+        loopFrame = null;
+        clearInterval(countdownTimer);
+        countdownTimer = null;
+        clearSettleTimer();
+        clearExplosion();
+
+        setBalance(currentBalance + bet);
+        gameState = "idle";
+        currentBet = 0;
+        currentMultiplier = 1;
+        roundProfit = 0;
+        worldPoints = [];
+        lastWorldPoint = { x: 0, y: 0 };
+        $("graphWrap").classList.remove("crashed");
+        setRoundState("Ожидание раунда");
+        setMainText("x1.00", "Ставка не подтверждена");
+        updateStatsUI();
+        drawScene(false);
+        setMainButtonMode();
+        lockBetControls(false);
+
+        if (String(err.message) === "insufficient_funds") {
+          showToast("Недостаточно средств");
+        } else if (String(err.message) === "telegram_init_data_missing") {
+          showToast("Открой игру через Telegram");
+        } else {
+          showToast("Сервер не подтвердил ставку");
+        }
+
+        refreshBalance({ silent: true });
+      });
+  }
+
+  async function cashout() {
+    if (gameState !== "flying") return;
+
+    roundProfit = round2(currentBet * currentMultiplier);
+    const roundId = activeRoundId;
+    setBalance(currentBalance + roundProfit);
+
+    cancelAnimationFrame(loopFrame);
+    loopFrame = null;
+
+    gameState = "settling";
+    addToHistory(currentMultiplier);
+    setRoundState("Успешный кешаут");
+    setMainText("x" + currentMultiplier.toFixed(2), "Ты забрал " + formatCurrency(roundProfit), "good");
+    updateStatsUI();
+    drawScene(false);
+    setMainButtonMode();
+    showToast("Забрано: " + formatCurrency(roundProfit));
+
+    apiRequest("credit", roundProfit, 1600)
+      .then((json) => {
+        if (roundId !== activeRoundId) return;
+        walletReady = true;
+        if (typeof json.balance === "number") {
+          currentBalance = Number(json.balance || 0);
+          updateBalanceUI();
+        }
+      })
+      .catch((err) => {
+        console.warn("credit error:", err);
+        showToast("Баланс обновляется...");
+        refreshBalance({ silent: true });
+      });
+
+    finalizeRoundAfter(850, activeRoundId);
+  }
+
+  async function handleMain() {
+    if (gameState === "idle") await startGame();
+    else if (gameState === "flying") await cashout();
+  }
+
+  function initEvents() {
+    $("mainBtn").addEventListener("click", handleMain);
+
+    $("betToggleBtn").addEventListener("click", () => {
+      if (!$("betToggleBtn").disabled) setQuickVisible(!quickVisible);
+    });
+
+    document.querySelectorAll(".quick-btn").forEach(btn => {
+      btn.addEventListener("click", function() {
+        if (this.disabled) return;
+        $("betInput").value = Math.min(Number(this.dataset.bet), MAX_BET);
+        setQuickVisible(false);
+      });
+    });
+
+    $("betInput").addEventListener("input", function() {
+      if (!this.value) return;
+      this.value = clampBetValue(this.value);
+    });
+
+    $("halfBtn").addEventListener("click", () => {
+      if ($("halfBtn").disabled) return;
+      const next = Math.max(MIN_BET, Math.floor(getBetAmount() / 2));
+      $("betInput").value = next;
+    });
+
+    $("doubleBtn").addEventListener("click", () => {
+      if ($("doubleBtn").disabled) return;
+      const next = Math.min(MAX_BET, Math.max(MIN_BET, getBetAmount() * 2 || MIN_BET));
+      $("betInput").value = next;
+    });
+
+
+    document.addEventListener("click", (e) => {
+      if (quickVisible && !e.target.closest("#betToggleBtn") && !e.target.closest("#quickBets")) {
+        setQuickVisible(false);
+      }
+    });
+
+    $("backBtn").addEventListener("click", () => {
+      window.location.href = "index.html";
+    });
+
+    $("rulesBtn").addEventListener("click", () => {
+      $("rulesOverlay").classList.add("show");
+      document.body.style.overflow = "hidden";
+    });
+
+    $("logoBtn").addEventListener("click", () => {
+      $("channelOverlay").classList.add("show");
+      document.body.style.overflow = "hidden";
+    });
+
+    $("rulesClose").addEventListener("click", () => {
+      $("rulesOverlay").classList.remove("show");
+      document.body.style.overflow = "";
+    });
+
+    $("channelClose").addEventListener("click", () => {
+      $("channelOverlay").classList.remove("show");
+      document.body.style.overflow = "";
+    });
+
+    $("rulesOverlay").addEventListener("click", (e) => {
+      if (e.target === $("rulesOverlay")) {
+        $("rulesOverlay").classList.remove("show");
+        document.body.style.overflow = "";
+      }
+    });
+
+    $("channelOverlay").addEventListener("click", (e) => {
+      if (e.target === $("channelOverlay")) {
+        $("channelOverlay").classList.remove("show");
+        document.body.style.overflow = "";
+      }
+    });
+
+    $("goChannel").addEventListener("click", () => {
+      if (window.Telegram?.WebApp?.openTelegramLink) window.Telegram.WebApp.openTelegramLink(TG_CHANNEL_URL); else window.open(TG_CHANNEL_URL, "_blank");
+    });
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") {
+        $("rulesOverlay").classList.remove("show");
+        $("channelOverlay").classList.remove("show");
+        setQuickVisible(false);
+        document.body.style.overflow = "";
+      }
+    });
+  }
+
+  async function init() {
+    startLoaderAnimation();
+
+    loadHistory();
+    renderHistory();
+    initCanvas();
+    resetGraph();
+    setRoundState("Загрузка баланса");
+    setMainButtonMode();
+    initEvents();
+
+    await refreshBalance();
+
+    setRoundState("Ожидание раунда");
+    setTimeout(() => {
+      getTelegramInitData();
+      finishLoader();
+    }, 650);
+  }
+
+  window.addEventListener("load", () => {
+    init();
+  });
+})();
+</script>
+</body>
+</html>
