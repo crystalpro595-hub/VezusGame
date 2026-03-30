@@ -1434,9 +1434,9 @@
               <img src="https://i.postimg.cc/W1HKFm58/file-00000000b8cc71fb863990b73d85156f.png" alt="Game 5" loading="lazy">
             </div>
           </div>
-          <div class="game-card" data-game="game6">
+          <div class="game-card" data-game="game6" data-target="crash">
             <div class="game-card-inner">
-              <img src="https://i.postimg.cc/TY9sZp02/46F82521-51BE-4FB1-B831-B19958E9872E.png" alt="Game 6" loading="lazy">
+              <img src="https://i.postimg.cc/LsyhDv81/file-000000004ea87243ac0507fe56d3a1a4.png" alt="Crash" loading="lazy">
             </div>
           </div>
         </div>
@@ -1686,7 +1686,8 @@
       cups: 'cups.html',
       blackjack: 'blackjack.html',
       candyslot: 'candyslot.html',
-      dice: 'dice.html'
+      dice: 'dice.html',
+      crash: 'crash.html'
     };
 
     const passwordOverlay = document.getElementById('passwordOverlay');
@@ -1907,6 +1908,7 @@
         else if (index === 2) goTo(FILES.cups);
         else if (index === 3) goTo('platform.html');
         else if (index === 4) goTo(FILES.dice);
+        else if (index === 5) goTo(FILES.crash);
         else showToast('В разработке', 1500);
 
         return;
