@@ -752,7 +752,7 @@
       border: none;
       background: rgba(255,255,255,.12);
       color: rgba(234,241,255,.9);
-      cursor: pointer;
+      cursor:pointer;
       display: grid;
       place-items: center;
       font-size: 18px;
@@ -771,7 +771,7 @@
       background: linear-gradient(145deg, rgba(255,255,255,0.1), rgba(255,255,255,0.02));
       border: 1px solid rgba(255,255,255,0.15);
       border-radius: 28px;
-      cursor: pointer;
+      cursor:pointer;
       transition: all 0.25s ease;
       backdrop-filter: blur(8px);
     }
@@ -914,7 +914,7 @@
       background: linear-gradient(145deg, rgba(42,171,238,0.22), rgba(34,158,217,0.12));
       border: 1px solid rgba(42,171,238,0.45);
       border-radius: 28px;
-      cursor: pointer;
+      cursor:pointer;
       transition: all 0.25s ease;
       backdrop-filter: blur(4px);
     }
@@ -1192,7 +1192,7 @@
       color: white;
       font-weight: 800;
       font-size: 16px;
-      cursor: pointer;
+      cursor:pointer;
       transition: transform 0.15s ease;
     }
 
@@ -1452,9 +1452,9 @@
               <img src="https://i.postimg.cc/7LL6RN33/file-000000002a3072439b55a7bddebe57ac.png" alt="Blackjack" loading="lazy">
             </div>
           </div>
-          <div class="game-card cardgame-card" data-cardgame="poker">
+          <div class="game-card cardgame-card" data-cardgame="redblack">
             <div class="game-card-inner">
-              <img src="https://i.postimg.cc/kXqsmY0m/Picsart-26-03-21-10-40-45-084.jpg" alt="Poker" loading="lazy">
+              <img src="https://i.postimg.cc/KzL1CzBx/file-000000006b147246a0e4e420fbe0eba2.png" alt="RedBlack" loading="lazy">
             </div>
           </div>
           <div class="game-card cardgame-card" data-cardgame="rummy">
@@ -1685,6 +1685,7 @@
       mines: 'mines.html',
       cups: 'cups.html',
       blackjack: 'blackjack.html',
+      redblack: 'redblack.html',
       candyslot: 'candyslot.html',
       dice: 'dice.html',
       crash: 'crash.html'
@@ -1919,6 +1920,7 @@
         const index = allCardGameCards.indexOf(card);
 
         if (index === 0) goTo(FILES.blackjack);
+        else if (index === 1) goTo(FILES.redblack);
         else showToast('В разработке', 1500);
 
         return;
