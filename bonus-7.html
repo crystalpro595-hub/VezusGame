@@ -1,0 +1,951 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Bonus • Vezus Game</title>
+
+  <link rel="preconnect" href="https://i.postimg.cc" crossorigin>
+  <link rel="dns-prefetch" href="https://i.postimg.cc">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  <link rel="preload" as="image" href="https://i.postimg.cc/qvL497mF/Picsart-26-02-27-02-02-37-502.png">
+  <link rel="preload" as="image" href="https://i.postimg.cc/fbJT34yY/076E519D-F095-4957-88BF-5591DEB82533.png">
+  <link rel="preload" as="image" href="https://i.postimg.cc/vHxXSFh4/Picsart-26-04-01-19-51-45-943.jpg">
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --text:#eaf1ff;
+      --muted:rgba(234,241,255,.74);
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+      --safe-top: env(safe-area-inset-top, 0px);
+      --glass: rgba(12, 14, 20, .74);
+      --stroke: rgba(255,255,255,.08);
+      --shadow: 0 18px 42px rgba(0,0,0,.48);
+      --shadow-soft: 0 12px 28px rgba(0,0,0,.34);
+      --tg1:#2AABEE;
+      --tg2:#229ED9;
+      --green1:#39d98a;
+      --green2:#18b76a;
+    }
+
+    *{
+      box-sizing:border-box;
+      font-family:'Inter', sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html, body{
+      height:100%;
+      margin:0;
+      overflow:hidden;
+      color:var(--text);
+      background:#020617;
+    }
+
+    body{
+      background-image:url("https://i.postimg.cc/fbJT34yY/076E519D-F095-4957-88BF-5591DEB82533.png");
+      background-size:cover;
+      background-position:center;
+      background-repeat:no-repeat;
+    }
+
+    body::before{
+      content:"";
+      position:fixed;
+      inset:0;
+      background:
+        radial-gradient(900px 600px at 30% 10%, rgba(255,255,255,.05), transparent 60%),
+        linear-gradient(180deg, rgba(0,0,0,.40), rgba(0,0,0,.68));
+      pointer-events:none;
+      z-index:0;
+    }
+
+    img{
+      backface-visibility:hidden;
+      -webkit-backface-visibility:hidden;
+      image-rendering:auto;
+    }
+
+    .app{
+      position:relative;
+      height:100%;
+      overflow:auto;
+      padding: calc(4px + var(--safe-top)) 16px calc(20px + var(--safe-bottom)) 16px;
+      z-index:1;
+      overscroll-behavior: contain;
+    }
+
+    .content{
+      display:flex;
+      flex-direction:column;
+      gap:14px;
+      width:100%;
+      max-width:520px;
+      margin:0 auto;
+      position:relative;
+      z-index:1;
+      align-items:center;
+    }
+
+    .top-row{
+      position: sticky;
+      top: calc(4px + var(--safe-top));
+      z-index: 10;
+      width:100%;
+      max-width:520px;
+      display:grid;
+      grid-template-columns:38px 1fr 54px;
+      align-items:center;
+      gap:8px;
+      border-radius:20px;
+    }
+
+    .icon-btn{
+      width:38px;
+      height:38px;
+      border-radius:13px;
+      border:1px solid var(--stroke);
+      cursor:pointer;
+      background: var(--glass);
+      box-shadow: var(--shadow-soft), inset 0 1px 0 rgba(255,255,255,.04);
+      display:grid;
+      place-items:center;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      transition: transform .15s ease;
+      padding:0;
+      overflow:hidden;
+      color:#fff;
+    }
+
+    .icon-btn:active{ transform: scale(.98); }
+
+    .back-icon{
+      width:18px;
+      height:18px;
+      display:block;
+    }
+
+    .balance-mini{
+      width:100%;
+      min-width:0;
+      height:42px;
+      border-radius:999px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:8px;
+      padding:6px 7px 6px 12px;
+      position:relative;
+      overflow:hidden;
+      background: var(--glass);
+      border:1px solid var(--stroke);
+      box-shadow: var(--shadow), inset 0 1px 0 rgba(255,255,255,.04);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+
+    .balance-mini::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      background:
+        radial-gradient(180px 60px at 0% 0%, rgba(255,255,255,.05), transparent 55%),
+        radial-gradient(180px 60px at 100% 100%, rgba(255,255,255,.03), transparent 55%);
+      pointer-events:none;
+    }
+
+    .bal-title{
+      position:relative;
+      z-index:1;
+      font-size:12px;
+      font-weight:900;
+      letter-spacing:.2px;
+      color: rgba(234,241,255,.92);
+      white-space:nowrap;
+    }
+
+    .bal-amount{
+      position:relative;
+      z-index:1;
+      height:28px;
+      border:none;
+      border-radius:999px;
+      cursor:pointer;
+      padding:0 10px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background: rgba(255,255,255,.08);
+      border:1px solid rgba(255,255,255,.08);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.05);
+      color: rgba(234,241,255,.98);
+      font-weight:900;
+      font-size:13px;
+      white-space:nowrap;
+      min-width:88px;
+    }
+
+    .bal-amount:active{ transform: scale(.99); }
+
+    .hero-logo{
+      width:54px;
+      height:54px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background:transparent;
+      border:none;
+      box-shadow:none;
+      padding:0;
+      cursor:pointer;
+    }
+
+    .hero-logo:active{ transform:scale(.98); }
+
+    .hero-logo img{
+      width:100%;
+      height:100%;
+      object-fit:contain;
+      display:block;
+    }
+
+    .hero-section{
+      width:100%;
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+      margin-top:2px;
+      align-items:center;
+    }
+
+    .hero-card{
+      position:relative;
+      width:min(100%, 430px);
+      min-height:380px;
+      border-radius:30px;
+      overflow:hidden;
+      background:#000;
+      border:1px solid rgba(255,255,255,.1);
+      box-shadow:
+        0 28px 68px rgba(0,0,0,.46),
+        0 0 34px rgba(130,96,255,.10),
+        inset 0 1px 0 rgba(255,255,255,.05);
+      isolation:isolate;
+    }
+
+    .hero-card::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      background:
+        linear-gradient(180deg, rgba(0,0,0,.04) 0%, rgba(0,0,0,.12) 24%, rgba(0,0,0,.62) 100%),
+        radial-gradient(260px 130px at 50% 0%, rgba(255,255,255,.10), transparent 70%);
+      z-index:1;
+      pointer-events:none;
+    }
+
+    .hero-card::after{
+      content:"";
+      position:absolute;
+      inset:0;
+      border-radius:inherit;
+      padding:1px;
+      background:linear-gradient(180deg, rgba(255,255,255,.24), rgba(183,156,255,.02));
+      -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+      -webkit-mask-composite:xor;
+      mask-composite:exclude;
+      pointer-events:none;
+      z-index:4;
+    }
+
+    .hero-image{
+      position:absolute;
+      inset:0;
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      object-position:center;
+      display:block;
+    }
+
+    .hero-floating-badge{
+      position:absolute;
+      top:16px;
+      left:16px;
+      z-index:2;
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      min-height:32px;
+      padding:0 12px;
+      border-radius:999px;
+      background:rgba(10,12,18,.48);
+      border:1px solid rgba(255,255,255,.14);
+      box-shadow:0 10px 24px rgba(0,0,0,.28);
+      backdrop-filter:blur(10px);
+      -webkit-backdrop-filter:blur(10px);
+      font-size:11px;
+      font-weight:900;
+      letter-spacing:.6px;
+      text-transform:uppercase;
+      color:#fff;
+    }
+
+    .details-fab{
+      position:absolute;
+      left:16px;
+      bottom:16px;
+      z-index:3;
+      min-height:42px;
+      padding:0 14px;
+      border:none;
+      border-radius:16px;
+      cursor:pointer;
+      background: rgba(10,12,18,.58);
+      border:1px solid rgba(255,255,255,.16);
+      backdrop-filter:blur(10px);
+      -webkit-backdrop-filter:blur(10px);
+      box-shadow:0 12px 24px rgba(0,0,0,.28), inset 0 1px 0 rgba(255,255,255,.08);
+      color:#fff;
+      font-size:12.5px;
+      font-weight:900;
+      letter-spacing:.15px;
+      transition:transform .16s ease, background .2s ease;
+      max-width:220px;
+    }
+
+    .details-fab:active{ transform:scale(.98); }
+
+    .future-note{
+      width:min(100%, 430px);
+      padding:0 6px;
+      text-align:center;
+      color:rgba(234,241,255,.52);
+      font-size:12px;
+      font-weight:700;
+      line-height:1.4;
+      letter-spacing:.12px;
+    }
+
+    .modal-overlay,
+    .channel-overlay{
+      position:fixed;
+      inset:0;
+      background: rgba(0,0,0,.72);
+      opacity:0;
+      pointer-events:none;
+      transition: opacity .22s ease;
+      z-index:260;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:14px;
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+    }
+
+    .modal-overlay.show,
+    .channel-overlay.show{
+      opacity:1;
+      pointer-events:auto;
+    }
+
+    .modal-card,
+    .channel-card{
+      width:min(400px, 100%);
+      max-height:min(86vh, 720px);
+      overflow:auto;
+      border-radius:24px;
+      background: rgba(18,20,28,.96);
+      border:1px solid rgba(255,255,255,.1);
+      box-shadow:0 34px 90px rgba(0,0,0,.7), inset 0 1px 0 rgba(255,255,255,.05);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      transform: translateY(12px) scale(.98);
+      opacity:.95;
+      transition: transform .22s ease, opacity .22s ease;
+    }
+
+    .modal-overlay.show .modal-card,
+    .channel-overlay.show .channel-card{
+      transform: translateY(0) scale(1);
+      opacity:1;
+    }
+
+    .modal-head,
+    .channel-head{
+      padding:14px 14px 10px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      background: rgba(255,255,255,.03);
+      border-bottom: 1px solid rgba(255,255,255,.07);
+      gap:10px;
+      position:sticky;
+      top:0;
+      z-index:1;
+    }
+
+    .modal-title,
+    .channel-title{
+      font-weight:900;
+      font-size:15px;
+      color: rgba(234,241,255,.96);
+    }
+
+    .modal-x,
+    .channel-x{
+      width:36px;
+      height:36px;
+      border-radius:14px;
+      border:1px solid rgba(255,255,255,.08);
+      background: rgba(255,255,255,.06);
+      color: rgba(234,241,255,.96);
+      cursor:pointer;
+      display:grid;
+      place-items:center;
+      flex:0 0 auto;
+    }
+
+    .modal-x:active,
+    .channel-x:active{ transform:scale(.98); }
+
+    .modal-body,
+    .channel-body{
+      padding:14px;
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+    }
+
+    .prize-block{
+      position:relative;
+      border-radius:18px;
+      padding:14px;
+      background:
+        radial-gradient(180px 100px at 0% 0%, rgba(255,255,255,.10), transparent 65%),
+        linear-gradient(145deg, rgba(97,62,210,.34), rgba(15,11,29,.8));
+      border:1px solid rgba(255,255,255,.10);
+      box-shadow:0 18px 30px rgba(0,0,0,.22), inset 0 1px 0 rgba(255,255,255,.05);
+    }
+
+    .prize-chip{
+      display:inline-flex;
+      align-items:center;
+      min-height:24px;
+      padding:0 9px;
+      margin-bottom:8px;
+      border-radius:999px;
+      background: rgba(255,255,255,.10);
+      border:1px solid rgba(255,255,255,.12);
+      color:#fff;
+      font-size:9px;
+      font-weight:900;
+      letter-spacing:.85px;
+      text-transform:uppercase;
+    }
+
+    .prize-title{
+      margin:0 0 6px;
+      color:#fff;
+      font-size:20px;
+      font-weight:900;
+      line-height:1.06;
+    }
+
+    .prize-text{
+      margin:0;
+      color:rgba(245,241,255,.88);
+      font-size:12px;
+      line-height:1.45;
+    }
+
+    .condition-card{
+      border-radius:18px;
+      padding:14px;
+      background:
+        radial-gradient(220px 110px at 0% 0%, rgba(57,217,138,.12), transparent 60%),
+        linear-gradient(180deg, rgba(8,7,18,.34), rgba(8,7,18,.58)),
+        linear-gradient(135deg, rgba(255,255,255,.04), rgba(255,255,255,0));
+      border:1px solid rgba(255,255,255,.08);
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.05), 0 10px 22px rgba(0,0,0,.18);
+    }
+
+    .condition-chip{
+      display:inline-flex;
+      align-items:center;
+      min-height:24px;
+      padding:0 9px;
+      margin-bottom:10px;
+      border-radius:999px;
+      background:rgba(57,217,138,.14);
+      border:1px solid rgba(57,217,138,.28);
+      color:#dfffea;
+      font-size:9px;
+      font-weight:900;
+      letter-spacing:.8px;
+      text-transform:uppercase;
+    }
+
+    .condition-grid{
+      display:grid;
+      gap:8px;
+    }
+
+    .condition-row{
+      display:flex;
+      gap:9px;
+      align-items:flex-start;
+      color:rgba(245,241,255,.92);
+      font-size:12px;
+      line-height:1.42;
+    }
+
+    .condition-num{
+      width:22px;
+      height:22px;
+      border-radius:999px;
+      flex:0 0 auto;
+      display:grid;
+      place-items:center;
+      background:rgba(255,255,255,.09);
+      border:1px solid rgba(255,255,255,.12);
+      font-size:11px;
+      font-weight:900;
+      color:#fff;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.06);
+    }
+
+    .condition-main{
+      margin-top:1px;
+      color:rgba(245,241,255,.95);
+    }
+
+    .condition-main strong,
+    .condition-highlight strong{ color:#fff; }
+
+    .condition-highlight{
+      margin-top:10px;
+      padding:11px 12px;
+      border-radius:14px;
+      background:linear-gradient(135deg, rgba(57,217,138,.16), rgba(57,217,138,.06));
+      border:1px solid rgba(57,217,138,.22);
+      color:#f5fff9;
+      font-size:11.5px;
+      line-height:1.42;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.04);
+    }
+
+    .modal-actions,
+    .channel-actions{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:10px;
+    }
+
+    .ghost-btn,
+    .solid-btn{
+      min-height:46px;
+      border-radius:15px;
+      border:none;
+      cursor:pointer;
+      font-size:13px;
+      font-weight:900;
+      letter-spacing:.15px;
+      color:#fff;
+    }
+
+    .ghost-btn{
+      background: rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.10);
+    }
+
+    .solid-btn{
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.14), rgba(255,255,255,.02)),
+        linear-gradient(135deg, var(--green1), var(--green2));
+      border:1px solid rgba(255,255,255,.14);
+      box-shadow:0 18px 34px rgba(24,183,106,.28), inset 0 1px 0 rgba(255,255,255,.10);
+    }
+
+    .ghost-btn:active,
+    .solid-btn:active,
+    .tg-btn:active{ transform:scale(.98); }
+
+    .channel-text{
+      margin:0;
+      color:rgba(245,241,255,.88);
+      font-size:13px;
+      line-height:1.5;
+    }
+
+    .tg-btn{
+      border:none;
+      cursor:pointer;
+      width:100%;
+      height:50px;
+      border-radius:18px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:10px;
+      background: linear-gradient(180deg, var(--tg1), var(--tg2));
+      box-shadow: 0 18px 40px rgba(34,158,217,.4), inset 0 1px 0 rgba(255,255,255,.2);
+      color:#fff;
+      font-weight:900;
+      font-size:14px;
+    }
+
+    .tg-ico{
+      width:21px;
+      height:21px;
+      display:block;
+      filter: drop-shadow(0 8px 14px rgba(0,0,0,.3));
+    }
+
+    @media (max-width: 420px){
+      .hero-card{ width:min(100%, 360px); min-height:330px; border-radius:26px; }
+      .details-fab{ left:14px; bottom:14px; min-height:40px; padding:0 12px; font-size:12px; max-width:170px; }
+      .future-note{ width:min(100%, 360px); font-size:11.5px; }
+      .modal-actions,
+      .channel-actions{ grid-template-columns:1fr; }
+    }
+
+    @media (max-width: 360px){
+      .top-row{
+        grid-template-columns:36px 1fr 46px;
+        gap:6px;
+      }
+      .icon-btn{
+        width:36px;
+        height:36px;
+        border-radius:12px;
+      }
+      .balance-mini{
+        height:38px;
+        padding:5px 6px 5px 10px;
+      }
+      .bal-title{ font-size:11px; }
+      .bal-amount{
+        height:24px;
+        font-size:12px;
+        min-width:70px;
+      }
+      .hero-logo{
+        width:46px;
+        height:46px;
+      }
+      .hero-card{ width:min(100%, 320px); min-height:300px; }
+      .modal-overlay,
+      .channel-overlay{ padding:10px; }
+      .modal-card,
+      .channel-card{ border-radius:20px; max-height:88vh; }
+      .modal-head,
+      .channel-head{ padding:12px 12px 9px; }
+      .modal-body,
+      .channel-body{ padding:12px; gap:10px; }
+      .prize-block,
+      .condition-card{ padding:12px; border-radius:16px; }
+      .prize-title{ font-size:18px; }
+      .prize-text,
+      .channel-text{ font-size:11.5px; }
+      .condition-row{ font-size:11.5px; }
+      .condition-highlight{ font-size:11px; }
+    }
+
+    @media (prefers-reduced-motion: reduce){
+      *{ transition:none !important; animation:none !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <div class="content">
+      <div class="top-row">
+        <button class="icon-btn" id="backBtn" aria-label="Назад">
+          <svg class="back-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M15 5L8 12L15 19" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+
+        <div class="balance-mini" aria-label="Баланс">
+          <span class="bal-title">Баланс</span>
+          <button class="bal-amount" id="balanceChip" aria-label="Открыть кошелёк">
+            <span id="balanceValue">...</span>
+          </button>
+        </div>
+
+        <button class="hero-logo" id="brandLogoBtn" aria-label="Открыть Telegram канал Vezus Game">
+          <img src="https://i.postimg.cc/qvL497mF/Picsart-26-02-27-02-02-37-502.png" alt="Vezus Game" loading="eager" fetchpriority="high" decoding="async">
+        </button>
+      </div>
+
+      <section class="hero-section">
+        <div class="hero-card">
+          <img class="hero-image" src="https://i.postimg.cc/vHxXSFh4/Picsart-26-04-01-19-51-45-943.jpg" alt="Розыгрыш iPhone" loading="eager" fetchpriority="high" decoding="async">
+          <div class="hero-floating-badge">РОЗЫГРЫШ · IPHONE</div>
+          <button class="details-fab" id="detailsBtn">Подробнее о розыгрыше</button>
+        </div>
+        <div class="future-note">Ожидайте в будущем больше бонусов</div>
+      </section>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="bonusModal" aria-hidden="true">
+    <div class="modal-card" role="dialog" aria-modal="true" aria-label="Условия участия">
+      <div class="modal-head">
+        <div class="modal-title">Условия участия</div>
+        <button class="modal-x" id="modalClose" aria-label="Закрыть">✕</button>
+      </div>
+
+      <div class="modal-body">
+        <div class="prize-block">
+          <div class="prize-chip">Главный приз</div>
+          <h3 class="prize-title">iPhone 16 Pro Max 256GB</h3>
+          <p class="prize-text">Сделай пополнение и участие в розыгрыше подключится автоматически.</p>
+        </div>
+
+        <div class="condition-card">
+          <div class="condition-chip">Условия</div>
+          <div class="condition-grid">
+            <div class="condition-row">
+              <div class="condition-num">1</div>
+              <div class="condition-main">Пополнение баланса от <strong>1000₽</strong>.</div>
+            </div>
+            <div class="condition-row">
+              <div class="condition-num">2</div>
+              <div class="condition-main">После пополнения участие включается <strong>автоматически</strong>.</div>
+            </div>
+            <div class="condition-row">
+              <div class="condition-num">3</div>
+              <div class="condition-main">Главный приз — <strong>iPhone 16 Pro Max 256GB</strong>.</div>
+            </div>
+          </div>
+          <div class="condition-highlight">
+            Пополни баланс <strong>от 1000₽</strong> и автоматически участвуй в розыгрыше <strong>iPhone 16 Pro Max 256GB</strong>.
+          </div>
+        </div>
+
+        <div class="modal-actions">
+          <button class="ghost-btn" id="modalLater">Позже</button>
+          <button class="solid-btn" id="goWalletBtn">Пополнить</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="channel-overlay" id="channelOverlay" aria-hidden="true">
+    <div class="channel-card" role="dialog" aria-modal="true" aria-label="Telegram канал">
+      <div class="channel-head">
+        <div class="channel-title">Наш Telegram канал</div>
+        <button class="channel-x" id="channelClose" aria-label="Закрыть">✕</button>
+      </div>
+      <div class="channel-body">
+        <p class="channel-text">
+          Нажми кнопку ниже — откроется наш Telegram канал:
+          <b>@VezusGame</b>
+        </p>
+        <button class="tg-btn" id="goChannel" aria-label="Перейти в Telegram канал">
+          <svg class="tg-ico" viewBox="0 0 240 240" aria-hidden="true">
+            <path fill="#fff" d="M120 0C53.7 0 0 53.7 0 120s53.7 120 120 120 120-53.7 120-120S186.3 0 120 0zm58.7 82.3l-19.7 92.8c-1.5 6.6-5.4 8.2-10.9 5.1l-30.2-22.3-14.6 14c-1.6 1.6-3 3-6.1 3l2.2-31.6 57.5-52c2.5-2.2-.5-3.4-3.9-1.2l-71 44.7-30.6-9.6c-6.6-2.1-6.7-6.6 1.4-9.7l119.6-46.1c5.5-2 10.3 1.3 8.8 9.9z"/>
+          </svg>
+          Перейти в Telegram канал
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <script>
+    const VERIFY_URL = "https://lazrfierfbhwlduqlvws.functions.supabase.co/verify-telegram";
+    const FILES = {
+      home: 'index.html',
+      wallet: 'wallet.html'
+    };
+
+    const balanceValueEl = document.getElementById('balanceValue');
+    const balanceChipEl  = document.getElementById('balanceChip');
+
+    function formatBalance(value) {
+      const num = Number(value ?? 0);
+      if (!Number.isFinite(num)) return '0 ₽';
+      const formatted = Number.isInteger(num) ? num : num.toFixed(2);
+      return `${formatted} ₽`;
+    }
+
+    function loadCachedProfile() {
+      try {
+        const raw = localStorage.getItem('tg_profile');
+        if (!raw) return null;
+        return JSON.parse(raw);
+      } catch {
+        return null;
+      }
+    }
+
+    function applyProfile(profile) {
+      if (!profile) return;
+      localStorage.setItem('tg_profile', JSON.stringify(profile));
+      balanceValueEl.textContent = formatBalance(profile.balance);
+    }
+
+    function getStartParam() {
+      try {
+        const tgStart = (window.Telegram?.WebApp?.initDataUnsafe?.start_param || '').trim();
+        if (tgStart) return tgStart.toUpperCase();
+        const url = new URL(window.location.href);
+        const q1 = (url.searchParams.get('tgWebAppStartParam') || '').trim();
+        if (q1) return q1.toUpperCase();
+        const q2 = (url.searchParams.get('startapp') || '').trim();
+        if (q2) return q2.toUpperCase();
+        const q3 = (url.searchParams.get('ref') || '').trim();
+        if (q3) return q3.toUpperCase();
+        return '';
+      } catch {
+        return '';
+      }
+    }
+
+    function clearStartParamsFromUrl() {
+      try {
+        const url = new URL(window.location.href);
+        url.searchParams.delete('tgWebAppStartParam');
+        url.searchParams.delete('startapp');
+        url.searchParams.delete('ref');
+        history.replaceState({}, '', `${url.pathname}${url.search}${url.hash}`);
+      } catch {}
+    }
+
+    async function autoAuthTelegram() {
+      const cached = loadCachedProfile();
+      if (cached) applyProfile(cached);
+      else balanceValueEl.textContent = '0 ₽';
+
+      if (!window.Telegram || !window.Telegram.WebApp) return;
+
+      try {
+        Telegram.WebApp.ready();
+        if (typeof Telegram.WebApp.expand === 'function') Telegram.WebApp.expand();
+        if (typeof Telegram.WebApp.setHeaderColor === 'function') Telegram.WebApp.setHeaderColor('#020617');
+      } catch {}
+
+      const initData = Telegram.WebApp.initData;
+      if (!initData) return;
+
+      const refCode = getStartParam();
+      balanceValueEl.textContent = '...';
+
+      try {
+        const res = await fetch(VERIFY_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ initData, refCode })
+        });
+        const json = await res.json().catch(() => ({}));
+        if (!res.ok || !json.ok || !json.profile) {
+          if (cached) applyProfile(cached);
+          else balanceValueEl.textContent = '0 ₽';
+          return;
+        }
+        applyProfile(json.profile);
+        if (refCode) clearStartParamsFromUrl();
+      } catch {
+        if (cached) applyProfile(cached);
+        else balanceValueEl.textContent = '0 ₽';
+      }
+    }
+
+    function goTo(file){
+      window.location.href = file;
+    }
+
+    function openTelegramLinkSafe(url){
+      if (window.Telegram?.WebApp?.openTelegramLink) window.Telegram.WebApp.openTelegramLink(url);
+      else window.open(url, '_blank', 'noopener');
+    }
+
+    const backBtn = document.getElementById('backBtn');
+    const detailsBtn = document.getElementById('detailsBtn');
+    const bonusModal = document.getElementById('bonusModal');
+    const modalClose = document.getElementById('modalClose');
+    const modalLater = document.getElementById('modalLater');
+    const goWalletBtn = document.getElementById('goWalletBtn');
+
+    function openBonusModal(){
+      bonusModal.classList.add('show');
+      bonusModal.setAttribute('aria-hidden', 'false');
+      document.body.style.overflow = 'hidden';
+      try{
+        if (window.Telegram?.WebApp?.HapticFeedback?.notificationOccurred) {
+          Telegram.WebApp.HapticFeedback.notificationOccurred('success');
+        }
+      }catch{}
+    }
+
+    function closeBonusModal(){
+      bonusModal.classList.remove('show');
+      bonusModal.setAttribute('aria-hidden', 'true');
+      document.body.style.overflow = '';
+    }
+
+    detailsBtn.addEventListener('click', openBonusModal);
+    modalClose.addEventListener('click', closeBonusModal);
+    modalLater.addEventListener('click', closeBonusModal);
+    bonusModal.addEventListener('click', (e) => {
+      if (e.target === bonusModal) closeBonusModal();
+    });
+
+    goWalletBtn.addEventListener('click', () => {
+      closeBonusModal();
+      goTo(FILES.wallet);
+    });
+
+    const brandLogoBtn = document.getElementById('brandLogoBtn');
+    const channelOverlay = document.getElementById('channelOverlay');
+    const channelClose = document.getElementById('channelClose');
+    const goChannel = document.getElementById('goChannel');
+
+    function openChannel(){
+      channelOverlay.classList.add('show');
+      channelOverlay.setAttribute('aria-hidden', 'false');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeChannel(){
+      channelOverlay.classList.remove('show');
+      channelOverlay.setAttribute('aria-hidden', 'true');
+      document.body.style.overflow = '';
+    }
+
+    brandLogoBtn.addEventListener('click', openChannel);
+    channelClose.addEventListener('click', closeChannel);
+    channelOverlay.addEventListener('click', (e) => {
+      if (e.target === channelOverlay) closeChannel();
+    });
+    goChannel.addEventListener('click', () => openTelegramLinkSafe('https://t.me/+VtANADHpNP42YjQ6'));
+
+    backBtn.addEventListener('click', () => {
+      if (history.length > 1) history.back();
+      else goTo(FILES.home);
+    });
+
+    balanceChipEl.addEventListener('click', () => {
+      goTo(FILES.wallet);
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        closeBonusModal();
+        closeChannel();
+      }
+    });
+
+    autoAuthTelegram();
+  </script>
+</body>
+</html>
