@@ -1,0 +1,2168 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Vezus Game</title>
+
+  <link rel="preconnect" href="https://i.postimg.cc" crossorigin>
+  <link rel="dns-prefetch" href="https://i.postimg.cc">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  <link rel="preload" as="image" href="https://i.postimg.cc/qvL497mF/Picsart-26-02-27-02-02-37-502.png">
+  <link rel="preload" as="image" href="https://i.postimg.cc/kgfc4B78/Picsart-26-02-26-17-32-07-162.jpg">
+  <link rel="preload" as="image" href="https://i.postimg.cc/fbJT34yY/076E519D-F095-4957-88BF-5591DEB82533.png">
+  <link rel="preload" as="image" href="https://i.postimg.cc/JhbwvzVv/Picsart-26-03-31-20-59-31-499.jpg">
+  <link rel="preload" as="image" href="https://i.postimg.cc/504zTgk5/Picsart-26-03-31-23-00-57-125.png">
+  <link rel="preload" as="image" href="https://i.postimg.cc/5ty3kKwP/file-00000000b6c0720aade148f488408e9f.png">
+  <link rel="preload" as="image" href="https://i.postimg.cc/fb0KN2bS/file-0000000046bc7243b5dff7c0706b4f56.png">
+  <link rel="preload" as="image" href="https://i.postimg.cc/bvPHy2Tj/file-000000003050724685646ed6faf61e24.png">
+  <link rel="preload" as="image" href="https://i.postimg.cc/7LL6RN33/file-000000002a3072439b55a7bddebe57ac.png">
+  <link rel="preload" as="image" href="https://i.postimg.cc/KzL1CzBx/file-000000006b147246a0e4e420fbe0eba2.png">
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --text:#eaf1ff;
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+      --safe-top: env(safe-area-inset-top, 0px);
+      --radius:18px;
+
+      --glass: rgba(12, 14, 20, .74);
+      --stroke: rgba(255,255,255,.08);
+      --shadow: 0 18px 42px rgba(0,0,0,.48);
+      --shadow-soft: 0 12px 28px rgba(0,0,0,.34);
+
+      --tg1:#2AABEE;
+      --tg2:#229ED9;
+    }
+
+    *{
+      box-sizing:border-box;
+      font-family:'Inter', sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html, body{
+      height:100%;
+      margin:0;
+      overflow:hidden;
+      color:var(--text);
+      background:#020617;
+    }
+
+    body{
+      background-image:url("https://i.postimg.cc/fbJT34yY/076E519D-F095-4957-88BF-5591DEB82533.png");
+      background-size:cover;
+      background-position:center;
+      background-repeat:no-repeat;
+    }
+
+    body::before{
+      content:"";
+      position:fixed;
+      inset:0;
+      background:
+        radial-gradient(900px 600px at 30% 10%, rgba(255,255,255,.05), transparent 60%),
+        linear-gradient(180deg, rgba(0,0,0,.40), rgba(0,0,0,.64));
+      pointer-events:none;
+      z-index:0;
+    }
+
+    img{
+      backface-visibility:hidden;
+      -webkit-backface-visibility:hidden;
+      image-rendering:auto;
+    }
+
+    .slots-section,
+    .project-footer,
+    .menu-sheet,
+    .support-card,
+    .channel-card{
+      content-visibility:auto;
+      contain-intrinsic-size: 1px 340px;
+    }
+
+    .app{
+      position:relative;
+      height:100%;
+      overflow:auto;
+      padding: calc(4px + var(--safe-top)) 16px calc(28px + var(--safe-bottom)) 16px;
+      z-index:1;
+      overscroll-behavior: contain;
+    }
+
+    .content{
+      margin-top:0;
+      display:flex;
+      flex-direction:column;
+      gap:16px;
+      width:100%;
+      max-width:520px;
+      margin-left:auto;
+      margin-right:auto;
+      position:relative;
+      z-index:1;
+      align-items:center;
+    }
+
+    .top-row{
+      position: sticky;
+      top: calc(4px + var(--safe-top));
+      z-index: 10;
+      width:100%;
+      max-width:520px;
+      display:grid;
+      grid-template-columns:38px 1fr 54px;
+      align-items:center;
+      gap:8px;
+      background: transparent;
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      padding: 0;
+      margin-bottom: 0;
+    }
+
+    .icon-btn{
+      width:38px;
+      height:38px;
+      border-radius:13px;
+      border:1px solid var(--stroke);
+      cursor:pointer;
+      background: var(--glass);
+      box-shadow: var(--shadow-soft), inset 0 1px 0 rgba(255,255,255,.04);
+      display:grid;
+      place-items:center;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      transition: transform .15s ease, background .15s ease;
+      padding:0;
+      overflow:hidden;
+    }
+
+    .icon-btn:active{ transform: scale(.98); }
+
+    .burger{
+      width:16px;
+      height:12px;
+      display:grid;
+      gap:3px;
+    }
+
+    .burger span{
+      height:2px;
+      border-radius:999px;
+      background: rgba(234,241,255,.92);
+      display:block;
+    }
+
+    .balance-mini{
+      width:100%;
+      min-width:0;
+      height:42px;
+      border-radius:999px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:8px;
+      padding:6px 7px 6px 12px;
+      position:relative;
+      overflow:hidden;
+      background: var(--glass);
+      border:1px solid var(--stroke);
+      box-shadow: var(--shadow), inset 0 1px 0 rgba(255,255,255,.04);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+
+    .balance-mini::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      background:
+        radial-gradient(180px 60px at 0% 0%, rgba(255,255,255,.05), transparent 55%),
+        radial-gradient(180px 60px at 100% 100%, rgba(255,255,255,.03), transparent 55%);
+      pointer-events:none;
+    }
+
+    .bal-title{
+      position:relative;
+      z-index:1;
+      font-size:12px;
+      font-weight:900;
+      letter-spacing:.2px;
+      color: rgba(234,241,255,.92);
+      white-space:nowrap;
+    }
+
+    .bal-amount{
+      position:relative;
+      z-index:1;
+      height:28px;
+      border:none;
+      border-radius:999px;
+      cursor:pointer;
+      padding:0 10px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background: rgba(255,255,255,.08);
+      border:1px solid rgba(255,255,255,.08);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.05);
+      color: rgba(234,241,255,.98);
+      font-weight:900;
+      font-size:13px;
+      white-space:nowrap;
+      min-width:88px;
+    }
+
+    .bal-amount:active{ transform: scale(.99); }
+
+    .hero-logo{
+      width:54px;
+      height:54px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background:transparent;
+      border:none;
+      box-shadow:none;
+      padding:0;
+      cursor:pointer;
+    }
+
+    .hero-logo:active{ transform:scale(.98); }
+
+    .hero-logo img{
+      width:100%;
+      height:100%;
+      object-fit:contain;
+      display:block;
+    }
+
+    .slider{
+      width:100%;
+      max-width:520px;
+      border-radius: var(--radius);
+    }
+
+    .slides{
+      display:flex;
+      gap:12px;
+      overflow-x:auto;
+      scroll-snap-type:x mandatory;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width:none;
+      padding-bottom:4px;
+    }
+
+    .slides::-webkit-scrollbar{ display:none; }
+
+    .slide{
+      scroll-snap-align:start;
+      flex:0 0 100%;
+      border-radius: var(--radius);
+      position:relative;
+      overflow:hidden;
+      background:#000;
+      box-shadow: 0 18px 55px rgba(0,0,0,.40);
+    }
+
+    .slide::before{
+      content:"";
+      display:block;
+      padding-top: 33.3333%;
+    }
+
+    .slide img{
+      position:absolute;
+      inset:0;
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      object-position:center;
+      display:block;
+    }
+
+    .slide::after{
+      content:"";
+      position:absolute;
+      inset:0;
+      background: linear-gradient(180deg, rgba(0,0,0,.10), rgba(0,0,0,.38));
+      pointer-events:none;
+    }
+
+    .slide-btn {
+      position: absolute;
+      bottom: 16px;
+      left: 16px;
+      z-index: 2;
+      background: rgba(255, 255, 255, 0.12);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255,255,255,0.25);
+      border-radius: 12px;
+      padding: 6px 14px;
+      font-size: 12px;
+      font-weight: 800;
+      color: white;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .slide-btn:active {
+      transform: scale(0.96);
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    .dots{
+      display:flex;
+      justify-content:center;
+      gap:8px;
+      margin-top:10px;
+    }
+
+    .dot{
+      width:8px;
+      height:8px;
+      border-radius:999px;
+      background: rgba(234,241,255,.26);
+      transition: transform .2s ease, background .2s ease, width .2s ease;
+      cursor:pointer;
+    }
+
+    .dot.active{
+      background: rgba(255,255,255,.92);
+      width:18px;
+      transform: translateY(-.5px);
+    }
+
+    .games-section, .slots-section{
+      width:100%;
+      max-width:520px;
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+    }
+
+    .games-header, .slots-header{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      padding-left:2px;
+      position:relative;
+      margin-bottom:2px;
+    }
+
+    .games-header::after, .slots-header::after{
+      content:"";
+      flex:1;
+      height:1px;
+      border-radius:999px;
+      background: linear-gradient(90deg, rgba(194,170,255,.34), rgba(194,170,255,.08) 58%, rgba(194,170,255,0));
+      transform: translateY(1px);
+    }
+
+    .games-title, .slots-title{
+      position:relative;
+      display:inline-block;
+      padding:0;
+      min-height:auto;
+      background:none;
+      border:none;
+      box-shadow:none;
+      color:#fff;
+      font-size:17px;
+      font-weight:900;
+      letter-spacing:.95px;
+      text-transform:uppercase;
+      text-shadow:
+        0 2px 14px rgba(152,116,255,.20),
+        0 0 18px rgba(152,116,255,.10);
+      line-height:1.05;
+    }
+
+    .games-title::before, .slots-title::before{
+      content:none;
+    }
+
+    .games-title::after, .slots-title::after{
+      content:"";
+      position:absolute;
+      left:0;
+      bottom:-6px;
+      width:36px;
+      height:3px;
+      border-radius:999px;
+      background: linear-gradient(90deg, rgba(255,255,255,.98), rgba(212,181,255,.92));
+      box-shadow: 0 0 16px rgba(196,164,255,.24);
+    }
+
+    .slots-title{
+      color:#fff;
+    }
+
+    .slots-title::after{
+      background: linear-gradient(90deg, rgba(255,255,255,.98), rgba(212,181,255,.92));
+    }
+
+    .games-scroll, .slots-scroll{
+      display:flex;
+      gap:12px;
+      overflow-x:auto;
+      scroll-snap-type:x mandatory;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width:none;
+      padding: 2px 0 6px 2px;
+    }
+
+    .games-scroll::-webkit-scrollbar, .slots-scroll::-webkit-scrollbar{
+      display:none;
+    }
+
+    .game-card, .slot-card{
+      flex:0 0 auto;
+      width:98px;
+      scroll-snap-align:start;
+      border-radius:20px;
+      background: linear-gradient(180deg, rgba(18,14,30,.98), rgba(10,8,20,.99));
+      border:1px solid rgba(177,154,255,.13);
+      box-shadow:
+        0 22px 38px rgba(0,0,0,.44),
+        0 10px 20px rgba(0,0,0,.24),
+        0 0 26px rgba(122,92,255,.08),
+        inset 0 1px 0 rgba(255,255,255,.06);
+      overflow:hidden;
+      cursor:pointer;
+      transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+      position:relative;
+      isolation:isolate;
+    }
+
+    .game-card::before, .slot-card::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      border-radius:inherit;
+      padding:1px;
+      background: linear-gradient(180deg, rgba(255,255,255,.2), rgba(183,156,255,.03));
+      -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      pointer-events:none;
+      z-index:4;
+      opacity:.9;
+    }
+
+    .game-card::after, .slot-card::after{
+      content:none;
+      display:none;
+    }
+
+    .cardgame-card::after,
+    .slot-card::after{
+      display:none;
+    }
+
+    .game-card:active, .slot-card:active{
+      transform: scale(.965);
+      box-shadow:
+        0 16px 28px rgba(0,0,0,.40),
+        0 8px 14px rgba(0,0,0,.18),
+        0 0 20px rgba(122,92,255,.10),
+        inset 0 1px 0 rgba(255,255,255,.05);
+    }
+
+    .game-card-inner, .slot-card-inner{
+      position:relative;
+      width:100%;
+      aspect-ratio: 3 / 4.35;
+      display:flex;
+      align-items:flex-end;
+      justify-content:center;
+      padding:8px;
+      border-radius:inherit;
+      overflow:hidden;
+    }
+
+    .game-card img, .slot-card img{
+      position:absolute;
+      inset:0;
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      object-position:center;
+      z-index:0;
+      transition: transform .35s ease, filter .35s ease;
+    }
+
+    .game-card:active img, .slot-card:active img{
+      transform: scale(1.02);
+      filter:none;
+    }
+
+    .card-shine{
+      display:none !important;
+    }
+
+    .card-caption{ display:none !important; }
+
+    .project-footer{
+      width:100%;
+      max-width:520px;
+      margin-top: 12px;
+      margin-bottom: 2px;
+      padding: 22px 18px 16px;
+      border-radius: 30px;
+      position: relative;
+      overflow: hidden;
+      background:
+        radial-gradient(260px 160px at 12% 0%, rgba(255,255,255,.11), rgba(255,255,255,0) 62%),
+        radial-gradient(220px 160px at 100% 100%, rgba(156,118,255,.22), rgba(255,255,255,0) 58%),
+        linear-gradient(145deg, rgba(52,35,94,.96), rgba(18,12,34,.98));
+      border: 1px solid rgba(206,188,255,.16);
+      box-shadow:
+        0 28px 58px rgba(0,0,0,.42),
+        inset 0 1px 0 rgba(255,255,255,.10),
+        0 0 34px rgba(130,96,255,.10);
+      isolation:isolate;
+    }
+
+    .project-footer::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,0) 34%),
+        radial-gradient(280px 90px at 50% -10%, rgba(255,255,255,.12), transparent 70%);
+      pointer-events:none;
+      z-index:0;
+    }
+
+    .project-footer::after{
+      content:"";
+      position:absolute;
+      right:-58px;
+      bottom:-58px;
+      width:170px;
+      height:170px;
+      border-radius:50%;
+      background: radial-gradient(circle, rgba(176,134,255,.18), rgba(176,134,255,0) 68%);
+      pointer-events:none;
+      z-index:0;
+    }
+
+    .project-footer-head{
+      position:relative;
+      z-index:1;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:14px;
+      margin-bottom:16px;
+    }
+
+    .project-brand{
+      display:flex;
+      align-items:center;
+      gap:14px;
+      min-width:0;
+      flex:1;
+    }
+
+    .project-footer-logo{
+      width:58px;
+      height:58px;
+      flex:0 0 auto;
+      display:block;
+      object-fit:contain;
+      filter: drop-shadow(0 16px 24px rgba(0,0,0,.30));
+    }
+
+    .project-footer-meta{
+      min-width:0;
+      display:flex;
+      flex-direction:column;
+      gap:0;
+      justify-content:center;
+    }
+
+    .project-footer-title{
+      font-size:18px;
+      font-weight:900;
+      color:#fff;
+      letter-spacing:.2px;
+      line-height:1.02;
+      text-shadow:0 2px 18px rgba(170,132,255,.24);
+    }
+
+    .project-footer-sub{
+      color: rgba(232,223,255,.72);
+      font-size:11px;
+      font-weight:800;
+      letter-spacing:1.05px;
+      text-transform:uppercase;
+    }
+
+    .project-footer-badge{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      min-width:54px;
+      min-height:54px;
+      padding:0 14px;
+      border-radius:18px;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.14), rgba(255,255,255,.05)),
+        linear-gradient(135deg, rgba(118,81,219,.52), rgba(56,34,107,.78));
+      border:1px solid rgba(255,255,255,.14);
+      color:#fff;
+      font-size:16px;
+      font-weight:900;
+      letter-spacing:.6px;
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.08),
+        0 14px 24px rgba(0,0,0,.24);
+      flex:0 0 auto;
+    }
+
+    .project-footer-warning{
+      position:relative;
+      z-index:1;
+      margin:0;
+      padding: 16px 16px 16px;
+      border-radius: 22px;
+      background:
+        linear-gradient(180deg, rgba(8,7,18,.28), rgba(8,7,18,.54)),
+        linear-gradient(135deg, rgba(255,255,255,.04), rgba(255,255,255,0));
+      border: 1px solid rgba(255,255,255,.08);
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.05),
+        0 10px 22px rgba(0,0,0,.18);
+      color: rgba(245,241,255,.90);
+    }
+
+    .project-footer-warning-chip{
+      display:inline-flex;
+      align-items:center;
+      min-height:28px;
+      padding:0 10px;
+      margin-bottom:10px;
+      border-radius:999px;
+      background: rgba(255,255,255,.08);
+      border: 1px solid rgba(255,255,255,.10);
+      color:#fff;
+      font-size:10px;
+      font-weight:900;
+      letter-spacing:.95px;
+      text-transform:uppercase;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.06);
+    }
+
+    .project-footer-warning-text{
+      margin:0;
+      color: rgba(245,241,255,.90);
+      font-size:12.5px;
+      line-height:1.58;
+    }
+
+    .project-footer-warning-text strong{
+      color:#fff;
+    }
+
+    .project-footer-divider{
+      position:relative;
+      z-index:1;
+      height:1px;
+      margin:16px 0 12px;
+      background: linear-gradient(90deg, rgba(255,255,255,.16), rgba(255,255,255,.04) 55%, rgba(255,255,255,0));
+    }
+
+    .project-footer-bottom{
+      position:relative;
+      z-index:1;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      flex-wrap:wrap;
+    }
+
+    .project-footer-note{
+      color: rgba(236,229,255,.80);
+      font-size:11px;
+      font-weight:800;
+      letter-spacing:.28px;
+    }
+
+    .project-footer-copy{
+      color: rgba(227,218,255,.74);
+      font-size:11px;
+      font-weight:900;
+      letter-spacing:.28px;
+    }
+
+    .menu-overlay{
+      position:fixed;
+      inset:0;
+      background: rgba(0,0,0,.6);
+      opacity:0;
+      pointer-events:none;
+      transition: opacity .3s ease;
+      z-index:200;
+      backdrop-filter: blur(6px);
+    }
+
+    .menu-overlay.show{
+      opacity:1;
+      pointer-events:auto;
+    }
+
+    .menu-sheet{
+      position:fixed;
+      top:0;
+      left:0;
+      bottom:0;
+      width:min(320px, 85%);
+      background: linear-gradient(145deg, rgba(12, 14, 20, 0.98), rgba(8, 10, 16, 0.98));
+      backdrop-filter: blur(30px);
+      -webkit-backdrop-filter: blur(30px);
+      border-right: 1px solid rgba(255,255,255,.12);
+      box-shadow: 8px 0 40px rgba(0,0,0,.7);
+      transform: translateX(-100%);
+      transition: transform .4s cubic-bezier(0.2, 0.9, 0.3, 1.1);
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+      z-index:201;
+    }
+
+    .menu-overlay.show .menu-sheet{
+      transform: translateX(0);
+    }
+
+    .menu-sheet-head{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      padding: 16px 16px 8px 20px;
+      border-bottom: 1px solid rgba(255,255,255,.12);
+      background: linear-gradient(135deg, rgba(255,255,255,0.04), rgba(255,255,255,0));
+    }
+
+    .sheet-title{
+      margin:0;
+      font-size: 20px;
+      font-weight:800;
+      letter-spacing:0.5px;
+      background: linear-gradient(135deg, #fff, #b0c8ff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .menu-close{
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      border: none;
+      background: rgba(255,255,255,.12);
+      color: rgba(234,241,255,.9);
+      cursor:pointer;
+      display: grid;
+      place-items: center;
+      font-size: 18px;
+      transition: all .25s ease;
+    }
+
+    .menu-close:hover { background: rgba(255,255,255,.22); transform: rotate(90deg) scale(1.05); }
+    .menu-close:active{ transform: scale(.94); }
+
+    .profile-block {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 16px 16px 20px 16px;
+      padding: 10px 14px;
+      background: linear-gradient(145deg, rgba(255,255,255,0.1), rgba(255,255,255,0.02));
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 28px;
+      cursor:pointer;
+      transition: all 0.25s ease;
+      backdrop-filter: blur(8px);
+    }
+
+    .profile-block:active {
+      background: rgba(255,255,255,0.15);
+      transform: scale(0.98);
+      border-color: rgba(255,255,255,0.3);
+    }
+
+    .profile-avatar {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid rgba(255,255,255,0.3);
+      background: linear-gradient(135deg, #2f3542, #1a1e2a);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 18px;
+      color: white;
+      text-transform: uppercase;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+    }
+
+    .profile-info {
+      flex: 1;
+    }
+
+    .profile-name {
+      font-weight: 800;
+      font-size: 15px;
+      color: white;
+      margin-bottom: 2px;
+      letter-spacing: -0.2px;
+    }
+
+    .profile-id {
+      font-size: 11px;
+      font-weight: 500;
+      color: rgba(234,241,255,0.7);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .profile-id span {
+      background: rgba(255,255,255,0.12);
+      padding: 2px 6px;
+      border-radius: 30px;
+      font-size: 9px;
+      font-weight: 600;
+    }
+
+    .profile-chevron {
+      color: rgba(255,255,255,0.5);
+      font-size: 20px;
+      margin-left: auto;
+      padding-right: 2px;
+    }
+
+    .menu-grid{
+      display:flex;
+      flex-direction:column;
+      padding:0 16px 12px 16px;
+      gap: 2px;
+    }
+
+    .menu-card {
+      border:none;
+      cursor:pointer;
+      background: transparent;
+      display:flex;
+      align-items:center;
+      gap: 12px;
+      width:100%;
+      padding: 8px 10px;
+      border-radius: 20px;
+      transition: all 0.2s ease;
+      border-bottom: 1px solid rgba(255,255,255,.04);
+    }
+
+    .menu-card:last-child {
+      border-bottom: none;
+    }
+
+    .menu-card:hover {
+      background: rgba(255,255,255,.08);
+      transform: translateX(4px);
+    }
+
+    .menu-card:active {
+      transform: scale(0.98);
+      background: rgba(255,255,255,.12);
+    }
+
+    .menu-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 14px;
+      flex: 0 0 auto;
+      display: grid;
+      place-items: center;
+      background: rgba(255,255,255,.08);
+      border: 1px solid rgba(255,255,255,.12);
+      box-shadow: 0 4px 10px -4px rgba(0,0,0,.5);
+    }
+
+    .menu-icon svg {
+      width: 18px;
+      height: 18px;
+      stroke: rgba(234,241,255,.98);
+      fill: none;
+      stroke-width: 2;
+      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+    }
+
+    .menu-card-title {
+      display: block;
+      text-align: left;
+      font-size: 14px;
+      font-weight: 600;
+      color: rgba(234,241,255,.96);
+      letter-spacing: 0.2px;
+    }
+
+    .menu-footer {
+      padding: 8px 16px 20px 16px;
+      margin-top: auto;
+    }
+
+    .support-footer-btn {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      width: 100%;
+      padding: 10px 14px;
+      background: linear-gradient(145deg, rgba(42,171,238,0.22), rgba(34,158,217,0.12));
+      border: 1px solid rgba(42,171,238,0.45);
+      border-radius: 28px;
+      cursor:pointer;
+      transition: all 0.25s ease;
+      backdrop-filter: blur(4px);
+    }
+
+    .support-footer-btn:hover {
+      background: rgba(42,171,238,0.3);
+      border-color: rgba(42,171,238,0.7);
+      transform: translateY(-2px);
+    }
+
+    .support-footer-btn:active {
+      transform: scale(0.97);
+    }
+
+    .support-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(42,171,238,0.25);
+      border: 1px solid rgba(42,171,238,0.5);
+      overflow: hidden;
+    }
+
+    .support-icon img {
+      width: 24px;
+      height: 24px;
+      object-fit: contain;
+    }
+
+    .support-footer-text {
+      flex: 1;
+    }
+
+    .support-footer-title {
+      font-weight: 800;
+      font-size: 13px;
+      color: white;
+    }
+
+    .support-footer-sub {
+      font-size: 10px;
+      font-weight: 500;
+      color: rgba(234,241,255,0.75);
+    }
+
+    .support-chevron {
+      color: rgba(255,255,255,0.6);
+      font-size: 20px;
+      margin-left: auto;
+    }
+
+    .support-overlay,
+    .channel-overlay{
+      position:fixed;
+      inset:0;
+      background: rgba(0,0,0,.72);
+      opacity:0;
+      pointer-events:none;
+      transition: opacity .22s ease;
+      z-index:260;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:18px;
+    }
+
+    .support-overlay.show,
+    .channel-overlay.show{
+      opacity:1;
+      pointer-events:auto;
+    }
+
+    .support-card,
+    .channel-card{
+      width:min(440px, 100%);
+      border-radius:28px;
+      overflow:hidden;
+      background: rgba(18,20,28,.96);
+      border: 1px solid rgba(255,255,255,.1);
+      box-shadow: 0 34px 90px rgba(0,0,0,.7), inset 0 1px 0 rgba(255,255,255,.05);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      transform: translateY(12px) scale(.98);
+      opacity:.95;
+      transition: transform .22s ease, opacity .22s ease;
+    }
+
+    .support-overlay.show .support-card,
+    .channel-overlay.show .channel-card{
+      transform: translateY(0) scale(1);
+      opacity:1;
+    }
+
+    .support-head,
+    .channel-head{
+      padding:18px 18px 12px 18px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      background: rgba(255,255,255,.03);
+      border-bottom: 1px solid rgba(255,255,255,.07);
+    }
+
+    .support-title,
+    .channel-title{
+      font-weight:900;
+      font-size:15px;
+      color: rgba(234,241,255,.96);
+    }
+
+    .support-x,
+    .channel-x{
+      width:40px;
+      height:40px;
+      border-radius:16px;
+      border:1px solid rgba(255,255,255,.08);
+      background: rgba(255,255,255,.06);
+      color: rgba(234,241,255,.96);
+      cursor:pointer;
+      display:grid;
+      place-items:center;
+    }
+
+    .support-x:active,
+    .channel-x:active{ transform: scale(.98); }
+
+    .support-body,
+    .channel-body{
+      padding:16px 18px 20px 18px;
+      display:flex;
+      flex-direction:column;
+      gap:14px;
+    }
+
+    .support-text,
+    .channel-text{
+      margin:0;
+      font-size:13px;
+      line-height:1.4;
+      color: rgba(234,241,255,.86);
+    }
+
+    .tg-btn{
+      border:none;
+      cursor:pointer;
+      width:100%;
+      height:52px;
+      border-radius:20px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:10px;
+      background: linear-gradient(180deg, var(--tg1), var(--tg2));
+      box-shadow: 0 18px 40px rgba(34,158,217,.4), inset 0 1px 0 rgba(255,255,255,.2);
+      color:#fff;
+      font-weight:900;
+      font-size:15px;
+    }
+
+    .tg-btn:active{ transform: scale(.99); }
+
+    .tg-ico{
+      width:22px;
+      height:22px;
+      display:block;
+      filter: drop-shadow(0 8px 14px rgba(0,0,0,.3));
+    }
+
+    .toast{
+      position:fixed;
+      left:14px;
+      right:14px;
+      bottom: calc(18px + var(--safe-bottom));
+      z-index:999;
+      pointer-events:none;
+      display:flex;
+      justify-content:center;
+      opacity:0;
+      transform: translateY(10px);
+      transition: opacity .18s ease, transform .18s ease;
+    }
+
+    .toast.show{
+      opacity:1;
+      transform: translateY(0);
+    }
+
+    .toast .box{
+      width:min(520px, 100%);
+      border-radius:22px;
+      padding:14px 16px;
+      background: rgba(12,14,20,.85);
+      border:1px solid rgba(255,255,255,.15);
+      box-shadow: 0 22px 60px rgba(0,0,0,.6), inset 0 1px 0 rgba(255,255,255,.1);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      text-align:center;
+      font-weight:900;
+      font-size:14px;
+      color: white;
+    }
+
+    .password-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.85);
+      backdrop-filter: blur(12px);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: opacity 0.3s ease;
+    }
+
+    .password-container {
+      width: min(340px, 85%);
+      background: rgba(18, 20, 28, 0.95);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 32px;
+      padding: 28px 24px;
+      text-align: center;
+      box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+    }
+
+    .password-container h2 {
+      margin: 0 0 8px 0;
+      font-size: 24px;
+      font-weight: 800;
+      background: linear-gradient(135deg, #fff, #b0c8ff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .password-container p {
+      font-size: 14px;
+      color: rgba(234,241,255,0.8);
+      margin-bottom: 24px;
+    }
+
+    .password-input {
+      width: 100%;
+      padding: 14px 18px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 28px;
+      color: white;
+      font-size: 16px;
+      font-weight: 500;
+      text-align: center;
+      letter-spacing: 2px;
+      outline: none;
+      transition: all 0.2s ease;
+    }
+
+    .password-input:focus {
+      border-color: #2AABEE;
+      box-shadow: 0 0 0 2px rgba(42,171,238,0.3);
+    }
+
+    .password-btn {
+      width: 100%;
+      margin-top: 20px;
+      padding: 14px;
+      background: linear-gradient(145deg, #2AABEE, #229ED9);
+      border: none;
+      border-radius: 28px;
+      color: white;
+      font-weight: 800;
+      font-size: 16px;
+      cursor:pointer;
+      transition: transform 0.15s ease;
+    }
+
+    .password-btn:active {
+      transform: scale(0.97);
+    }
+
+    .error-msg {
+      color: #ff6b6b;
+      font-size: 13px;
+      margin-top: 12px;
+      min-height: 20px;
+    }
+
+    @media (max-width: 360px){
+      .top-row{
+        grid-template-columns:36px 1fr 46px;
+        gap:6px;
+      }
+      .icon-btn{
+        width:36px;
+        height:36px;
+        border-radius:12px;
+      }
+      .balance-mini{
+        height:38px;
+        padding:5px 6px 5px 10px;
+      }
+      .bal-title{
+        font-size:11px;
+      }
+      .bal-amount{
+        height:24px;
+        font-size:12px;
+        min-width:70px;
+      }
+      .hero-logo{
+        width:46px;
+        height:46px;
+      }
+      .game-card, .slot-card{
+        width:86px;
+        border-radius:17px;
+      }
+      .games-title, .slots-title{
+        font-size:14px;
+        letter-spacing:.8px;
+      }
+      .games-title::after, .slots-title::after{
+        width:30px;
+        height:3px;
+        bottom:-5px;
+      }
+      .project-footer{
+        padding: 16px 14px 14px;
+        border-radius: 24px;
+      }
+      .project-footer-head{
+        gap:10px;
+        margin-bottom:12px;
+      }
+      .project-brand{
+        gap:10px;
+      }
+      .project-footer-logo{
+        width:48px;
+        height:48px;
+      }
+      .project-footer-title{
+        font-size:15px;
+      }
+      .project-footer-sub{
+        font-size:9px;
+      }
+      .project-footer-badge{
+        min-width:44px;
+        min-height:44px;
+        border-radius:14px;
+        font-size:14px;
+      }
+      .project-footer-warning{
+        padding:12px 12px 13px;
+        border-radius:18px;
+      }
+      .project-footer-warning-chip{
+        min-height:24px;
+        padding:0 8px;
+        margin-bottom:8px;
+        font-size:8.5px;
+      }
+      .project-footer-warning-text{
+        font-size:11.5px;
+      }
+      .project-footer-note,
+      .project-footer-copy{
+        font-size:10px;
+      }
+
+      .menu-sheet{
+        width: min(280px, 85%);
+      }
+      .profile-avatar {
+        width: 40px;
+        height: 40px;
+        font-size: 16px;
+      }
+      .profile-name {
+        font-size: 13px;
+      }
+      .profile-id {
+        font-size: 10px;
+      }
+      .menu-icon {
+        width: 32px;
+        height: 32px;
+      }
+      .menu-card-title {
+        font-size: 13px;
+      }
+      .slide-btn {
+        padding: 5px 12px;
+        font-size: 10px;
+        left: 12px;
+        bottom: 12px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce){
+      *{ transition:none !important; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="password-overlay" id="passwordOverlay">
+    <div class="password-container">
+      <h2>Вход</h2>
+      <p>Введите пароль для доступа</p>
+      <input type="password" class="password-input" id="passwordInput" placeholder="•••" maxlength="10" autocomplete="off">
+      <button class="password-btn" id="passwordSubmit">Войти</button>
+      <div class="error-msg" id="passwordError"></div>
+    </div>
+  </div>
+
+  <div class="app" id="appRoot" style="display: none;">
+    <div class="content">
+
+      <div class="top-row">
+        <button class="icon-btn" id="menuBtn" aria-label="Открыть меню">
+          <div class="burger" aria-hidden="true">
+            <span></span><span></span><span></span>
+          </div>
+        </button>
+
+        <div class="balance-mini" aria-label="Баланс">
+          <span class="bal-title">Баланс</span>
+          <button class="bal-amount" id="balanceChip" aria-label="Открыть кошелёк">
+            <span id="balanceValue">...</span>
+          </button>
+        </div>
+
+        <button class="hero-logo" id="brandLogoBtn" aria-label="Открыть Telegram канал Vezus Game">
+          <img
+            src="https://i.postimg.cc/qvL497mF/Picsart-26-02-27-02-02-37-502.png"
+            alt="Vezus Game"
+            loading="eager"
+            fetchpriority="high"
+            decoding="async"
+          >
+        </button>
+      </div>
+
+      <div class="slider" aria-label="Баннеры">
+        <div class="slides" id="slides">
+          <div class="slide">
+            <img
+              src="https://i.postimg.cc/JhbwvzVv/Picsart-26-03-31-20-59-31-499.jpg"
+              alt="Banner 2"
+              loading="eager"
+              fetchpriority="high"
+              decoding="async"
+            >
+            <button class="slide-btn" data-banner="bonus">Бонусы</button>
+          </div>
+          <div class="slide">
+            <img
+              src="https://i.postimg.cc/504zTgk5/Picsart-26-03-31-23-00-57-125.png"
+              alt="Banner 1"
+              loading="lazy"
+              decoding="async"
+            >
+            <button class="slide-btn" data-banner="fortune">Колесо фортуны</button>
+          </div>
+          <div class="slide">
+            <img
+              src="https://i.postimg.cc/Hky2HSWQ/Picsart-26-03-31-22-36-47-515.jpg"
+              alt="Banner 3"
+              loading="lazy"
+              decoding="async"
+            >
+            <button class="slide-btn" data-banner="wallet">Пополнить</button>
+          </div>
+        </div>
+
+        <div class="dots" id="dots" aria-label="Индикатор баннера">
+          <div class="dot active"></div>
+          <div class="dot"></div>
+          <div class="dot"></div>
+        </div>
+      </div>
+
+      <div class="games-section">
+        <div class="games-header">
+          <span class="games-title">Игры</span>
+        </div>
+        <div class="games-scroll" id="gamesScroll">
+          <div class="game-card" data-game="game1" data-target="coinflip">
+            <div class="game-card-inner">
+              <img src="https://i.postimg.cc/5ty3kKwP/file-00000000b6c0720aade148f488408e9f.png" alt="Game 1" loading="eager" fetchpriority="high" decoding="async">
+            </div>
+          </div>
+          <div class="game-card" data-game="game2" data-target="mines">
+            <div class="game-card-inner">
+              <img src="https://i.postimg.cc/fb0KN2bS/file-0000000046bc7243b5dff7c0706b4f56.png" alt="Game 2" loading="eager" fetchpriority="high" decoding="async">
+            </div>
+          </div>
+          <div class="game-card" data-game="game3" data-target="cups">
+            <div class="game-card-inner">
+              <img src="https://i.postimg.cc/0NGtLXjd/file-000000002a50720ab566c5ef52ba0cca.png" alt="Game 3" loading="eager" fetchpriority="high" decoding="async">
+            </div>
+          </div>
+          <div class="game-card" data-game="game4">
+            <div class="game-card-inner">
+              <img src="https://i.postimg.cc/g09hvYYH/file-0000000026b0720abb6fa8ad25c26b19.png" alt="Game 4" loading="lazy" decoding="async">
+            </div>
+          </div>
+          <div class="game-card" data-game="game5" data-target="dice">
+            <div class="game-card-inner">
+              <img src="https://i.postimg.cc/y6DGNPrb/file-00000000c758724397b1a7113c45ee42.png" alt="Game 5" loading="lazy" decoding="async">
+            </div>
+          </div>
+          <div class="game-card" data-game="game6" data-target="crash">
+            <div class="game-card-inner">
+              <img src="https://i.postimg.cc/JhcLPqWX/file-00000000ee28720ab4f360ea80a3752f.png" alt="Crash" loading="lazy" decoding="async">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="slots-section">
+        <div class="slots-header">
+          <span class="slots-title">Слоты</span>
+        </div>
+        <div class="slots-scroll" id="slotsScroll">
+          <div class="slot-card" data-slot="slot1">
+            <div class="slot-card-inner">
+              <img src="https://i.postimg.cc/bvPHy2Tj/file-000000003050724685646ed6faf61e24.png" alt="Slot 1" loading="eager" fetchpriority="high" decoding="async">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="games-section">
+        <div class="games-header">
+          <span class="games-title">Карточные игры</span>
+        </div>
+        <div class="games-scroll" id="cardGamesScroll">
+          <div class="game-card cardgame-card" data-cardgame="blackjack">
+            <div class="game-card-inner">
+              <img src="https://i.postimg.cc/7LL6RN33/file-000000002a3072439b55a7bddebe57ac.png" alt="Blackjack" loading="eager" fetchpriority="high" decoding="async">
+            </div>
+          </div>
+          <div class="game-card cardgame-card" data-cardgame="redblack">
+            <div class="game-card-inner">
+              <img src="https://i.postimg.cc/KzL1CzBx/file-000000006b147246a0e4e420fbe0eba2.png" alt="RedBlack" loading="eager" fetchpriority="high" decoding="async">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="project-footer">
+        <div class="project-footer-head">
+          <div class="project-brand">
+            <img
+              class="project-footer-logo"
+              src="https://i.postimg.cc/qvL497mF/Picsart-26-02-27-02-02-37-502.png"
+              alt="Vezus Game"
+              loading="lazy"
+              decoding="async"
+            >
+            <div class="project-footer-meta">
+              <div class="project-footer-title">Vezus Game</div>
+            </div>
+          </div>
+          <div class="project-footer-badge">18+</div>
+        </div>
+
+        <div class="project-footer-warning">
+          <div class="project-footer-warning-chip">Ответственная игра</div>
+          <p class="project-footer-warning-text">
+            <strong>Предупреждение:</strong> азартные игры могут вызывать зависимость и приводить к финансовым потерям. Играйте ответственно, воспринимайте участие только как развлечение и не используйте для игры средства, потеря которых критична для вас.
+          </p>
+        </div>
+
+        <div class="project-footer-divider" aria-hidden="true"></div>
+
+        <div class="project-footer-bottom">
+          <div class="project-footer-note">Проект создан в 2026 году · Только для совершеннолетних</div>
+          <div class="project-footer-copy">© 2026 Vezus Game</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="menu-overlay" id="menuOverlay" aria-hidden="true">
+    <div class="menu-sheet" role="dialog" aria-modal="true" aria-label="Меню">
+      <div class="menu-sheet-head">
+        <p class="sheet-title">Меню</p>
+        <button class="menu-close" id="menuClose" aria-label="Закрыть меню">✕</button>
+      </div>
+
+      <div class="profile-block" id="menuProfileBlock">
+        <div class="profile-avatar" id="profileAvatar">?</div>
+        <div class="profile-info">
+          <div class="profile-name" id="profileName">Загрузка...</div>
+          <div class="profile-id" id="profileId">Telegram ID</div>
+        </div>
+        <div class="profile-chevron">›</div>
+      </div>
+
+      <div class="menu-grid">
+        <button class="menu-card" data-action="vouchers">
+          <span class="menu-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24">
+              <path d="M3 9V6a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v3"></path>
+              <path d="M21 15v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-3"></path>
+              <path d="M3 9h18v6H3z"></path>
+              <path d="M12 9v6"></path>
+            </svg>
+          </span>
+          <span class="menu-card-title">Ваучеры</span>
+        </button>
+
+        <button class="menu-card" data-action="partner">
+          <span class="menu-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24">
+              <path d="M10 13a5 5 0 0 0 7.07 0l2.83-2.83a5 5 0 0 0-7.07-7.07L10.59 5.3"></path>
+              <path d="M14 11a5 5 0 0 0-7.07 0L4.1 13.83a5 5 0 1 0 7.07 7.07L13.41 18.7"></path>
+            </svg>
+          </span>
+          <span class="menu-card-title">Партнёрская программа</span>
+        </button>
+
+        <button class="menu-card" data-action="rules">
+          <span class="menu-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+              <line x1="16" y1="13" x2="8" y2="13"></line>
+              <line x1="16" y1="17" x2="8" y2="17"></line>
+              <polyline points="10 9 9 9 8 9"></polyline>
+            </svg>
+          </span>
+          <span class="menu-card-title">Правила</span>
+        </button>
+
+        <button class="menu-card" data-action="history">
+          <span class="menu-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24">
+              <path d="M3 12a9 9 0 1 0 3-6.7"></path>
+              <path d="M3 3v6h6"></path>
+              <path d="M12 7v5l3 3"></path>
+            </svg>
+          </span>
+          <span class="menu-card-title">История</span>
+        </button>
+      </div>
+
+      <div class="menu-footer">
+        <div class="support-footer-btn" id="menuSupportBtn">
+          <span class="support-icon" aria-hidden="true">
+            <img src="https://i.postimg.cc/B6Tct9DC/telegram-logo-telegram-social-media-icon-free-png.png" alt="Telegram">
+          </span>
+          <div class="support-footer-text">
+            <span class="support-footer-title">Техническая поддержка</span>
+            <span class="support-footer-sub">24/7 · Telegram</span>
+          </div>
+          <div class="support-chevron">›</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="support-overlay" id="supportOverlay" aria-hidden="true">
+    <div class="support-card" role="dialog" aria-modal="true" aria-label="Поддержка">
+      <div class="support-head">
+        <div class="support-title">Поддержка</div>
+        <button class="support-x" id="supportClose" aria-label="Закрыть">✕</button>
+      </div>
+      <div class="support-body">
+        <p class="support-text">
+          Нажми кнопку ниже — откроется Telegram чат поддержки:
+          <b>@VezusGameMan</b>
+        </p>
+        <button class="tg-btn" id="goTelegram" aria-label="Перейти в Telegram">
+          <svg class="tg-ico" viewBox="0 0 240 240" aria-hidden="true">
+            <path fill="#fff" d="M120 0C53.7 0 0 53.7 0 120s53.7 120 120 120 120-53.7 120-120S186.3 0 120 0zm58.7 82.3l-19.7 92.8c-1.5 6.6-5.4 8.2-10.9 5.1l-30.2-22.3-14.6 14c-1.6 1.6-3 3-6.1 3l2.2-31.6 57.5-52c2.5-2.2-.5-3.4-3.9-1.2l-71 44.7-30.6-9.6c-6.6-2.1-6.7-6.6 1.4-9.7l119.6-46.1c5.5-2 10.3 1.3 8.8 9.9z"/>
+          </svg>
+          Перейти в Telegram
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="channel-overlay" id="channelOverlay" aria-hidden="true">
+    <div class="channel-card" role="dialog" aria-modal="true" aria-label="Telegram канал">
+      <div class="channel-head">
+        <div class="channel-title">Наш Telegram канал</div>
+        <button class="channel-x" id="channelClose" aria-label="Закрыть">✕</button>
+      </div>
+      <div class="channel-body">
+        <p class="channel-text">
+          Нажми кнопку ниже — откроется наш Telegram канал:
+          <b>@VezusGame</b>
+        </p>
+        <button class="tg-btn" id="goChannel" aria-label="Перейти в Telegram канал">
+          <svg class="tg-ico" viewBox="0 0 240 240" aria-hidden="true">
+            <path fill="#fff" d="M120 0C53.7 0 0 53.7 0 120s53.7 120 120 120 120-53.7 120-120S186.3 0 120 0zm58.7 82.3l-19.7 92.8c-1.5 6.6-5.4 8.2-10.9 5.1l-30.2-22.3-14.6 14c-1.6 1.6-3 3-6.1 3l2.2-31.6 57.5-52c2.5-2.2-.5-3.4-3.9-1.2l-71 44.7-30.6-9.6c-6.6-2.1-6.7-6.6 1.4-9.7l119.6-46.1c5.5-2 10.3 1.3 8.8 9.9z"/>
+          </svg>
+          Перейти в Telegram канал
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast" aria-live="polite" aria-atomic="true">
+    <div class="box" id="toastText">В разработке</div>
+  </div>
+
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+  <script>
+    const VERIFY_URL = "https://lazrfierfbhwlduqlvws.functions.supabase.co/verify-telegram";
+
+    const FILES = {
+      wallet: 'wallet.html',
+      profile: 'profile.html',
+      games: 'games.html',
+      shop: 'ucshop.html',
+      custom: 'custom.html',
+      vouchers: 'vouchers.html',
+      referral: 'referral.html',
+      history: 'history.html',
+      rules: 'rules.html',
+      partner: 'partner.html',
+      bonus: 'bonus.html',
+      fortune: 'fortune.html',
+      coinflip: 'coinflip.html',
+      mines: 'mines.html',
+      cups: 'cups.html',
+      blackjack: 'blackjack.html',
+      redblack: 'redblack.html',
+      candyslot: 'candyslot.html',
+      dice: 'dice.html',
+      crash: 'crash.html'
+    };
+
+    const CRITICAL_IMAGES = [
+      'https://i.postimg.cc/JhbwvzVv/Picsart-26-03-31-20-59-31-499.jpg',
+      'https://i.postimg.cc/504zTgk5/Picsart-26-03-31-23-00-57-125.png',
+      'https://i.postimg.cc/Hky2HSWQ/Picsart-26-03-31-22-36-47-515.jpg',
+      'https://i.postimg.cc/5ty3kKwP/file-00000000b6c0720aade148f488408e9f.png',
+      'https://i.postimg.cc/fb0KN2bS/file-0000000046bc7243b5dff7c0706b4f56.png',
+      'https://i.postimg.cc/0NGtLXjd/file-000000002a50720ab566c5ef52ba0cca.png',
+      'https://i.postimg.cc/g09hvYYH/file-0000000026b0720abb6fa8ad25c26b19.png',
+      'https://i.postimg.cc/y6DGNPrb/file-00000000c758724397b1a7113c45ee42.png',
+      'https://i.postimg.cc/JhcLPqWX/file-00000000ee28720ab4f360ea80a3752f.png',
+      'https://i.postimg.cc/bvPHy2Tj/file-000000003050724685646ed6faf61e24.png',
+      'https://i.postimg.cc/7LL6RN33/file-000000002a3072439b55a7bddebe57ac.png',
+      'https://i.postimg.cc/KzL1CzBx/file-000000006b147246a0e4e420fbe0eba2.png'
+    ];
+
+    function warmImageCache() {
+      CRITICAL_IMAGES.forEach((src) => {
+        const img = new Image();
+        img.decoding = 'async';
+        img.loading = 'eager';
+        img.src = src;
+      });
+    }
+
+    const passwordOverlay = document.getElementById('passwordOverlay');
+    const appRoot = document.getElementById('appRoot');
+    const passwordInput = document.getElementById('passwordInput');
+    const passwordSubmit = document.getElementById('passwordSubmit');
+    const passwordError = document.getElementById('passwordError');
+
+    function checkAuth() {
+      const authenticated = sessionStorage.getItem('authenticated') === 'true';
+      if (authenticated) {
+        passwordOverlay.style.display = 'none';
+        appRoot.style.display = 'block';
+        document.body.style.overflow = 'auto';
+      } else {
+        passwordOverlay.style.display = 'flex';
+        appRoot.style.display = 'none';
+        document.body.style.overflow = 'hidden';
+      }
+    }
+
+    function submitPassword() {
+      const entered = passwordInput.value.trim();
+      if (entered === '228') {
+        sessionStorage.setItem('authenticated', 'true');
+        checkAuth();
+        initApp();
+      } else {
+        passwordError.textContent = 'Неверный пароль';
+        passwordInput.value = '';
+        passwordInput.focus();
+      }
+    }
+
+    passwordSubmit.addEventListener('click', submitPassword);
+    passwordInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') submitPassword();
+    });
+
+    checkAuth();
+
+    const balanceValueEl = document.getElementById('balanceValue');
+    const balanceChipEl  = document.getElementById('balanceChip');
+
+    const profileAvatar = document.getElementById('profileAvatar');
+    const profileName = document.getElementById('profileName');
+    const profileId = document.getElementById('profileId');
+    const menuProfileBlock = document.getElementById('menuProfileBlock');
+    const menuSupportBtn = document.getElementById('menuSupportBtn');
+
+    const toastEl = document.getElementById('toast');
+    const toastTextEl = document.getElementById('toastText');
+    let toastTimer = null;
+
+    function showToast(text, ms = 1700){
+      toastTextEl.textContent = text;
+      toastEl.classList.add('show');
+      try{
+        if (window.Telegram?.WebApp?.HapticFeedback?.impactOccurred) {
+          Telegram.WebApp.HapticFeedback.impactOccurred('light');
+        }
+      }catch{}
+      if (toastTimer) clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => toastEl.classList.remove('show'), ms);
+    }
+
+    function clamp(n, min, max) {
+      return Math.max(min, Math.min(max, n));
+    }
+
+    function formatBalance(value) {
+      const num = Number(value ?? 0);
+      if (!Number.isFinite(num)) return '0 ₽';
+      const formatted = Number.isInteger(num) ? num : num.toFixed(2);
+      return `${formatted} ₽`;
+    }
+
+    function loadCachedProfile() {
+      try {
+        const raw = localStorage.getItem('tg_profile');
+        if (!raw) return null;
+        return JSON.parse(raw);
+      } catch { return null; }
+    }
+
+    function applyProfile(profile) {
+      if (!profile) return;
+      localStorage.setItem('tg_profile', JSON.stringify(profile));
+      balanceValueEl.textContent = formatBalance(profile.balance);
+    }
+
+    function getStartParam() {
+      try {
+        const tgStart = (window.Telegram?.WebApp?.initDataUnsafe?.start_param || '').trim();
+        if (tgStart) return tgStart.toUpperCase();
+        const url = new URL(window.location.href);
+        const q1 = (url.searchParams.get('tgWebAppStartParam') || '').trim();
+        if (q1) return q1.toUpperCase();
+        const q2 = (url.searchParams.get('startapp') || '').trim();
+        if (q2) return q2.toUpperCase();
+        const q3 = (url.searchParams.get('ref') || '').trim();
+        if (q3) return q3.toUpperCase();
+        return '';
+      } catch { return ''; }
+    }
+
+    function clearStartParamsFromUrl() {
+      try {
+        const url = new URL(window.location.href);
+        url.searchParams.delete('tgWebAppStartParam');
+        url.searchParams.delete('startapp');
+        url.searchParams.delete('ref');
+        history.replaceState({}, '', `${url.pathname}${url.search}${url.hash}`);
+      } catch {}
+    }
+
+    async function autoAuthTelegram() {
+      const cached = loadCachedProfile();
+      if (cached) applyProfile(cached);
+      else balanceValueEl.textContent = '0 ₽';
+
+      if (!window.Telegram || !window.Telegram.WebApp) return;
+
+      try {
+        Telegram.WebApp.ready();
+        if (typeof Telegram.WebApp.expand === 'function') Telegram.WebApp.expand();
+        if (typeof Telegram.WebApp.setHeaderColor === 'function') Telegram.WebApp.setHeaderColor('#020617');
+      } catch {}
+
+      const initData = Telegram.WebApp.initData;
+      if (!initData) return;
+
+      const refCode = getStartParam();
+      balanceValueEl.textContent = '...';
+
+      try {
+        const res = await fetch(VERIFY_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ initData, refCode })
+        });
+        const json = await res.json().catch(() => ({}));
+        if (!res.ok || !json.ok || !json.profile) {
+          if (cached) applyProfile(cached);
+          else balanceValueEl.textContent = '0 ₽';
+          return;
+        }
+        applyProfile(json.profile);
+        if (json.referral) localStorage.setItem('tg_referral', JSON.stringify(json.referral));
+        if (refCode) clearStartParamsFromUrl();
+      } catch {
+        if (cached) applyProfile(cached);
+        else balanceValueEl.textContent = '0 ₽';
+      }
+    }
+
+    function goTo(file){ window.location.href = file; }
+
+    function openTelegramLinkSafe(url){
+      if (window.Telegram?.WebApp?.openTelegramLink) window.Telegram.WebApp.openTelegramLink(url);
+      else window.open(url, '_blank', 'noopener');
+    }
+
+    function updateMenuProfile() {
+      if (!window.Telegram?.WebApp) return;
+      const user = window.Telegram.WebApp.initDataUnsafe?.user;
+      if (!user) {
+        profileAvatar.textContent = '?';
+        profileAvatar.style.background = '#2f3542';
+        profileName.textContent = 'Гость';
+        profileId.innerHTML = '<span>не авторизован</span>';
+        return;
+      }
+      let firstName = user.first_name || '';
+      let lastName = user.last_name || '';
+      let fullName = (firstName + ' ' + lastName).trim() || 'Пользователь';
+      profileName.textContent = fullName;
+      let idText = user.username ? '@' + user.username : 'ID ' + user.id;
+      profileId.innerHTML = `<span>${idText}</span>`;
+      if (user.photo_url) {
+        profileAvatar.innerHTML = '';
+        profileAvatar.style.background = 'transparent';
+        const img = document.createElement('img');
+        img.src = user.photo_url;
+        img.alt = 'avatar';
+        img.style.width = '100%';
+        img.style.height = '100%';
+        img.style.borderRadius = '50%';
+        img.style.objectFit = 'cover';
+        profileAvatar.appendChild(img);
+      } else {
+        profileAvatar.innerHTML = '';
+        profileAvatar.style.background = '#2f3542';
+        let initials = (firstName.charAt(0) + (lastName.charAt(0) || '')).toUpperCase() || '?';
+        profileAvatar.textContent = initials;
+        profileAvatar.style.display = 'flex';
+        profileAvatar.style.alignItems = 'center';
+        profileAvatar.style.justifyContent = 'center';
+      }
+    }
+
+    balanceChipEl.addEventListener('click', () => goTo(FILES.wallet));
+
+    appRoot.addEventListener('click', (e) => {
+      const card = e.target.closest('.game-card, .slot-card');
+      if (!card) return;
+
+      const isGames = card.closest('#gamesScroll') !== null;
+      const isCardGames = card.closest('#cardGamesScroll') !== null;
+      const isSlots = card.closest('#slotsScroll') !== null;
+
+      if (isGames) {
+        const allGamesCards = Array.from(document.querySelectorAll('#gamesScroll .game-card'));
+        const index = allGamesCards.indexOf(card);
+
+        if (index === 0) goTo(FILES.coinflip);
+        else if (index === 1) goTo(FILES.mines);
+        else if (index === 2) goTo(FILES.cups);
+        else if (index === 3) goTo('platform.html');
+        else if (index === 4) goTo(FILES.dice);
+        else if (index === 5) goTo(FILES.crash);
+        else showToast('В разработке', 1500);
+
+        return;
+      }
+
+      if (isCardGames) {
+        const allCardGameCards = Array.from(document.querySelectorAll('#cardGamesScroll .game-card'));
+        const index = allCardGameCards.indexOf(card);
+
+        if (index === 0) goTo(FILES.blackjack);
+        else if (index === 1) goTo(FILES.redblack);
+        else showToast('В разработке', 1500);
+
+        return;
+      }
+
+      if (isSlots) {
+        const slotName = card.dataset.slot;
+
+        if (slotName === 'slot1') {
+          goTo(FILES.candyslot);
+        } else {
+          showToast('В разработке', 1500);
+        }
+
+        return;
+      }
+    });
+
+    const slideBtns = document.querySelectorAll('.slide-btn');
+    slideBtns.forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const bannerType = btn.getAttribute('data-banner');
+
+        if (bannerType === 'fortune') {
+          if (FILES.fortune) goTo(FILES.fortune);
+          else showToast('Колесо фортуны — скоро', 1500);
+        } else if (bannerType === 'bonus') {
+          if (FILES.bonus) goTo(FILES.bonus);
+          else showToast('Бонусы — скоро', 1500);
+        } else if (bannerType === 'wallet') {
+          goTo(FILES.wallet);
+        }
+      });
+    });
+
+    const slides = document.getElementById('slides');
+    const dotsWrap = document.getElementById('dots');
+    const dots = Array.from(dotsWrap.querySelectorAll('.dot'));
+
+    function getStep(){
+      const first = slides.querySelector('.slide');
+      if (!first) return slides.clientWidth || 1;
+      const w = first.getBoundingClientRect().width || 1;
+      const gap = parseFloat(getComputedStyle(slides).gap || '0') || 0;
+      return w + gap;
+    }
+
+    function getCurrentIndex(){
+      const step = getStep();
+      return clamp(Math.round(slides.scrollLeft / step), 0, dots.length - 1);
+    }
+
+    function updateDotsByScroll(){
+      const idx = getCurrentIndex();
+      dots.forEach((d, i) => d.classList.toggle('active', i === idx));
+    }
+
+    let rafId = null;
+    slides.addEventListener('scroll', () => {
+      if (rafId) return;
+      rafId = requestAnimationFrame(() => {
+        updateDotsByScroll();
+        rafId = null;
+      });
+    }, { passive:true });
+
+    dots.forEach((dot, i) => {
+      dot.addEventListener('click', () => slides.scrollTo({
+        left: i * getStep(),
+        behavior: 'smooth'
+      }));
+    });
+
+    window.addEventListener('resize', updateDotsByScroll);
+
+    const AUTOPLAY_DELAY = 5000;
+    const RESUME_DELAY = 3500;
+    let autoplayInterval = null;
+    let resumeTimeout = null;
+
+    function stopAutoplay(){
+      if(autoplayInterval) clearInterval(autoplayInterval);
+      autoplayInterval = null;
+    }
+
+    function startAutoplay(){
+      if(dots.length <= 1 || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+      stopAutoplay();
+      autoplayInterval = setInterval(() => {
+        const next = (getCurrentIndex() + 1) % dots.length;
+        slides.scrollTo({ left: next * getStep(), behavior: 'smooth' });
+      }, AUTOPLAY_DELAY);
+    }
+
+    function pauseAndResume(){
+      stopAutoplay();
+      if(resumeTimeout) clearTimeout(resumeTimeout);
+      resumeTimeout = setTimeout(startAutoplay, RESUME_DELAY);
+    }
+
+    ['pointerdown', 'touchstart', 'mousedown', 'wheel'].forEach(evt => {
+      slides.addEventListener(evt, pauseAndResume, { passive:true });
+    });
+
+    document.addEventListener('visibilitychange', () => {
+      document.hidden ? stopAutoplay() : startAutoplay();
+    });
+
+    const menuBtn = document.getElementById('menuBtn');
+    const menuOverlay = document.getElementById('menuOverlay');
+    const menuClose = document.getElementById('menuClose');
+
+    function openMenu(){
+      updateMenuProfile();
+      menuOverlay.classList.add('show');
+      menuOverlay.setAttribute('aria-hidden', 'false');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeMenu(){
+      menuOverlay.classList.remove('show');
+      menuOverlay.setAttribute('aria-hidden', 'true');
+      document.body.style.overflow = '';
+    }
+
+    menuBtn.addEventListener('click', openMenu);
+    menuClose.addEventListener('click', closeMenu);
+    menuOverlay.addEventListener('click', (e) => {
+      if (e.target === menuOverlay) closeMenu();
+    });
+
+    menuProfileBlock.addEventListener('click', () => {
+      closeMenu();
+      goTo(FILES.profile);
+    });
+
+    menuSupportBtn.addEventListener('click', () => {
+      closeMenu();
+      openSupport();
+    });
+
+    const supportOverlay = document.getElementById('supportOverlay');
+    const supportClose = document.getElementById('supportClose');
+    const goTelegram = document.getElementById('goTelegram');
+
+    function openSupport(){
+      supportOverlay.classList.add('show');
+      supportOverlay.setAttribute('aria-hidden', 'false');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeSupport(){
+      supportOverlay.classList.remove('show');
+      supportOverlay.setAttribute('aria-hidden', 'true');
+      document.body.style.overflow = '';
+    }
+
+    supportClose.addEventListener('click', closeSupport);
+    supportOverlay.addEventListener('click', (e) => {
+      if (e.target === supportOverlay) closeSupport();
+    });
+    goTelegram.addEventListener('click', () => openTelegramLinkSafe('https://t.me/VezusGameMan'));
+
+    const brandLogoBtn = document.getElementById('brandLogoBtn');
+    const channelOverlay = document.getElementById('channelOverlay');
+    const channelClose = document.getElementById('channelClose');
+    const goChannel = document.getElementById('goChannel');
+
+    function openChannel(){
+      channelOverlay.classList.add('show');
+      channelOverlay.setAttribute('aria-hidden', 'false');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeChannel(){
+      channelOverlay.classList.remove('show');
+      channelOverlay.setAttribute('aria-hidden', 'true');
+      document.body.style.overflow = '';
+    }
+
+    brandLogoBtn.addEventListener('click', openChannel);
+    channelClose.addEventListener('click', closeChannel);
+    channelOverlay.addEventListener('click', (e) => {
+      if (e.target === channelOverlay) closeChannel();
+    });
+    goChannel.addEventListener('click', () => openTelegramLinkSafe('https://t.me/+VtANADHpNP42YjQ6'));
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        closeSupport();
+        closeMenu();
+        closeChannel();
+      }
+    });
+
+    document.querySelectorAll('.menu-card').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const action = btn.getAttribute('data-action');
+
+        if (action === 'partner') {
+          closeMenu();
+          showToast('Партнёрская программа — в разработке', 1800);
+          return;
+        }
+
+        closeMenu();
+
+        if (action === 'vouchers') return goTo(FILES.vouchers);
+        if (action === 'history') return goTo(FILES.history);
+        if (action === 'rules') return goTo(FILES.rules);
+      });
+    });
+
+    function initApp() {
+      updateDotsByScroll();
+      startAutoplay();
+      autoAuthTelegram();
+      updateMenuProfile();
+      warmImageCache();
+    }
+
+    if (sessionStorage.getItem('authenticated') === 'true') {
+      initApp();
+    }
+  </script>
+</body>
+</html>
