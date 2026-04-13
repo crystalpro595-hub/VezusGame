@@ -1,0 +1,3249 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Honey Slot</title>
+
+  <link rel="preconnect" href="https://i.postimg.cc" crossorigin>
+  <link rel="dns-prefetch" href="https://i.postimg.cc">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --bg:url('https://i.postimg.cc/265qBRGM/file-00000000106c71f6be454d5fc27b9083.png');
+      --text:#fff6df;
+      --muted:rgba(255,245,220,.78);
+      --safe-top:env(safe-area-inset-top,0px);
+      --safe-bottom:env(safe-area-inset-bottom,0px);
+      --cols:6;
+      --rows:5;
+      --gap:8px;
+      --cell:60px;
+      --board-h:332px;
+      --board-w:392px;
+    }
+
+    *{ box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+    html,body{ margin:0; min-height:100%; font-family:'Inter',sans-serif; color:var(--text); }
+    body{ background:#2a1200; overflow:hidden; }
+
+    body::before,
+    body::after{
+      content:"";
+      position:fixed;
+      inset:0;
+      pointer-events:none;
+    }
+    body::before{
+      background:
+        linear-gradient(180deg, rgba(16,7,0,.18), rgba(16,7,0,.64) 66%, rgba(16,7,0,.84)),
+        var(--bg) center/cover no-repeat;
+      transform:scale(1.03);
+      filter:saturate(1.04) contrast(1.02);
+    }
+    body::after{
+      background:
+        radial-gradient(72vw 42vh at 50% 22%, rgba(255,233,162,.28), transparent 65%),
+        radial-gradient(48vw 30vh at 50% 85%, rgba(255,152,32,.16), transparent 70%);
+      mix-blend-mode:screen;
+    }
+
+    .preloader {
+      position: fixed; inset: 0; z-index: 9999;
+      display: flex; align-items: center; justify-content: center; padding: 24px;
+      background: radial-gradient(900px 520px at 20% 10%, rgba(196,181,253,0.16), transparent 56%),
+                  radial-gradient(760px 460px at 80% 20%, rgba(129,140,248,0.16), transparent 54%),
+                  linear-gradient(180deg, #4c1d95 0%, #2e1065 46%, #14072b 100%);
+      transition: opacity 0.35s ease, visibility 0.35s ease;
+    }
+    .preloader.hide {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+    .preloader-inner {
+      width: min(320px, 86vw);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 18px;
+    }
+    .preloader-logo-wrap {
+      width: min(170px, 56vw);
+      display: flex;
+      justify-content: center;
+      position: relative;
+      padding: 10px;
+    }
+    .preloader-logo-wrap::before {
+      content: "";
+      position: absolute;
+      left: 50%;
+      bottom: 6px;
+      width: 74%;
+      height: 18px;
+      transform: translateX(-50%);
+      border-radius: 999px;
+      background: radial-gradient(ellipse at center, rgba(0,0,0,0.42), rgba(0,0,0,0) 72%);
+      animation: loaderShadow 0.62s ease-in-out infinite;
+    }
+    .preloader-logo {
+      width: 100%;
+      height: auto;
+      display: block;
+      position: relative;
+      z-index: 2;
+      filter: drop-shadow(0 16px 26px rgba(0,0,0,0.30)) drop-shadow(0 0 22px rgba(167,139,250,0.18));
+      transform-origin: center bottom;
+      animation: logoBounce 0.62s ease-in-out infinite;
+      user-select: none;
+    }
+    .preloader-bar {
+      width: 100%;
+      height: 12px;
+      padding: 2px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.10);
+      border: 1px solid rgba(255,255,255,0.12);
+      overflow: hidden;
+    }
+    .preloader-fill {
+      width: 0%;
+      height: 100%;
+      border-radius: 999px;
+      background: linear-gradient(90deg, #c084fc, #8b5cf6, #60a5fa);
+      box-shadow: 0 0 14px rgba(192,132,252,0.34);
+      transition: width 0.18s ease;
+    }
+    .preloader-hint {
+      font-size: 12px;
+      font-weight: 900;
+      color: rgba(234,241,255,0.86);
+      text-shadow: 0 10px 18px rgba(0,0,0,0.35);
+    }
+    @keyframes logoBounce {
+      0% { transform: translateY(0) scale(1); }
+      40% { transform: translateY(-10px) scale(1.02); }
+      55% { transform: translateY(0) scale(1); }
+      70% { transform: translateY(-4px) scale(1.01); }
+      100% { transform: translateY(0) scale(1); }
+    }
+    @keyframes loaderShadow {
+      0% { transform: translateX(-50%) scaleX(0.96); opacity: 0.88; }
+      40% { transform: translateX(-50%) scaleX(1.06); opacity: 0.78; }
+      100% { transform: translateX(-50%) scaleX(0.96); opacity: 0.88; }
+    }
+
+    .app{
+      position:relative;
+      z-index:1;
+      min-height:100vh;
+      padding: calc(12px + var(--safe-top)) 14px calc(18px + var(--safe-bottom));
+      display:flex;
+      justify-content:center;
+    }
+    .content{
+      width:min(470px, 100%);
+      display:flex;
+      flex-direction:column;
+      gap:16px;
+    }
+
+    .sticky-top{
+      position:sticky;
+      top:calc(8px + var(--safe-top));
+      z-index:40;
+    }
+    .top-row{
+      display:grid;
+      grid-template-columns:40px minmax(0,1fr) 56px;
+      gap:10px;
+      align-items:center;
+      padding:10px 12px;
+      border-radius:24px;
+      background:rgba(255,255,255,.08);
+      border:1px solid rgba(255,255,255,.10);
+      box-shadow:0 10px 34px rgba(0,0,0,.18), inset 0 1px 0 rgba(255,255,255,.08);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+    .icon-btn{
+      width:40px;
+      height:40px;
+      border-radius:14px;
+      background: rgba(255,255,255,.16);
+      border:1px solid rgba(255,255,255,.22);
+      box-shadow: 0 10px 18px rgba(128,68,156,.12), inset 0 1px 0 rgba(255,255,255,.18);
+      display:grid;
+      place-items:center;
+      color:var(--text);
+      cursor:pointer;
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      padding:0;
+      font-size:16px;
+      font-weight:900;
+    }
+    .icon-btn:active,
+    .action-btn:active,
+    .sheet-close:active,
+    .bet-chip:active{ transform:scale(.98); }
+    .balance-mini{
+      width:100%;
+      min-width:0;
+      height:38px;
+      border-radius:999px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:6px;
+      padding:5px 6px 5px 10px;
+      position:relative;
+      overflow:hidden;
+      background: rgba(255,255,255,.16);
+      border:1px solid rgba(255,255,255,.22);
+      box-shadow: 0 12px 24px rgba(128,68,156,.12), inset 0 1px 0 rgba(255,255,255,.18);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+    }
+    .balance-mini::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      background:
+        radial-gradient(140px 50px at 0% 0%, rgba(255,255,255,.05), transparent 55%),
+        radial-gradient(140px 50px at 100% 100%, rgba(255,255,255,.03), transparent 55%);
+      pointer-events:none;
+    }
+    .bal-title,.bal-amount{ position:relative; z-index:1; }
+    .bal-title{ font-size:11px; font-weight:900; color: rgba(234,241,255,.92); white-space:nowrap; }
+    .bal-amount{ min-width:108px; height:28px; border-radius:999px; padding:0 12px; display:flex; align-items:center; justify-content:center; background:linear-gradient(180deg, rgba(255,255,255,.18), rgba(255,255,255,.08)); color: rgba(234,241,255,.98); font-weight:900; font-size:12px; white-space:nowrap; pointer-events:none; }
+    .logo-badge{ width:56px; height:56px; display:flex; align-items:center; justify-content:center; pointer-events:none; user-select:none; }
+    .logo-badge img{ width:100%; height:100%; object-fit:contain; filter: drop-shadow(0 6px 22px rgba(0,0,0,.18)); }
+
+    .board-card{ position:relative; padding:98px 0 0; background:none; border:none; box-shadow:none; overflow:visible; display:flex; justify-content:center; }
+    .board-frame{
+      position:relative;
+      width:fit-content;
+      margin:0 auto;
+      border-radius:38px;
+      padding:14px;
+      background:
+        radial-gradient(circle at 50% -6%, rgba(255,245,204,.34), transparent 36%),
+        radial-gradient(circle at 0% 50%, rgba(255,195,88,.14), transparent 36%),
+        radial-gradient(circle at 100% 50%, rgba(255,180,74,.14), transparent 36%),
+        linear-gradient(180deg, rgba(255,214,101,.30), rgba(255,155,40,.18) 26%, rgba(61,26,0,.82) 100%),
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='108' height='93.53' viewBox='0 0 108 93.53'%3E%3Cg fill='none' stroke='rgba(255,214,110,0.18)' stroke-width='1.5'%3E%3Cpath d='M27 1l26 15v31L27 62 1 47V16z'/%3E%3Cpath d='M81 1l26 15v31L81 62 55 47V16z'/%3E%3Cpath d='M27 32l26 15v31L27 93 1 78V47z'/%3E%3Cpath d='M81 32l26 15v31L81 93 55 78V47z'/%3E%3C/g%3E%3C/svg%3E") center/108px 93.53px repeat;
+      border:1px solid rgba(255,234,184,.46);
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.24),
+        inset 0 0 0 2px rgba(255,204,96,.14),
+        inset 0 -24px 38px rgba(62,24,0,.48),
+        0 22px 38px rgba(0,0,0,.34),
+        0 0 0 1px rgba(255,194,92,.12),
+        0 0 34px rgba(255,174,56,.18);
+      overflow:hidden;
+      isolation:isolate;
+    }
+    .board-frame::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      border-radius:inherit;
+      pointer-events:none;
+      background:
+        radial-gradient(circle at 0 0, rgba(255,242,194,.12), transparent 22%),
+        radial-gradient(circle at 100% 0, rgba(255,201,88,.14), transparent 24%),
+        radial-gradient(circle at 0 100%, rgba(255,176,54,.14), transparent 24%),
+        radial-gradient(circle at 100% 100%, rgba(255,232,170,.12), transparent 24%),
+        linear-gradient(90deg, transparent 0%, rgba(255,220,132,.08) 50%, transparent 100%);
+      mix-blend-mode:screen;
+      z-index:1;
+    }
+    .board-frame::after{
+      content:"";
+      position:absolute;
+      inset:9px;
+      border-radius:28px;
+      border:1px solid rgba(255,238,198,.18);
+      box-shadow: inset 0 0 0 1px rgba(255,194,77,.08), inset 0 14px 22px rgba(255,220,138,.05);
+      pointer-events:none;
+      z-index:2;
+    }
+    .board-viewport{
+      position:relative;
+      width:var(--board-w);
+      border-radius:26px;
+      overflow:hidden;
+      min-height:var(--board-h);
+      height:var(--board-h);
+      background:
+        radial-gradient(circle at 50% 0%, rgba(255,246,212,.14), transparent 32%),
+        linear-gradient(180deg, rgba(46,17,0,.12), rgba(12,4,0,.34));
+      box-shadow: inset 0 0 0 1px rgba(255,209,109,.08);
+    }
+    .honeycomb-overlay{
+      position:absolute;
+      inset:0;
+      opacity:.86;
+      pointer-events:none;
+      z-index:0;
+      background:
+        radial-gradient(circle at 50% 0%, rgba(255,244,201,.16), transparent 34%),
+        linear-gradient(180deg, rgba(255,206,88,.08), rgba(255,140,18,.05) 36%, rgba(0,0,0,.12)),
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='96' height='83.14' viewBox='0 0 96 83.14'%3E%3Cg fill='none' stroke='rgba(255,214,110,0.34)' stroke-width='1.4'%3E%3Cpath d='M24 1l23 13.5v27L24 55 1 41.5v-27z'/%3E%3Cpath d='M72 1l23 13.5v27L72 55 49 41.5v-27z'/%3E%3Cpath d='M24 29l23 13.5v27L24 83 1 69.5v-27z'/%3E%3Cpath d='M72 29l23 13.5v27L72 83 49 69.5v-27z'/%3E%3C/g%3E%3C/svg%3E") center/96px 83.14px repeat;
+    }
+    .honey-grid{
+      position:absolute;
+      inset:0;
+      z-index:4;
+      pointer-events:none;
+      overflow:hidden;
+    }
+    .honey-cell{
+      position:absolute;
+      top:0;
+      left:0;
+      width:var(--cell);
+      height:var(--cell);
+      pointer-events:none;
+      opacity:1;
+      transform:translate3d(0,0,0);
+    }
+    .honey-cell::before,
+    .honey-cell::after{
+      display:none;
+    }
+    .honey-cell .honey-mult{
+      position:absolute;
+      right:1px;
+      top:1px;
+      min-width:24px;
+      height:18px;
+      padding:0 6px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:7.8px;
+      line-height:1;
+      font-weight:900;
+      letter-spacing:.01em;
+      color:#fff9f1;
+      text-shadow:0 1px 0 rgba(98,38,0,.34);
+      background:
+        radial-gradient(circle at 28% 22%, rgba(255,255,255,.55), transparent 32%),
+        linear-gradient(180deg, rgba(255,239,190,.98) 0%, rgba(255,201,92,.98) 42%, rgba(237,151,35,.98) 76%, rgba(177,87,12,.98) 100%);
+      border:1px solid rgba(255,244,214,.82);
+      box-shadow:
+        0 3px 8px rgba(72,28,0,.18),
+        inset 0 1px 0 rgba(255,255,255,.52),
+        inset 0 -1px 0 rgba(128,58,0,.26);
+      clip-path:polygon(18% 0, 82% 0, 100% 50%, 82% 100%, 18% 100%, 0 50%);
+      opacity:0;
+      transform:scale(.92);
+      transform-origin:100% 0;
+      transition:opacity .16s ease, transform .16s ease, filter .16s ease;
+      z-index:5;
+      pointer-events:none;
+      filter:saturate(1.08);
+      backdrop-filter:none;
+      -webkit-backdrop-filter:none;
+      overflow:hidden;
+    }
+    .honey-cell .honey-mult::before{
+      content:'';
+      position:absolute;
+      inset:1px;
+      clip-path:polygon(18% 0, 82% 0, 100% 50%, 82% 100%, 18% 100%, 0 50%);
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.28), rgba(255,255,255,0) 48%),
+        radial-gradient(circle at 50% 120%, rgba(115,47,0,.18), transparent 55%);
+      opacity:.9;
+      pointer-events:none;
+    }
+    .honey-cell .honey-mult > span,
+    .honey-cell .honey-mult{
+      isolation:isolate;
+    }
+    .honey-cell.active .honey-mult{
+      opacity:1;
+      transform:scale(1);
+    }
+    .honey-cell.charge .honey-mult{ animation:honeyBadgePulse .24s ease; }
+    .honey-cell.reset .honey-mult{ animation:honeyBadgeOut .18s ease forwards; }
+    .reels{
+      position:relative;
+      z-index:2;
+      width:100%;
+      height:100%;
+      overflow:hidden;
+      transform:translateZ(0);
+      contain:layout paint style;
+    }
+
+    .tile{
+      position:absolute;
+      top:0;
+      left:0;
+      width:var(--cell);
+      height:var(--cell);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      pointer-events:none;
+      z-index:1;
+      backface-visibility:hidden;
+      transform:translate3d(0,0,0);
+      will-change:transform;
+    }
+    .tile::before,
+    .tile::after{
+      display:none;
+    }
+    .tile img{
+      position:relative;
+      z-index:1;
+      width:92%;
+      height:92%;
+      object-fit:contain;
+      transition:transform .18s ease;
+      user-select:none;
+      -webkit-user-drag:none;
+      backface-visibility:hidden;
+      -webkit-backface-visibility:hidden;
+      transform:translateZ(0);
+      will-change:transform;
+      opacity:1;
+    }
+    .tile.win img{
+      transform:translateY(-1px) scale(1.05);
+    }
+    .tile.vanish{
+      opacity:1 !important;
+    }
+    .tile.vanish img{
+      animation:tileFadeOut .20s ease forwards;
+    }
+    .tile.pop img{ animation:tilePop .24s ease; }
+    @keyframes tilePop{ 0%{ transform:scale(.96); } 60%{ transform:scale(1.02); } 100%{ transform:scale(1); } }
+    @keyframes tileFadeOut{ 0%{ transform:scale(1); opacity:1; } 70%{ transform:scale(.96); opacity:1; } 100%{ transform:scale(.92); opacity:0; } }
+    @keyframes honeyBadgePulse{ 0%{ opacity:.96; transform:scale(1); filter:saturate(1.08); } 50%{ opacity:1; transform:scale(1.12); filter:saturate(1.18) brightness(1.04); } 100%{ opacity:1; transform:scale(1); filter:saturate(1.08); } }
+    @keyframes honeyBadgeOut{ 0%{ opacity:1; transform:scale(1); } 100%{ opacity:0; transform:scale(.9); } }
+
+    .top-feature-row,
+    .bonus-zone,
+    .win-card,
+    .controls-card{ position:relative; padding:0; background:none; border:none; box-shadow:none; overflow:visible; }
+
+    .top-feature-row{ display:none !important; }
+    .bonus-zone{
+      display:flex;
+      justify-content:flex-start;
+      min-width:0;
+    }
+    .bonus-buy-btn{
+      position:relative;
+      width:min(88px, 21vw);
+      padding:0;
+      border:none;
+      background:none;
+      display:block;
+      cursor:pointer;
+      opacity:1;
+      filter:saturate(1);
+    }
+    .bonus-buy-btn img{
+      width:100%;
+      height:auto;
+      display:block;
+      object-fit:contain;
+      filter:drop-shadow(0 10px 18px rgba(0,0,0,.14));
+      opacity:1;
+    }
+    .bonus-buy-btn .bonus-soon{
+      position:absolute;
+      right:7%;
+      top:50%;
+      transform:translateY(-50%);
+      padding:2px 5px;
+      border-radius:999px;
+      font-size:8px;
+      font-weight:900;
+      color:#fff8e8;
+      background:rgba(37,14,0,.52);
+      border:1px solid rgba(255,244,214,.18);
+      letter-spacing:.04em;
+      backdrop-filter:blur(6px);
+      -webkit-backdrop-filter:blur(6px);
+      text-transform:uppercase;
+    }
+    .controls-bonus-btn{
+      width:min(114px, 28vw);
+      flex:0 0 auto;
+      justify-self:end;
+      margin-left:0;
+      margin-bottom:2px;
+      transform:translate(-8px, -12px);
+    }
+    .controls-bonus-btn img{
+      opacity:.9;
+      filter:drop-shadow(0 10px 18px rgba(0,0,0,.14));
+    }
+    .controls-bonus-btn .bonus-soon{
+      font-size:7px;
+      padding:2px 4px;
+      right:8%;
+    }
+    .bonus-buy-btn:disabled{
+      cursor:not-allowed;
+      opacity:.72;
+      filter:grayscale(.08) brightness(.96);
+    }
+    .bonus-buy-btn:disabled img{
+      opacity:.9;
+    }
+
+    .win-card{
+      display:flex;
+      justify-content:flex-end;
+      min-width:0;
+      margin-bottom:2px;
+    }
+    .board-win-wrap{
+      position:absolute;
+      top:18px;
+      left:50%;
+      transform:translateX(-50%);
+      z-index:9;
+      pointer-events:none;
+      display:flex;
+      justify-content:center;
+      width:100%;
+    }
+    .win-banner-shell{
+      position:relative;
+      width:min(560px, 99vw);
+      display:block;
+      min-height:138px;
+      overflow:visible;
+    }
+    .board-card .win-banner{
+      width:100%;
+      margin:0 auto;
+      filter:drop-shadow(0 16px 26px rgba(0,0,0,.16));
+    }
+    .board-card .win-center{
+      padding:8px 22px 12px;
+    }
+    .win-banner{
+      position:relative;
+      width:min(434px, 92vw);
+      aspect-ratio:330 / 112;
+      display:block;
+      filter:drop-shadow(0 12px 26px rgba(0,0,0,.16));
+      user-select:none;
+      pointer-events:none;
+    }
+    .win-banner img{
+      width:100%;
+      height:100%;
+      object-fit:contain;
+      display:block;
+    }
+    .win-center{
+      position:absolute;
+      inset:0;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:8px 18px 12px;
+      text-align:center;
+    }
+    .spin-win-value{
+      min-width:132px;
+      height:24px;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      font-size:20px;
+      line-height:1;
+      font-weight:900;
+      color:#fff8e9;
+      text-shadow:0 2px 6px rgba(79,27,0,.18);
+      white-space:nowrap;
+      font-variant-numeric:tabular-nums;
+      font-feature-settings:"tnum" 1, "lnum" 1;
+      transform:translateY(3px);
+      will-change:opacity;
+    }
+    .spin-win-value.bump{
+      animation:winValuePulse .18s ease;
+    }
+    .win-bee{
+      position:absolute;
+      right:-4px;
+      top:-12px;
+      width:min(116px, 26vw);
+      height:auto;
+      display:block;
+      user-select:none;
+      pointer-events:none;
+      filter:drop-shadow(0 10px 16px rgba(0,0,0,.18));
+      transform-origin:center center;
+      animation:beeHover 2.2s ease-in-out infinite;
+      z-index:10;
+    }
+    .bonus-jar-wrap{
+      position:absolute;
+      left:-20px;
+      top:-6px;
+      width:min(116px, 28vw);
+      display:block;
+      z-index:11;
+      pointer-events:none;
+    }
+    .bonus-jar-btn{
+      position:relative;
+      width:100%;
+      padding:0;
+      border:none;
+      background:none;
+      display:block;
+      cursor:default;
+      pointer-events:auto;
+      user-select:none;
+      touch-action:manipulation;
+    }
+    .bonus-jar-btn img{
+      width:100%;
+      height:auto;
+      display:block;
+      object-fit:contain;
+      filter:drop-shadow(0 14px 24px rgba(0,0,0,.2));
+    }
+    .bonus-jar-btn.ready{
+      cursor:pointer;
+    }
+    .bonus-jar-btn.ready img{
+      animation:jarReadyPulse 1.1s ease-in-out infinite, jarReadyBlink 1.9s ease-in-out infinite;
+    }
+    .bonus-jar-btn.jar-bump img{
+      animation:jarBump .38s ease;
+    }
+    .bonus-jar-btn:disabled{
+      opacity:1;
+    }
+    .tile[data-symbol="bonus"] img{
+      animation:bonusGlow 1.7s ease-in-out infinite;
+      filter:drop-shadow(0 0 8px rgba(255,229,139,.42));
+    }
+    .tile.bonus-flying img{
+      opacity:.26 !important;
+      transform:scale(.92) !important;
+      transition:opacity .18s ease, transform .18s ease;
+    }
+    
+    .bonus-land-splash{
+      position:absolute;
+      left:0;
+      top:0;
+      width:var(--cell);
+      height:var(--cell);
+      pointer-events:none;
+      z-index:3;
+      opacity:0;
+      will-change:transform, opacity;
+    }
+    .bonus-land-splash .drop{
+      position:absolute;
+      border-radius:999px;
+      background:radial-gradient(circle at 35% 35%, rgba(255,240,178,.96) 0%, rgba(255,206,82,.88) 42%, rgba(210,114,18,.72) 100%);
+      box-shadow:0 1px 4px rgba(108,54,2,.18);
+      opacity:.92;
+      transform:translate3d(0,0,0) scale(.7);
+    }
+    .bonus-land-splash .drop.d1{ width:13px; height:13px; left:29px; top:24px; animation:honeySplash1 .52s ease-out forwards; }
+    .bonus-land-splash .drop.d2{ width:9px; height:9px; left:18px; top:31px; animation:honeySplash2 .56s ease-out forwards; }
+    .bonus-land-splash .drop.d3{ width:10px; height:10px; left:43px; top:29px; animation:honeySplash3 .58s ease-out forwards; }
+    .bonus-land-splash .drop.d4{ width:8px; height:8px; left:24px; top:16px; animation:honeySplash4 .48s ease-out forwards; }
+    .bonus-land-splash .drop.d5{ width:7px; height:7px; left:46px; top:18px; animation:honeySplash5 .5s ease-out forwards; }
+    @keyframes honeySplash1{ 0%{ transform:translate3d(0,0,0) scale(.55); opacity:.95; } 100%{ transform:translate3d(0,10px,0) scale(1); opacity:0; } }
+    @keyframes honeySplash2{ 0%{ transform:translate3d(0,0,0) scale(.55); opacity:.92; } 100%{ transform:translate3d(-10px,8px,0) scale(.98); opacity:0; } }
+    @keyframes honeySplash3{ 0%{ transform:translate3d(0,0,0) scale(.58); opacity:.92; } 100%{ transform:translate3d(10px,9px,0) scale(1); opacity:0; } }
+    @keyframes honeySplash4{ 0%{ transform:translate3d(0,0,0) scale(.5); opacity:.88; } 100%{ transform:translate3d(-6px,-8px,0) scale(.92); opacity:0; } }
+    @keyframes honeySplash5{ 0%{ transform:translate3d(0,0,0) scale(.5); opacity:.88; } 100%{ transform:translate3d(7px,-7px,0) scale(.92); opacity:0; } }
+.bonus-fly-clone{
+      position:fixed;
+      left:0;
+      top:0;
+      z-index:9998;
+      object-fit:contain;
+      pointer-events:none;
+      will-change:transform, opacity;
+      filter:drop-shadow(0 10px 18px rgba(0,0,0,.16)) drop-shadow(0 0 8px rgba(255,228,141,.28));
+      transform:translate3d(0,0,0) scale(1);
+      opacity:1;
+      transition:none;
+    }
+    @keyframes bonusGlow{
+      0%,100%{ opacity:1; transform:translateY(0) scale(1); filter:drop-shadow(0 0 6px rgba(255,219,108,.34)); }
+      50%{ opacity:1; transform:translateY(-1px) scale(1.045); filter:drop-shadow(0 0 10px rgba(255,238,166,.54)); }
+    }
+    @keyframes jarReadyPulse{
+      0%,100%{ transform:scale(1); }
+      50%{ transform:scale(1.04); }
+    }
+    @keyframes jarReadyBlink{
+      0%,100%{ filter:drop-shadow(0 12px 22px rgba(0,0,0,.18)); }
+      50%{ filter:drop-shadow(0 0 16px rgba(255,227,132,.38)) drop-shadow(0 10px 18px rgba(0,0,0,.16)); }
+    }
+    @keyframes jarBump{
+      0%{ transform:scale(1); }
+      50%{ transform:scale(1.08); }
+      100%{ transform:scale(1); }
+    }
+
+    .action-row{
+      width:100%;
+      display:grid;
+      grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);
+      align-items:flex-end;
+      column-gap:12px;
+    }
+    .action-btn{ border:none; cursor:pointer; color:var(--text); transition:transform .18s ease, filter .18s ease, opacity .18s ease; }
+
+    .bet-stack{
+      position:relative;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-self:start;
+      gap:5px;
+      transform:translate(18px, -14px);
+    }
+    .bet-amount-pill{
+      min-width:78px;
+      min-height:22px;
+      padding:0 10px;
+      border-radius:999px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:12px;
+      line-height:1;
+      font-weight:900;
+      color:#fff8e6;
+      background:linear-gradient(180deg, rgba(71,27,0,.74), rgba(36,12,0,.82));
+      border:1px solid rgba(255,227,171,.18);
+      box-shadow:0 8px 18px rgba(0,0,0,.14), inset 0 1px 0 rgba(255,255,255,.08);
+      backdrop-filter:blur(8px);
+      -webkit-backdrop-filter:blur(8px);
+      pointer-events:none;
+      white-space:nowrap;
+      font-variant-numeric:tabular-nums;
+    }
+    .bet-open-btn{
+      width:min(82px, 22vw);
+      aspect-ratio: 122 / 76;
+      padding:0;
+      border:none;
+      background:none;
+      display:grid;
+      place-items:center;
+      filter:drop-shadow(0 14px 22px rgba(0,0,0,.18));
+    }
+    .bet-open-btn img{
+      width:100%;
+      height:100%;
+      object-fit:contain;
+      display:block;
+      transition:transform .18s ease, filter .18s ease, opacity .18s ease;
+    }
+    .bet-open-btn:hover img{ transform:translateY(-1px) scale(1.02); }
+    .bet-open-btn:disabled{ opacity:.72; cursor:not-allowed; }
+    @keyframes winValuePulse{ 0%{ opacity:.78; } 60%{ opacity:1; } 100%{ opacity:1; } }
+    @keyframes beeHover{ 0%,100%{ transform:translate3d(0,0,0) rotate(-2deg); } 50%{ transform:translate3d(0,-5px,0) rotate(2deg); } }
+
+    .spin-btn{
+      width:min(132px, 36vw);
+      aspect-ratio:1/1;
+      background:none;
+      padding:0;
+      display:grid;
+      place-items:center;
+      justify-self:center;
+      filter:drop-shadow(0 18px 24px rgba(0,0,0,.24));
+    }
+    .spin-btn img{ width:100%; height:100%; object-fit:contain; display:block; transition:transform .18s ease, filter .18s ease, opacity .18s ease; }
+    .spin-btn:hover img{ transform:translateY(-1px) scale(1.02); filter:drop-shadow(0 0 24px rgba(255,186,72,.22)); }
+    .spin-btn:disabled{ opacity:.72; filter:grayscale(.05) brightness(.94); cursor:not-allowed; }
+
+
+    .menu-fab{
+      position:fixed;
+      left:max(12px, calc(env(safe-area-inset-left, 0px) + 12px));
+      bottom:calc(16px + var(--safe-bottom));
+      z-index:135;
+      width:min(66px, 17vw);
+      aspect-ratio:1/1;
+      padding:0;
+      border:none;
+      background:none;
+      display:grid;
+      place-items:center;
+      filter:drop-shadow(0 12px 20px rgba(0,0,0,.26));
+      cursor:pointer;
+    }
+    .menu-fab img{
+      width:100%;
+      height:100%;
+      object-fit:contain;
+      display:block;
+      transition:transform .18s ease, filter .18s ease, opacity .18s ease;
+    }
+    .menu-fab:hover img{ transform:translateY(-1px) scale(1.02); }
+    .menu-fab:active img{ transform:scale(.98); }
+
+    .menu-scrim{
+      position:fixed;
+      inset:0;
+      z-index:145;
+      background:rgba(9,4,0,.44);
+      backdrop-filter:blur(5px);
+      -webkit-backdrop-filter:blur(5px);
+      opacity:0;
+      pointer-events:none;
+      transition:opacity .24s ease;
+    }
+    .menu-scrim.show{ opacity:1; pointer-events:auto; }
+    .side-menu{
+      position:absolute;
+      top:0;
+      left:0;
+      bottom:0;
+      width:min(346px, 86vw);
+      background:
+        radial-gradient(160px 200px at 18% 8%, rgba(255,213,112,.18), transparent 72%),
+        linear-gradient(180deg, rgba(86,34,0,.96), rgba(31,12,0,.98));
+      border-right:1px solid rgba(255,226,173,.18);
+      box-shadow:24px 0 48px rgba(0,0,0,.38);
+      transform:translateX(-104%);
+      transition:transform .28s cubic-bezier(.2,.9,.2,1);
+      overflow:hidden;
+    }
+    .menu-scrim.show .side-menu{ transform:translateX(0); }
+    .menu-head{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      padding:calc(14px + var(--safe-top)) 16px 12px;
+      border-bottom:1px solid rgba(255,229,178,.10);
+      background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,0));
+    }
+    .menu-title{
+      font-size:18px;
+      font-weight:900;
+      color:#fff6de;
+      letter-spacing:.02em;
+    }
+    .menu-close,
+    .rules-back{
+      width:38px;
+      height:38px;
+      border-radius:12px;
+      border:1px solid rgba(255,255,255,.12);
+      background:rgba(255,255,255,.08);
+      color:#fff7e3;
+      font-size:18px;
+      font-weight:900;
+      display:grid;
+      place-items:center;
+      cursor:pointer;
+      flex:0 0 auto;
+    }
+    .menu-scroll,
+    .rules-panel{
+      height:calc(100% - 67px - var(--safe-top));
+      overflow:auto;
+      padding:14px 16px calc(24px + var(--safe-bottom));
+      scrollbar-width:none;
+    }
+    .menu-scroll::-webkit-scrollbar,
+    .rules-panel::-webkit-scrollbar{ display:none; }
+    .menu-group{
+      padding:14px;
+      border-radius:22px;
+      background:linear-gradient(180deg, rgba(255,231,180,.08), rgba(69,25,0,.52));
+      border:1px solid rgba(255,227,171,.12);
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.05);
+    }
+    .menu-group + .menu-group{ margin-top:12px; }
+    .menu-label{
+      font-size:12px;
+      font-weight:900;
+      color:rgba(255,244,222,.72);
+      text-transform:uppercase;
+      letter-spacing:.08em;
+      margin-bottom:10px;
+    }
+    .speed-row{
+      display:grid;
+      grid-template-columns:repeat(2, minmax(0, 1fr));
+      gap:8px;
+    }
+    .speed-chip{
+      min-height:46px;
+      border:none;
+      border-radius:16px;
+      background:linear-gradient(180deg, rgba(255,233,174,.12), rgba(56,20,0,.76));
+      border:1px solid rgba(255,225,160,.12);
+      color:#fff8e8;
+      font-size:13px;
+      font-weight:900;
+      cursor:pointer;
+      transition:transform .18s ease, border-color .18s ease, background .18s ease, box-shadow .18s ease;
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.05);
+    }
+    .speed-chip.active{
+      background:linear-gradient(180deg, rgba(255,221,125,.30), rgba(132,56,0,.92));
+      border-color:rgba(255,231,179,.28);
+      box-shadow:0 0 18px rgba(255,171,58,.15), inset 0 1px 0 rgba(255,255,255,.10);
+    }
+    .menu-link{
+      width:100%;
+      min-height:52px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      padding:0 14px;
+      border:none;
+      border-radius:18px;
+      background:linear-gradient(180deg, rgba(255,228,165,.10), rgba(58,21,0,.78));
+      border:1px solid rgba(255,224,161,.12);
+      color:#fff9e9;
+      font-size:15px;
+      font-weight:900;
+      cursor:pointer;
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.05);
+    }
+    .menu-link::after{
+      content:'›';
+      font-size:20px;
+      line-height:1;
+      opacity:.86;
+    }
+    .menu-note{
+      padding:14px;
+      border-radius:20px;
+      background:linear-gradient(180deg, rgba(255,200,90,.10), rgba(66,22,0,.78));
+      border:1px solid rgba(255,213,114,.14);
+    }
+    .menu-note-title{
+      font-size:12px;
+      font-weight:900;
+      letter-spacing:.08em;
+      text-transform:uppercase;
+      color:#ffd78d;
+      margin-bottom:8px;
+    }
+    .menu-note p{
+      margin:0;
+      font-size:13px;
+      line-height:1.45;
+      color:rgba(255,244,224,.88);
+    }
+    .rules-panel{
+      position:absolute;
+      inset:0;
+      background:
+        radial-gradient(160px 200px at 18% 8%, rgba(255,213,112,.18), transparent 72%),
+        linear-gradient(180deg, rgba(86,34,0,.98), rgba(31,12,0,.99));
+      transform:translateX(104%);
+      transition:transform .28s cubic-bezier(.2,.9,.2,1);
+      z-index:2;
+      padding-top:calc(14px + var(--safe-top));
+    }
+    .rules-panel.show{ transform:translateX(0); }
+    .rules-head{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      margin-bottom:14px;
+    }
+    .rules-title{
+      font-size:18px;
+      font-weight:900;
+      color:#fff7e0;
+    }
+    .rules-section + .rules-section{ margin-top:14px; }
+    .rules-list{
+      margin:0;
+      padding-left:18px;
+      display:grid;
+      gap:7px;
+      color:rgba(255,244,224,.92);
+      font-size:13px;
+      line-height:1.45;
+    }
+    .rules-symbols{
+      display:grid;
+      grid-template-columns:repeat(2, minmax(0,1fr));
+      gap:10px;
+    }
+    .rule-symbol{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      min-height:58px;
+      padding:10px 12px;
+      border-radius:18px;
+      background:linear-gradient(180deg, rgba(255,232,176,.08), rgba(61,22,0,.60));
+      border:1px solid rgba(255,226,168,.12);
+    }
+    .rule-symbol img{
+      width:36px;
+      height:36px;
+      object-fit:contain;
+      flex:0 0 auto;
+      filter:drop-shadow(0 8px 14px rgba(0,0,0,.16));
+    }
+    .rule-symbol span{
+      font-size:13px;
+      font-weight:800;
+      color:#fff7e5;
+      line-height:1.18;
+      display:flex;
+      flex-direction:column;
+      gap:3px;
+    }
+    .rule-pay{
+      font-size:11px;
+      font-weight:700;
+      color:rgba(255,231,182,.86);
+      letter-spacing:.01em;
+    }
+
+
+    .bet-popover{
+      position:absolute;
+      right:-8px;
+      bottom:calc(100% + 10px);
+      width:min(236px, 66vw);
+      padding:10px;
+      border-radius:22px;
+      background:linear-gradient(180deg, rgba(108,46,0,.97), rgba(41,17,0,.98));
+      border:1px solid rgba(255,227,171,.16);
+      box-shadow:0 16px 34px rgba(0,0,0,.28), inset 0 1px 0 rgba(255,255,255,.06);
+      backdrop-filter:blur(10px);
+      -webkit-backdrop-filter:blur(10px);
+      opacity:0;
+      pointer-events:none;
+      transform:translate3d(0,8px,0) scale(.96);
+      transform-origin:88% 100%;
+      transition:opacity .18s ease, transform .18s ease;
+      z-index:55;
+    }
+    .bet-popover.show{
+      opacity:1;
+      pointer-events:auto;
+      transform:translate3d(0,0,0) scale(1);
+    }
+    .bet-popover::after{
+      content:'';
+      position:absolute;
+      right:28px;
+      bottom:-7px;
+      width:14px;
+      height:14px;
+      background:linear-gradient(180deg, rgba(78,31,0,.98), rgba(41,17,0,.98));
+      border-right:1px solid rgba(255,227,171,.16);
+      border-bottom:1px solid rgba(255,227,171,.16);
+      transform:rotate(45deg);
+    }
+    .bet-popover-head{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      margin-bottom:8px;
+      padding:0 2px;
+    }
+    .bet-popover-title{
+      font-size:12px;
+      font-weight:900;
+      letter-spacing:.08em;
+      text-transform:uppercase;
+      color:rgba(255,244,222,.76);
+    }
+    .bet-popover-close{
+      width:24px;
+      height:24px;
+      border:none;
+      border-radius:9px;
+      background:rgba(255,255,255,.08);
+      border:1px solid rgba(255,255,255,.10);
+      color:#fff5de;
+      font-size:13px;
+      font-weight:900;
+      display:grid;
+      place-items:center;
+      cursor:pointer;
+      padding:0;
+      line-height:1;
+    }
+
+    .overlay{
+      position:fixed; inset:0; z-index:120; background:rgba(12,5,0,.54); opacity:0; pointer-events:none;
+      transition:opacity .22s ease; display:flex; align-items:flex-end; justify-content:center;
+      padding:14px 14px calc(14px + var(--safe-bottom)); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+    }
+    .overlay.show{ opacity:1; pointer-events:auto; }
+    .sheet{
+      width:min(520px, 100%); border-radius:26px;
+      background:linear-gradient(180deg, rgba(112,48,0,.94), rgba(41,17,0,.98));
+      border:1px solid rgba(255,230,177,.18); box-shadow:0 24px 48px rgba(0,0,0,.34); overflow:hidden;
+      transform:translateY(16px); transition:transform .26s cubic-bezier(.2,.9,.2,1);
+    }
+    .overlay.show .sheet{ transform:translateY(0); }
+    .sheet-head{ display:flex; align-items:center; justify-content:space-between; gap:10px; padding:16px 16px 12px; border-bottom:1px solid rgba(255,228,170,.10); }
+    .sheet-title{ font-size:18px; font-weight:900; color:#fff6df; }
+    .sheet-close{ width:36px; height:36px; border:none; border-radius:12px; color:#fff6df; background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.10); cursor:pointer; font-size:16px; font-weight:900; }
+    .sheet-body{ padding:14px 16px 18px; display:flex; flex-direction:column; gap:14px; }
+    .bet-grid{ display:grid; grid-template-columns:repeat(4, minmax(0,1fr)); gap:10px; }
+    .bet-chip{
+      border:none; border-radius:16px; min-height:56px;
+      background:linear-gradient(180deg, rgba(255,223,150,.14), rgba(67,26,0,.70));
+      border:1px solid rgba(255,225,160,.16); color:#fff6dd; font-size:15px; font-weight:900; cursor:pointer;
+      transition:transform .18s ease, background .18s ease, border-color .18s ease, box-shadow .18s ease; box-shadow:inset 0 1px 0 rgba(255,255,255,.06);
+    }
+    .bet-chip.active{ background:linear-gradient(180deg, rgba(255,220,124,.34), rgba(121,49,0,.94)); border-color:rgba(255,233,176,.34); box-shadow:0 0 18px rgba(255,181,62,.18), inset 0 1px 0 rgba(255,255,255,.10); }
+    .toast{ display:none !important; }
+
+    .bonus-jar-wrap.hidden{
+      opacity:0;
+      pointer-events:none;
+    }
+    .free-spins-wrap{
+      position:absolute;
+      left:-6px;
+      top:10px;
+      width:min(118px, 29vw);
+      display:block;
+      z-index:12;
+      pointer-events:none;
+      opacity:0;
+      transform:translateY(6px);
+      transition:opacity .26s ease, transform .26s ease;
+    }
+    .free-spins-wrap.show{
+      opacity:1;
+      transform:translateY(0);
+    }
+    .free-spins-counter{
+      position:relative;
+      width:100%;
+      filter:drop-shadow(0 12px 22px rgba(0,0,0,.22));
+    }
+    .free-spins-counter img{
+      width:100%;
+      height:auto;
+      display:block;
+      object-fit:contain;
+      user-select:none;
+      pointer-events:none;
+    }
+    .free-spins-value{
+      position:absolute;
+      left:50%;
+      top:59%;
+      transform:translate(-50%, -50%);
+      min-width:36px;
+      height:28px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:24px;
+      line-height:1;
+      font-weight:1000;
+      color:#fff8eb;
+      text-shadow:0 2px 8px rgba(56,20,0,.30);
+      font-variant-numeric:tabular-nums;
+      font-feature-settings:"tnum" 1, "lnum" 1;
+      white-space:nowrap;
+      letter-spacing:-.01em;
+    }
+    #bonusResultModal .bonus-modal-sum{
+      top:53.9%;
+    }
+    .bonus-modal-scrim{
+      position:fixed;
+      inset:0;
+      z-index:230;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:24px;
+      background:rgba(7,3,0,.52);
+      backdrop-filter:blur(5px);
+      -webkit-backdrop-filter:blur(5px);
+      opacity:0;
+      pointer-events:none;
+      transition:opacity .28s ease;
+    }
+    .bonus-modal-scrim.show{
+      opacity:1;
+      pointer-events:auto;
+    }
+    .bonus-modal-card{
+      position:relative;
+      width:min(430px, 92vw);
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:flex-start;
+      transform:translateY(8px) scale(.98);
+      transition:transform .28s cubic-bezier(.2,.8,.2,1);
+      filter:drop-shadow(0 18px 34px rgba(0,0,0,.34));
+    }
+    .bonus-modal-scrim.show .bonus-modal-card{
+      transform:translateY(0) scale(1);
+    }
+    .bonus-modal-card img{
+      width:100%;
+      height:auto;
+      display:block;
+      object-fit:contain;
+      user-select:none;
+      pointer-events:none;
+    }
+    .bonus-modal-sum{
+      position:absolute;
+      left:50%;
+      top:54.8%;
+      transform:translate(-50%, -50%);
+      min-width:180px;
+      max-width:78%;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:28px;
+      line-height:1;
+      font-weight:1000;
+      color:#fff8ea;
+      text-shadow:0 3px 12px rgba(64,22,0,.34);
+      white-space:nowrap;
+      font-variant-numeric:tabular-nums;
+      font-feature-settings:"tnum" 1, "lnum" 1;
+      letter-spacing:-.01em;
+    }
+    .bonus-modal-hint{
+      margin-top:10px;
+      text-align:center;
+      color:#fff3cf;
+      font-size:13px;
+      font-weight:900;
+      text-shadow:0 2px 10px rgba(0,0,0,.34);
+      letter-spacing:.02em;
+      animation:bonusHintBlink 1.05s ease-in-out infinite;
+      user-select:none;
+      pointer-events:none;
+    }
+    @keyframes bonusHintBlink{
+      0%,100%{ opacity:.56; }
+      50%{ opacity:1; }
+    }
+
+    .buy-confirm-card{
+      width:min(360px, 90vw);
+      border-radius:26px;
+      padding:18px 18px 16px;
+      background:
+        radial-gradient(120% 120% at 18% 8%, rgba(255,247,210,.34), transparent 38%),
+        radial-gradient(110% 120% at 82% 100%, rgba(255,190,64,.16), transparent 48%),
+        linear-gradient(180deg, rgba(84,43,8,.96), rgba(46,24,6,.96));
+      border:1px solid rgba(255,220,138,.34);
+      box-shadow:
+        0 18px 34px rgba(0,0,0,.34),
+        inset 0 1px 0 rgba(255,244,208,.22),
+        inset 0 -10px 22px rgba(0,0,0,.18);
+      position:relative;
+      overflow:hidden;
+    }
+    .buy-confirm-card::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      background:
+        radial-gradient(circle at 25% 22%, rgba(255,214,96,.18) 0 10%, transparent 11%),
+        radial-gradient(circle at 38% 22%, rgba(255,214,96,.14) 0 10%, transparent 11%),
+        radial-gradient(circle at 51% 22%, rgba(255,214,96,.18) 0 10%, transparent 11%),
+        radial-gradient(circle at 31.5% 34%, rgba(255,214,96,.14) 0 10%, transparent 11%),
+        radial-gradient(circle at 44.5% 34%, rgba(255,214,96,.18) 0 10%, transparent 11%),
+        radial-gradient(circle at 57.5% 34%, rgba(255,214,96,.14) 0 10%, transparent 11%);
+      opacity:.28;
+      pointer-events:none;
+      mask-image:linear-gradient(180deg, rgba(0,0,0,.88), rgba(0,0,0,.32));
+      -webkit-mask-image:linear-gradient(180deg, rgba(0,0,0,.88), rgba(0,0,0,.32));
+    }
+    .buy-confirm-title{
+      position:relative;
+      text-align:center;
+      font-size:20px;
+      line-height:1.1;
+      font-weight:1000;
+      color:#fff3c6;
+      text-shadow:0 2px 12px rgba(0,0,0,.28);
+      margin-bottom:8px;
+    }
+    .buy-confirm-sub{
+      position:relative;
+      text-align:center;
+      font-size:12px;
+      line-height:1.25;
+      color:rgba(255,243,206,.84);
+      margin-bottom:12px;
+      font-weight:800;
+    }
+    .buy-confirm-price{
+      position:relative;
+      min-height:54px;
+      border-radius:18px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      margin-bottom:14px;
+      background:linear-gradient(180deg, rgba(255,215,113,.28), rgba(140,76,10,.18));
+      border:1px solid rgba(255,222,145,.28);
+      color:#fff9e9;
+      font-weight:1000;
+      font-size:28px;
+      letter-spacing:-.02em;
+      text-shadow:0 3px 12px rgba(0,0,0,.26);
+      font-variant-numeric:tabular-nums;
+      font-feature-settings:"tnum" 1, "lnum" 1;
+    }
+    .buy-confirm-actions{
+      position:relative;
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:10px;
+    }
+    .buy-confirm-btn{
+      min-height:46px;
+      border:none;
+      border-radius:16px;
+      cursor:pointer;
+      font-weight:1000;
+      font-size:15px;
+      letter-spacing:.01em;
+      color:#fffaf0;
+      text-shadow:0 2px 10px rgba(0,0,0,.26);
+      box-shadow:0 10px 20px rgba(0,0,0,.22), inset 0 1px 0 rgba(255,248,222,.24);
+      transition:transform .18s ease, filter .18s ease;
+    }
+    .buy-confirm-btn:active{ transform:translateY(1px) scale(.985); }
+    .buy-confirm-btn.buy{
+      background:linear-gradient(180deg, #f0c04b, #b46a13);
+    }
+    .buy-confirm-btn.back{
+      background:linear-gradient(180deg, rgba(255,244,220,.20), rgba(115,67,20,.38));
+      border:1px solid rgba(255,232,170,.18);
+    }
+
+    @media (max-width:420px){
+      .buy-confirm-card{ width:min(334px, 90vw); padding:16px 15px 14px; }
+      .buy-confirm-title{ font-size:18px; }
+      .buy-confirm-sub{ font-size:11px; margin-bottom:10px; }
+      .buy-confirm-price{ min-height:50px; font-size:24px; margin-bottom:12px; }
+      .buy-confirm-btn{ min-height:42px; font-size:14px; }
+      :root{ --gap:8px; }
+      .free-spins-wrap{ width:min(104px, 26vw); left:-4px; top:8px; }
+      .free-spins-value{ font-size:21px; top:58.5%; }
+      .bonus-modal-card{ width:min(390px, 92vw); }
+      .bonus-modal-sum{ font-size:24px; min-width:150px; top:55%; }
+      #bonusResultModal .bonus-modal-sum{ top:54.2%; }
+      .bonus-modal-hint{ font-size:12px; margin-top:8px; }
+      .top-row{ grid-template-columns:36px minmax(0,1fr) 50px; }
+      .bal-amount{ min-width:94px; font-size:11px; }
+      .logo-badge{ width:50px; height:50px; }
+      .top-feature-row{ display:none !important; }
+      .board-card{ padding-top:100px; }
+      .win-banner-shell{ width:min(500px, 99vw); min-height:128px; overflow:visible; }
+      .board-card .win-banner{ width:100%; max-width:min(390px, 86vw); }
+      .spin-win-value{ min-width:112px; font-size:18px; }
+      .bonus-jar-wrap{ width:min(96px, 24vw); left:-14px; top:-8px; }
+      .win-bee{ width:min(98px, 24vw); right:-4px; top:-16px; }
+      .action-row{ column-gap:10px; }
+      .bet-stack{ gap:4px; transform:translate(14px, -12px); }
+      .bet-amount-pill{ min-width:72px; min-height:21px; font-size:10px; padding:0 8px; }
+      .bet-open-btn{ width:min(76px, 21vw); }
+      .bet-popover{ right:-4px; bottom:calc(100% + 8px); width:min(214px, 62vw); padding:9px; border-radius:20px; }
+      .bet-popover::after{ right:24px; }
+      .spin-btn{ width:min(116px, 32vw); }
+      .controls-bonus-btn{ width:min(104px, 28vw); transform:translate(-6px, -11px); }
+      .controls-bonus-btn .bonus-soon{ font-size:7px; right:8%; }
+      .menu-fab{ width:min(60px, 16vw); bottom:calc(14px + var(--safe-bottom)); }
+      .side-menu{ width:min(320px, 88vw); }
+      .menu-head{ padding:calc(12px + var(--safe-top)) 14px 10px; }
+      .menu-scroll,
+      .rules-panel{ padding-left:14px; padding-right:14px; }
+      .speed-chip{ min-height:46px; font-size:12px; }
+      .menu-link{ min-height:50px; font-size:14px; }
+      .rules-symbols{ grid-template-columns:1fr; }
+      .bet-grid{ grid-template-columns:repeat(3, minmax(0,1fr)); }
+    }
+  </style>
+</head>
+<body>
+  <div class="preloader" id="preloader">
+    <div class="preloader-inner">
+      <div class="preloader-logo-wrap">
+        <img class="preloader-logo" src="https://i.postimg.cc/qvL497mF/Picsart-26-02-27-02-02-37-502.png" alt="Vezus">
+      </div>
+      <div class="preloader-bar"><div class="preloader-fill" id="preloaderFill"></div></div>
+      <div class="preloader-hint" id="preloaderHint">Загрузка…</div>
+    </div>
+  </div>
+
+  <div class="app">
+    <div class="content">
+      <div class="sticky-top">
+        <div class="top-row">
+          <button class="icon-btn" id="backBtn" type="button" aria-label="Назад">←</button>
+          <div class="balance-mini" aria-label="Баланс">
+            <span class="bal-title">Баланс</span>
+            <div class="bal-amount" id="balanceValue">10 000 ₽</div>
+          </div>
+          <div class="logo-badge" aria-hidden="true">
+            <img src="https://i.postimg.cc/qvL497mF/Picsart-26-02-27-02-02-37-502.png" alt="">
+          </div>
+        </div>
+      </div>
+
+
+      <section class="board-card">
+        <div class="board-win-wrap" aria-label="Выигрыш за спин">
+          <div class="win-banner-shell">
+            <div class="bonus-jar-wrap" id="bonusJarWrap">
+              <button class="bonus-jar-btn" id="bonusJarBtn" type="button" aria-label="Банка бонусной игры" disabled>
+                <img class="bonus-jar-img" id="bonusJarImg" src="https://i.postimg.cc/d08CJ86D/Picsart-26-04-03-10-51-20-207.png" alt="Банка бонусной игры">
+              </button>
+            </div>
+            <div class="free-spins-wrap" id="freeSpinsWrap" aria-hidden="true">
+              <div class="free-spins-counter">
+                <img src="https://i.postimg.cc/j20gtvvC/Picsart-26-04-03-15-20-38-070.png" alt="Оставшиеся бесплатные спины">
+                <div class="free-spins-value" id="freeSpinsValue">10</div>
+              </div>
+            </div>
+            <div class="win-banner">
+              <img src="https://i.postimg.cc/fW7L68Hv/Picsart-26-04-02-21-54-47-469.png" alt="Выигрыш">
+              <div class="win-center">
+                <div class="spin-win-value" id="spinWinValue">0 ₽</div>
+              </div>
+            </div>
+            <img class="win-bee" id="winBee" src="https://i.postimg.cc/XYj5vp1j/Picsart-26-04-02-23-46-36-446.png" alt="">
+          </div>
+        </div>
+        <div class="board-frame" id="boardFrame">
+          <div class="board-viewport" id="boardViewport">
+            <div class="honeycomb-overlay"></div>
+            <div class="honey-grid" id="honeyGrid"></div>
+            <div class="reels" id="reels"></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="controls-card">
+        <div class="action-row">
+          <button class="bonus-buy-btn controls-bonus-btn" id="bonusBuyBtn" type="button" aria-label="Покупка бонуса">
+            <img src="https://i.postimg.cc/d12sc0jb/Picsart-26-04-02-21-47-05-247.png" alt="Купить бонус">
+            <span class="bonus-soon" id="bonusBuyPrice">0 ₽</span>
+          </button>
+          <button class="action-btn spin-btn" id="spinBtn" type="button" aria-label="Крутить">
+            <img src="https://i.postimg.cc/LXTdY5vk/Picsart-26-04-02-15-35-12-671.png" alt="Крутить">
+          </button>
+          <div class="bet-stack">
+            <div class="bet-amount-pill" id="betValue">20 ₽</div>
+            <button class="action-btn bet-open-btn" id="betOpenBtn" type="button" aria-label="Выбор ставки" aria-expanded="false" aria-controls="betPopover">
+              <img src="https://i.postimg.cc/KjtgVF1t/Picsart-26-04-02-21-03-59-677.png" alt="Ставка">
+            </button>
+            <div class="bet-popover" id="betPopover" aria-hidden="true">
+              <div class="bet-popover-head">
+                <div class="bet-popover-title">Выбор ставки</div>
+                <button class="bet-popover-close" id="betClose" type="button" aria-label="Закрыть">✕</button>
+              </div>
+              <div class="bet-grid" id="betGrid"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+
+
+  <button class="menu-fab" id="menuFab" type="button" aria-label="Меню">
+    <img src="https://i.postimg.cc/1tw0qbGP/file-00000000302071f4bf1c0ba5d625136a.png" alt="Меню">
+  </button>
+
+  <div class="menu-scrim" id="menuScrim" aria-hidden="true">
+    <aside class="side-menu" role="dialog" aria-modal="true" aria-label="Меню слота">
+      <div class="menu-head">
+        <div class="menu-title">Меню</div>
+        <button class="menu-close" id="menuClose" type="button" aria-label="Закрыть">✕</button>
+      </div>
+      <div class="menu-scroll">
+        <section class="menu-group">
+          <div class="menu-label">Скорость игры</div>
+          <div class="speed-row" id="speedRow">
+            <button class="speed-chip" type="button" data-speed="slow">Медленно</button>
+            <button class="speed-chip active" type="button" data-speed="normal">Нормально</button>
+            <button class="speed-chip" type="button" data-speed="fast">Быстро</button>
+            <button class="speed-chip" type="button" data-speed="ultra">Ультра</button>
+            <button class="speed-chip" type="button" data-speed="turbo">Турбо</button>
+          </div>
+        </section>
+
+        <section class="menu-group">
+          <button class="menu-link" id="openRulesBtn" type="button">Правила</button>
+        </section>
+      </div>
+
+      <div class="rules-panel" id="rulesPanel" aria-hidden="true">
+        <div class="rules-head">
+          <button class="rules-back" id="rulesBack" type="button" aria-label="Назад">←</button>
+          <div class="rules-title">Правила</div>
+          <div style="width:38px;height:38px;flex:0 0 auto;"></div>
+        </div>
+
+        <section class="rules-section menu-group">
+          <div class="menu-label">Символы</div>
+          <div class="rules-symbols" id="rulesSymbols"></div>
+        </section>
+
+        <section class="rules-section menu-group">
+          <div class="menu-label">Логика игры</div>
+          <ul class="rules-list">
+            <li>Поле 6×5.</li>
+            <li>Закрываются только одинаковые символы, которые стоят рядом по сторонам, от 5 и больше.</li>
+            <li>Редкий бонус-символ сразу вылетает в банку слева от счётчика выигрыша.</li>
+            <li>Каждые 5 бонус-символов поднимают банку на новый уровень.</li>
+            <li>Финальная банка показывает окно активации и запускает 10 автоспинов.</li>
+            <li>Чем дороже символ, тем выше его базовая выплата. Большие связки платят больше.</li>
+          </ul>
+        </section>
+
+        <section class="rules-section menu-group">
+          <div class="menu-label">Множители</div>
+          <ul class="rules-list">
+            <li>Множители появляются только на клетках, где было закрытие.</li>
+            <li>Новая комбинация на этих клетках усиливает следующий выигрыш в том же спине.</li>
+            <li>Ступени множителей: 0.2 / 0.3 / 0.4 / 0.5 / 0.8 / 1.5 / 1.8 / 2 / 2.2 / 2.6 / 2.8 / 3 / 3.5 / 4 / 4.2 / 4.7 / 4.9 / 5.</li>
+            <li>Новый spin очищает множители прошлого спина. Если кластер попал на несколько honey-меток, их эффект складывается полноценно, а итоговый honey-множитель за закрытие может вырасти до 5x.</li>
+          </ul>
+        </section>
+      </div>
+    </aside>
+  </div>
+
+  <div class="bonus-modal-scrim" id="buyBonusModal" aria-hidden="true">
+    <div class="buy-confirm-card">
+      <div class="buy-confirm-title">Купить бонусную игру?</div>
+      <div class="buy-confirm-sub"></div>
+      <div class="buy-confirm-price" id="buyBonusModalPrice">0 ₽</div>
+      <div class="buy-confirm-actions">
+        <button class="buy-confirm-btn back" id="buyBonusCancelBtn" type="button">Назад</button>
+        <button class="buy-confirm-btn buy" id="buyBonusConfirmBtn" type="button">Купить</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="bonus-modal-scrim" id="bonusIntroModal" aria-hidden="true">
+    <div class="bonus-modal-card">
+      <img src="https://i.postimg.cc/nz9sPZQD/Picsart-26-04-03-15-18-36-357.png" alt="Бонусная игра активирована">
+      <div class="bonus-modal-hint">Нажмите в любом месте чтоб продолжить</div>
+    </div>
+  </div>
+
+  <div class="bonus-modal-scrim" id="bonusResultModal" aria-hidden="true">
+    <div class="bonus-modal-card">
+      <img src="https://i.postimg.cc/DZNDd99J/Picsart-26-04-03-15-33-16-358.png" alt="Итог бонусной игры">
+      <div class="bonus-modal-sum" id="bonusResultValue">0 ₽</div>
+      <div class="bonus-modal-hint">Нажмите в любом месте чтоб продолжить</div>
+    </div>
+  </div>
+
+  <script>
+
+    const ROWS = 5;
+    const COLS = 6;
+    const BETS = [20, 40, 80, 100, 150, 250, 500, 1000];
+    const CLUSTER_MIN = 5;
+        const MAX_CASCADES = 12;
+    const HONEY_MULTIPLIER_STEPS = [0.2, 0.3, 0.4, 0.5, 0.8, 1.5, 1.8, 2, 2.2, 2.6, 2.8, 3, 3.5, 4, 4.2, 4.7, 4.9, 5];
+    const BONUS_SYMBOL_ID = 'bonus';
+    const BONUS_STAGE_STEP = 5;
+    const BONUS_TARGET_COUNT = 20;
+    const BONUS_FREE_SPINS = 10;
+    const BONUS_BUY_SYMBOL_COUNT = 20;
+    const BONUS_BUY_TARGET_RANGES = [
+      { weight:0.30, min:1, max:200 },
+      { weight:0.24, min:200, max:500 },
+      { weight:0.18, min:500, max:800 },
+      { weight:0.12, min:800, max:1000 },
+      { weight:0.09, min:1000, max:2000 },
+      { weight:0.045, min:2000, max:2500 },
+      { weight:0.015, min:2500, max:15000 }
+    ];
+    const BONUS_COUNTER_IMAGE = 'https://i.postimg.cc/j20gtvvC/Picsart-26-04-03-15-20-38-070.png';
+    const BONUS_START_IMAGE = 'https://i.postimg.cc/nz9sPZQD/Picsart-26-04-03-15-18-36-357.png';
+    const BONUS_END_IMAGE = 'https://i.postimg.cc/DZNDd99J/Picsart-26-04-03-15-33-16-358.png';
+    const NORMAL_BEE_IMAGE = 'https://i.postimg.cc/XYj5vp1j/Picsart-26-04-02-23-46-36-446.png';
+    const BONUS_BEE_IMAGE = 'https://i.postimg.cc/3rDpLjgS/Picsart-26-04-05-12-40-11-541.png';
+    const BONUS_JAR_IMAGES = [
+      'https://i.postimg.cc/d08CJ86D/Picsart-26-04-03-10-51-20-207.png',
+      'https://i.postimg.cc/kG5wVjh9/Picsart-26-04-03-10-53-42-273.png',
+      'https://i.postimg.cc/Y0L9rFB3/Picsart-26-04-03-10-54-44-258.png',
+      'https://i.postimg.cc/7Yv7CHtf/Picsart-26-04-03-10-56-08-033.png',
+      'https://i.postimg.cc/7YMCfgTp/Picsart-26-04-03-11-03-17-448.png'
+    ];
+    const STORAGE_KEY = 'honey-slot-v58-progress';
+    const SPEED_MODES = {
+      slow: { label:'Медленно', factor:1.2 },
+      normal: { label:'Нормально', factor:1 },
+      fast: { label:'Быстро', factor:0.78 },
+      ultra: { label:'Ультра', factor:0.58 },
+      turbo: { label:'Турбо', factor:0.42 }
+    };
+    const SYMBOLS = [
+      { id:'common', label:'Обычный', image:'https://i.postimg.cc/prGyy3f1/Picsart-26-04-03-08-36-42-533.png', weight:54, payout:0.10, tier:'base' },
+      { id:'mid', label:'Средний', image:'https://i.postimg.cc/Bb6nWNry/Picsart-26-04-03-08-37-30-596.png', weight:27, payout:0.15, tier:'base' },
+      { id:'good', label:'Хороший', image:'https://i.postimg.cc/9QTFjDkh/Picsart-26-04-03-08-35-10-274.png', weight:10, payout:0.24, tier:'base' },
+      { id:'exp', label:'Дорогой', image:'https://i.postimg.cc/nzVH70hs/Picsart-26-04-03-08-36-07-402.png', weight:5, payout:0.40, tier:'base' },
+      { id:'vexp', label:'Очень дорогой', image:'https://i.postimg.cc/QdLhSXd6/Picsart-26-04-03-08-34-46-596.png', weight:4, payout:0.62, tier:'base' },
+      { id:'bonus', label:'Бонус', image:'https://i.postimg.cc/nLkFGGGm/Picsart-26-04-05-16-10-14-856.png', weight:1, payout:0, tier:'bonus' }
+    ];
+
+    const SYMBOL_BY_ID = Object.fromEntries(SYMBOLS.map(s => [s.id, s]));
+    const BASE_SYMBOLS = SYMBOLS.filter(s => s.tier === 'base');
+    const BASE_SYMBOL_IDS = BASE_SYMBOLS.map(s => s.id);
+
+    const reelsEl = document.getElementById('reels');
+    const honeyGridEl = document.getElementById('honeyGrid');
+    const boardViewportEl = document.getElementById('boardViewport');
+    const boardFrameEl = document.getElementById('boardFrame');
+    const boardCardEl = document.querySelector('.board-card');
+    const balanceValueEl = document.getElementById('balanceValue');
+    const betValueEl = document.getElementById('betValue');
+    const spinBtn = document.getElementById('spinBtn');
+    const spinWinValueEl = document.getElementById('spinWinValue');
+    const bonusJarWrap = document.getElementById('bonusJarWrap');
+    const winBeeEl = document.getElementById('winBee');
+    const bonusJarBtn = document.getElementById('bonusJarBtn');
+    const bonusJarImg = document.getElementById('bonusJarImg');
+    const buyBonusModal = document.getElementById('buyBonusModal');
+    const buyBonusModalPriceEl = document.getElementById('buyBonusModalPrice');
+    const buyBonusConfirmBtn = document.getElementById('buyBonusConfirmBtn');
+    const buyBonusCancelBtn = document.getElementById('buyBonusCancelBtn');
+    const freeSpinsWrap = document.getElementById('freeSpinsWrap');
+    const freeSpinsValueEl = document.getElementById('freeSpinsValue');
+    const bonusIntroModal = document.getElementById('bonusIntroModal');
+    const bonusResultModal = document.getElementById('bonusResultModal');
+    const bonusResultValueEl = document.getElementById('bonusResultValue');
+    const betGrid = document.getElementById('betGrid');
+    const betOpenBtn = document.getElementById('betOpenBtn');
+    const betPopover = document.getElementById('betPopover');
+    const appEl = document.querySelector('.app');
+    const contentEl = document.querySelector('.content');
+    const stickyTopEl = document.querySelector('.sticky-top');
+    const bonusZoneEl = document.querySelector('.bonus-zone');
+    const winCardEl = document.querySelector('.top-feature-row');
+    const controlsCardEl = document.querySelector('.controls-card');
+    const bonusBuyBtn = document.getElementById('bonusBuyBtn');
+    const bonusBuyPriceEl = document.getElementById('bonusBuyPrice');
+    const menuFab = document.getElementById('menuFab');
+    const menuScrim = document.getElementById('menuScrim');
+    const speedRow = document.getElementById('speedRow');
+    const openRulesBtn = document.getElementById('openRulesBtn');
+    const rulesPanel = document.getElementById('rulesPanel');
+    const rulesSymbols = document.getElementById('rulesSymbols');
+
+    const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+    const posKey = (r, c) => `${r}:${c}`;
+    const randomOf = (arr) => arr[Math.floor(Math.random() * arr.length)];
+    let uidCounter = 0;
+    const tileMap = new Map();
+    const honeyMap = new Map();
+    const preloadedImages = new Map();
+
+    const state = {
+      balance: 10000,
+      betIndex: 1,
+      isSpinning: false,
+      board: [],
+      honey: createHoneyMatrix(),
+      spinWin: 0,
+      speedMode: 'normal',
+      bonusProgress: 0,
+      bonusProgressByBet: {},
+      freeSpins: 0,
+      bonusMode: false,
+      bonusWin: 0,
+      buyBonusConfirmOpen: false,
+      bonusIntroOpen: false,
+      bonusResultOpen: false,
+      bonusAutoplayActive: false,
+      bonusSpinsPlayed: 0,
+      pendingBonusSource: null,
+      bonusSource: 'natural',
+      bonusTargetWin: 0,
+      bonusSpinTargets: [],
+      suppressRandomBonus: false,
+      buyingBonus: false
+    };
+
+    function createHoneyMatrix(){
+      return Array.from({ length: ROWS }, () => Array(COLS).fill(0));
+    }
+
+    function formatCurrency(value){
+      const num = Math.max(0, Math.round(Number(value) || 0));
+      return `${num.toLocaleString('ru-RU')} ₽`;
+    }
+
+    function createBonusProgressMap(){
+      return Object.fromEntries(BETS.map((bet) => [String(bet), 0]));
+    }
+
+    function clampBetIndex(index){
+      const num = Number(index);
+      if (!Number.isFinite(num)) return 0;
+      return Math.max(0, Math.min(BETS.length - 1, Math.floor(num)));
+    }
+
+    function clampBonusProgress(value){
+      return Math.max(0, Math.min(BONUS_TARGET_COUNT, Math.floor(Number(value) || 0)));
+    }
+
+    function normalizeBonusProgressMap(raw){
+      const base = createBonusProgressMap();
+      if (!raw || typeof raw !== 'object') return base;
+      for (const bet of BETS) {
+        const key = String(bet);
+        base[key] = clampBonusProgress(raw[key]);
+      }
+      return base;
+    }
+
+    function readStoredState(){
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return null;
+        const parsed = JSON.parse(raw);
+        if (!parsed || typeof parsed !== 'object') return null;
+        return parsed;
+      } catch {
+        return null;
+      }
+    }
+
+    function saveStoredState(){
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify({
+          betIndex: clampBetIndex(state.betIndex),
+          bonusProgressByBet: normalizeBonusProgressMap(state.bonusProgressByBet),
+          speedMode: SPEED_MODES[state.speedMode] ? state.speedMode : 'normal'
+        }));
+      } catch {}
+    }
+
+    function syncCurrentBetBonusProgress(){
+      const key = String(currentBet());
+      state.bonusProgressByBet = normalizeBonusProgressMap(state.bonusProgressByBet);
+      state.bonusProgress = clampBonusProgress(state.bonusProgressByBet[key]);
+    }
+
+    function writeCurrentBetBonusProgress(progress){
+      state.bonusProgressByBet = normalizeBonusProgressMap(state.bonusProgressByBet);
+      const key = String(currentBet());
+      const safe = clampBonusProgress(progress);
+      state.bonusProgress = safe;
+      state.bonusProgressByBet[key] = safe;
+      saveStoredState();
+    }
+
+
+    function modalOpen(){
+      return !!(state.buyBonusConfirmOpen || state.bonusIntroOpen || state.bonusResultOpen);
+    }
+
+    function openBonusModal(modal){
+      if (!modal) return;
+      modal.classList.add('show');
+      modal.setAttribute('aria-hidden', 'false');
+    }
+
+    function closeBonusModal(modal){
+      if (!modal) return;
+      modal.classList.remove('show');
+      modal.setAttribute('aria-hidden', 'true');
+    }
+
+    function syncBuyBonusModal(){
+      if (buyBonusModalPriceEl) buyBonusModalPriceEl.textContent = formatCurrency(currentBonusBuyPrice());
+    }
+
+    function openBuyBonusConfirm(){
+      if (!bonusBuyBtn || bonusBuyBtn.disabled || state.isSpinning || state.bonusMode || modalOpen() || state.bonusAutoplayActive || state.buyingBonus) return;
+      if (bonusReady()) return;
+      const price = currentBonusBuyPrice();
+      if (state.balance < price) return;
+      closeMenu();
+      closeBetSheet();
+      syncBuyBonusModal();
+      state.buyBonusConfirmOpen = true;
+      openBonusModal(buyBonusModal);
+      updateUi();
+    }
+
+    function closeBuyBonusConfirm(){
+      if (!state.buyBonusConfirmOpen) return;
+      state.buyBonusConfirmOpen = false;
+      closeBonusModal(buyBonusModal);
+      updateUi();
+    }
+
+    async function confirmBuyBonusConfirm(){
+      if (!state.buyBonusConfirmOpen) return;
+      state.buyBonusConfirmOpen = false;
+      closeBonusModal(buyBonusModal);
+      updateUi();
+      await sleep(20);
+      await buyBonusGame();
+    }
+
+    function renderFreeSpinsCounter(){
+      if (bonusJarWrap) bonusJarWrap.classList.toggle('hidden', !!state.bonusMode);
+      if (!freeSpinsWrap || !freeSpinsValueEl) return;
+      const show = !!state.bonusMode;
+      freeSpinsWrap.classList.toggle('show', show);
+      freeSpinsWrap.setAttribute('aria-hidden', show ? 'false' : 'true');
+      freeSpinsValueEl.textContent = String(Math.max(0, state.freeSpins));
+    }
+
+    function showBonusIntro(){
+      if (!bonusReady() || state.isSpinning || state.bonusMode || modalOpen()) return;
+      state.bonusIntroOpen = true;
+      openBonusModal(bonusIntroModal);
+      updateUi();
+    }
+
+    function showBonusResult(){
+      if (!bonusResultModal || state.bonusResultOpen) return;
+      if (bonusResultValueEl) bonusResultValueEl.textContent = formatCurrency(state.bonusWin);
+      state.bonusResultOpen = true;
+      openBonusModal(bonusResultModal);
+      updateUi();
+    }
+
+    async function confirmBonusIntro(){
+      if (!state.bonusIntroOpen || state.bonusAutoplayActive) return;
+      state.bonusIntroOpen = false;
+      closeBonusModal(bonusIntroModal);
+      state.bonusMode = true;
+      state.bonusWin = 0;
+      state.freeSpins = BONUS_FREE_SPINS;
+      state.bonusSpinsPlayed = 0;
+      prepareBonusSession(state.pendingBonusSource || 'natural');
+      clearHoneyMultipliers(false);
+      resetBonusJar();
+      setSpinWin(0, false);
+      updateUi();
+      await sleep(speedMs(260, 150));
+      runBonusAutoplay();
+    }
+
+    function finishBonusMode(){
+      if (!state.bonusResultOpen) return;
+      state.bonusResultOpen = false;
+      closeBonusModal(bonusResultModal);
+      state.bonusMode = false;
+      state.freeSpins = 0;
+      state.bonusWin = 0;
+      state.bonusSpinsPlayed = 0;
+      resetBonusSessionProfile();
+      clearHoneyMultipliers(false);
+      setSpinWin(0, false);
+      updateUi();
+    }
+
+    async function runBonusAutoplay(){
+      if (state.bonusAutoplayActive) return;
+      state.bonusAutoplayActive = true;
+      updateUi();
+      try {
+        await sleep(speedMs(360, 180));
+        while (state.bonusMode && state.freeSpins > 0) {
+          await runSpin({ triggeredByAuto:true });
+          await sleep(speedMs(260, 130));
+        }
+      } finally {
+        state.bonusAutoplayActive = false;
+        updateUi();
+      }
+      if (state.bonusMode && state.freeSpins <= 0 && !state.bonusResultOpen) {
+        showBonusResult();
+      }
+    }
+
+    function currentBet(){
+      return BETS[state.betIndex];
+    }
+
+    function currentSpeedFactor(){
+      return SPEED_MODES[state.speedMode]?.factor || 1;
+    }
+
+    function speedMs(ms, min = 0){
+      return Math.max(min, Math.round(ms * currentSpeedFactor()));
+    }
+
+    function renderSpeedControls(){
+      if (!speedRow) return;
+      speedRow.querySelectorAll('[data-speed]').forEach((button) => {
+        const active = button.dataset.speed === state.speedMode;
+        button.classList.toggle('active', active);
+        button.setAttribute('aria-pressed', active ? 'true' : 'false');
+      });
+    }
+
+    function renderRulesSymbols(){
+      if (!rulesSymbols) return;
+      const rulesSymbolsList = [...BASE_SYMBOLS, SYMBOL_BY_ID[BONUS_SYMBOL_ID]].filter(Boolean);
+      rulesSymbols.innerHTML = rulesSymbolsList.map(symbol => {
+        const payText = symbol.id === BONUS_SYMBOL_ID
+          ? 'Копит банку бонуски'
+          : `База: ${Number(symbol.payout).toFixed(2)}× ставки`;
+        return `
+        <div class="rule-symbol">
+          <img src="${symbol.image}" alt="${symbol.label}">
+          <span>${symbol.label}<small class="rule-pay">${payText}</small></span>
+        </div>
+      `;
+      }).join('');
+    }
+
+    function openMenu(){
+      if (!menuScrim) return;
+      menuScrim.classList.add('show');
+      menuScrim.setAttribute('aria-hidden', 'false');
+    }
+
+    function closeMenu(){
+      if (!menuScrim) return;
+      menuScrim.classList.remove('show');
+      menuScrim.setAttribute('aria-hidden', 'true');
+      closeRulesPanel();
+    }
+
+    function openRulesPanel(){
+      if (!rulesPanel) return;
+      rulesPanel.classList.add('show');
+      rulesPanel.setAttribute('aria-hidden', 'false');
+    }
+
+    function closeRulesPanel(){
+      if (!rulesPanel) return;
+      rulesPanel.classList.remove('show');
+      rulesPanel.setAttribute('aria-hidden', 'true');
+    }
+
+    function setGameSpeed(mode){
+      if (!SPEED_MODES[mode]) return;
+      state.speedMode = mode;
+      renderSpeedControls();
+      saveStoredState();
+    }
+
+    function renderSpinWin(pulse = false){
+      if (!spinWinValueEl) return;
+      spinWinValueEl.textContent = formatCurrency(state.spinWin);
+      if (pulse) {
+        spinWinValueEl.classList.remove('bump');
+        void spinWinValueEl.offsetWidth;
+        spinWinValueEl.classList.add('bump');
+        setTimeout(() => spinWinValueEl.classList.remove('bump'), 240);
+      }
+    }
+
+    function renderBeeState(){
+      if (!winBeeEl) return;
+      const nextSrc = state.bonusMode ? BONUS_BEE_IMAGE : NORMAL_BEE_IMAGE;
+      if (winBeeEl.getAttribute('src') !== nextSrc) winBeeEl.setAttribute('src', nextSrc);
+    }
+
+    function setSpinWin(value, pulse = false){
+      state.spinWin = Math.max(0, Math.round(Number(value) || 0));
+      renderSpinWin(pulse);
+    }
+
+    function makeSymbol(symbolId){
+      const source = SYMBOL_BY_ID[symbolId];
+      return { ...source, uid: ++uidCounter };
+    }
+
+    async function preloadSymbolAssets(){
+      const preloadList = [
+        ...SYMBOLS.map(symbol => symbol.image),
+        ...BONUS_JAR_IMAGES,
+        BONUS_COUNTER_IMAGE,
+        BONUS_START_IMAGE,
+        BONUS_END_IMAGE,
+        NORMAL_BEE_IMAGE,
+        BONUS_BEE_IMAGE
+      ];
+      const tasks = preloadList.map(src => new Promise(resolve => {
+        const img = new Image();
+        img.decoding = 'async';
+        img.loading = 'eager';
+        img.onload = async () => {
+          try { if (img.decode) await img.decode(); } catch {}
+          preloadedImages.set(src, img);
+          resolve();
+        };
+        img.onerror = () => resolve();
+        img.src = src;
+      }));
+      await Promise.all(tasks);
+    }
+    function showToast(){ return; }
+
+
+    function weightedChoice(ranges){
+      const total = ranges.reduce((sum, item) => sum + Math.max(0, Number(item.weight) || 0), 0);
+      if (!total) return ranges[0];
+      let roll = Math.random() * total;
+      for (const item of ranges) {
+        roll -= Math.max(0, Number(item.weight) || 0);
+        if (roll <= 0) return item;
+      }
+      return ranges[ranges.length - 1];
+    }
+
+    function randomInt(min, max){
+      const lo = Math.floor(Math.min(min, max));
+      const hi = Math.floor(Math.max(min, max));
+      return lo + Math.floor(Math.random() * (hi - lo + 1));
+    }
+
+    function buildBuyBonusSpinTargets(totalWin){
+      const spinCount = BONUS_FREE_SPINS;
+      if (!spinCount) return [];
+      const total = Math.max(0, Math.round(totalWin));
+      const tier = total / Math.max(1, currentBet());
+      const rawWeights = Array.from({ length: spinCount }, (_, index) => {
+        const base = 0.18 + Math.random() * 0.48;
+        const earlyBias = index < 4 ? 0.08 : 0;
+        const lateBias = index >= 7 ? 0.03 : 0;
+        return base + earlyBias + lateBias;
+      });
+      const mediumHits = tier > 90 ? 2 : 1;
+      const bigHits = tier > 220 ? 1 : 0;
+      const available = Array.from({ length: spinCount }, (_, i) => i).sort(() => Math.random() - 0.5);
+      for (let i = 0; i < mediumHits && i < available.length; i++) rawWeights[available[i]] += 0.8 + Math.random() * 0.5;
+      for (let i = 0; i < bigHits && i + mediumHits < available.length; i++) rawWeights[available[i + mediumHits]] += 1.2 + Math.random() * 0.7;
+      const sum = rawWeights.reduce((a, b) => a + b, 0) || 1;
+      const targets = rawWeights.map(weight => Math.round((weight / sum) * total));
+      let diff = total - targets.reduce((a, b) => a + b, 0);
+      let cursor = 0;
+      while (diff !== 0 && cursor < 5000) {
+        const idx = cursor % spinCount;
+        if (diff > 0) {
+          targets[idx] += 1;
+          diff -= 1;
+        } else if (targets[idx] > 0) {
+          targets[idx] -= 1;
+          diff += 1;
+        }
+        cursor += 1;
+      }
+      return targets;
+    }
+
+    function createBuyBonusPlan(){
+      const scale = currentBet() / 20;
+      const band = weightedChoice(BONUS_BUY_TARGET_RANGES);
+      const total = Math.round(randomInt(band.min, band.max) * scale);
+      return {
+        total,
+        targets: buildBuyBonusSpinTargets(total)
+      };
+    }
+
+    function prepareBonusSession(source = 'natural'){
+      state.bonusSource = source;
+      if (source === 'buy') {
+        const plan = createBuyBonusPlan();
+        state.bonusTargetWin = plan.total;
+        state.bonusSpinTargets = plan.targets;
+      } else {
+        state.bonusTargetWin = 0;
+        state.bonusSpinTargets = [];
+      }
+    }
+
+    function resetBonusSessionProfile(){
+      state.pendingBonusSource = null;
+      state.bonusSource = 'natural';
+      state.bonusTargetWin = 0;
+      state.bonusSpinTargets = [];
+    }
+
+    function getBonusSpinRigOptions(){
+      if (!state.bonusMode) return null;
+      if (state.bonusSource === 'buy') {
+        return {
+          extraWinChance: 0.34,
+          preserveNaturalWinsChance: 0.26,
+          allowDoubleClusterChance: 0.07,
+          rareBigWinChance: 0.035,
+          smallClusterSizes: [5, 5, 5, 6, 6, 6, 7],
+          bigClusterSizes: [7, 8, 8, 9],
+          hotspotPreferChance: 0.72
+        };
+      }
+      return {
+        extraWinChance: 0.58,
+        preserveNaturalWinsChance: 0.52,
+        allowDoubleClusterChance: 0.16,
+        rareBigWinChance: 0.18,
+        smallClusterSizes: [5, 5, 5, 5, 6, 6, 6, 7],
+        bigClusterSizes: [7, 8, 8, 9, 10, 11, 12],
+        hotspotPreferChance: 0.84
+      };
+    }
+
+    function applyBonusTargetFloor(actualWin, spinIndex){
+      if (!state.bonusMode || state.bonusSource !== 'buy') return Math.max(0, Math.round(actualWin));
+      const targets = Array.isArray(state.bonusSpinTargets) ? state.bonusSpinTargets : [];
+      if (!targets.length) return Math.max(0, Math.round(actualWin));
+      const planned = Math.max(0, Math.round(targets[spinIndex] || 0));
+      const remainingTarget = Math.max(0, Math.round(state.bonusTargetWin - state.bonusWin));
+      const floor = Math.round(planned * (0.84 + Math.random() * 0.14));
+      const adjusted = Math.max(Math.round(actualWin), Math.min(remainingTarget, floor));
+      if (spinIndex >= BONUS_FREE_SPINS - 1) return Math.max(adjusted, remainingTarget);
+      return adjusted;
+    }
+
+    function currentBonusBuyPrice(){
+      return currentBet() * 100;
+    }
+
+    function updateUi(){
+      const controlsLocked = !!(state.isSpinning || state.bonusMode || modalOpen() || state.bonusAutoplayActive || state.buyingBonus);
+      balanceValueEl.textContent = formatCurrency(state.balance);
+      betValueEl.textContent = formatCurrency(currentBet());
+      spinBtn.disabled = controlsLocked;
+      betOpenBtn.disabled = controlsLocked;
+      if (bonusBuyPriceEl) bonusBuyPriceEl.textContent = formatCurrency(currentBonusBuyPrice());
+      syncBuyBonusModal();
+      if (bonusBuyBtn) {
+        const buyLocked = controlsLocked || bonusReady() || state.balance < currentBonusBuyPrice();
+        bonusBuyBtn.disabled = buyLocked;
+        bonusBuyBtn.setAttribute('aria-disabled', buyLocked ? 'true' : 'false');
+        bonusBuyBtn.setAttribute('aria-label', `Купить бонус за ${formatCurrency(currentBonusBuyPrice())}`);
+      }
+      if (controlsLocked) closeBetSheet();
+      renderBetGrid();
+      renderSpinWin(false);
+      renderSpeedControls();
+      renderBeeState();
+      renderBonusJar();
+      renderFreeSpinsCounter();
+    }
+
+    function weightedRandomSymbol(options = {}){
+      const { excludeIds = [] } = options;
+      const excluded = new Set(excludeIds);
+      const bonusAllowed = !excluded.has(BONUS_SYMBOL_ID) && !state.bonusMode && !state.suppressRandomBonus;
+      if (bonusAllowed && Math.random() < 0.0032) return makeSymbol(BONUS_SYMBOL_ID);
+
+      const available = BASE_SYMBOLS.filter(symbol => !excluded.has(symbol.id));
+      const fallback = available.length ? available : BASE_SYMBOLS;
+      const totalWeight = fallback.reduce((sum, symbol) => sum + Math.max(0, Number(symbol.weight) || 0), 0);
+      let roll = Math.random() * (totalWeight || fallback.length || 1);
+
+      for (const symbol of fallback) {
+        roll -= Math.max(0, Number(symbol.weight) || 0);
+        if (roll <= 0) return makeSymbol(symbol.id);
+      }
+
+      return makeSymbol(fallback[fallback.length - 1]?.id || BASE_SYMBOL_IDS[0]);
+    }
+
+    function createBoard(){
+      return Array.from({ length: ROWS }, () => Array.from({ length: COLS }, () => weightedRandomSymbol()));
+    }
+
+    function createPurchasedBonusBoard(count = BONUS_BUY_SYMBOL_COUNT){
+      const safeCount = Math.max(0, Math.min(ROWS * COLS, Math.floor(Number(count) || 0)));
+      const picks = Array.from({ length: ROWS * COLS }, (_, index) => index).sort(() => Math.random() - 0.5);
+      const bonusSet = new Set(picks.slice(0, safeCount));
+      return Array.from({ length: ROWS }, (_, r) => Array.from({ length: COLS }, (_, c) => {
+        const flatIndex = r * COLS + c;
+        return bonusSet.has(flatIndex)
+          ? makeSymbol(BONUS_SYMBOL_ID)
+          : weightedRandomSymbol({ excludeIds:[BONUS_SYMBOL_ID] });
+      }));
+    }
+
+    function copyBoardRefs(board){
+      return board.map(row => row.slice());
+    }
+
+    function getGap(){
+      return parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--gap')) || 10;
+    }
+
+    function getCellSize(){
+      return parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--cell')) || 68;
+    }
+
+    function getX(col){
+      return col * (getCellSize() + getGap());
+    }
+
+    function getY(row){
+      return row * (getCellSize() + getGap());
+    }
+
+    function getHoneyStageIndex(value){
+      if (!value) return -1;
+      const found = HONEY_MULTIPLIER_STEPS.indexOf(value);
+      if (found >= 0) return found;
+      if (value >= HONEY_MULTIPLIER_STEPS[HONEY_MULTIPLIER_STEPS.length - 1]) return HONEY_MULTIPLIER_STEPS.length - 1;
+      return -1;
+    }
+
+    function getHoneyDisplay(value){
+      if (!value) return '';
+      const rounded = Number(value);
+      return Number.isInteger(rounded) ? `${rounded}x` : `${rounded.toFixed(1)}x`;
+    }
+
+    function getHoneyEffectiveFactor(value){
+      if (!value) return 1;
+      return Math.min(5, value < 1 ? 1 + value : value);
+    }
+
+    function nextHoneyMultiplier(value){
+      if (!value) return HONEY_MULTIPLIER_STEPS[0];
+      const idx = HONEY_MULTIPLIER_STEPS.indexOf(value);
+      if (idx >= 0 && idx < HONEY_MULTIPLIER_STEPS.length - 1) return HONEY_MULTIPLIER_STEPS[idx + 1];
+      if (value >= HONEY_MULTIPLIER_STEPS[HONEY_MULTIPLIER_STEPS.length - 1]) return HONEY_MULTIPLIER_STEPS[HONEY_MULTIPLIER_STEPS.length - 1];
+      return HONEY_MULTIPLIER_STEPS[0];
+    }
+
+    function getHoneyHotspots(){
+      const cells = [];
+      for (let r = 0; r < ROWS; r++) {
+        for (let c = 0; c < COLS; c++) {
+          if (state.honey[r][c] > 0) cells.push([r, c]);
+        }
+      }
+      return cells;
+    }
+
+    function growCluster(seedRow, seedCol, size){
+      const queue = [[seedRow, seedCol]];
+      const visited = new Set();
+      const picked = [];
+
+      while (queue.length && picked.length < size) {
+        const [r, c] = queue.shift();
+        const key = posKey(r, c);
+        if (visited.has(key) || r < 0 || r >= ROWS || c < 0 || c >= COLS) continue;
+        visited.add(key);
+        picked.push([r, c]);
+        const neighbors = [[r - 1, c], [r + 1, c], [r, c - 1], [r, c + 1]].sort(() => Math.random() - 0.5);
+        queue.push(...neighbors);
+      }
+
+      return picked;
+    }
+
+    function weightedRandomSymbolAvoiding(symbolIds = []){
+      const excludes = new Set(symbolIds.filter(Boolean));
+      return weightedRandomSymbol({ excludeIds:[...excludes] });
+    }
+
+    function scrubAccidentalWins(board, passes = 7){
+      const next = copyBoardRefs(board);
+      for (let pass = 0; pass < passes; pass++) {
+        const clusters = findClusters(next);
+        if (!clusters.length) break;
+
+        for (const cluster of clusters) {
+          const candidates = cluster.cells.filter(([r, c]) => next[r][c]);
+          const [r, c] = randomOf(candidates.length ? candidates : cluster.cells);
+          const neighbors = [[r - 1, c], [r + 1, c], [r, c - 1], [r, c + 1]]
+            .filter(([nr, nc]) => nr >= 0 && nr < ROWS && nc >= 0 && nc < COLS)
+            .map(([nr, nc]) => next[nr][nc]?.id)
+            .filter(Boolean);
+          next[r][c] = weightedRandomSymbolAvoiding([...neighbors, cluster.symbol?.id]);
+        }
+      }
+      return next;
+    }
+
+    function injectPattern(board, options = {}){
+      const {
+        extraWinChance = 0.14,
+        preserveNaturalWinsChance = 0.16,
+        allowDoubleClusterChance = 0.02,
+        rareBigWinChance = 0.0,
+        smallClusterSizes = [5, 5, 6, 6, 7],
+        bigClusterSizes = [7, 8, 8, 9],
+        hotspotPreferChance = 0.66
+      } = options;
+      const next = Math.random() < preserveNaturalWinsChance ? copyBoardRefs(board) : scrubAccidentalWins(board, 6);
+      const hotspots = getHoneyHotspots();
+
+      const pickBasePool = (preferHotspot = false, forceBig = false) => {
+        if (forceBig) {
+          return state.bonusMode
+            ? [BASE_SYMBOLS[1], BASE_SYMBOLS[2], BASE_SYMBOLS[2], BASE_SYMBOLS[3], BASE_SYMBOLS[4]].filter(Boolean)
+            : [BASE_SYMBOLS[1], BASE_SYMBOLS[2], BASE_SYMBOLS[3], BASE_SYMBOLS[4]].filter(Boolean);
+        }
+        if (preferHotspot) {
+          return state.bonusMode
+            ? [BASE_SYMBOLS[0], BASE_SYMBOLS[1], BASE_SYMBOLS[2], BASE_SYMBOLS[2], BASE_SYMBOLS[3], BASE_SYMBOLS[4]].filter(Boolean)
+            : [BASE_SYMBOLS[0], BASE_SYMBOLS[1], BASE_SYMBOLS[1], BASE_SYMBOLS[2], BASE_SYMBOLS[3]].filter(Boolean);
+        }
+        return state.bonusMode
+          ? [BASE_SYMBOLS[0], BASE_SYMBOLS[0], BASE_SYMBOLS[1], BASE_SYMBOLS[1], BASE_SYMBOLS[2], BASE_SYMBOLS[3], BASE_SYMBOLS[4]].filter(Boolean)
+          : [BASE_SYMBOLS[0], BASE_SYMBOLS[0], BASE_SYMBOLS[0], BASE_SYMBOLS[1], BASE_SYMBOLS[1], BASE_SYMBOLS[2], BASE_SYMBOLS[3]].filter(Boolean);
+      };
+
+      const injectOneCluster = ({ preferHotspot = false, forceBig = false } = {}) => {
+        const useHoneySeed = preferHotspot && hotspots.length > 0 && Math.random() < hotspotPreferChance;
+        const [seedR, seedC] = useHoneySeed ? randomOf(hotspots) : [Math.floor(Math.random() * ROWS), Math.floor(Math.random() * COLS)];
+        const base = randomOf(pickBasePool(useHoneySeed, forceBig));
+        const sizePool = forceBig ? bigClusterSizes : smallClusterSizes;
+        const size = randomOf(sizePool);
+        const picked = growCluster(seedR, seedC, size);
+        for (const [r, c] of picked) next[r][c] = makeSymbol(base.id);
+      };
+
+      if (Math.random() < extraWinChance) {
+        const forceBig = Math.random() < rareBigWinChance;
+        injectOneCluster({ preferHotspot: true, forceBig });
+        if (Math.random() < allowDoubleClusterChance) {
+          injectOneCluster({ preferHotspot: false, forceBig: false });
+        }
+      }
+
+      return next;
+    }
+
+    function applyHoneyCellPosition(el, row, col){
+      el.style.transform = `translate3d(${getX(col)}px, ${getY(row)}px, 0)`;
+    }
+
+    function buildHoneyGrid(){
+      honeyGridEl.innerHTML = '';
+      honeyMap.clear();
+      for (let r = 0; r < ROWS; r++) {
+        for (let c = 0; c < COLS; c++) {
+          const el = document.createElement('div');
+          el.className = 'honey-cell';
+          el.dataset.pos = posKey(r, c);
+          el.innerHTML = '<div class="honey-mult"></div>';
+          applyHoneyCellPosition(el, r, c);
+          honeyGridEl.appendChild(el);
+          honeyMap.set(posKey(r, c), el);
+        }
+      }
+      renderHoneyGrid();
+    }
+
+    function renderHoneyGrid(){
+      for (let r = 0; r < ROWS; r++) {
+        for (let c = 0; c < COLS; c++) {
+          const el = honeyMap.get(posKey(r, c));
+          if (!el) continue;
+          const mult = Number(state.honey[r][c]) || 0;
+          const active = mult > 0;
+          const badge = el.querySelector('.honey-mult');
+          if (badge) badge.textContent = active ? getHoneyDisplay(mult) : '';
+          el.classList.toggle('active', active);
+        }
+      }
+    }
+
+    function animateHoneyCells(cells, mode = 'charge', duration = 380){
+      const unique = [...new Set(cells.map(([r, c]) => posKey(r, c)))];
+      const actualDuration = speedMs(duration, 120);
+      unique.forEach((key) => {
+        const el = honeyMap.get(key);
+        if (!el) return;
+        el.classList.remove(mode);
+        void el.offsetWidth;
+        el.classList.add(mode);
+      });
+      setTimeout(() => {
+        unique.forEach((key) => honeyMap.get(key)?.classList.remove(mode));
+      }, actualDuration);
+    }
+
+    function clearHoneyMultipliers(animated = true){
+      const cells = [];
+      for (let r = 0; r < ROWS; r++) {
+        for (let c = 0; c < COLS; c++) {
+          if (state.honey[r][c] > 0) cells.push([r, c]);
+          state.honey[r][c] = 0;
+        }
+      }
+      if (animated && cells.length) animateHoneyCells(cells, 'reset', 320);
+      renderHoneyGrid();
+      return cells.length;
+    }
+
+    function getClusterHoneyFactor(cluster){
+      const factors = [];
+      for (const [r, c] of cluster.cells) {
+        const mult = Number(state.honey[r][c]) || 0;
+        if (mult > 0) factors.push(getHoneyEffectiveFactor(mult));
+      }
+      if (!factors.length) return 1;
+
+      let factor = 1;
+      for (const extra of factors) {
+        factor *= Math.max(1, extra);
+      }
+      return Math.min(5, Math.max(1, factor));
+    }
+
+    function calculateClusterTotalWin(cluster){
+      return Math.round(calculateClusterWin(cluster) * getClusterHoneyFactor(cluster));
+    }
+
+    function upgradeHoneyCells(cells){
+      const unique = [];
+      const seen = new Set();
+      for (const [r, c] of cells) {
+        const key = posKey(r, c);
+        if (seen.has(key)) continue;
+        seen.add(key);
+        state.honey[r][c] = nextHoneyMultiplier(Number(state.honey[r][c]) || 0);
+        unique.push([r, c]);
+      }
+      renderHoneyGrid();
+      return unique;
+    }
+
+    function getUniqueClusterCells(clusters){
+      const cells = [];
+      const seen = new Set();
+      for (const cluster of clusters) {
+        for (const [r, c] of cluster.cells) {
+          const key = posKey(r, c);
+          if (seen.has(key)) continue;
+          seen.add(key);
+          cells.push([r, c]);
+        }
+      }
+      return cells;
+    }
+
+
+    function getBonusStageIndex(progress = state.bonusProgress){
+      const safeProgress = Math.max(0, Math.min(BONUS_TARGET_COUNT, Number(progress) || 0));
+      return Math.min(BONUS_JAR_IMAGES.length - 1, Math.floor(safeProgress / BONUS_STAGE_STEP));
+    }
+
+    function bonusReady(){
+      return state.bonusProgress >= BONUS_TARGET_COUNT;
+    }
+
+    function renderBonusJar(){
+      if (!bonusJarImg || !bonusJarBtn) return;
+      bonusJarImg.src = BONUS_JAR_IMAGES[getBonusStageIndex()];
+      bonusJarBtn.classList.toggle('ready', bonusReady() && !state.bonusMode);
+      const locked = state.isSpinning || state.bonusMode || modalOpen() || state.bonusAutoplayActive;
+      bonusJarBtn.disabled = locked || !bonusReady();
+      bonusJarBtn.setAttribute('aria-disabled', bonusJarBtn.disabled ? 'true' : 'false');
+      bonusJarBtn.setAttribute('aria-label', bonusReady() ? 'Запустить 10 бесплатных спинов' : 'Банка бонусной игры');
+      if (bonusJarWrap) bonusJarWrap.classList.toggle('hidden', !!state.bonusMode);
+    }
+
+    function pulseBonusJar(){
+      if (!bonusJarBtn) return;
+      bonusJarBtn.classList.remove('jar-bump');
+      void bonusJarBtn.offsetWidth;
+      bonusJarBtn.classList.add('jar-bump');
+      setTimeout(() => bonusJarBtn.classList.remove('jar-bump'), 420);
+    }
+
+    function addBonusProgress(count){
+      if (!count) return;
+      const prevStage = getBonusStageIndex();
+      const prevReady = bonusReady();
+      writeCurrentBetBonusProgress(state.bonusProgress + count);
+      renderBonusJar();
+      if (getBonusStageIndex() !== prevStage || (!prevReady && bonusReady())) pulseBonusJar();
+    }
+
+    function resetBonusJar(){
+      writeCurrentBetBonusProgress(0);
+      renderBonusJar();
+    }
+
+    function activateBonusGame(){
+      if (!state.pendingBonusSource) state.pendingBonusSource = 'natural';
+      showBonusIntro();
+    }
+
+    async function buyBonusGame(){
+      if (!bonusBuyBtn || bonusBuyBtn.disabled || state.isSpinning || state.bonusMode || modalOpen() || state.bonusAutoplayActive || state.buyingBonus) return;
+      const price = currentBonusBuyPrice();
+      if (state.balance < price || bonusReady()) return;
+      closeMenu();
+      closeBetSheet();
+      state.buyingBonus = true;
+      state.balance -= price;
+      state.suppressRandomBonus = true;
+      updateUi();
+
+      try {
+        await dropBoardOut();
+        state.board = createPurchasedBonusBoard(BONUS_BUY_SYMBOL_COUNT);
+        await animateBoardIn();
+        await resolveBonusSymbols(BONUS_BUY_SYMBOL_COUNT);
+        state.pendingBonusSource = 'buy';
+        await sleep(speedMs(160, 90));
+      } catch (error) {
+        console.error(error);
+      } finally {
+        state.suppressRandomBonus = false;
+        state.buyingBonus = false;
+        updateUi();
+      }
+    }
+
+    function findBonusCells(board){
+      const cells = [];
+      for (let r = 0; r < ROWS; r++) {
+        for (let c = 0; c < COLS; c++) {
+          if (board[r][c]?.id === BONUS_SYMBOL_ID) cells.push([r, c]);
+        }
+      }
+      return cells;
+    }
+
+    function clearBonusSymbolsForIdle(board){
+      for (let r = 0; r < ROWS; r++) {
+        for (let c = 0; c < COLS; c++) {
+          if (board[r][c]?.id === BONUS_SYMBOL_ID) board[r][c] = weightedRandomSymbol({ excludeIds:[BONUS_SYMBOL_ID] });
+        }
+      }
+      return board;
+    }
+
+    function animateBonusFlyToJar(tileEl, delay = 0){
+      if (!tileEl || !bonusJarBtn) return speedMs(380, 220) + delay;
+      const img = tileEl.querySelector('img');
+      if (!img) return speedMs(380, 220) + delay;
+      const start = img.getBoundingClientRect();
+      const target = bonusJarBtn.getBoundingClientRect();
+      const clone = img.cloneNode(true);
+      clone.className = 'bonus-fly-clone';
+      clone.style.left = `${start.left}px`;
+      clone.style.top = `${start.top}px`;
+      clone.style.width = `${start.width}px`;
+      clone.style.height = `${start.height}px`;
+      document.body.appendChild(clone);
+
+      const targetX = (target.left + target.width * 0.42) - (start.left + start.width / 2);
+      const targetY = (target.top + target.height * 0.52) - (start.top + start.height / 2);
+      const duration = speedMs(920, 520);
+      const actualDelay = speedMs(delay, 0);
+      clone.style.transition = 'none';
+      clone.style.transform = 'translate3d(0,0,0) scale(1) rotate(0deg)';
+      clone.style.opacity = '1';
+      void clone.offsetWidth;
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          clone.style.transition = `transform ${duration}ms cubic-bezier(.2,.78,.18,1) ${actualDelay}ms, opacity ${Math.max(speedMs(300, 180), duration - speedMs(80, 50))}ms ease ${actualDelay}ms`;
+          clone.style.transform = `translate3d(${targetX}px, ${targetY}px, 0) scale(.5) rotate(${Math.random() < 0.5 ? '-' : ''}${9 + Math.random() * 8}deg)`;
+          clone.style.opacity = '0.3';
+        });
+      });
+      setTimeout(() => clone.remove(), actualDelay + duration + 110);
+      return actualDelay + duration + 110;
+    }
+
+
+    function animateBonusLandingSplash(row, col, delay = 0){
+      if (!reelsEl) return;
+      const splash = document.createElement('div');
+      splash.className = 'bonus-land-splash';
+      splash.innerHTML = '<span class="drop d1"></span><span class="drop d2"></span><span class="drop d3"></span><span class="drop d4"></span><span class="drop d5"></span>';
+      applyTilePosition(splash, row, col, { animate:false });
+      const actualDelay = speedMs(delay, 0);
+      setTimeout(() => {
+        reelsEl.appendChild(splash);
+        splash.style.opacity = '1';
+        setTimeout(() => splash.remove(), speedMs(760, 420));
+      }, actualDelay);
+    }
+
+    async function collectBonusSymbolsRound(){
+      const bonusCells = findBonusCells(state.board);
+      if (!bonusCells.length) return 0;
+
+      const removedUIDs = [];
+      const timings = [];
+
+      bonusCells.forEach(([r, c], index) => {
+        const cell = state.board[r][c];
+        if (!cell) return;
+        const el = tileMap.get(cell.uid);
+        if (el) {
+          el.classList.add('bonus-flying');
+          timings.push(animateBonusFlyToJar(el, index * 70));
+        }
+        removedUIDs.push(cell.uid);
+        state.board[r][c] = null;
+      });
+
+      if (timings.length) await sleep(Math.max(...timings));
+      removedUIDs.forEach(uid => removeTileElByUid(uid));
+      addBonusProgress(bonusCells.length);
+      await collapseAndRefill();
+      return bonusCells.length;
+    }
+
+    async function resolveBonusSymbols(maxRounds = 6){
+      if (state.bonusMode) return 0;
+      let rounds = 0;
+      let collected = 0;
+      while (rounds < maxRounds) {
+        const count = findBonusCells(state.board).length;
+        if (!count) break;
+        collected += await collectBonusSymbolsRound();
+        rounds += 1;
+      }
+      return collected;
+    }
+
+    function resizeBoard(repositionOnly = false){
+      const gap = window.innerWidth <= 420 ? 6 : 8;
+      document.documentElement.style.setProperty('--gap', `${gap}px`);
+
+      const framePad = 24;
+      const viewportWidth = Math.max(300, Math.min(
+        (boardCardEl?.clientWidth || contentEl?.clientWidth || window.innerWidth || 390) - framePad,
+        window.innerWidth - 22 - framePad
+      ));
+      const widthBasedCell = (viewportWidth - gap * (COLS - 1)) / COLS;
+
+      const stickyHeight = stickyTopEl?.getBoundingClientRect().height || 0;
+      const bonusHeight = bonusZoneEl?.getBoundingClientRect().height || 0;
+      const winHeight = winCardEl?.getBoundingClientRect().height || 0;
+      const controlsHeight = controlsCardEl?.getBoundingClientRect().height || 0;
+      const appStyles = appEl ? getComputedStyle(appEl) : null;
+      const contentStyles = contentEl ? getComputedStyle(contentEl) : null;
+      const appPadTop = appStyles ? parseFloat(appStyles.paddingTop) || 0 : 0;
+      const appPadBottom = appStyles ? parseFloat(appStyles.paddingBottom) || 0 : 0;
+      const contentGap = contentStyles ? parseFloat(contentStyles.gap) || 16 : 16;
+      const contentChildren = contentEl ? Array.from(contentEl.children).filter(el => el.offsetParent !== null).length : 0;
+      const totalGaps = Math.max(0, contentChildren - 1);
+      const availableHeight = Math.max(250, window.innerHeight - stickyHeight - bonusHeight - winHeight - controlsHeight - appPadTop - appPadBottom - contentGap * totalGaps - 28);
+      const heightBasedCell = (availableHeight - gap * (ROWS - 1)) / ROWS;
+
+      const cell = Math.max(42, Math.min(widthBasedCell, heightBasedCell));
+      const width = (cell * COLS) + (gap * (COLS - 1));
+      const height = (cell * ROWS) + (gap * (ROWS - 1));
+      document.documentElement.style.setProperty('--cell', `${cell}px`);
+      document.documentElement.style.setProperty('--board-w', `${width}px`);
+      document.documentElement.style.setProperty('--board-h', `${height}px`);
+      boardViewportEl.style.width = `${width}px`;
+      boardViewportEl.style.height = `${height}px`;
+      if (boardFrameEl) boardFrameEl.style.width = `${width + framePad}px`;
+
+      for (let r = 0; r < ROWS; r++) {
+        for (let c = 0; c < COLS; c++) {
+          const honeyEl = honeyMap.get(posKey(r, c));
+          if (honeyEl) applyHoneyCellPosition(honeyEl, r, c);
+        }
+      }
+
+      if (repositionOnly && state.board.length) {
+        for (let r = 0; r < ROWS; r++) {
+          for (let c = 0; c < COLS; c++) {
+            const cellData = state.board[r][c];
+            if (!cellData) continue;
+            const el = tileMap.get(cellData.uid);
+            if (el) applyTilePosition(el, r, c, { animate:false });
+          }
+        }
+      }
+    }
+
+    function triggerSoftBounce(){
+      return;
+    }
+
+    function applyTilePosition(el, row, col, opts = {}){
+      const { animate = true, startRow = null, delay = 0, distanceOverride = null } = opts;
+      const x = getX(col);
+      const y = getY(row);
+
+      if (!animate) {
+        el.style.transition = 'none';
+        el.style.transform = `translate3d(${x}px, ${y}px, 0)`;
+        void el.offsetWidth;
+        el.style.transition = '';
+        el._row = row;
+        el._col = col;
+        return 0;
+      }
+
+      if (startRow !== null) {
+        const fromY = getY(startRow);
+        el.style.transition = 'none';
+        el.style.transform = `translate3d(${x}px, ${fromY}px, 0)`;
+        el.style.opacity = '1';
+        void el.offsetWidth;
+        const distance = distanceOverride ?? Math.abs(row - startRow);
+        const duration = speedMs(Math.max(500, 520 + distance * 82), 260);
+        const actualDelay = speedMs(delay, 0);
+        el.style.transition = `transform ${duration}ms cubic-bezier(.16,.82,.20,1) ${actualDelay}ms`;
+        el.style.transform = `translate3d(${x}px, ${y}px, 0)`;
+        triggerSoftBounce(el, row, col, actualDelay + duration - 30, distance);
+        el._row = row;
+        el._col = col;
+        return actualDelay + duration;
+      }
+
+      const currentRow = Number.isFinite(el._row) ? el._row : row;
+      const distance = distanceOverride ?? Math.abs(currentRow - row);
+      if (distance === 0) {
+        el.style.transition = 'none';
+        el.style.transform = `translate3d(${x}px, ${y}px, 0)`;
+        el._row = row;
+        el._col = col;
+        return 0;
+      }
+
+      const duration = speedMs(Math.max(420, 430 + Math.max(0, distance - 1) * 78), 220);
+      const actualDelay = speedMs(delay, 0);
+      el.style.transition = `transform ${duration}ms cubic-bezier(.16,.82,.20,1) ${actualDelay}ms`;
+      el.style.transform = `translate3d(${x}px, ${y}px, 0)`;
+      triggerSoftBounce(el, row, col, actualDelay + duration - 24, distance);
+      el._row = row;
+      el._col = col;
+      return actualDelay + duration;
+    }
+
+    function createTileEl(cell, row, col, startRow = null, delay = 0){
+      const el = document.createElement('div');
+      el.className = 'tile';
+      el.dataset.uid = String(cell.uid);
+      el.dataset.symbol = cell.id;
+      const img = document.createElement('img');
+      img.src = preloadedImages.get(cell.image)?.src || cell.image;
+      img.alt = cell.label;
+      img.decoding = 'async';
+      img.loading = 'eager';
+      img.fetchPriority = 'high';
+      img.draggable = false;
+      el.appendChild(img);
+      reelsEl.appendChild(el);
+      tileMap.set(cell.uid, el);
+
+      if (startRow === null) {
+        applyTilePosition(el, row, col, { animate:false });
+        return 0;
+      }
+
+      el.classList.add('pop');
+      const totalTime = applyTilePosition(el, row, col, { animate:true, startRow, delay });
+      if (cell.id === BONUS_SYMBOL_ID) {
+        animateBonusLandingSplash(row, col, Math.max(0, totalTime - speedMs(140, 90)));
+      }
+      return totalTime;
+    }
+
+    function removeTileElByUid(uid){
+      const el = tileMap.get(uid);
+      if (el) el.remove();
+      tileMap.delete(uid);
+    }
+
+    function renderBoardInstant(){
+      reelsEl.innerHTML = '';
+      tileMap.clear();
+      resizeBoard(false);
+      for (let r = 0; r < ROWS; r++) {
+        for (let c = 0; c < COLS; c++) {
+          const cell = state.board[r][c];
+          if (!cell) continue;
+          createTileEl(cell, r, c, null, 0);
+        }
+      }
+      renderHoneyGrid();
+      updateUi();
+    }
+
+    async function animateBoardIn(){
+      resizeBoard(false);
+      reelsEl.innerHTML = '';
+      tileMap.clear();
+      const endTimes = [];
+      for (let c = 0; c < COLS; c++) {
+        for (let r = 0; r < ROWS; r++) {
+          const cell = state.board[r][c];
+          if (!cell) continue;
+          const startRow = -ROWS - 1 - (ROWS - 1 - r);
+          const delay = speedMs(c * 56 + r * 26, 0);
+          endTimes.push(createTileEl(cell, r, c, startRow, delay));
+        }
+      }
+      if (endTimes.length) await sleep(Math.max(...endTimes) + speedMs(70, 40));
+      updateUi();
+    }
+
+    async function dropBoardOut(){
+      const tiles = [...tileMap.values()];
+      if (!tiles.length) return;
+      const boardHeight = boardViewportEl.clientHeight || parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--board-h')) || 300;
+      let maxTime = 0;
+      tiles.forEach(el => {
+        const row = Number(el._row ?? 0);
+        const col = Number(el._col ?? 0);
+        const delay = speedMs(row * 24 + col * 12, 0);
+        const duration = speedMs(340 + (ROWS - row) * 72, 220);
+        el.style.transition = `transform ${duration}ms cubic-bezier(.18,.80,.24,1) ${delay}ms, opacity ${Math.max(speedMs(220, 140), duration - speedMs(50, 24))}ms ease ${delay}ms`;
+        el.style.transform = `translate3d(${getX(col)}px, ${boardHeight + getCellSize() + row * 8}px, 0) scale(.96)`;
+        el.style.opacity = '0';
+        maxTime = Math.max(maxTime, duration + delay);
+      });
+      await sleep(maxTime + speedMs(30, 20));
+      reelsEl.innerHTML = '';
+      tileMap.clear();
+    }
+
+    function clusterMultiplier(size){
+      const table = { 5:0.9, 6:1.12, 7:1.38, 8:1.68, 9:2.02, 10:2.4, 11:2.82, 12:3.28, 13:3.78, 14:4.32, 15:4.9, 16:5.52, 17:6.18, 18:6.88, 19:7.62, 20:8.4 };
+      if (table[size]) return table[size];
+      return 8.4 + Math.max(0, size - 20) * 0.34;
+    }
+
+    function calculateClusterWin(cluster){
+      const base = currentBet() * cluster.symbol.payout * clusterMultiplier(cluster.cells.length);
+      return Math.round(base);
+    }
+
+    function findClusters(board){
+      const clusters = [];
+      const visited = Array.from({ length: ROWS }, () => Array(COLS).fill(false));
+      const neighbors = [
+        [-1, 0],
+        [1, 0],
+        [0, -1],
+        [0, 1]
+      ];
+
+      for (let r = 0; r < ROWS; r++) {
+        for (let c = 0; c < COLS; c++) {
+          if (visited[r][c]) continue;
+          const startCell = board[r][c];
+          if (!startCell || !BASE_SYMBOL_IDS.includes(startCell.id)) {
+            visited[r][c] = true;
+            continue;
+          }
+
+          const symbolId = startCell.id;
+          const queue = [[r, c]];
+          const cells = [];
+          let qIndex = 0;
+          visited[r][c] = true;
+
+          while (qIndex < queue.length) {
+            const [cr, cc] = queue[qIndex++];
+            const current = board[cr][cc];
+            if (!current || current.id !== symbolId) continue;
+            cells.push([cr, cc]);
+
+            for (const [dr, dc] of neighbors) {
+              const nr = cr + dr;
+              const nc = cc + dc;
+              if (nr < 0 || nr >= ROWS || nc < 0 || nc >= COLS) continue;
+              if (visited[nr][nc]) continue;
+              const near = board[nr][nc];
+              if (!near || near.id !== symbolId) continue;
+              visited[nr][nc] = true;
+              queue.push([nr, nc]);
+            }
+          }
+
+          if (cells.length >= CLUSTER_MIN) {
+            clusters.push({
+              symbol: SYMBOL_BY_ID[symbolId],
+              cells,
+              wildCount: 0,
+              symbolCount: cells.length
+            });
+          }
+        }
+      }
+
+      return clusters.sort((a, b) => {
+        const byWin = calculateClusterTotalWin(b) - calculateClusterTotalWin(a);
+        if (byWin) return byWin;
+        return b.cells.length - a.cells.length;
+      });
+    }
+
+    async function flashClusters(clusters, duration = 420){
+      const uids = [];
+      for (const cluster of clusters) {
+        for (const [r, c] of cluster.cells) {
+          const cell = state.board[r][c];
+          if (!cell) continue;
+          const el = tileMap.get(cell.uid);
+          if (!el) continue;
+          el.classList.add('win');
+          uids.push(cell.uid);
+        }
+      }
+      await sleep(speedMs(duration, 180));
+      uids.forEach(uid => tileMap.get(uid)?.classList.remove('win'));
+    }
+
+    async function burstClustersAndAnimate(clusters){
+      const removedUIDs = [];
+      const upgradedCells = upgradeHoneyCells(getUniqueClusterCells(clusters));
+
+      for (const cluster of clusters) {
+        for (const [r, c] of cluster.cells) {
+          const cell = state.board[r][c];
+          if (!cell) continue;
+          const el = tileMap.get(cell.uid);
+          if (el) el.classList.add('vanish');
+          removedUIDs.push(cell.uid);
+          state.board[r][c] = null;
+        }
+      }
+
+      renderHoneyGrid();
+      if (upgradedCells.length) animateHoneyCells(upgradedCells, 'charge', 220);
+      await sleep(speedMs(210, 120));
+      removedUIDs.forEach(uid => removeTileElByUid(uid));
+    }
+
+    async function collapseAndRefill(){
+      const endTimes = [];
+
+      for (let c = 0; c < COLS; c++) {
+        const existing = [];
+        for (let r = ROWS - 1; r >= 0; r--) {
+          if (state.board[r][c]) existing.push(state.board[r][c]);
+        }
+
+        for (let r = 0; r < ROWS; r++) state.board[r][c] = null;
+
+        for (let index = 0; index < existing.length; index++) {
+          const cell = existing[index];
+          const targetRow = ROWS - 1 - index;
+          state.board[targetRow][c] = cell;
+          const el = tileMap.get(cell.uid);
+          if (!el) continue;
+          const prevRow = Number.isFinite(el._row) ? el._row : targetRow;
+          if (prevRow !== targetRow) {
+            endTimes.push(applyTilePosition(el, targetRow, c, {
+              animate:true,
+              delay: Math.min(speedMs(160, 80), speedMs(c * 18 + index * 16, 0)),
+              distanceOverride: Math.abs(targetRow - prevRow)
+            }));
+          } else {
+            applyTilePosition(el, targetRow, c, { animate:false });
+          }
+        }
+
+        const empties = ROWS - existing.length;
+        for (let i = 0; i < empties; i++) {
+          const targetRow = i;
+          const belowIds = [];
+          if (targetRow + 1 < ROWS && state.board[targetRow + 1][c]) belowIds.push(state.board[targetRow + 1][c].id);
+          const leftId = c > 0 && state.board[targetRow][c - 1] ? state.board[targetRow][c - 1].id : null;
+          const rightId = c + 1 < COLS && state.board[targetRow][c + 1] ? state.board[targetRow][c + 1].id : null;
+          const biasPool = [belowIds[0], belowIds[0], leftId, rightId].filter(Boolean);
+          const cell = biasPool.length && Math.random() < (state.bonusMode ? 0.36 : 0.015) ? makeSymbol(randomOf(biasPool)) : weightedRandomSymbol();
+          state.board[targetRow][c] = cell;
+          const startRow = -empties - 2 + i;
+          const delay = speedMs(c * 36 + i * 24, 0);
+          endTimes.push(createTileEl(cell, targetRow, c, startRow, delay));
+        }
+      }
+
+      if (endTimes.length) await sleep(Math.max(...endTimes) + speedMs(70, 40));
+    }
+
+    async function runSpin(options = {}){
+      const { triggeredByAuto = false } = options;
+      if (state.isSpinning || modalOpen()) return;
+      if (state.bonusMode && !triggeredByAuto) return;
+      closeMenu();
+      const useFreeSpin = state.bonusMode && state.freeSpins > 0;
+      if (!useFreeSpin && state.balance < currentBet()) {
+        return;
+      }
+
+      state.isSpinning = true;
+      updateUi();
+
+      try {
+        const bonusDisplayBase = useFreeSpin ? state.bonusWin : 0;
+        setSpinWin(bonusDisplayBase, false);
+
+        const shouldClearHoney = !useFreeSpin;
+        if (shouldClearHoney) {
+          const clearedHoney = clearHoneyMultipliers(true);
+          if (clearedHoney > 0) await sleep(speedMs(120, 70));
+        }
+
+        if (useFreeSpin) state.freeSpins = Math.max(0, state.freeSpins - 1);
+        else state.balance -= currentBet();
+        updateUi();
+
+        await dropBoardOut();
+        const spinPatternOptions = useFreeSpin ? getBonusSpinRigOptions() : {
+          extraWinChance: 0.011,
+          preserveNaturalWinsChance: 0.012,
+          allowDoubleClusterChance: 0.0007,
+          rareBigWinChance: 0.0003,
+          smallClusterSizes: [5, 5, 5],
+          bigClusterSizes: [6],
+          hotspotPreferChance: 0.26
+        };
+        state.board = injectPattern(createBoard(), spinPatternOptions);
+        await animateBoardIn();
+        await resolveBonusSymbols();
+
+        let totalWin = 0;
+        let cascades = 0;
+        let totalClosed = 0;
+        let honeyFactorPeak = 1;
+
+        while (cascades < MAX_CASCADES) {
+          const clusters = findClusters(state.board);
+          if (!clusters.length) break;
+
+          cascades += 1;
+          await flashClusters(clusters, speedMs(320, 180));
+
+          for (const cluster of clusters) {
+            const honeyFactor = getClusterHoneyFactor(cluster);
+            honeyFactorPeak = Math.max(honeyFactorPeak, honeyFactor);
+            totalWin += Math.round(calculateClusterWin(cluster) * honeyFactor);
+            totalClosed += cluster.cells.length;
+          }
+
+          setSpinWin(bonusDisplayBase + totalWin, true);
+
+          await burstClustersAndAnimate(clusters);
+          await collapseAndRefill();
+          await resolveBonusSymbols();
+          await sleep(speedMs(120, 70));
+        }
+
+        if (useFreeSpin) {
+          totalWin = applyBonusTargetFloor(totalWin, state.bonusSpinsPlayed);
+        }
+
+        if (totalClosed > 0 || (useFreeSpin && totalWin > 0)) {
+          if (useFreeSpin && totalWin > 0 && !totalClosed) setSpinWin(bonusDisplayBase + totalWin, true);
+          state.balance += totalWin;
+          if (useFreeSpin) state.bonusWin += totalWin;
+          setSpinWin(useFreeSpin ? state.bonusWin : totalWin, true);
+        } else if (useFreeSpin) {
+          setSpinWin(state.bonusWin, false);
+        }
+
+        if (useFreeSpin) state.bonusSpinsPlayed += 1;
+      } catch (error) {
+        console.error(error);
+      } finally {
+        state.isSpinning = false;
+        updateUi();
+      }
+    }
+
+    function openBetSheet(){
+      if (state.isSpinning || !betPopover) return;
+      closeMenu();
+      betPopover.classList.add('show');
+      betPopover.setAttribute('aria-hidden', 'false');
+      betOpenBtn.setAttribute('aria-expanded', 'true');
+    }
+
+    function closeBetSheet(){
+      if (!betPopover) return;
+      betPopover.classList.remove('show');
+      betPopover.setAttribute('aria-hidden', 'true');
+      betOpenBtn.setAttribute('aria-expanded', 'false');
+    }
+
+    function toggleBetSheet(){
+      if (betPopover?.classList.contains('show')) closeBetSheet();
+      else openBetSheet();
+    }
+
+    function selectBet(index){
+      if (state.isSpinning) return;
+      state.betIndex = clampBetIndex(index);
+      syncCurrentBetBonusProgress();
+      saveStoredState();
+      updateUi();
+      closeBetSheet();
+      showToast(`Ставка: ${formatCurrency(currentBet())}`);
+    }
+
+    function renderBetGrid(){
+      betGrid.innerHTML = BETS.map((bet, index) => `
+        <button class="bet-chip ${index === state.betIndex ? 'active' : ''}" data-bet-index="${index}" type="button">
+          ${formatCurrency(bet)}
+        </button>
+      `).join('');
+    }
+
+    function bindEvents(){
+      spinBtn.addEventListener('click', runSpin);
+      bonusBuyBtn?.addEventListener('click', openBuyBonusConfirm);
+      bonusJarBtn?.addEventListener('click', activateBonusGame);
+      buyBonusConfirmBtn?.addEventListener('click', (e) => { e.stopPropagation(); confirmBuyBonusConfirm(); });
+      buyBonusCancelBtn?.addEventListener('click', (e) => { e.stopPropagation(); closeBuyBonusConfirm(); });
+      buyBonusModal?.addEventListener('click', (e) => { if (e.target === buyBonusModal) closeBuyBonusConfirm(); });
+      bonusIntroModal?.addEventListener('click', confirmBonusIntro);
+      bonusResultModal?.addEventListener('click', finishBonusMode);
+      betOpenBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        toggleBetSheet();
+      });
+      menuFab?.addEventListener('click', openMenu);
+      document.getElementById('menuClose')?.addEventListener('click', closeMenu);
+      menuScrim?.addEventListener('click', (e) => {
+        if (e.target === menuScrim) closeMenu();
+      });
+      speedRow?.addEventListener('click', (e) => {
+        const button = e.target.closest('[data-speed]');
+        if (!button) return;
+        setGameSpeed(button.dataset.speed);
+      });
+      openRulesBtn?.addEventListener('click', openRulesPanel);
+      document.getElementById('rulesBack')?.addEventListener('click', closeRulesPanel);
+      document.getElementById('betClose')?.addEventListener('click', (e) => {
+        e.stopPropagation();
+        closeBetSheet();
+      });
+      betPopover?.addEventListener('click', (e) => e.stopPropagation());
+      betGrid.addEventListener('click', (e) => {
+        const button = e.target.closest('[data-bet-index]');
+        if (!button) return;
+        selectBet(Number(button.dataset.betIndex));
+      });
+      document.getElementById('backBtn').addEventListener('click', () => {
+        window.location.href = 'index.html';
+      });
+      document.addEventListener('click', (e) => {
+        if (e.target.closest('#betOpenBtn') || e.target.closest('#betPopover') || e.target.closest('#menuFab') || e.target.closest('#menuScrim')) return;
+        closeBetSheet();
+      });
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+          if (state.bonusResultOpen) finishBonusMode();
+          else if (state.bonusIntroOpen) confirmBonusIntro();
+          else if (state.buyBonusConfirmOpen) closeBuyBonusConfirm();
+          else if (rulesPanel?.classList.contains('show')) closeRulesPanel();
+          else if (menuScrim?.classList.contains('show')) closeMenu();
+          else closeBetSheet();
+        }
+        if (e.code === 'Space') {
+          e.preventDefault();
+          runSpin();
+        }
+      });
+      let resizeTimer = 0;
+      window.addEventListener('resize', () => {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(() => resizeBoard(true), 60);
+      });
+    }
+
+    async function runPreloader(){
+      const fill = document.getElementById('preloaderFill');
+      const hint = document.getElementById('preloaderHint');
+      const assets = [
+        'https://i.postimg.cc/265qBRGM/file-00000000106c71f6be454d5fc27b9083.png',
+        'https://i.postimg.cc/LXTdY5vk/Picsart-26-04-02-15-35-12-671.png',
+        'https://i.postimg.cc/KjtgVF1t/Picsart-26-04-02-21-03-59-677.png',
+        'https://i.postimg.cc/fW7L68Hv/Picsart-26-04-02-21-54-47-469.png',
+        'https://i.postimg.cc/d12sc0jb/Picsart-26-04-02-21-47-05-247.png',
+        'https://i.postimg.cc/XYj5vp1j/Picsart-26-04-02-23-46-36-446.png',
+        'https://i.postimg.cc/qvL497mF/Picsart-26-02-27-02-02-37-502.png',
+        BONUS_COUNTER_IMAGE,
+        BONUS_START_IMAGE,
+        BONUS_END_IMAGE,
+        ...BONUS_JAR_IMAGES,
+        ...SYMBOLS.map(s => s.image)
+      ];
+      let loaded = 0;
+      const updateFill = () => {
+        const progress = Math.round((loaded / assets.length) * 100);
+        fill.style.width = `${progress}%`;
+        hint.textContent = `Загрузка ${progress}%`;
+      };
+      await Promise.all(assets.map(src => new Promise(resolve => {
+        const img = new Image();
+        img.onload = () => { loaded += 1; updateFill(); resolve(); };
+        img.onerror = () => { loaded += 1; updateFill(); resolve(); };
+        img.src = src;
+      })));
+      await sleep(280);
+      document.getElementById('preloader').classList.add('hide');
+    }
+
+    async function init(){
+      const stored = readStoredState();
+      state.bonusProgressByBet = normalizeBonusProgressMap(stored?.bonusProgressByBet);
+      state.betIndex = clampBetIndex(stored?.betIndex ?? state.betIndex);
+      state.speedMode = SPEED_MODES[stored?.speedMode] ? stored.speedMode : state.speedMode;
+      syncCurrentBetBonusProgress();
+      await runPreloader();
+      await preloadSymbolAssets();
+      resizeBoard(false);
+      buildHoneyGrid();
+      renderRulesSymbols();
+      state.board = clearBonusSymbolsForIdle(injectPattern(createBoard(), { extraWinChance: 0.018, preserveNaturalWinsChance: 0.02, allowDoubleClusterChance: 0.0015, rareBigWinChance: 0.0, hotspotPreferChance: 0.24 }));
+      renderBoardInstant();
+      renderBonusJar();
+      renderFreeSpinsCounter();
+      setSpinWin(0, false);
+      updateUi();
+      bindEvents();
+      saveStoredState();
+    }
+
+    init();
+  
+  </script>
+</body>
+</html>
