@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <title>Кошелёк</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800;900&display=swap" rel="stylesheet">
+
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+  <style>
+    *{
+      box-sizing:border-box;
+      -webkit-tap-highlight-color:transparent;
+    }
+
+    html,
+    body{
+      margin:0;
+      width:100%;
+      min-height:100%;
+      font-family:"Montserrat", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background:#ffffff;
+      color:#111111;
+      overscroll-behavior:none;
+      touch-action:manipulation;
+    }
+
+    body{
+      min-height:100vh;
+    }
+
+    button,
+    a{
+      font-family:inherit;
+      touch-action:manipulation;
+    }
+
+    .wallet-page{
+      width:min(100%, 720px);
+      min-height:100vh;
+      margin:0 auto;
+      padding:
+        calc(104px + env(safe-area-inset-top))
+        18px
+        calc(26px + env(safe-area-inset-bottom));
+    }
+
+    .back-link{
+      width:max-content;
+      min-height:38px;
+      display:inline-flex;
+      align-items:center;
+      gap:7px;
+      padding:0;
+      border:0;
+      background:transparent;
+      color:#111111;
+      text-decoration:none;
+      font-size:15px;
+      font-weight:800;
+      cursor:pointer;
+    }
+
+    .back-link svg{
+      width:21px;
+      height:21px;
+      fill:none;
+      stroke:currentColor;
+      stroke-width:2.4;
+      stroke-linecap:round;
+      stroke-linejoin:round;
+    }
+
+    .wallet-actions{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:10px;
+      width:100%;
+      margin-top:22px;
+    }
+
+    .wallet-action-btn{
+      min-height:50px;
+      border:1px solid rgba(17,17,17,.08);
+      border-radius:16px;
+      color:rgba(17,17,17,.72);
+      font-size:14px;
+      font-weight:850;
+      cursor:pointer;
+      background:rgba(17,17,17,.045);
+      transition:transform .12s ease, background .16s ease, color .16s ease, border-color .16s ease;
+    }
+
+    .wallet-action-btn:active{
+      transform:scale(.975);
+    }
+
+    .wallet-action-btn.active{
+      color:#ffffff;
+      border-color:transparent;
+      background:linear-gradient(135deg, #9d4dff, #d946ef);
+    }
+
+    @media (max-width:390px){
+      .wallet-page{
+        padding-top:calc(94px + env(safe-area-inset-top));
+        padding-left:16px;
+        padding-right:16px;
+      }
+
+      .wallet-actions{
+        margin-top:20px;
+        gap:9px;
+      }
+
+      .wallet-action-btn{
+        min-height:48px;
+        border-radius:15px;
+        font-size:13px;
+      }
+    }
+
+    @media (min-width:720px){
+      .wallet-page{
+        padding-top:calc(116px + env(safe-area-inset-top));
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <main class="wallet-page">
+    <a class="back-link" href="index.html" aria-label="Назад">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M15 18l-6-6 6-6"/>
+      </svg>
+      <span>Назад</span>
+    </a>
+
+    <div class="wallet-actions" role="tablist" aria-label="Действия кошелька">
+      <button class="wallet-action-btn active" type="button" data-wallet-tab="deposit" role="tab" aria-selected="true">Пополнить</button>
+      <button class="wallet-action-btn" type="button" data-wallet-tab="withdraw" role="tab" aria-selected="false">Вывести</button>
+    </div>
+  </main>
+
+  <script>
+    (function(){
+      const tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
+
+      try{
+        tg && tg.ready && tg.ready();
+        tg && tg.expand && tg.expand();
+      }catch(error){}
+
+      const buttons = document.querySelectorAll('.wallet-action-btn');
+
+      buttons.forEach(function(button){
+        button.addEventListener('click', function(){
+          buttons.forEach(function(item){
+            item.classList.remove('active');
+            item.setAttribute('aria-selected', 'false');
+          });
+
+          button.classList.add('active');
+          button.setAttribute('aria-selected', 'true');
+        });
+      });
+    })();
+  </script>
+</body>
+</html>
