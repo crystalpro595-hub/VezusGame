@@ -1,0 +1,1259 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <title>Vezus Admin Panel</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800;900&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --bg:#050010;
+      --panel:#0e0622;
+      --panel2:#160936;
+      --card:rgba(255,255,255,.075);
+      --card2:rgba(255,255,255,.115);
+      --stroke:rgba(255,255,255,.13);
+      --text:#fff;
+      --muted:rgba(255,255,255,.62);
+      --violet:#9d4dff;
+      --pink:#d946ef;
+      --green:#22c55e;
+      --red:#ff3b6b;
+      --yellow:#ffd166;
+      --blue:#60a5fa;
+      --radius:24px;
+      --shadow:0 20px 60px rgba(0,0,0,.45);
+    }
+
+    *{
+      box-sizing:border-box;
+      -webkit-tap-highlight-color:transparent;
+    }
+
+    body{
+      margin:0;
+      min-height:100vh;
+      font-family:"Montserrat",system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+      color:var(--text);
+      background:
+        radial-gradient(circle at 10% 0%, rgba(157,77,255,.32), transparent 34%),
+        radial-gradient(circle at 95% 18%, rgba(217,70,239,.18), transparent 32%),
+        radial-gradient(circle at 50% 105%, rgba(96,45,175,.25), transparent 38%),
+        linear-gradient(160deg, #020006, #070013 48%, #020006);
+      overflow-x:hidden;
+      padding-bottom:24px;
+    }
+
+    button,input,select,textarea{
+      font-family:inherit;
+    }
+
+    .app{
+      width:min(1180px, 100%);
+      margin:0 auto;
+      padding:16px;
+    }
+
+    .topbar{
+      position:sticky;
+      top:0;
+      z-index:30;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:14px;
+      padding:14px 0 16px;
+      backdrop-filter:blur(14px);
+      -webkit-backdrop-filter:blur(14px);
+    }
+
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      min-width:0;
+    }
+
+    .brand-logo{
+      width:46px;
+      height:46px;
+      display:grid;
+      place-items:center;
+      border-radius:18px;
+      background:linear-gradient(135deg, var(--violet), var(--pink));
+      box-shadow:0 14px 32px rgba(157,77,255,.25);
+      font-size:20px;
+      font-weight:950;
+    }
+
+    .brand h1{
+      margin:0;
+      font-size:21px;
+      line-height:1.1;
+      font-weight:950;
+      letter-spacing:-.02em;
+    }
+
+    .brand p{
+      margin:4px 0 0;
+      color:var(--muted);
+      font-size:12px;
+      font-weight:700;
+    }
+
+    .top-actions{
+      display:flex;
+      align-items:center;
+      gap:9px;
+    }
+
+    .btn{
+      min-height:42px;
+      border:0;
+      border-radius:16px;
+      padding:0 14px;
+      color:#fff;
+      font-size:12px;
+      font-weight:900;
+      cursor:pointer;
+      background:linear-gradient(135deg, rgba(255,255,255,.13), rgba(255,255,255,.045));
+      border:1px solid rgba(255,255,255,.12);
+      box-shadow:inset 0 0 0 1px rgba(255,255,255,.025);
+      transition:transform .14s ease, opacity .18s ease, background .18s ease;
+    }
+
+    .btn:active{
+      transform:scale(.97);
+    }
+
+    .btn.primary{
+      border:0;
+      background:linear-gradient(135deg, var(--violet), var(--pink));
+      box-shadow:0 12px 24px rgba(157,77,255,.24);
+    }
+
+    .btn.green{
+      border:0;
+      background:linear-gradient(135deg, #16a34a, #22c55e);
+    }
+
+    .btn.red{
+      border:0;
+      background:linear-gradient(135deg, #e11d48, #fb7185);
+    }
+
+    .btn.yellow{
+      color:#13051f;
+      border:0;
+      background:linear-gradient(135deg, #facc15, #f59e0b);
+    }
+
+    .btn.small{
+      min-height:34px;
+      padding:0 10px;
+      border-radius:13px;
+      font-size:10px;
+    }
+
+    .login{
+      width:min(420px, calc(100% - 24px));
+      margin:90px auto 0;
+      padding:24px;
+      border-radius:30px;
+      border:1px solid var(--stroke);
+      background:
+        radial-gradient(circle at 18% 0%, rgba(157,77,255,.26), transparent 40%),
+        linear-gradient(135deg, rgba(255,255,255,.10), rgba(255,255,255,.035));
+      box-shadow:var(--shadow);
+    }
+
+    .login h2{
+      margin:0;
+      font-size:24px;
+      font-weight:950;
+    }
+
+    .login p{
+      margin:8px 0 18px;
+      color:var(--muted);
+      font-size:13px;
+      font-weight:700;
+      line-height:1.45;
+    }
+
+    .field{
+      display:grid;
+      gap:7px;
+      margin-bottom:12px;
+    }
+
+    .field label{
+      color:rgba(255,255,255,.74);
+      font-size:11px;
+      font-weight:900;
+      text-transform:uppercase;
+      letter-spacing:.08em;
+    }
+
+    .input{
+      width:100%;
+      min-height:46px;
+      border:1px solid rgba(255,255,255,.12);
+      border-radius:16px;
+      outline:none;
+      padding:0 14px;
+      color:#fff;
+      font-size:14px;
+      font-weight:800;
+      background:rgba(0,0,0,.24);
+      box-shadow:inset 0 0 0 1px rgba(255,255,255,.025);
+    }
+
+    .input::placeholder{
+      color:rgba(255,255,255,.34);
+    }
+
+    .main{
+      display:none;
+    }
+
+    body.authed .main{
+      display:block;
+    }
+
+    body.authed .login{
+      display:none;
+    }
+
+    .stats{
+      display:grid;
+      grid-template-columns:repeat(4, minmax(0, 1fr));
+      gap:12px;
+      margin:6px 0 16px;
+    }
+
+    .stat{
+      min-height:104px;
+      padding:16px;
+      border-radius:24px;
+      border:1px solid var(--stroke);
+      background:
+        radial-gradient(circle at 0% 0%, rgba(157,77,255,.16), transparent 44%),
+        linear-gradient(135deg, rgba(255,255,255,.09), rgba(255,255,255,.03));
+      box-shadow:0 14px 34px rgba(0,0,0,.22);
+    }
+
+    .stat span{
+      display:block;
+      color:var(--muted);
+      font-size:11px;
+      font-weight:900;
+      text-transform:uppercase;
+      letter-spacing:.08em;
+    }
+
+    .stat strong{
+      display:block;
+      margin-top:12px;
+      font-size:25px;
+      font-weight:950;
+      letter-spacing:-.03em;
+    }
+
+    .tabs{
+      display:flex;
+      gap:8px;
+      overflow:auto;
+      padding:3px 0 15px;
+      scrollbar-width:none;
+    }
+
+    .tabs::-webkit-scrollbar{
+      display:none;
+    }
+
+    .tab{
+      flex:0 0 auto;
+      min-height:42px;
+      border:1px solid rgba(255,255,255,.11);
+      border-radius:999px;
+      padding:0 15px;
+      color:rgba(255,255,255,.72);
+      background:rgba(255,255,255,.055);
+      font-size:12px;
+      font-weight:900;
+      cursor:pointer;
+    }
+
+    .tab.active{
+      color:#fff;
+      background:linear-gradient(135deg, rgba(157,77,255,.38), rgba(217,70,239,.18));
+      border-color:rgba(255,255,255,.18);
+    }
+
+    .panel{
+      display:none;
+      border:1px solid var(--stroke);
+      border-radius:28px;
+      background:
+        radial-gradient(circle at 0% 0%, rgba(157,77,255,.10), transparent 42%),
+        linear-gradient(135deg, rgba(255,255,255,.085), rgba(255,255,255,.03));
+      box-shadow:var(--shadow);
+      overflow:hidden;
+    }
+
+    .panel.active{
+      display:block;
+    }
+
+    .panel-head{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      padding:16px;
+      border-bottom:1px solid rgba(255,255,255,.09);
+    }
+
+    .panel-head h2{
+      margin:0;
+      font-size:18px;
+      font-weight:950;
+    }
+
+    .panel-head p{
+      margin:4px 0 0;
+      color:var(--muted);
+      font-size:12px;
+      font-weight:700;
+    }
+
+    .toolbar{
+      display:flex;
+      flex-wrap:wrap;
+      align-items:center;
+      gap:9px;
+    }
+
+    .search{
+      min-height:40px;
+      min-width:220px;
+      border:1px solid rgba(255,255,255,.12);
+      border-radius:15px;
+      outline:none;
+      padding:0 12px;
+      color:#fff;
+      background:rgba(0,0,0,.22);
+      font-size:12px;
+      font-weight:800;
+    }
+
+    .content{
+      padding:14px;
+    }
+
+    .table-wrap{
+      width:100%;
+      overflow:auto;
+      border-radius:22px;
+      border:1px solid rgba(255,255,255,.08);
+    }
+
+    table{
+      width:100%;
+      border-collapse:collapse;
+      min-width:760px;
+      background:rgba(0,0,0,.12);
+    }
+
+    th,td{
+      padding:12px;
+      border-bottom:1px solid rgba(255,255,255,.07);
+      text-align:left;
+      vertical-align:middle;
+      font-size:12px;
+      font-weight:750;
+    }
+
+    th{
+      color:rgba(255,255,255,.54);
+      font-size:10px;
+      font-weight:950;
+      text-transform:uppercase;
+      letter-spacing:.08em;
+      background:rgba(255,255,255,.04);
+    }
+
+    tr:last-child td{
+      border-bottom:0;
+    }
+
+    .muted{
+      color:var(--muted);
+    }
+
+    .mono{
+      font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-weight:800;
+      font-size:11px;
+    }
+
+    .badge{
+      display:inline-flex;
+      align-items:center;
+      min-height:26px;
+      padding:0 9px;
+      border-radius:999px;
+      font-size:10px;
+      font-weight:950;
+      border:1px solid rgba(255,255,255,.10);
+      background:rgba(255,255,255,.08);
+    }
+
+    .badge.pending{
+      color:#fff2b0;
+      background:rgba(250,204,21,.14);
+      border-color:rgba(250,204,21,.22);
+    }
+
+    .badge.confirmed,
+    .badge.completed{
+      color:#afffc9;
+      background:rgba(34,197,94,.14);
+      border-color:rgba(34,197,94,.22);
+    }
+
+    .badge.rejected,
+    .badge.cancelled{
+      color:#ffb6c9;
+      background:rgba(255,59,107,.13);
+      border-color:rgba(255,59,107,.22);
+    }
+
+    .actions{
+      display:flex;
+      flex-wrap:wrap;
+      gap:7px;
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns:repeat(2, minmax(0, 1fr));
+      gap:14px;
+    }
+
+    .card{
+      padding:16px;
+      border-radius:24px;
+      border:1px solid rgba(255,255,255,.10);
+      background:rgba(0,0,0,.15);
+    }
+
+    .card h3{
+      margin:0 0 12px;
+      font-size:16px;
+      font-weight:950;
+    }
+
+    .form-row{
+      display:grid;
+      grid-template-columns:repeat(2, minmax(0, 1fr));
+      gap:10px;
+    }
+
+    .toast{
+      position:fixed;
+      left:50%;
+      bottom:22px;
+      z-index:999;
+      max-width:min(360px, calc(100% - 28px));
+      padding:12px 14px;
+      border-radius:18px;
+      background:#fff;
+      color:#111;
+      font-size:12px;
+      font-weight:900;
+      text-align:center;
+      box-shadow:0 16px 44px rgba(0,0,0,.36);
+      opacity:0;
+      transform:translate(-50%, 14px);
+      pointer-events:none;
+      transition:opacity .2s ease, transform .2s ease;
+    }
+
+    .toast.active{
+      opacity:1;
+      transform:translate(-50%, 0);
+    }
+
+    .toast.error{
+      color:var(--red);
+    }
+
+    .empty{
+      min-height:150px;
+      display:grid;
+      place-items:center;
+      color:var(--muted);
+      font-size:13px;
+      font-weight:800;
+      text-align:center;
+    }
+
+    .loading{
+      opacity:.56;
+      pointer-events:none;
+    }
+
+    @media (max-width:800px){
+      .stats{
+        grid-template-columns:repeat(2, minmax(0, 1fr));
+      }
+
+      .grid{
+        grid-template-columns:1fr;
+      }
+
+      .panel-head{
+        align-items:flex-start;
+        flex-direction:column;
+      }
+
+      .search{
+        width:100%;
+        min-width:0;
+      }
+    }
+
+    @media (max-width:430px){
+      .app{
+        padding:12px;
+      }
+
+      .brand h1{
+        font-size:18px;
+      }
+
+      .brand-logo{
+        width:42px;
+        height:42px;
+      }
+
+      .top-actions .btn{
+        padding:0 10px;
+      }
+
+      .stats{
+        gap:9px;
+      }
+
+      .stat{
+        min-height:92px;
+        padding:14px;
+      }
+
+      .stat strong{
+        font-size:22px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <div class="topbar">
+      <div class="brand">
+        <div class="brand-logo">V</div>
+        <div>
+          <h1>Vezus Admin</h1>
+          <p>Панель управления заявками, балансами и настройками</p>
+        </div>
+      </div>
+
+      <div class="top-actions">
+        <button class="btn" id="refreshBtn" type="button">Обновить</button>
+        <button class="btn red" id="logoutBtn" type="button">Выйти</button>
+      </div>
+    </div>
+
+    <section class="login" id="loginBox">
+      <h2>Вход в админку</h2>
+      <p>Введите админ-токен. Он должен проверяться на стороне Edge Function, а не только в HTML.</p>
+
+      <div class="field">
+        <label for="adminTokenInput">Admin token</label>
+        <input class="input" id="adminTokenInput" type="password" placeholder="Введите токен" autocomplete="off" />
+      </div>
+
+      <button class="btn primary" id="loginBtn" type="button" style="width:100%;">Войти</button>
+    </section>
+
+    <main class="main">
+      <section class="stats">
+        <div class="stat">
+          <span>Пользователи</span>
+          <strong id="statUsers">0</strong>
+        </div>
+        <div class="stat">
+          <span>Депозиты в ожидании</span>
+          <strong id="statDeposits">0</strong>
+        </div>
+        <div class="stat">
+          <span>Выводы в ожидании</span>
+          <strong id="statWithdraws">0</strong>
+        </div>
+        <div class="stat">
+          <span>Оборот</span>
+          <strong id="statVolume">0 ₽</strong>
+        </div>
+      </section>
+
+      <nav class="tabs">
+        <button class="tab active" data-tab="requests" type="button">Заявки</button>
+        <button class="tab" data-tab="users" type="button">Пользователи</button>
+        <button class="tab" data-tab="balances" type="button">Балансы</button>
+        <button class="tab" data-tab="vouchers" type="button">Ваучеры</button>
+        <button class="tab" data-tab="games" type="button">Настройки игр</button>
+      </nav>
+
+      <section class="panel active" id="panel-requests">
+        <div class="panel-head">
+          <div>
+            <h2>Заявки</h2>
+            <p>Депозиты и выводы пользователей</p>
+          </div>
+          <div class="toolbar">
+            <select class="search" id="requestTypeFilter">
+              <option value="all">Все заявки</option>
+              <option value="deposit">Пополнения</option>
+              <option value="withdraw">Выводы</option>
+            </select>
+            <select class="search" id="requestStatusFilter">
+              <option value="all">Все статусы</option>
+              <option value="pending">В ожидании</option>
+              <option value="confirmed">Подтверждено</option>
+              <option value="completed">Выполнено</option>
+              <option value="rejected">Отклонено</option>
+              <option value="cancelled">Отмена</option>
+            </select>
+          </div>
+        </div>
+        <div class="content">
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Тип</th>
+                  <th>Пользователь</th>
+                  <th>Сумма</th>
+                  <th>Реквизиты</th>
+                  <th>Статус</th>
+                  <th>Дата</th>
+                  <th>Действия</th>
+                </tr>
+              </thead>
+              <tbody id="requestsBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel" id="panel-users">
+        <div class="panel-head">
+          <div>
+            <h2>Пользователи</h2>
+            <p>Список Telegram-пользователей</p>
+          </div>
+          <input class="search" id="userSearch" placeholder="Поиск по ID / username" />
+        </div>
+        <div class="content">
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Telegram ID</th>
+                  <th>Username</th>
+                  <th>Имя</th>
+                  <th>Баланс</th>
+                  <th>Дата</th>
+                  <th>Действия</th>
+                </tr>
+              </thead>
+              <tbody id="usersBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel" id="panel-balances">
+        <div class="panel-head">
+          <div>
+            <h2>Ручное изменение баланса</h2>
+            <p>Пополнение или списание баланса пользователя</p>
+          </div>
+        </div>
+        <div class="content">
+          <div class="grid">
+            <div class="card">
+              <h3>Изменить баланс</h3>
+              <div class="field">
+                <label>Telegram ID</label>
+                <input class="input" id="balanceUserId" placeholder="Например: 123456789" />
+              </div>
+              <div class="form-row">
+                <div class="field">
+                  <label>Операция</label>
+                  <select class="input" id="balanceMode">
+                    <option value="add">Добавить</option>
+                    <option value="subtract">Списать</option>
+                    <option value="set">Установить</option>
+                  </select>
+                </div>
+                <div class="field">
+                  <label>Сумма</label>
+                  <input class="input" id="balanceAmount" type="number" min="0" placeholder="0" />
+                </div>
+              </div>
+              <div class="field">
+                <label>Комментарий</label>
+                <input class="input" id="balanceReason" placeholder="Причина изменения" />
+              </div>
+              <button class="btn primary" id="applyBalanceBtn" type="button">Применить</button>
+            </div>
+
+            <div class="card">
+              <h3>Подсказка</h3>
+              <p class="muted" style="font-size:13px;line-height:1.5;margin:0;">
+                Реальная защита должна быть в Edge Function. HTML не должен содержать service-role ключ.
+                Эта форма отправляет admin_token вместе с запросом, а сервер должен проверить его.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel" id="panel-vouchers">
+        <div class="panel-head">
+          <div>
+            <h2>Ваучеры</h2>
+            <p>Создание и просмотр промокодов</p>
+          </div>
+        </div>
+        <div class="content">
+          <div class="grid">
+            <div class="card">
+              <h3>Создать ваучер</h3>
+              <div class="field">
+                <label>Код</label>
+                <input class="input" id="voucherCode" placeholder="Например: BonusVG50" />
+              </div>
+              <div class="form-row">
+                <div class="field">
+                  <label>Сумма</label>
+                  <input class="input" id="voucherAmount" type="number" min="0" placeholder="50" />
+                </div>
+                <div class="field">
+                  <label>Лимит активаций</label>
+                  <input class="input" id="voucherLimit" type="number" min="1" value="1" />
+                </div>
+              </div>
+              <button class="btn primary" id="createVoucherBtn" type="button">Создать</button>
+            </div>
+
+            <div class="card">
+              <h3>Список ваучеров</h3>
+              <div class="table-wrap">
+                <table style="min-width:520px;">
+                  <thead>
+                    <tr>
+                      <th>Код</th>
+                      <th>Сумма</th>
+                      <th>Активации</th>
+                      <th>Статус</th>
+                    </tr>
+                  </thead>
+                  <tbody id="vouchersBody"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel" id="panel-games">
+        <div class="panel-head">
+          <div>
+            <h2>Настройки игр</h2>
+            <p>Будущие параметры слотов и мини-игр</p>
+          </div>
+        </div>
+        <div class="content">
+          <div class="grid">
+            <div class="card">
+              <h3>Шанс выигрыша</h3>
+              <div class="field">
+                <label>Игра</label>
+                <select class="input" id="gameKey">
+                  <option value="mini_slot">Mini Slot</option>
+                  <option value="coinflip">Coin Flip</option>
+                  <option value="aztec">Aztec Slot</option>
+                </select>
+              </div>
+              <div class="field">
+                <label>Шанс выигрыша, %</label>
+                <input class="input" id="winChance" type="range" min="0" max="100" value="35" />
+                <div class="muted" style="font-size:13px;font-weight:900;">Текущее значение: <span id="winChanceText">35%</span></div>
+              </div>
+              <button class="btn primary" id="saveGameSettingsBtn" type="button">Сохранить настройки</button>
+            </div>
+
+            <div class="card">
+              <h3>Текущие настройки</h3>
+              <div id="gameSettingsList" class="muted" style="font-size:13px;line-height:1.5;">Нет данных</div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    const SUPABASE_URL = 'https://wrdztrfowsrlorgyfssq.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndyZHp0cmZvd3NybG9yZ3lmc3NxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc4MzMwODAsImV4cCI6MjA5MzQwOTA4MH0.e4R40qWi2YEWJDdJdcaVSxZJ6SMhyqBsZdaK2QIvGYs';
+    const API_URL = SUPABASE_URL + '/functions/v1/vezus-api';
+
+    const state = {
+      adminToken: localStorage.getItem('vezus_admin_token') || '',
+      users: [],
+      deposits: [],
+      withdraws: [],
+      vouchers: [],
+      gameSettings: {}
+    };
+
+    const $ = (id) => document.getElementById(id);
+
+    function money(value){
+      try{
+        return new Intl.NumberFormat('ru-RU').format(Number(value) || 0) + ' ₽';
+      }catch(e){
+        return String(Number(value) || 0) + ' ₽';
+      }
+    }
+
+    function date(iso){
+      try{
+        return new Intl.DateTimeFormat('ru-RU', {
+          day:'2-digit',
+          month:'2-digit',
+          year:'numeric',
+          hour:'2-digit',
+          minute:'2-digit'
+        }).format(new Date(iso));
+      }catch(e){
+        return '';
+      }
+    }
+
+    function toast(text, type=''){
+      const el = $('toast');
+      el.textContent = text;
+      el.className = 'toast active ' + type;
+      setTimeout(() => el.classList.remove('active'), 2600);
+    }
+
+    function normalizeError(error){
+      const msg = String(error?.message || error || 'Ошибка');
+      if(msg.toLowerCase().includes('admin')) return 'Ошибка доступа: проверьте admin token';
+      return msg;
+    }
+
+    async function api(action, payload = {}){
+      const res = await fetch(API_URL, {
+        method:'POST',
+        headers:{
+          'Content-Type':'application/json',
+          'apikey':SUPABASE_ANON_KEY,
+          'Authorization':'Bearer ' + SUPABASE_ANON_KEY,
+          'x-admin-token': state.adminToken
+        },
+        body:JSON.stringify({
+          action,
+          payload:{
+            ...payload,
+            admin_token: state.adminToken
+          }
+        })
+      });
+
+      const text = await res.text();
+      let data = {};
+      try{
+        data = JSON.parse(text);
+      }catch(e){
+        throw new Error('Сервер вернул не JSON');
+      }
+
+      if(!res.ok || data.error){
+        throw new Error(data.error || 'Ошибка сервера');
+      }
+
+      return data;
+    }
+
+    function normalizeRows(data){
+      state.users = data.users || data.data?.users || [];
+      state.deposits = data.deposits || data.deposit_requests || data.data?.deposits || [];
+      state.withdraws = data.withdraws || data.withdraw_requests || data.data?.withdraws || [];
+      state.vouchers = data.vouchers || data.data?.vouchers || [];
+      state.gameSettings = data.game_settings || data.gameSettings || data.data?.gameSettings || {};
+    }
+
+    async function loadAdmin(){
+      document.body.classList.add('loading');
+      try{
+        const data = await api('admin_init');
+        normalizeRows(data);
+        renderAll();
+        document.body.classList.add('authed');
+        toast('Данные обновлены');
+      }catch(error){
+        toast(normalizeError(error), 'error');
+        console.error(error);
+      }finally{
+        document.body.classList.remove('loading');
+      }
+    }
+
+    function statusBadge(status){
+      const s = status || 'pending';
+      const text = {
+        pending:'В ожидании',
+        confirmed:'Подтверждено',
+        completed:'Выполнено',
+        rejected:'Отклонено',
+        cancelled:'Отмена'
+      }[s] || s;
+      return `<span class="badge ${s}">${text}</span>`;
+    }
+
+    function userLabel(row){
+      const id = row.telegram_id || row.user_id || row.telegramId || row.tg_id || '';
+      const username = row.username ? '@' + row.username : '';
+      return `<div><strong>${username || 'Без username'}</strong><br><span class="muted mono">${id}</span></div>`;
+    }
+
+    function requestDetails(row, type){
+      if(type === 'deposit'){
+        return `
+          <div class="muted">Банк: ${row.bank || row.metadata?.bank || 'СберБанк'}</div>
+          <div class="muted">ФИО: ${row.payer_name || row.metadata?.payer_name || '-'}</div>
+        `;
+      }
+
+      return `
+        <div class="muted">Банк: ${row.bank || row.metadata?.bank || '-'}</div>
+        <div class="muted">Тел: ${row.phone || row.metadata?.phone || '-'}</div>
+        <div class="muted">ФИО: ${row.full_name || row.metadata?.full_name || '-'}</div>
+      `;
+    }
+
+    function allRequests(){
+      const deposits = state.deposits.map(r => ({...r, _type:'deposit'}));
+      const withdraws = state.withdraws.map(r => ({...r, _type:'withdraw'}));
+      return [...deposits, ...withdraws].sort((a,b) => new Date(b.created_at || 0) - new Date(a.created_at || 0));
+    }
+
+    function renderRequests(){
+      const typeFilter = $('requestTypeFilter').value;
+      const statusFilter = $('requestStatusFilter').value;
+
+      let rows = allRequests();
+      if(typeFilter !== 'all') rows = rows.filter(r => r._type === typeFilter);
+      if(statusFilter !== 'all') rows = rows.filter(r => (r.status || 'pending') === statusFilter);
+
+      const body = $('requestsBody');
+      if(!rows.length){
+        body.innerHTML = `<tr><td colspan="7"><div class="empty">Заявок нет</div></td></tr>`;
+        return;
+      }
+
+      body.innerHTML = rows.map(row => {
+        const type = row._type;
+        const id = row.id || row.request_id;
+        const status = row.status || 'pending';
+        const amount = row.amount || row.value || 0;
+
+        let actions = '';
+        if(status === 'pending' && type === 'deposit'){
+          actions = `
+            <button class="btn green small" data-action="approve_deposit" data-id="${id}">Одобрить</button>
+            <button class="btn red small" data-action="reject_deposit" data-id="${id}">Отклонить</button>
+          `;
+        }else if(status === 'pending' && type === 'withdraw'){
+          actions = `
+            <button class="btn green small" data-action="approve_withdraw" data-id="${id}">Выполнить</button>
+            <button class="btn red small" data-action="reject_withdraw" data-id="${id}">Отклонить</button>
+          `;
+        }else{
+          actions = `<span class="muted">Нет действий</span>`;
+        }
+
+        return `
+          <tr>
+            <td><span class="badge">${type === 'deposit' ? 'Пополнение' : 'Вывод'}</span></td>
+            <td>${userLabel(row)}</td>
+            <td><strong>${money(amount)}</strong></td>
+            <td>${requestDetails(row, type)}</td>
+            <td>${statusBadge(status)}</td>
+            <td class="muted">${date(row.created_at || row.createdAt)}</td>
+            <td><div class="actions">${actions}</div></td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function renderUsers(){
+      const q = $('userSearch').value.trim().toLowerCase();
+      let rows = state.users;
+      if(q){
+        rows = rows.filter(u => {
+          const blob = [
+            u.telegram_id,
+            u.user_id,
+            u.username,
+            u.first_name,
+            u.last_name
+          ].join(' ').toLowerCase();
+          return blob.includes(q);
+        });
+      }
+
+      const body = $('usersBody');
+      if(!rows.length){
+        body.innerHTML = `<tr><td colspan="6"><div class="empty">Пользователей нет</div></td></tr>`;
+        return;
+      }
+
+      body.innerHTML = rows.map(u => {
+        const tid = u.telegram_id || u.user_id || u.tg_id || '';
+        const balance = u.balance ?? u.amount ?? 0;
+        return `
+          <tr>
+            <td class="mono">${tid}</td>
+            <td>${u.username ? '@' + u.username : '-'}</td>
+            <td>${[u.first_name, u.last_name].filter(Boolean).join(' ') || '-'}</td>
+            <td><strong>${money(balance)}</strong></td>
+            <td class="muted">${date(u.created_at || u.createdAt)}</td>
+            <td>
+              <button class="btn small" data-fill-user="${tid}">Изменить баланс</button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function renderVouchers(){
+      const body = $('vouchersBody');
+      if(!state.vouchers.length){
+        body.innerHTML = `<tr><td colspan="4"><div class="empty">Ваучеров нет</div></td></tr>`;
+        return;
+      }
+
+      body.innerHTML = state.vouchers.map(v => `
+        <tr>
+          <td class="mono">${v.code || '-'}</td>
+          <td>${money(v.amount || 0)}</td>
+          <td>${v.used_count || 0}/${v.limit_count || v.max_uses || 1}</td>
+          <td>${statusBadge(v.status || (v.is_active === false ? 'cancelled' : 'completed'))}</td>
+        </tr>
+      `).join('');
+    }
+
+    function renderGameSettings(){
+      const box = $('gameSettingsList');
+      const entries = Object.entries(state.gameSettings || {});
+      if(!entries.length){
+        box.textContent = 'Нет данных';
+        return;
+      }
+
+      box.innerHTML = entries.map(([key, value]) => {
+        if(typeof value === 'object'){
+          return `<div><strong>${key}</strong>: <span class="mono">${JSON.stringify(value)}</span></div>`;
+        }
+        return `<div><strong>${key}</strong>: ${value}</div>`;
+      }).join('');
+    }
+
+    function renderStats(){
+      $('statUsers').textContent = state.users.length;
+      $('statDeposits').textContent = state.deposits.filter(r => (r.status || 'pending') === 'pending').length;
+      $('statWithdraws').textContent = state.withdraws.filter(r => (r.status || 'pending') === 'pending').length;
+
+      const volume = [...state.deposits, ...state.withdraws].reduce((sum, r) => sum + (Number(r.amount || r.value || 0) || 0), 0);
+      $('statVolume').textContent = money(volume);
+    }
+
+    function renderAll(){
+      renderStats();
+      renderRequests();
+      renderUsers();
+      renderVouchers();
+      renderGameSettings();
+    }
+
+    async function updateRequest(action, id){
+      try{
+        await api('admin_update_request', { action_type:action, request_id:id });
+        toast('Статус заявки обновлён');
+        await loadAdmin();
+      }catch(error){
+        toast(normalizeError(error), 'error');
+      }
+    }
+
+    async function applyBalance(){
+      const telegram_id = $('balanceUserId').value.trim();
+      const amount = Number($('balanceAmount').value || 0);
+      const mode = $('balanceMode').value;
+      const reason = $('balanceReason').value.trim();
+
+      if(!telegram_id){
+        toast('Укажите Telegram ID', 'error');
+        return;
+      }
+
+      try{
+        await api('admin_adjust_balance', {
+          telegram_id,
+          amount,
+          mode,
+          reason
+        });
+        toast('Баланс обновлён');
+        await loadAdmin();
+      }catch(error){
+        toast(normalizeError(error), 'error');
+      }
+    }
+
+    async function createVoucher(){
+      const code = $('voucherCode').value.trim();
+      const amount = Number($('voucherAmount').value || 0);
+      const limit = Number($('voucherLimit').value || 1);
+
+      if(!code || !amount){
+        toast('Укажите код и сумму', 'error');
+        return;
+      }
+
+      try{
+        await api('admin_create_voucher', {
+          code,
+          amount,
+          limit_count:limit
+        });
+        toast('Ваучер создан');
+        $('voucherCode').value = '';
+        $('voucherAmount').value = '';
+        await loadAdmin();
+      }catch(error){
+        toast(normalizeError(error), 'error');
+      }
+    }
+
+    async function saveGameSettings(){
+      const game_key = $('gameKey').value;
+      const win_chance = Number($('winChance').value || 0);
+
+      try{
+        await api('admin_update_game_settings', {
+          game_key,
+          settings:{
+            win_chance
+          }
+        });
+        toast('Настройки игры сохранены');
+        await loadAdmin();
+      }catch(error){
+        toast(normalizeError(error), 'error');
+      }
+    }
+
+    function bind(){
+      $('loginBtn').addEventListener('click', () => {
+        const token = $('adminTokenInput').value.trim();
+        if(!token){
+          toast('Введите admin token', 'error');
+          return;
+        }
+        state.adminToken = token;
+        localStorage.setItem('vezus_admin_token', token);
+        loadAdmin();
+      });
+
+      $('logoutBtn').addEventListener('click', () => {
+        localStorage.removeItem('vezus_admin_token');
+        state.adminToken = '';
+        document.body.classList.remove('authed');
+      });
+
+      $('refreshBtn').addEventListener('click', loadAdmin);
+
+      document.querySelectorAll('.tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+          document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+          document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+          tab.classList.add('active');
+          $('panel-' + tab.dataset.tab).classList.add('active');
+        });
+      });
+
+      $('requestTypeFilter').addEventListener('change', renderRequests);
+      $('requestStatusFilter').addEventListener('change', renderRequests);
+      $('userSearch').addEventListener('input', renderUsers);
+
+      document.addEventListener('click', (event) => {
+        const actionBtn = event.target.closest('[data-action]');
+        if(actionBtn){
+          updateRequest(actionBtn.dataset.action, actionBtn.dataset.id);
+        }
+
+        const fillBtn = event.target.closest('[data-fill-user]');
+        if(fillBtn){
+          $('balanceUserId').value = fillBtn.dataset.fillUser;
+          document.querySelector('[data-tab="balances"]').click();
+        }
+      });
+
+      $('applyBalanceBtn').addEventListener('click', applyBalance);
+      $('createVoucherBtn').addEventListener('click', createVoucher);
+      $('saveGameSettingsBtn').addEventListener('click', saveGameSettings);
+
+      $('winChance').addEventListener('input', () => {
+        $('winChanceText').textContent = $('winChance').value + '%';
+      });
+
+      $('adminTokenInput').addEventListener('keydown', (e) => {
+        if(e.key === 'Enter') $('loginBtn').click();
+      });
+    }
+
+    function init(){
+      bind();
+      if(state.adminToken){
+        $('adminTokenInput').value = state.adminToken;
+        loadAdmin();
+      }
+    }
+
+    init();
+  </script>
+</body>
+</html>
