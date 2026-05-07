@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <title>Coinflip</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800;900&display=swap" rel="stylesheet">
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <style>
+    *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+    html,body{margin:0;width:100%;height:100%;overflow:hidden;font-family:"Montserrat",system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#fff;background:radial-gradient(circle at 50% 0%,rgba(120,120,135,.22),transparent 35%),radial-gradient(circle at 50% 100%,rgba(0,0,0,.5),transparent 45%),linear-gradient(180deg,#34343a 0%,#1c1c21 48%,#0c0c0f 100%);touch-action:manipulation;overscroll-behavior:none}
+    body{position:fixed;inset:0}button,input{font-family:inherit}:root{--safe-top:env(safe-area-inset-top);--safe-bottom:env(safe-area-inset-bottom)}
+    .page{width:min(100%,720px);height:100dvh;margin:0 auto;position:relative;overflow:hidden;padding:calc(22px + var(--safe-top)) 16px calc(18px + var(--safe-bottom));display:flex;flex-direction:column;align-items:center}
+    .balance-chip{min-height:44px;display:inline-flex;align-items:center;gap:9px;padding:0 14px 0 10px;border:1px solid rgba(255,255,255,.1);border-radius:999px;color:#fff;background:radial-gradient(circle at 18% 0%,rgba(255,255,255,.16),transparent 38%),linear-gradient(135deg,rgba(255,255,255,.1),rgba(255,255,255,.045));box-shadow:0 14px 34px rgba(0,0,0,.34),inset 0 0 0 1px rgba(255,255,255,.04);backdrop-filter:blur(18px);cursor:pointer}
+    .balance-chip:active{transform:scale(.97)}.wallet-icon{width:30px;height:30px;display:grid;place-items:center;border-radius:50%;color:rgba(255,255,255,.82);background:rgba(255,255,255,.1);flex:0 0 auto}.wallet-icon svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.balance-text{display:flex;align-items:baseline;gap:6px;line-height:1}.balance-label{color:rgba(255,255,255,.5);font-size:10px;font-weight:750}.balance-value{color:#fff;font-size:15px;font-weight:900;letter-spacing:-.02em}
+    .game{flex:1;width:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;padding-bottom:18px}.coin-wrap{width:100%;display:flex;align-items:center;justify-content:center;perspective:1000px;margin-bottom:24px}.coin{width:min(62vw,255px);aspect-ratio:1;position:relative;transform-style:preserve-3d;filter:drop-shadow(0 34px 40px rgba(0,0,0,.58))}.coin.spinning{animation:coinSpin 1.45s cubic-bezier(.16,.74,.19,1) both}.coin.final-side-1{transform:rotateY(0deg)}.coin.final-side-2{transform:rotateY(180deg)}
+    @keyframes coinSpin{0%{transform:rotateY(0deg) scale(1)}22%{transform:rotateY(380deg) scale(1.06)}52%{transform:rotateY(980deg) scale(1.1)}78%{transform:rotateY(1500deg) scale(1.04)}100%{transform:rotateY(1800deg) scale(1)}}
+    .coin-face{position:absolute;inset:0;display:grid;place-items:center;border-radius:50%;backface-visibility:hidden;overflow:hidden}.coin-face img{width:100%;height:100%;object-fit:contain;display:block;user-select:none;pointer-events:none}.coin-back{transform:rotateY(180deg)}
+    .controls{width:100%;max-width:420px;display:grid;gap:12px}.side-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}.side-btn{min-height:54px;border:1px solid rgba(255,255,255,.075);border-radius:18px;background:rgba(255,255,255,.055);color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:transform .13s ease,background .16s ease,border-color .16s ease}.side-btn:active{transform:scale(.97)}.side-btn.active{border-color:rgba(255,255,255,.2);background:radial-gradient(circle at 20% 0%,rgba(255,255,255,.18),transparent 38%),rgba(255,255,255,.12);box-shadow:0 12px 24px rgba(0,0,0,.22),inset 0 0 0 1px rgba(255,255,255,.05)}.side-btn img{width:38px;height:38px;object-fit:contain;filter:drop-shadow(0 6px 9px rgba(0,0,0,.3));pointer-events:none}
+    .bet-row{display:grid;grid-template-columns:1fr auto;gap:10px;padding:9px;border:1px solid rgba(255,255,255,.065);border-radius:20px;background:rgba(255,255,255,.045)}.bet-field{height:48px;position:relative;border-radius:15px;overflow:hidden;background:rgba(0,0,0,.24);border:1px solid rgba(255,255,255,.065)}.bet-label{position:absolute;top:7px;left:12px;color:rgba(255,255,255,.42);font-size:8px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;pointer-events:none}.bet-input{width:100%;height:100%;border:0;outline:none;padding:20px 12px 5px;color:#fff;background:transparent;font-size:17px;font-weight:850}.quick-bets{display:flex;gap:6px;align-items:center}.quick-bet{min-width:40px;min-height:34px;padding:0 8px;border:1px solid rgba(255,255,255,.07);border-radius:12px;color:rgba(255,255,255,.72);background:rgba(255,255,255,.055);font-size:10px;font-weight:850;cursor:pointer}.quick-bet:active{transform:scale(.95)}
+    .flip-btn{width:100%;min-height:56px;border:0;border-radius:20px;color:#fff;background:radial-gradient(circle at 18% 0%,rgba(255,255,255,.28),transparent 32%),linear-gradient(135deg,#4f4f5a,#23232a);box-shadow:0 18px 34px rgba(0,0,0,.34),inset 0 0 0 1px rgba(255,255,255,.08);font-size:15px;font-weight:950;cursor:pointer}.flip-btn:active{transform:scale(.982)}.flip-btn:disabled{opacity:.58}.mini-status{min-height:18px;color:rgba(255,255,255,.52);font-size:11px;font-weight:650;text-align:center}
+    .wallet-frame-overlay{position:fixed;inset:0;z-index:500;opacity:0;pointer-events:none;background:rgba(0,0,0,.5);transition:opacity .18s ease}.wallet-frame-overlay.active{opacity:1;pointer-events:auto}.wallet-frame-box{position:fixed;left:50%;top:calc(82px + var(--safe-top));z-index:501;width:min(94vw,430px);height:min(76vh,680px);max-height:calc(100vh - 110px - var(--safe-top) - var(--safe-bottom));overflow:hidden;border-radius:30px;background:#fff;box-shadow:0 24px 80px rgba(0,0,0,.58);transform:translate(-50%,18px) scale(.985);opacity:0;pointer-events:none;transition:opacity .2s ease,transform .24s cubic-bezier(.2,.78,.22,1)}.wallet-frame-box.active{opacity:1;pointer-events:auto;transform:translate(-50%,0) scale(1)}.wallet-frame-handle{position:absolute;left:50%;top:10px;z-index:2;width:46px;height:5px;border-radius:999px;background:rgba(17,17,17,.14);transform:translateX(-50%);pointer-events:none}.wallet-frame{width:100%;height:100%;display:block;border:0;background:#fff}
+    @media(max-width:390px){.page{padding-left:14px;padding-right:14px}.coin{width:min(66vw,235px)}.controls{gap:10px}.quick-bet{min-width:36px;font-size:9px}.wallet-frame-box{top:calc(74px + var(--safe-top));width:calc(100vw - 18px);height:min(77vh,650px);border-radius:28px}}
+    @media(max-width:350px){.coin{width:min(62vw,205px)}.quick-bets{gap:5px}.quick-bet{min-width:32px;padding:0 6px}}
+  
+    /* FINAL PATCH: баланс как в index.html, сверху слева */
+    .page{
+      align-items:center !important;
+      padding-top:calc(24px + var(--safe-top)) !important;
+    }
+
+    .balance-chip{
+      position:absolute !important;
+      left:14px !important;
+      top:calc(16px + var(--safe-top)) !important;
+      z-index:40 !important;
+      width:auto !important;
+      min-width:168px !important;
+      height:44px !important;
+      min-height:44px !important;
+      display:flex !important;
+      flex-direction:row-reverse !important;
+      align-items:center !important;
+      justify-content:space-between !important;
+      gap:11px !important;
+      padding:7px 9px 7px 15px !important;
+      border:1px solid rgba(255,255,255,.15) !important;
+      border-radius:18px !important;
+      color:#fff !important;
+      background:
+        linear-gradient(135deg, rgba(16,6,42,.82), rgba(8,2,26,.74)),
+        radial-gradient(circle at 18% 0%, rgba(157,77,255,.22), transparent 42%) !important;
+      box-shadow:0 8px 22px rgba(0,0,0,.32), inset 0 0 0 1px rgba(255,255,255,.045) !important;
+      backdrop-filter:none !important;
+      -webkit-backdrop-filter:none !important;
+    }
+
+    .balance-chip:active{
+      transform:scale(.985) !important;
+    }
+
+    .balance-text{
+      display:flex !important;
+      flex-direction:column !important;
+      align-items:flex-start !important;
+      gap:0 !important;
+      line-height:1.05 !important;
+      min-width:0 !important;
+    }
+
+    .balance-label{
+      color:rgba(255,255,255,.68) !important;
+      font-size:9px !important;
+      font-weight:700 !important;
+      letter-spacing:.12em !important;
+      text-transform:uppercase !important;
+    }
+
+    .balance-value{
+      margin-top:3px !important;
+      color:#fff !important;
+      font-size:14px !important;
+      font-weight:800 !important;
+      letter-spacing:.02em !important;
+      white-space:nowrap !important;
+    }
+
+    .wallet-icon{
+      width:32px !important;
+      height:32px !important;
+      display:grid !important;
+      place-items:center !important;
+      flex:0 0 auto !important;
+      border:1px solid rgba(255,255,255,.15) !important;
+      border-radius:13px !important;
+      color:#fff !important;
+      background:linear-gradient(135deg, rgba(255,255,255,.13), rgba(255,255,255,.055)) !important;
+      box-shadow:inset 0 0 0 1px rgba(255,255,255,.04), 0 0 18px rgba(157,77,255,.22) !important;
+    }
+
+    .wallet-icon svg{
+      width:19px !important;
+      height:19px !important;
+      stroke:#fff !important;
+      stroke-width:2 !important;
+      filter:drop-shadow(0 0 6px rgba(255,255,255,.28)) !important;
+    }
+
+    @media(max-width:390px){
+      .balance-chip{
+        left:12px !important;
+        top:calc(14px + var(--safe-top)) !important;
+        min-width:150px !important;
+        height:42px !important;
+        min-height:42px !important;
+      }
+
+      .wallet-icon{
+        width:30px !important;
+        height:30px !important;
+        border-radius:12px !important;
+      }
+    }
+
+  </style>
+</head>
+<body>
+  <main class="page">
+    <button class="balance-chip" id="balanceChip" type="button" aria-label="Открыть кошелёк">
+      <span class="wallet-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 7.5h15a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5.5A2.5 2.5 0 0 1 3 17V7.5a3 3 0 0 1 3-3h11"/><path d="M4 8c.5-.7 1.2-1 2.2-1H19"/><path d="M17 13h.01"/></svg></span>
+      <span class="balance-text"><span class="balance-label">Баланс</span><strong class="balance-value" id="balanceValue">1000</strong></span>
+    </button>
+    <section class="game">
+      <div class="coin-wrap"><div class="coin final-side-1" id="coin"><div class="coin-face coin-front"><img src="images/CoinFlipMoney1.png" alt="Сторона 1" draggable="false"></div><div class="coin-face coin-back"><img src="images/CoinFlipMoney2.png" alt="Сторона 2" draggable="false"></div></div></div>
+      <div class="controls">
+        <div class="side-row"><button class="side-btn active" type="button" data-side="1" aria-label="Сторона 1"><img src="images/CoinFlipMoney1.png" alt=""></button><button class="side-btn" type="button" data-side="2" aria-label="Сторона 2"><img src="images/CoinFlipMoney2.png" alt=""></button></div>
+        <div class="bet-row"><label class="bet-field"><span class="bet-label">Ставка</span><input class="bet-input" id="betInput" type="text" inputmode="numeric" value="50" autocomplete="off"></label><div class="quick-bets"><button class="quick-bet" type="button" data-bet="50">50</button><button class="quick-bet" type="button" data-bet="100">100</button><button class="quick-bet" type="button" data-bet="250">250</button><button class="quick-bet" type="button" data-bet="500">500</button></div></div>
+        <button class="flip-btn" id="flipBtn" type="button">Крутить</button><div class="mini-status" id="statusText"></div>
+      </div>
+    </section>
+  </main>
+  <div class="wallet-frame-overlay" id="walletFrameOverlay" aria-hidden="true"></div><section class="wallet-frame-box" id="walletFrameBox" aria-label="Кошелёк"><div class="wallet-frame-handle" aria-hidden="true"></div><iframe class="wallet-frame" id="walletFrame" title="Кошелёк" src="about:blank"></iframe></section>
+  <script>
+    (function(){const tg=window.Telegram&&window.Telegram.WebApp?window.Telegram.WebApp:null;try{tg&&tg.ready&&tg.ready();tg&&tg.expand&&tg.expand()}catch(error){}const BALANCE_KEY='coinflip_balance_v3';const balanceValue=document.getElementById('balanceValue');const balanceChip=document.getElementById('balanceChip');const coin=document.getElementById('coin');const statusText=document.getElementById('statusText');const betInput=document.getElementById('betInput');const flipBtn=document.getElementById('flipBtn');const sideButtons=document.querySelectorAll('.side-btn');const quickBetButtons=document.querySelectorAll('.quick-bet');const walletOverlay=document.getElementById('walletFrameOverlay');const walletBox=document.getElementById('walletFrameBox');const walletFrame=document.getElementById('walletFrame');let selectedSide=1;let isSpinning=false;function formatBalance(value){return new Intl.NumberFormat('ru-RU').format(Number(value)||0)}function getBalance(){const raw=localStorage.getItem(BALANCE_KEY);const saved=Number(raw);if(raw!==null&&Number.isFinite(saved)&&saved>=0){return saved}localStorage.setItem(BALANCE_KEY,'1000');return 1000}function setBalance(value){const safeValue=Math.max(0,Math.floor(Number(value)||0));localStorage.setItem(BALANCE_KEY,String(safeValue));renderBalance()}function renderBalance(){if(balanceValue){balanceValue.textContent=formatBalance(getBalance())}}function setSelectedSide(side){selectedSide=Number(side)===2?2:1;sideButtons.forEach(function(button){button.classList.toggle('active',Number(button.dataset.side)===selectedSide)})}function cleanBetInput(){betInput.value=String(betInput.value).replace(/\D/g,'')}function getBet(){cleanBetInput();return Math.floor(Number(betInput.value)||0)}function setStatus(message){statusText.textContent=message||''}function addWalletCacheBust(src){const stamp=Date.now();return src+(src.indexOf('?')===-1?'?v=':'&v=')+stamp}function sendTelegramInitDataToWalletFrame(){if(!walletFrame||!walletFrame.contentWindow)return;const initData=tg&&typeof tg.initData==='string'?tg.initData:'';if(!initData)return;try{walletFrame.contentWindow.postMessage({type:'VEZUS_TG_INIT_DATA',initData:initData},'*')}catch(error){}}function openWalletOverlay(){if(!walletOverlay||!walletBox||!walletFrame){window.location.href='wallet.html';return}walletFrame.src=addWalletCacheBust('wallet.html');walletOverlay.classList.add('active');walletBox.classList.add('active');setTimeout(sendTelegramInitDataToWalletFrame,120);setTimeout(sendTelegramInitDataToWalletFrame,500);setTimeout(sendTelegramInitDataToWalletFrame,1100)}function closeWalletOverlay(){if(!walletOverlay||!walletBox||!walletFrame)return;walletOverlay.classList.remove('active');walletBox.classList.remove('active');setTimeout(function(){if(!walletBox.classList.contains('active')){walletFrame.src='about:blank'}},220)}function flipCoin(){if(isSpinning)return;const balance=getBalance();const bet=getBet();if(!bet){setStatus('Укажи ставку');return}if(bet<10){setStatus('Минимум 10');return}if(bet>balance){setStatus('Недостаточно средств');return}isSpinning=true;flipBtn.disabled=true;setBalance(balance-bet);setStatus('');const resultSide=Math.random()<.5?1:2;coin.classList.remove('spinning','final-side-1','final-side-2');requestAnimationFrame(function(){coin.classList.add('spinning')});setTimeout(function(){coin.classList.remove('spinning');coin.classList.add(resultSide===1?'final-side-1':'final-side-2');const isWin=resultSide===selectedSide;const currentBalance=getBalance();if(isWin){setBalance(currentBalance+bet*2);setStatus('+ '+bet)}else{setStatus('- '+bet)}isSpinning=false;flipBtn.disabled=false},1450)}sideButtons.forEach(function(button){button.addEventListener('click',function(){if(isSpinning)return;setSelectedSide(button.dataset.side)})});quickBetButtons.forEach(function(button){button.addEventListener('click',function(){betInput.value=button.dataset.bet;setStatus('')})});betInput.addEventListener('input',function(){cleanBetInput();setStatus('')});flipBtn.addEventListener('click',flipCoin);if(balanceChip){balanceChip.addEventListener('click',openWalletOverlay)}if(walletOverlay){walletOverlay.addEventListener('click',closeWalletOverlay)}if(walletFrame){walletFrame.addEventListener('load',function(){sendTelegramInitDataToWalletFrame();setTimeout(sendTelegramInitDataToWalletFrame,150);setTimeout(sendTelegramInitDataToWalletFrame,500)})}window.addEventListener('message',function(event){const data=event.data||{};if(data&&data.type==='VEZUS_WALLET_READY'){sendTelegramInitDataToWalletFrame();setTimeout(sendTelegramInitDataToWalletFrame,150)}});renderBalance();setSelectedSide(1)})();
+  </script>
+</body>
+</html>
