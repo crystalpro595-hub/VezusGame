@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <title>История платежей — DB v1</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800;900&display=swap" rel="stylesheet">
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+  <style>
+    :root{
+      --bg:#050607;
+      --panel:#0c0f13;
+      --card:#11151b;
+      --text:#f7f8fb;
+      --muted:#8f97a3;
+      --soft:#171c23;
+      --stroke:rgba(255,255,255,.08);
+      --green:#38d878;
+      --red:#ff5d83;
+      --blue:#8da2ff;
+      --orange:#ffb24a;
+      --shadow:0 14px 34px rgba(0,0,0,.34);
+    }
+
+    *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+
+    html,body{
+      margin:0;
+      min-height:100%;
+      overscroll-behavior:none;
+      touch-action:manipulation;
+      background:var(--bg);
+    }
+
+    body{
+      min-height:100vh;
+      font-family:"Montserrat",system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+      color:var(--text);
+      overflow-x:hidden;
+      background:
+        radial-gradient(circle at 18% -10%, rgba(255,255,255,.075), transparent 34%),
+        radial-gradient(circle at 102% 10%, rgba(120,130,145,.12), transparent 34%),
+        linear-gradient(180deg, #12151a 0%, #080a0d 48%, #030405 100%);
+    }
+
+    .page{
+      width:min(100%, 620px);
+      margin:0 auto;
+      padding:
+        calc(16px + env(safe-area-inset-top))
+        16px
+        calc(28px + env(safe-area-inset-bottom));
+    }
+
+    .title{
+      margin:0 0 16px;
+      color:var(--text);
+      font-size:23px;
+      line-height:1.1;
+      font-weight:900;
+      letter-spacing:-.03em;
+    }
+
+    .filters{
+      display:flex;
+      gap:8px;
+      overflow-x:auto;
+      scrollbar-width:none;
+      padding:0 0 16px;
+      margin:0 -2px;
+    }
+
+    .filters::-webkit-scrollbar{display:none;}
+
+    .filter-btn{
+      flex:0 0 auto;
+      min-height:38px;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:7px;
+      padding:0 13px;
+      border:1px solid var(--stroke);
+      border-radius:12px;
+      color:rgba(255,255,255,.62);
+      background:rgba(255,255,255,.055);
+      box-shadow:0 10px 24px rgba(0,0,0,.20);
+      font-family:inherit;
+      font-size:12px;
+      font-weight:850;
+      cursor:pointer;
+      transition:background .14s ease, color .14s ease, border-color .14s ease, transform .12s ease;
+    }
+
+    .filter-btn svg{
+      width:16px;
+      height:16px;
+      fill:none;
+      stroke:currentColor;
+      stroke-width:2.2;
+      stroke-linecap:round;
+      stroke-linejoin:round;
+    }
+
+    .filter-btn:active{transform:scale(.96);}
+
+    .filter-btn.active{
+      color:#fff;
+      border-color:rgba(255,255,255,.16);
+      background:linear-gradient(135deg, rgba(255,255,255,.12), rgba(255,255,255,.055));
+    }
+
+    .history-list{
+      display:grid;
+      gap:9px;
+      padding-bottom:18px;
+    }
+
+    .history-empty{
+      min-height:120px;
+      display:grid;
+      place-items:center;
+      padding:22px;
+      border-radius:16px;
+      color:rgba(255,255,255,.48);
+      font-size:13px;
+      font-weight:800;
+      text-align:center;
+      background:rgba(255,255,255,.045);
+      border:1px dashed rgba(255,255,255,.10);
+      box-shadow:var(--shadow);
+    }
+
+    .history-item{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      min-height:70px;
+      padding:12px;
+      border-radius:17px;
+      border:1px solid var(--stroke);
+      background:linear-gradient(135deg, rgba(255,255,255,.075), rgba(255,255,255,.028));
+      box-shadow:0 14px 30px rgba(0,0,0,.26);
+    }
+
+    .history-left{
+      min-width:0;
+      display:flex;
+      align-items:center;
+      gap:10px;
+    }
+
+    .history-icon{
+      width:42px;
+      height:42px;
+      flex:0 0 auto;
+      display:grid;
+      place-items:center;
+      border-radius:14px;
+      background:rgba(255,255,255,.065);
+      border:1px solid rgba(255,255,255,.08);
+      color:#fff;
+    }
+
+    .history-icon.deposit{color:var(--green);background:rgba(56,216,120,.12);border-color:rgba(56,216,120,.18);}
+    .history-icon.withdraw{color:var(--red);background:rgba(255,93,131,.12);border-color:rgba(255,93,131,.18);}
+    
+
+    .history-icon svg{
+      width:22px;
+      height:22px;
+      fill:none;
+      stroke:currentColor;
+      stroke-width:2.15;
+      stroke-linecap:round;
+      stroke-linejoin:round;
+    }
+
+    .history-main{min-width:0;}
+
+    .history-name{
+      display:block;
+      max-width:190px;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      white-space:nowrap;
+      color:#fff;
+      font-size:13px;
+      font-weight:900;
+    }
+
+    .history-date{
+      display:block;
+      margin-top:3px;
+      color:rgba(255,255,255,.48);
+      font-size:10px;
+      font-weight:750;
+    }
+
+    .history-right{
+      flex:0 0 auto;
+      text-align:right;
+    }
+
+    .history-amount{
+      display:block;
+      color:var(--green);
+      font-size:13px;
+      font-weight:950;
+      white-space:nowrap;
+    }
+
+    .history-amount.minus{color:var(--red);}
+
+    .history-status{
+      display:block;
+      margin-top:4px;
+      color:rgba(255,255,255,.46);
+      font-size:10px;
+      font-weight:850;
+    }
+
+    .history-status.pending{
+      display:inline-flex;
+      align-items:center;
+      justify-content:flex-end;
+      gap:4px;
+      color:var(--orange);
+    }
+
+    .history-status.pending svg{
+      width:12px;
+      height:12px;
+      fill:none;
+      stroke:currentColor;
+      stroke-width:2;
+      stroke-linecap:round;
+      stroke-linejoin:round;
+    }
+
+    .history-status.cancelled{color:rgba(255,255,255,.42);}
+
+    .history-cancel-btn{
+      height:24px;
+      min-height:24px;
+      margin-top:6px;
+      padding:0 8px;
+      border:1px solid rgba(255,255,255,.12);
+      border-radius:999px;
+      color:#fff;
+      background:rgba(255,255,255,.07);
+      font-family:inherit;
+      font-size:9.5px;
+      font-weight:850;
+      cursor:pointer;
+      touch-action:manipulation;
+    }
+
+    .history-cancel-btn:active{transform:scale(.96);}
+
+    @media (max-width:390px){
+      .page{padding-left:14px;padding-right:14px;padding-top:calc(14px + env(safe-area-inset-top));}
+      .title{font-size:22px;margin-top:0;}
+      .filter-btn{min-height:36px;padding:0 11px;font-size:11.5px;}
+      .history-name{max-width:150px;}
+    }
+
+    @media (min-width:720px){
+      .page{padding-left:22px;padding-right:22px;padding-top:calc(18px + env(safe-area-inset-top));}
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <h1 class="title">История платежей</h1>
+
+    <div class="filters" role="tablist" aria-label="Фильтр истории">
+      <button class="filter-btn active" type="button" data-filter="all">
+        <svg viewBox="0 0 24 24"><rect x="4" y="4" width="6" height="6" rx="2"/><rect x="14" y="4" width="6" height="6" rx="2"/><rect x="4" y="14" width="6" height="6" rx="2"/><rect x="14" y="14" width="6" height="6" rx="2"/></svg>
+        Все
+      </button>
+      <button class="filter-btn" type="button" data-filter="deposit">
+        <svg viewBox="0 0 24 24"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/><path d="M7 18h10"/></svg>
+        Депозиты
+      </button>
+      <button class="filter-btn" type="button" data-filter="withdraw">
+        <svg viewBox="0 0 24 24"><path d="M12 21V9"/><path d="m7 14 5-5 5 5"/><path d="M5 3h14"/><path d="M7 6h10"/></svg>
+        Выводы
+      </button>
+    </div>
+
+    <section class="history-list" id="historyList" aria-live="polite">
+      <div class="history-empty">История пока пустая</div>
+    </section>
+  </main>
+
+  <script>
+    (function(){
+      const SUPABASE_URL = 'https://xcsjedwhqcrwdzmuahjl.supabase.co';
+      const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhjc2plZHdocWNyd2R6bXVhaGpsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgyNzk0ODYsImV4cCI6MjA5Mzg1NTQ4Nn0.M2ksKeWwDt0BQxgjxpGhLKLMNP_ve1dcZvQ0Ix88Ock';
+      const WALLET_FUNCTION_URL = SUPABASE_URL + '/functions/v1/wallet';
+
+      const tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
+      try{
+        tg && tg.ready && tg.ready();
+        tg && tg.expand && tg.expand();
+      }catch(error){}
+
+      const historyList = document.getElementById('historyList');
+      const filterButtons = Array.from(document.querySelectorAll('[data-filter]'));
+      let currentItems = [];
+      let currentFilter = 'all';
+      let isLoading = false;
+
+      function getInitData(){
+        try{
+          if(tg && tg.initData) return tg.initData;
+        }catch(error){}
+
+        try{
+          const saved = sessionStorage.getItem('vezus_init_data');
+          if(saved) return saved;
+        }catch(error){}
+
+        try{
+          const backup = localStorage.getItem('vezus_init_data_backup');
+          if(backup) return backup;
+        }catch(error){}
+
+        try{
+          if(
+            window.parent &&
+            window.parent !== window &&
+            window.parent.Telegram &&
+            window.parent.Telegram.WebApp &&
+            window.parent.Telegram.WebApp.initData
+          ){
+            return window.parent.Telegram.WebApp.initData;
+          }
+        }catch(error){}
+
+        return '';
+      }
+
+      function escapeHtml(value){
+        return String(value ?? '').replace(/[&<>'"]/g, function(char){
+          return {'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[char];
+        });
+      }
+
+      function formatDate(iso){
+        try{
+          return new Intl.DateTimeFormat('ru-RU', {
+            day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit'
+          }).format(new Date(iso));
+        }catch(error){
+          return '';
+        }
+      }
+
+      function formatAmount(value){
+        const amount = Number(value) || 0;
+        return new Intl.NumberFormat('ru-RU').format(amount) + ' ₽';
+      }
+
+      function icon(type){
+        if(type === 'deposit') {
+          return '<svg viewBox="0 0 24 24"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/><path d="M7 18h10"/></svg>';
+        }
+
+        return '<svg viewBox="0 0 24 24"><path d="M12 21V9"/><path d="m7 14 5-5 5 5"/><path d="M5 3h14"/><path d="M7 6h10"/></svg>';
+      }
+
+      function statusLabel(status){
+        if(status === 'pending') return 'В ожидании';
+        if(status === 'approved') return 'Выполнено';
+        if(status === 'declined') return 'Отклонено';
+        if(status === 'cancelled') return 'Отмена';
+        return status || 'В ожидании';
+      }
+
+      function titleForItem(item){
+        if(item.type === 'deposit') return 'Пополнение баланса';
+        if(item.type === 'withdraw') return 'Заявка на вывод';
+        return 'Операция';
+      }
+
+      function normalizeTransaction(tx){
+        return {
+          id: tx.id,
+          type: tx.type === 'withdraw' ? 'withdraw' : 'deposit',
+          status: tx.status || 'pending',
+          amount: Number(tx.amount || 0),
+          createdAt: tx.created_at || tx.updated_at || new Date().toISOString(),
+          title: titleForItem(tx),
+          method: tx.method || '',
+          sender_fio: tx.sender_fio || '',
+          recipient_fio: tx.recipient_fio || '',
+          recipient_bank: tx.recipient_bank || ''
+        };
+      }
+
+      function renderLoading(){
+        historyList.innerHTML = '<div class="history-empty">Загружаем историю...</div>';
+      }
+
+      function renderError(message){
+        historyList.innerHTML = '<div class="history-empty">' + escapeHtml(message || 'Не удалось загрузить историю') + '</div>';
+      }
+
+      function renderHistory(filter){
+        currentFilter = filter || currentFilter || 'all';
+        const filtered = currentFilter === 'all'
+          ? currentItems
+          : currentItems.filter(function(item){ return item.type === currentFilter; });
+
+        if(!filtered.length){
+          historyList.innerHTML = '<div class="history-empty">В этом разделе пока пусто</div>';
+          return;
+        }
+
+        historyList.innerHTML = filtered.map(function(item){
+          const type = item.type === 'withdraw' ? 'withdraw' : 'deposit';
+          const pending = item.status === 'pending';
+          const approved = item.status === 'approved';
+          const declined = item.status === 'declined';
+          const cancelled = item.status === 'cancelled';
+          const minus = type === 'withdraw';
+          const sign = minus ? '-' : (approved ? '+' : '');
+          const statusClass = pending ? 'pending' : (cancelled || declined ? 'cancelled' : '');
+
+          let statusHtml = '';
+          if(pending){
+            statusHtml = '<span class="history-status pending"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M12 8v5l3 2"/></svg>' + statusLabel(item.status) + '</span>';
+          }else{
+            statusHtml = '<span class="history-status ' + statusClass + '">' + escapeHtml(statusLabel(item.status)) + '</span>';
+          }
+
+          return '<article class="history-item">' +
+            '<div class="history-left">' +
+              '<span class="history-icon ' + escapeHtml(type) + '">' + icon(type) + '</span>' +
+              '<span class="history-main">' +
+                '<span class="history-name">' + escapeHtml(item.title) + '</span>' +
+                '<span class="history-date">' + escapeHtml(formatDate(item.createdAt)) + '</span>' +
+              '</span>' +
+            '</div>' +
+            '<div class="history-right">' +
+              '<span class="history-amount ' + (minus ? 'minus' : '') + '">' + sign + formatAmount(item.amount) + '</span>' +
+              statusHtml +
+            '</div>' +
+          '</article>';
+        }).join('');
+      }
+
+      async function loadHistory(){
+        if(isLoading) return;
+        isLoading = true;
+        renderLoading();
+
+        try{
+          const initData = getInitData();
+
+          if(!initData){
+            throw new Error('Откройте историю внутри Telegram Mini App');
+          }
+
+          const response = await fetch(WALLET_FUNCTION_URL, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': 'Bearer ' + SUPABASE_ANON_KEY,
+              'apikey': SUPABASE_ANON_KEY
+            },
+            body: JSON.stringify({
+              initData: initData,
+              action: 'get'
+            })
+          });
+
+          const data = await response.json().catch(function(){ return {}; });
+
+          if(!response.ok){
+            throw new Error(data.error || 'Ошибка загрузки истории');
+          }
+
+          currentItems = Array.isArray(data.transactions)
+            ? data.transactions
+                .filter(function(tx){ return tx && (tx.type === 'deposit' || tx.type === 'withdraw'); })
+                .map(normalizeTransaction)
+            : [];
+
+          renderHistory(currentFilter);
+        }catch(error){
+          renderError(error && error.message ? error.message : 'Не удалось загрузить историю');
+        }finally{
+          isLoading = false;
+        }
+      }
+
+      filterButtons.forEach(function(button){
+        button.addEventListener('click', function(){
+          filterButtons.forEach(function(item){ item.classList.remove('active'); });
+          button.classList.add('active');
+          renderHistory(button.dataset.filter || 'all');
+        });
+      });
+
+      window.addEventListener('message', function(event){
+        try{
+          if(event && event.data && event.data.type === 'vezus_refresh_history'){
+            loadHistory();
+          }
+        }catch(error){}
+      });
+
+      document.addEventListener('visibilitychange', function(){
+        if(!document.hidden) loadHistory();
+      });
+
+      loadHistory();
+    })();
+  </script>
+</body>
+</html>
