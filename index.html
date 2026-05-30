@@ -7662,7 +7662,195 @@
     }
 
 
-  </style>
+  
+
+    /* FINAL PRO BANNERS: стабильная карусель как в нормальных проектах */
+    .hero-slider{
+      --vezus-banner-height:190px;
+      --vezus-banner-gap:12px;
+      --vezus-banner-width:100%;
+      width:100% !important;
+      height:var(--vezus-banner-height) !important;
+      min-height:var(--vezus-banner-height) !important;
+      max-height:var(--vezus-banner-height) !important;
+      position:relative !important;
+      overflow:hidden !important;
+      border-radius:12px !important;
+      scroll-snap-type:none !important;
+      scroll-behavior:auto !important;
+      overscroll-behavior:contain !important;
+      touch-action:pan-y !important;
+      user-select:none !important;
+      -webkit-user-select:none !important;
+    }
+
+    .banner-track{
+      position:relative !important;
+      display:block !important;
+      width:100% !important;
+      height:100% !important;
+      min-height:0 !important;
+      transform:none !important;
+      transition:none !important;
+      will-change:auto !important;
+    }
+
+    .banner,
+    .banner.banner-image-slot,
+    .banner-image-slot{
+      position:absolute !important;
+      top:0 !important;
+      left:50% !important;
+      width:var(--vezus-banner-width) !important;
+      min-width:0 !important;
+      max-width:none !important;
+      height:100% !important;
+      min-height:0 !important;
+      max-height:none !important;
+      flex:none !important;
+      padding:0 !important;
+      border-radius:12px !important;
+      overflow:hidden !important;
+      background-size:cover !important;
+      background-position:center center !important;
+      background-repeat:no-repeat !important;
+      transform:translate3d(calc(-50% + var(--vezus-banner-x, 0px)), 0, 0) scale(var(--vezus-banner-scale, 1)) !important;
+      opacity:var(--vezus-banner-opacity, 0) !important;
+      z-index:var(--vezus-banner-z, 1) !important;
+      pointer-events:none !important;
+      box-shadow:none !important;
+      scroll-snap-align:none !important;
+      scroll-snap-stop:normal !important;
+      backface-visibility:hidden !important;
+      -webkit-backface-visibility:hidden !important;
+    }
+
+    .banner.is-active{
+      pointer-events:auto !important;
+    }
+
+    .banner img,
+    .banner-image-slot img{
+      width:100% !important;
+      height:100% !important;
+      object-fit:cover !important;
+      object-position:center center !important;
+      border-radius:12px !important;
+      display:block !important;
+      pointer-events:none !important;
+      user-select:none !important;
+      -webkit-user-select:none !important;
+    }
+
+    .banner-activate-btn{
+      right:9px !important;
+      bottom:9px !important;
+      min-height:26px !important;
+      padding:0 10px !important;
+      border-radius:8px !important;
+      border:1px solid rgba(255,255,255,.16) !important;
+      color:rgba(255,255,255,.92) !important;
+      background:rgba(10,6,20,.68) !important;
+      box-shadow:none !important;
+      font-size:10px !important;
+      font-weight:800 !important;
+      letter-spacing:0 !important;
+      backdrop-filter:none !important;
+      -webkit-backdrop-filter:none !important;
+    }
+
+    .banner-activate-btn:active{
+      transform:scale(.97) !important;
+    }
+
+    .banner-mini-indicator{
+      width:max-content !important;
+      min-height:14px !important;
+      display:flex !important;
+      align-items:center !important;
+      justify-content:center !important;
+      gap:5px !important;
+      margin:8px auto 0 !important;
+      padding:3px 7px !important;
+      border-radius:999px !important;
+      background:rgba(255,255,255,.04) !important;
+      border:1px solid rgba(255,255,255,.06) !important;
+    }
+
+    .banner-mini-indicator span{
+      width:5px !important;
+      height:5px !important;
+      border-radius:999px !important;
+      opacity:.58 !important;
+      background:rgba(255,255,255,.38) !important;
+      transition:width .18s ease, opacity .18s ease, background .18s ease !important;
+    }
+
+    .banner-mini-indicator span.active{
+      width:16px !important;
+      opacity:1 !important;
+      background:rgba(255,255,255,.92) !important;
+    }
+
+    @media (min-width:720px){
+      .hero-slider{
+        --vezus-banner-height:160px;
+        --vezus-banner-gap:12px;
+        --vezus-banner-width:calc((100% - (var(--vezus-banner-gap) * 2)) / 3);
+      }
+    }
+
+    @media (min-width:1024px){
+      .hero-slider{
+        --vezus-banner-height:170px;
+        --vezus-banner-gap:14px;
+      }
+    }
+
+    @media (max-width:719px){
+      .hero-slider{
+        --vezus-banner-height:190px;
+        --vezus-banner-gap:12px;
+        --vezus-banner-width:100%;
+        border-radius:11px !important;
+      }
+
+      .banner,
+      .banner.banner-image-slot,
+      .banner-image-slot,
+      .banner img,
+      .banner-image-slot img{
+        border-radius:11px !important;
+      }
+    }
+
+    /* FINAL PRO SCROLL: нормальная вертикальная прокрутка страницы */
+    html,
+    body{
+      touch-action:auto !important;
+      overscroll-behavior-y:auto !important;
+      overflow-y:auto !important;
+      -webkit-overflow-scrolling:touch !important;
+    }
+
+    .app,
+    main,
+    .section,
+    .project-footer{
+      touch-action:auto !important;
+    }
+
+    .cards-row,
+    .games-row,
+    .slots-row,
+    .card-games-row{
+      touch-action:pan-x pan-y !important;
+      scroll-snap-type:none !important;
+      scroll-behavior:auto !important;
+      overscroll-behavior-x:contain !important;
+      -webkit-overflow-scrolling:touch !important;
+    }
+</style>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <script>
   /*
@@ -8385,7 +8573,7 @@
       }
 
 
-      /* Баннеры: стабильная бесконечная лента 1-2-3-4-5-1-2-3-4-5 */
+      /* Баннеры: правильная стабильная карусель без прыжков */
       const slider = document.getElementById('heroSlider');
       const track = document.getElementById('bannerTrack');
       const bannerIndicator = document.getElementById('bannerMiniIndicator');
@@ -8394,173 +8582,191 @@
       if(slider && track){
         Array.from(track.querySelectorAll('[data-generated="true"], [data-clone="true"]')).forEach((clone) => clone.remove());
 
-        const sourceSlides = Array.from(track.querySelectorAll('.banner')).filter((slide) => slide.dataset.generated !== 'true');
-        const total = sourceSlides.length;
-        const cycles = 9;
-        const middleCycle = Math.floor(cycles / 2);
-        let slides = [];
+        const slides = Array.from(track.querySelectorAll('.banner')).slice(0, 5);
+        const total = slides.length;
         let activeIndex = 0;
-        let autoTimeout = null;
-        let scrollEndTimeout = null;
-        let indicatorRaf = null;
-        let userInteracting = false;
-        let silentJumping = false;
+        let autoTimer = null;
+        let resizeTimer = null;
+        let isDragging = false;
+        let horizontalGesture = false;
+        let startX = 0;
+        let startY = 0;
+        let dragX = 0;
 
-        track.dataset.ready = 'infinite-five-banner-carousel-stable';
-        track.style.transform = 'none';
-        track.style.transition = 'none';
+        track.dataset.ready = 'vezus-pro-carousel';
+        slider.dataset.ready = 'vezus-pro-carousel';
 
-        function makeSlideFromSource(source, cycle, realIndex){
-          const slide = source.cloneNode(true);
-          slide.dataset.generated = 'true';
-          slide.dataset.cycle = String(cycle);
-          slide.dataset.realIndex = String(realIndex);
-          slide.setAttribute('aria-hidden', cycle === middleCycle ? 'false' : 'true');
-          return slide;
+        function normalizeIndex(index){
+          if(total <= 0) return 0;
+          return ((index % total) + total) % total;
         }
 
-        if(total > 1){
-          track.innerHTML = '';
-          const fragment = document.createDocumentFragment();
-
-          for(let cycle = 0; cycle < cycles; cycle += 1){
-            sourceSlides.forEach((source, realIndex) => {
-              fragment.appendChild(makeSlideFromSource(source, cycle, realIndex));
-            });
-          }
-
-          track.appendChild(fragment);
+        function circularDiff(index, active){
+          if(total <= 0) return 0;
+          let diff = index - active;
+          const half = total / 2;
+          if(diff > half) diff -= total;
+          if(diff < -half) diff += total;
+          return diff;
         }
 
-        slides = Array.from(track.querySelectorAll('.banner'));
-        activeIndex = total > 1 ? middleCycle * total : 0;
-
-        function clampScroll(left){
-          const maxLeft = Math.max(0, slider.scrollWidth - slider.clientWidth);
-          return Math.min(Math.max(0, left), maxLeft);
+        function isLargeScreen(){
+          return window.matchMedia('(min-width: 720px)').matches;
         }
 
-        function getCenteredLeft(slide){
-          if(!slide) return 0;
-          const slideLeft = slide.offsetLeft - track.offsetLeft;
-          return clampScroll(slideLeft - ((slider.clientWidth - slide.offsetWidth) / 2));
+        function currentStep(){
+          const first = slides[0];
+          if(!first) return slider.clientWidth;
+          const gapRaw = getComputedStyle(slider).getPropertyValue('--vezus-banner-gap').trim();
+          const gap = Number.parseFloat(gapRaw) || 12;
+          return first.getBoundingClientRect().width + gap;
         }
 
-        function logicalBannerIdFromSlide(slide){
-          return slide ? String(slide.dataset.bannerId || '') : '';
-        }
-
-        function setIndicatorByBannerId(bannerId){
+        function setIndicator(index){
+          const bannerId = String(normalizeIndex(index) + 1);
           bannerIndicatorItems.forEach((item) => {
-            item.classList.toggle('active', item.dataset.bannerIndicator === String(bannerId));
+            item.classList.toggle('active', item.dataset.bannerIndicator === bannerId);
           });
         }
 
-        function nearestSlideIndex(){
-          const center = slider.scrollLeft + slider.clientWidth / 2;
-          let nearest = activeIndex;
-          let nearestDistance = Infinity;
+        function predictedIndex(offset){
+          const step = Math.max(1, currentStep());
+          const limit = Math.min(96, step * 0.28);
+          if(offset <= -limit) return normalizeIndex(activeIndex + 1);
+          if(offset >= limit) return normalizeIndex(activeIndex - 1);
+          return activeIndex;
+        }
+
+        function render(offset, animate){
+          if(!total) return;
+
+          const large = isLargeScreen();
+          const step = currentStep();
+          const clampedOffset = Math.max(Math.min(offset || 0, step * 0.92), -step * 0.92);
 
           slides.forEach((slide, index) => {
-            const slideCenter = (slide.offsetLeft - track.offsetLeft) + slide.offsetWidth / 2;
-            const distance = Math.abs(center - slideCenter);
-            if(distance < nearestDistance){
-              nearestDistance = distance;
-              nearest = index;
-            }
+            const rel = circularDiff(index, activeIndex);
+            const abs = Math.abs(rel);
+            const x = (rel * step) + clampedOffset;
+            const visible = large ? abs <= 2 : abs <= 1;
+            const sideVisible = large ? abs <= 1 : abs === 0;
+
+            slide.style.setProperty('--vezus-banner-x', `${x}px`);
+            slide.style.setProperty('--vezus-banner-scale', large && abs === 1 ? '.965' : '1');
+            slide.style.setProperty('--vezus-banner-opacity', visible ? (sideVisible ? '1' : '0') : '0');
+            slide.style.setProperty('--vezus-banner-z', String(20 - abs));
+            slide.style.transition = animate
+              ? 'transform .52s cubic-bezier(.22,.72,.22,1), opacity .28s ease'
+              : 'none';
+            slide.classList.toggle('is-active', index === activeIndex);
+            slide.setAttribute('aria-hidden', index === activeIndex ? 'false' : 'true');
           });
 
-          return nearest;
+          setIndicator(predictedIndex(clampedOffset));
         }
 
-        function updateIndicatorNow(){
-          const nearest = nearestSlideIndex();
-          activeIndex = nearest;
-          setIndicatorByBannerId(logicalBannerIdFromSlide(slides[nearest]));
+        function goTo(index, animate){
+          activeIndex = normalizeIndex(index);
+          dragX = 0;
+          render(0, animate !== false);
         }
 
-        function scrollToIndex(index, behavior){
-          const slide = slides[index];
-          if(!slide) return;
-          activeIndex = index;
-          setIndicatorByBannerId(logicalBannerIdFromSlide(slide));
-          slider.scrollTo({ left:getCenteredLeft(slide), behavior:behavior || 'smooth' });
+        function goNext(){
+          goTo(activeIndex + 1, true);
         }
 
-        function jumpToMiddleIfNeeded(){
-          if(!total || total < 2 || silentJumping) return;
-
-          const currentSlide = slides[activeIndex];
-          if(!currentSlide) return;
-
-          const currentCycle = Math.floor(activeIndex / total);
-          if(currentCycle > 1 && currentCycle < cycles - 2) return;
-
-          const realIndex = Number(currentSlide.dataset.realIndex || 0);
-          const targetIndex = (middleCycle * total) + realIndex;
-
-          if(targetIndex === activeIndex) return;
-
-          silentJumping = true;
-          activeIndex = targetIndex;
-          slider.scrollTo({ left:getCenteredLeft(slides[targetIndex]), behavior:'auto' });
-          requestAnimationFrame(() => {
-            silentJumping = false;
-            setIndicatorByBannerId(logicalBannerIdFromSlide(slides[activeIndex]));
-          });
+        function goPrev(){
+          goTo(activeIndex - 1, true);
         }
 
-        function scheduleAuto(delay){
-          clearTimeout(autoTimeout);
+        function stopAuto(){
+          clearInterval(autoTimer);
+          autoTimer = null;
+        }
+
+        function startAuto(){
+          stopAuto();
           if(total < 2) return;
-          autoTimeout = setTimeout(() => {
-            if(userInteracting) return;
-            scrollToIndex(activeIndex + 1, 'smooth');
-            scheduleAuto(8200);
-          }, delay || 8200);
+          autoTimer = setInterval(() => {
+            if(document.hidden || isDragging) return;
+            goNext();
+          }, 10500);
         }
 
-        function handleScrollEnd(){
-          if(silentJumping) return;
-          updateIndicatorNow();
-          jumpToMiddleIfNeeded();
-          if(!userInteracting) scheduleAuto(8200);
+        function finishDrag(){
+          if(!isDragging) return;
+
+          const step = Math.max(1, currentStep());
+          const threshold = Math.min(90, Math.max(42, step * 0.18));
+          const shouldMove = Math.abs(dragX) >= threshold;
+          const direction = dragX < 0 ? 1 : -1;
+
+          isDragging = false;
+          horizontalGesture = false;
+
+          if(shouldMove){
+            goTo(activeIndex + direction, true);
+          }else{
+            render(0, true);
+          }
+
+          dragX = 0;
+          startAuto();
         }
 
-        slider.addEventListener('scroll', () => {
-          if(silentJumping) return;
-
-          if(indicatorRaf) cancelAnimationFrame(indicatorRaf);
-          indicatorRaf = requestAnimationFrame(updateIndicatorNow);
-
-          clearTimeout(scrollEndTimeout);
-          scrollEndTimeout = setTimeout(handleScrollEnd, 180);
+        slider.addEventListener('pointerdown', (event) => {
+          if(event.button !== undefined && event.button !== 0) return;
+          isDragging = true;
+          horizontalGesture = false;
+          startX = event.clientX;
+          startY = event.clientY;
+          dragX = 0;
+          stopAuto();
+          try{ slider.setPointerCapture(event.pointerId); }catch(error){}
         }, { passive:true });
 
-        slider.addEventListener('pointerdown', () => {
-          userInteracting = true;
-          clearTimeout(autoTimeout);
-          clearTimeout(scrollEndTimeout);
-        }, { passive:true });
+        slider.addEventListener('pointermove', (event) => {
+          if(!isDragging) return;
 
-        ['pointerup', 'pointercancel', 'pointerleave'].forEach((eventName) => {
-          slider.addEventListener(eventName, () => {
-            if(!userInteracting) return;
-            userInteracting = false;
-            updateIndicatorNow();
-            jumpToMiddleIfNeeded();
-            scheduleAuto(8200);
-          }, { passive:true });
+          const dx = event.clientX - startX;
+          const dy = event.clientY - startY;
+
+          if(!horizontalGesture){
+            if(Math.abs(dx) < 8 && Math.abs(dy) < 8) return;
+            if(Math.abs(dy) > Math.abs(dx) * 1.05){
+              return;
+            }
+            horizontalGesture = true;
+          }
+
+          event.preventDefault();
+          const step = Math.max(1, currentStep());
+          dragX = Math.max(Math.min(dx, step * .9), -step * .9);
+          render(dragX, false);
+        }, { passive:false });
+
+        slider.addEventListener('pointerup', finishDrag, { passive:true });
+        slider.addEventListener('pointercancel', finishDrag, { passive:true });
+        slider.addEventListener('lostpointercapture', finishDrag, { passive:true });
+
+        slider.addEventListener('mouseenter', stopAuto);
+        slider.addEventListener('mouseleave', startAuto);
+
+        document.addEventListener('visibilitychange', () => {
+          if(document.hidden){
+            stopAuto();
+          }else{
+            startAuto();
+          }
         });
 
         window.addEventListener('resize', () => {
-          scrollToIndex(activeIndex, 'auto');
+          clearTimeout(resizeTimer);
+          resizeTimer = setTimeout(() => render(0, false), 120);
         });
 
-        requestAnimationFrame(() => {
-          scrollToIndex(activeIndex, 'auto');
-          scheduleAuto(8200);
-        });
+        render(0, false);
+        startAuto();
       }
 
       /* Нижняя панель */
