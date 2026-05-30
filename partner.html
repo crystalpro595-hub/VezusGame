@@ -1,0 +1,807 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <title>Партнерство — VezusGame</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800;900&display=swap" rel="stylesheet">
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+  <style>
+    :root{
+      --bg:#05000e;
+      --panel:rgba(255,255,255,.070);
+      --panel-2:rgba(255,255,255,.045);
+      --stroke:rgba(255,255,255,.105);
+      --stroke-2:rgba(255,255,255,.075);
+      --text:#fff;
+      --muted:rgba(255,255,255,.58);
+      --muted-2:rgba(255,255,255,.42);
+      --violet:#9d4dff;
+      --pink:#d946ef;
+      --green:#73f2a2;
+      --red:#ff6d91;
+      --radius:28px;
+    }
+
+    *{
+      box-sizing:border-box;
+      -webkit-tap-highlight-color:transparent;
+    }
+
+    html,
+    body{
+      margin:0;
+      min-height:100%;
+      font-family:"Montserrat",system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+      color:var(--text);
+      background:
+        radial-gradient(circle at 18% -10%, rgba(167,76,255,.34), transparent 34%),
+        radial-gradient(circle at 104% 12%, rgba(126,34,206,.30), transparent 35%),
+        radial-gradient(circle at 46% 112%, rgba(72,0,150,.36), transparent 44%),
+        linear-gradient(180deg, #18002c 0%, #0b0018 48%, #030007 100%);
+      overflow-x:hidden;
+      touch-action:pan-y;
+      overscroll-behavior-y:auto;
+    }
+
+    body{
+      padding:calc(20px + env(safe-area-inset-top)) 14px calc(28px + env(safe-area-inset-bottom));
+    }
+
+    button,
+    input{
+      font-family:inherit;
+    }
+
+    button{
+      cursor:pointer;
+      touch-action:manipulation;
+    }
+
+    .page{
+      width:min(100%, 560px);
+      margin:0 auto;
+    }
+
+    .top{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      margin-bottom:18px;
+    }
+
+    .back{
+      width:44px;
+      height:44px;
+      display:grid;
+      place-items:center;
+      border:1px solid var(--stroke);
+      border-radius:16px;
+      color:#fff;
+      text-decoration:none;
+      background:rgba(255,255,255,.065);
+    }
+
+    .back svg{
+      width:22px;
+      height:22px;
+      fill:none;
+      stroke:currentColor;
+      stroke-width:2.4;
+      stroke-linecap:round;
+      stroke-linejoin:round;
+    }
+
+    .logo{
+      width:138px;
+      height:46px;
+      display:flex;
+      align-items:center;
+      justify-content:flex-end;
+    }
+
+    .logo img{
+      display:block;
+      max-width:100%;
+      max-height:100%;
+      object-fit:contain;
+    }
+
+    .hero{
+      position:relative;
+      overflow:hidden;
+      padding:20px;
+      border:1px solid var(--stroke);
+      border-radius:var(--radius);
+      background:
+        radial-gradient(circle at 0 0, rgba(157,77,255,.23), transparent 42%),
+        linear-gradient(135deg, rgba(255,255,255,.090), rgba(255,255,255,.030));
+      box-shadow:0 18px 42px rgba(0,0,0,.30);
+    }
+
+    .hero::after{
+      content:"";
+      position:absolute;
+      width:160px;
+      height:160px;
+      right:-74px;
+      top:-64px;
+      border-radius:50%;
+      background:rgba(217,70,239,.14);
+      pointer-events:none;
+    }
+
+    .badge{
+      width:max-content;
+      max-width:100%;
+      padding:7px 11px;
+      border:1px solid var(--stroke);
+      border-radius:999px;
+      background:rgba(255,255,255,.075);
+      color:rgba(255,255,255,.72);
+      font-size:10px;
+      font-weight:900;
+      text-transform:uppercase;
+      letter-spacing:.12em;
+    }
+
+    h1{
+      position:relative;
+      z-index:1;
+      margin:14px 0 8px;
+      font-size:30px;
+      line-height:1.03;
+      font-weight:950;
+      letter-spacing:-.035em;
+    }
+
+    .lead{
+      position:relative;
+      z-index:1;
+      margin:0;
+      max-width:410px;
+      color:var(--muted);
+      font-size:13px;
+      font-weight:700;
+      line-height:1.5;
+    }
+
+    .stats{
+      display:grid;
+      grid-template-columns:repeat(2, minmax(0, 1fr));
+      gap:10px;
+      margin-top:15px;
+    }
+
+    .stat{
+      min-height:88px;
+      padding:14px;
+      border:1px solid var(--stroke-2);
+      border-radius:22px;
+      background:rgba(255,255,255,.050);
+    }
+
+    .stat.big{
+      grid-column:1 / -1;
+      min-height:96px;
+      background:
+        radial-gradient(circle at 0 0, rgba(115,242,162,.12), transparent 48%),
+        rgba(255,255,255,.055);
+    }
+
+    .stat span{
+      display:block;
+      color:var(--muted-2);
+      font-size:11px;
+      font-weight:800;
+      line-height:1.25;
+    }
+
+    .stat strong{
+      display:block;
+      margin-top:8px;
+      font-size:21px;
+      font-weight:950;
+      letter-spacing:-.02em;
+    }
+
+    .stat.big strong{
+      font-size:28px;
+    }
+
+    .card{
+      margin-top:14px;
+      padding:16px;
+      border:1px solid var(--stroke);
+      border-radius:24px;
+      background:linear-gradient(135deg, rgba(255,255,255,.070), rgba(255,255,255,.024));
+    }
+
+    .card h2{
+      margin:0 0 10px;
+      font-size:17px;
+      font-weight:950;
+      letter-spacing:-.015em;
+    }
+
+    .small-text{
+      margin:0 0 12px;
+      color:var(--muted);
+      font-size:12px;
+      font-weight:700;
+      line-height:1.45;
+    }
+
+    .ref-box{
+      display:flex;
+      align-items:center;
+      gap:9px;
+      min-height:52px;
+      padding:8px;
+      border:1px solid var(--stroke-2);
+      border-radius:18px;
+      background:rgba(0,0,0,.23);
+    }
+
+    .ref-code{
+      min-width:0;
+      flex:1;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      white-space:nowrap;
+      padding-left:8px;
+      color:#fff;
+      font-size:15px;
+      font-weight:900;
+      letter-spacing:.03em;
+    }
+
+    .copy,
+    .main-btn{
+      min-height:38px;
+      padding:0 13px;
+      border:0;
+      border-radius:14px;
+      background:linear-gradient(135deg, var(--violet), var(--pink));
+      color:#fff;
+      font-size:12px;
+      font-weight:950;
+    }
+
+    .copy.secondary{
+      background:rgba(255,255,255,.075);
+      border:1px solid var(--stroke-2);
+      color:rgba(255,255,255,.84);
+    }
+
+    .promo-row{
+      display:flex;
+      gap:9px;
+      align-items:center;
+    }
+
+    .promo-input{
+      min-width:0;
+      flex:1;
+      height:50px;
+      border:1px solid var(--stroke-2);
+      border-radius:18px;
+      outline:none;
+      padding:0 14px;
+      color:#fff;
+      background:rgba(0,0,0,.22);
+      font-size:16px !important;
+      font-weight:850;
+      text-transform:uppercase;
+    }
+
+    .promo-input::placeholder{
+      color:rgba(255,255,255,.34);
+      text-transform:none;
+      font-size:13px;
+      font-weight:700;
+    }
+
+    .main-btn{
+      height:50px;
+      padding:0 15px;
+      border-radius:18px;
+      font-size:13px;
+    }
+
+    .main-btn:disabled,
+    .copy:disabled{
+      opacity:.55;
+      cursor:not-allowed;
+    }
+
+    .message{
+      display:none;
+      margin-top:10px;
+      padding:10px 11px;
+      border-radius:15px;
+      font-size:12px;
+      font-weight:800;
+      line-height:1.35;
+      text-align:center;
+      background:rgba(255,255,255,.055);
+      border:1px solid var(--stroke-2);
+      color:var(--muted);
+    }
+
+    .message.show{display:block}
+    .message.success{color:var(--green);border-color:rgba(115,242,162,.20);background:rgba(115,242,162,.075)}
+    .message.error{color:var(--red);border-color:rgba(255,109,145,.20);background:rgba(255,109,145,.075)}
+
+    .status-pill{
+      display:inline-flex;
+      align-items:center;
+      gap:7px;
+      min-height:34px;
+      padding:0 11px;
+      border-radius:999px;
+      background:rgba(255,255,255,.065);
+      border:1px solid var(--stroke-2);
+      color:rgba(255,255,255,.68);
+      font-size:11px;
+      font-weight:850;
+    }
+
+    .status-pill.active{
+      color:var(--green);
+      background:rgba(115,242,162,.075);
+      border-color:rgba(115,242,162,.20);
+    }
+
+    .steps{
+      display:grid;
+      gap:9px;
+      margin-top:12px;
+    }
+
+    .step{
+      display:flex;
+      gap:10px;
+      align-items:flex-start;
+      padding:12px;
+      border:1px solid var(--stroke-2);
+      border-radius:18px;
+      background:rgba(255,255,255,.042);
+    }
+
+    .num{
+      width:28px;
+      height:28px;
+      flex:0 0 auto;
+      display:grid;
+      place-items:center;
+      border-radius:11px;
+      background:rgba(157,77,255,.22);
+      font-size:12px;
+      font-weight:950;
+    }
+
+    .step p{
+      margin:0;
+      color:var(--muted);
+      font-size:12px;
+      font-weight:700;
+      line-height:1.45;
+    }
+
+    .step p strong{
+      display:block;
+      margin-bottom:2px;
+      color:#fff;
+      font-size:13px;
+      font-weight:900;
+    }
+
+    .history{
+      display:grid;
+      gap:9px;
+    }
+
+    .earning{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      min-height:58px;
+      padding:11px 12px;
+      border-radius:18px;
+      background:rgba(255,255,255,.045);
+      border:1px solid var(--stroke-2);
+    }
+
+    .earning-title{
+      min-width:0;
+    }
+
+    .earning-title strong{
+      display:block;
+      color:#fff;
+      font-size:13px;
+      font-weight:950;
+    }
+
+    .earning-title span{
+      display:block;
+      margin-top:3px;
+      color:var(--muted-2);
+      font-size:10px;
+      font-weight:750;
+    }
+
+    .earning-amount{
+      flex:0 0 auto;
+      text-align:right;
+      color:var(--green);
+      font-size:13px;
+      font-weight:950;
+      white-space:nowrap;
+    }
+
+    .earning-amount small{
+      display:block;
+      margin-top:3px;
+      color:var(--muted-2);
+      font-size:10px;
+      font-weight:800;
+    }
+
+    .empty,
+    .loading{
+      min-height:90px;
+      display:grid;
+      place-items:center;
+      text-align:center;
+      color:var(--muted-2);
+      font-size:13px;
+      font-weight:750;
+      border:1px dashed rgba(255,255,255,.11);
+      border-radius:20px;
+      background:rgba(255,255,255,.032);
+    }
+
+    .footer-gap{
+      height:10px;
+    }
+
+    @media (max-width:370px){
+      h1{font-size:27px}
+      .promo-row{flex-direction:column;align-items:stretch}
+      .main-btn{width:100%}
+      .stats{grid-template-columns:1fr}
+      .stat.big{grid-column:auto}
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <header class="top">
+      <a class="back" href="index.html" aria-label="Назад">
+        <svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/><path d="M20 12H9"/></svg>
+      </a>
+      <div class="logo"><img src="images/Logovezusgame.png" alt="VezusGame"></div>
+    </header>
+
+    <section class="hero">
+      <div class="badge">VezusGame</div>
+      <h1>Партнерство</h1>
+      <p class="lead">Приглашай игроков по своему промокоду и получай 10% от чистого проигрыша приглашённых после активации.</p>
+
+      <div class="stats">
+        <div class="stat big"><span>Доступно к выводу</span><strong id="availableBalance">0 ₽</strong></div>
+        <div class="stat"><span>В ожидании</span><strong id="pendingBalance">0 ₽</strong></div>
+        <div class="stat"><span>Приглашено</span><strong id="referralsCount">0</strong></div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>Твой промокод</h2>
+      <p class="small-text">Отправь этот код игроку. Он сможет ввести его в любой момент, но только один раз.</p>
+      <div class="ref-box">
+        <div class="ref-code" id="myCode">Загрузка...</div>
+        <button class="copy" id="copyCode" type="button">Копировать</button>
+      </div>
+    </section>
+
+    <section class="card" id="activateCard">
+      <h2>Ввести промокод партнёра</h2>
+      <p class="small-text">Если ты пришёл от партнёра, введи его промокод. После активации изменить партнёра нельзя.</p>
+      <div class="promo-row">
+        <input class="promo-input" id="promoInput" type="text" inputmode="text" autocomplete="off" placeholder="Например: VEZUS777" />
+        <button class="main-btn" id="activateBtn" type="button">Активировать</button>
+      </div>
+      <div class="message" id="activateMessage"></div>
+    </section>
+
+    <section class="card">
+      <h2>Статус</h2>
+      <div class="status-pill" id="bindStatus">Проверка статуса...</div>
+    </section>
+
+    <section class="card">
+      <h2>Как считаются начисления</h2>
+      <div class="steps">
+        <div class="step"><div class="num">1</div><p><strong>Игрок вводит промокод</strong>Привязка к партнёру происходит один раз и сохраняется навсегда.</p></div>
+        <div class="step"><div class="num">2</div><p><strong>Считается только новый проигрыш</strong>Старые проигрыши до ввода промокода не учитываются.</p></div>
+        <div class="step"><div class="num">3</div><p><strong>Партнёр получает 10%</strong>Начисление идёт только с чистого проигрыша приглашённого игрока.</p></div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>История начислений</h2>
+      <div class="history" id="earningsList">
+        <div class="loading">Загрузка истории...</div>
+      </div>
+    </section>
+
+    <div class="footer-gap"></div>
+  </main>
+
+  <script>
+    window.VEZUS_SUPABASE = window.VEZUS_SUPABASE || {
+      url: 'https://xcsjedwhqcrwdzmuahjl.supabase.co',
+      anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhjc2plZHdocWNyd2R6bXVhaGpsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgyNzk0ODYsImV4cCI6MjA5Mzg1NTQ4Nn0.M2ksKeWwDt0BQxgjxpGhLKLMNP_ve1dcZvQ0Ix88Ock',
+      partnerFunction: 'partner-code'
+    };
+
+    (function(){
+      const tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
+      const config = window.VEZUS_SUPABASE || {};
+
+      const els = {
+        myCode: document.getElementById('myCode'),
+        copyCode: document.getElementById('copyCode'),
+        availableBalance: document.getElementById('availableBalance'),
+        pendingBalance: document.getElementById('pendingBalance'),
+        referralsCount: document.getElementById('referralsCount'),
+        bindStatus: document.getElementById('bindStatus'),
+        promoInput: document.getElementById('promoInput'),
+        activateBtn: document.getElementById('activateBtn'),
+        activateMessage: document.getElementById('activateMessage'),
+        earningsList: document.getElementById('earningsList')
+      };
+
+      let dashboardData = null;
+
+      function initTelegram(){
+        if(!tg) return;
+        try{ tg.ready(); }catch(error){}
+        try{ tg.expand(); }catch(error){}
+      }
+
+      function getInitData(){
+        const initData = tg && tg.initData ? tg.initData : '';
+        if(initData){
+          try{ sessionStorage.setItem('vezus_init_data', initData); }catch(error){}
+          try{ localStorage.setItem('vezus_init_data_backup', initData); }catch(error){}
+          return initData;
+        }
+
+        try{
+          return sessionStorage.getItem('vezus_init_data') || localStorage.getItem('vezus_init_data_backup') || '';
+        }catch(error){
+          return '';
+        }
+      }
+
+      function functionUrl(){
+        const base = String(config.url || '').replace(/\/+$/, '');
+        return base + '/functions/v1/' + (config.partnerFunction || 'partner-code');
+      }
+
+      function formatRubles(value){
+        const number = Number(value) || 0;
+        try{
+          return new Intl.NumberFormat('ru-RU').format(number) + ' ₽';
+        }catch(error){
+          return String(number) + ' ₽';
+        }
+      }
+
+      function formatDate(value){
+        if(!value) return '';
+        try{
+          return new Intl.DateTimeFormat('ru-RU', {
+            day:'2-digit',
+            month:'2-digit',
+            year:'2-digit',
+            hour:'2-digit',
+            minute:'2-digit'
+          }).format(new Date(value));
+        }catch(error){
+          return String(value);
+        }
+      }
+
+      function showMessage(type, text){
+        if(!els.activateMessage) return;
+        els.activateMessage.textContent = text || '';
+        els.activateMessage.className = 'message show ' + (type || '');
+      }
+
+      function hideMessage(){
+        if(!els.activateMessage) return;
+        els.activateMessage.textContent = '';
+        els.activateMessage.className = 'message';
+      }
+
+      async function callPartner(action, extra){
+        const initData = getInitData();
+        if(!initData){
+          throw new Error('Открой страницу внутри Telegram Mini App');
+        }
+
+        const response = await fetch(functionUrl(), {
+          method:'POST',
+          headers:{
+            'Content-Type':'application/json',
+            'Authorization':'Bearer ' + config.anonKey,
+            'apikey': config.anonKey
+          },
+          body:JSON.stringify(Object.assign({ action, initData }, extra || {}))
+        });
+
+        const data = await response.json().catch(function(){ return {}; });
+        if(!response.ok || data.ok === false){
+          throw new Error(data.message || data.error || 'Ошибка партнёрской функции');
+        }
+        return data;
+      }
+
+      function renderDashboard(data){
+        dashboardData = data || {};
+        const user = data.user || {};
+        const totals = data.totals || {};
+        const code = user.referral_code || '—';
+
+        if(els.myCode) els.myCode.textContent = code;
+        if(els.availableBalance) els.availableBalance.textContent = formatRubles(totals.available ?? user.partner_balance ?? 0);
+        if(els.pendingBalance) els.pendingBalance.textContent = formatRubles(totals.pending ?? user.partner_pending_balance ?? 0);
+        if(els.referralsCount) els.referralsCount.textContent = String(data.referrals_count ?? 0);
+
+        if(user.invited_by_user_id || user.partner_code_used){
+          if(els.bindStatus){
+            els.bindStatus.textContent = 'Ты уже привязан к партнёру' + (user.partner_code_used ? ': ' + user.partner_code_used : '');
+            els.bindStatus.classList.add('active');
+          }
+          if(els.promoInput) els.promoInput.disabled = true;
+          if(els.activateBtn) els.activateBtn.disabled = true;
+          showMessage('success', 'Промокод уже активирован. Изменить партнёра нельзя.');
+        }else{
+          if(els.bindStatus){
+            els.bindStatus.textContent = 'Промокод партнёра ещё не активирован';
+            els.bindStatus.classList.remove('active');
+          }
+          if(els.promoInput) els.promoInput.disabled = false;
+          if(els.activateBtn) els.activateBtn.disabled = false;
+          hideMessage();
+        }
+
+        renderEarnings(data.earnings || []);
+      }
+
+      function renderEarnings(items){
+        if(!els.earningsList) return;
+        if(!items.length){
+          els.earningsList.innerHTML = '<div class="empty">Начислений пока нет</div>';
+          return;
+        }
+
+        els.earningsList.innerHTML = items.map(function(item){
+          const amount = formatRubles(item.commission_amount || 0);
+          const base = formatRubles(item.base_loss_amount || 0);
+          const statusMap = {
+            pending:'В ожидании',
+            available:'Доступно',
+            paid:'Выплачено',
+            cancelled:'Отменено'
+          };
+          const status = statusMap[item.status] || item.status || '';
+          return '<div class="earning">' +
+            '<div class="earning-title">' +
+              '<strong>Начисление партнёра</strong>' +
+              '<span>' + formatDate(item.created_at) + ' · база ' + base + '</span>' +
+            '</div>' +
+            '<div class="earning-amount">' + amount + '<small>' + status + '</small></div>' +
+          '</div>';
+        }).join('');
+      }
+
+      async function copyText(text, button){
+        try{
+          await navigator.clipboard.writeText(text);
+        }catch(error){
+          const input = document.createElement('input');
+          input.value = text;
+          document.body.appendChild(input);
+          input.select();
+          document.execCommand('copy');
+          input.remove();
+        }
+
+        if(button){
+          const old = button.textContent;
+          button.textContent = 'Скопировано';
+          setTimeout(function(){ button.textContent = old || 'Копировать'; }, 900);
+        }
+      }
+
+      async function loadDashboard(){
+        try{
+          const data = await callPartner('dashboard');
+          renderDashboard(data);
+        }catch(error){
+          if(els.earningsList){
+            els.earningsList.innerHTML = '<div class="empty">' + (error.message || 'Не удалось загрузить партнёрство') + '</div>';
+          }
+          if(els.bindStatus){
+            els.bindStatus.textContent = error.message || 'Ошибка загрузки';
+          }
+        }
+      }
+
+      async function activateCode(){
+        const code = els.promoInput ? els.promoInput.value.trim().toUpperCase() : '';
+        if(!code){
+          showMessage('error', 'Введите промокод партнёра');
+          return;
+        }
+
+        if(els.activateBtn){
+          els.activateBtn.disabled = true;
+          els.activateBtn.textContent = 'Проверка...';
+        }
+
+        try{
+          const data = await callPartner('activate', { code });
+          showMessage(data.ok ? 'success' : 'error', data.message || (data.ok ? 'Промокод активирован' : 'Не удалось активировать код'));
+          await loadDashboard();
+        }catch(error){
+          showMessage('error', error.message || 'Не удалось активировать промокод');
+        }finally{
+          if(els.activateBtn){
+            els.activateBtn.textContent = 'Активировать';
+            if(!(dashboardData && dashboardData.user && (dashboardData.user.invited_by_user_id || dashboardData.user.partner_code_used))){
+              els.activateBtn.disabled = false;
+            }
+          }
+        }
+      }
+
+      initTelegram();
+
+      if(els.copyCode){
+        els.copyCode.addEventListener('click', function(){
+          const code = els.myCode ? els.myCode.textContent.trim() : '';
+          if(code && code !== 'Загрузка...' && code !== '—') copyText(code, els.copyCode);
+        });
+      }
+
+      if(els.activateBtn){
+        els.activateBtn.addEventListener('click', activateCode);
+      }
+
+      if(els.promoInput){
+        els.promoInput.addEventListener('input', function(){
+          els.promoInput.value = els.promoInput.value.toUpperCase().replace(/\s+/g, '');
+          hideMessage();
+        });
+        els.promoInput.addEventListener('keydown', function(event){
+          if(event.key === 'Enter') activateCode();
+        });
+      }
+
+      loadDashboard();
+    })();
+  </script>
+</body>
+</html>
