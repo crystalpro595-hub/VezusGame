@@ -1,0 +1,2183 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, viewport-fit=cover"
+    />
+    <title>Vezus Admin Pro</title>
+    <style>
+      :root {
+        --bg: #0d0f13;
+        --panel: #151922;
+        --panel2: #1b202b;
+        --panel3: #232a36;
+        --text: #f6f7f9;
+        --muted: #9aa3b2;
+        --muted2: #687080;
+        --line: #2b323f;
+        --green: #34d399;
+        --greenBg: rgba(52, 211, 153, 0.11);
+        --red: #fb7185;
+        --redBg: rgba(251, 113, 133, 0.1);
+        --blue: #60a5fa;
+        --blueBg: rgba(96, 165, 250, 0.1);
+        --orange: #fbbf24;
+        --orangeBg: rgba(251, 191, 36, 0.11);
+        --shadow: 0 16px 42px rgba(0, 0, 0, 0.3);
+        --r: 20px;
+      }
+      * {
+        box-sizing: border-box;
+        -webkit-tap-highlight-color: transparent;
+        min-width: 0;
+      }
+      html {
+        touch-action: manipulation;
+        -webkit-text-size-adjust: 100%;
+        overflow-x: hidden;
+      }
+      body {
+        margin: 0;
+        min-height: 100vh;
+        overflow-x: hidden;
+        overscroll-behavior: none;
+        background:
+          radial-gradient(
+            circle at 20% -8%,
+            rgba(96, 165, 250, 0.12),
+            transparent 30%
+          ),
+          radial-gradient(
+            circle at 105% 10%,
+            rgba(52, 211, 153, 0.08),
+            transparent 28%
+          ),
+          var(--bg);
+        color: var(--text);
+        font-family:
+          -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial,
+          sans-serif;
+        -webkit-font-smoothing: antialiased;
+      }
+      button,
+      input {
+        font: inherit;
+      }
+      button {
+        touch-action: manipulation;
+      }
+      .hidden {
+        display: none !important;
+      }
+      .app {
+        width: 100%;
+        max-width: 520px;
+        margin: 0 auto;
+        min-height: 100vh;
+        padding: calc(env(safe-area-inset-top) + 16px) 12px 32px;
+        overflow-x: hidden;
+      }
+      .top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        margin-bottom: 14px;
+      }
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 11px;
+      }
+      .logo {
+        width: 42px;
+        height: 42px;
+        border-radius: 14px;
+        background: linear-gradient(145deg, #2a303b, #151922);
+        border: 1px solid var(--line);
+        display: grid;
+        place-items: center;
+        flex: 0 0 auto;
+        box-shadow: var(--shadow);
+      }
+      .title h1 {
+        margin: 0;
+        font-size: 20px;
+        letter-spacing: -0.02em;
+      }
+      .title p {
+        margin: 4px 0 0;
+        color: var(--muted);
+        font-size: 12px;
+      }
+      .top-actions {
+        display: flex;
+        gap: 8px;
+        flex: 0 0 auto;
+      }
+      .icon-btn {
+        width: 40px;
+        height: 40px;
+        border: 1px solid rgba(75, 85, 99, 0.75);
+        border-radius: 14px;
+        background: linear-gradient(180deg, #1c2028, #151820);
+        color: var(--text);
+        display: grid;
+        place-items: center;
+        cursor: pointer;
+        box-shadow:
+          inset 0 1px 0 rgba(255, 255, 255, 0.04),
+          0 10px 22px rgba(0, 0, 0, 0.18);
+      }
+      .icon-btn:active,
+      .trash-btn:active,
+      .btn:active,
+      .tab:active,
+      .chip:active {
+        transform: scale(0.96);
+      }
+      .icon-btn:disabled {
+        opacity: 0.55;
+      }
+      .login-wrap {
+        min-height: 86vh;
+        display: grid;
+        place-items: center;
+      }
+      .login-card {
+        width: 100%;
+        background: rgba(21, 25, 34, 0.96);
+        border: 1px solid var(--line);
+        border-radius: 28px;
+        padding: 24px;
+        box-shadow: var(--shadow);
+      }
+      .login-card .logo {
+        margin-bottom: 18px;
+      }
+      .login-card h1 {
+        margin: 0 0 8px;
+        font-size: 28px;
+      }
+      .login-card p {
+        margin: 0 0 22px;
+        color: var(--muted);
+        line-height: 1.45;
+      }
+      .label {
+        display: block;
+        color: var(--muted);
+        font-size: 12px;
+        margin: 0 0 7px;
+      }
+      .field {
+        margin-bottom: 12px;
+      }
+      .input {
+        width: 100%;
+        height: 48px;
+        border: 1px solid var(--line);
+        border-radius: 15px;
+        background: #11141a;
+        color: var(--text);
+        padding: 0 13px;
+        outline: none;
+        font-size: 16px;
+      }
+      .input:focus {
+        border-color: #4b5563;
+        background: #141821;
+      }
+      .primary {
+        width: 100%;
+        min-height: 50px;
+        border: 0;
+        border-radius: 16px;
+        background: #e5e7eb;
+        color: #111827;
+        font-weight: 850;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 9px;
+      }
+      .primary:disabled {
+        opacity: 0.55;
+      }
+      .summary {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 9px;
+        margin-bottom: 13px;
+      }
+      .stat {
+        background: linear-gradient(
+          180deg,
+          rgba(31, 35, 44, 0.96),
+          rgba(20, 23, 30, 0.96)
+        );
+        border: 1px solid rgba(75, 85, 99, 0.34);
+        border-radius: 18px;
+        padding: 13px;
+        min-height: 88px;
+      }
+      .stat-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        margin-bottom: 10px;
+      }
+      .stat-label {
+        color: var(--muted);
+        font-size: 12px;
+      }
+      .stat-value {
+        font-size: 23px;
+        font-weight: 900;
+        letter-spacing: -0.03em;
+      }
+      .stat-sub {
+        color: var(--muted2);
+        font-size: 11px;
+        margin-top: 3px;
+      }
+      .pill-icon {
+        width: 30px;
+        height: 30px;
+        border-radius: 11px;
+        display: grid;
+        place-items: center;
+        background: var(--panel3);
+        color: var(--muted);
+        flex: 0 0 auto;
+      }
+      .tabs {
+        display: flex;
+        gap: 7px;
+        padding: 5px;
+        border: 1px solid var(--line);
+        background: rgba(21, 25, 34, 0.94);
+        border-radius: 17px;
+        margin: 13px 0;
+        position: sticky;
+        top: 8px;
+        z-index: 20;
+        overflow-x: auto;
+        scrollbar-width: none;
+      }
+      .tabs::-webkit-scrollbar {
+        display: none;
+      }
+      .tab {
+        height: 41px;
+        min-width: max-content;
+        flex: 1 0 auto;
+        padding: 0 11px;
+        border: 0;
+        border-radius: 13px;
+        background: transparent;
+        color: var(--muted);
+        font-weight: 800;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 7px;
+        cursor: pointer;
+      }
+      .tab.active {
+        background: var(--panel3);
+        color: var(--text);
+      }
+      .toolbar,
+      .periods {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 12px;
+        overflow-x: auto;
+        padding-bottom: 2px;
+        scrollbar-width: none;
+      }
+      .toolbar::-webkit-scrollbar,
+      .periods::-webkit-scrollbar {
+        display: none;
+      }
+      .chip,
+      .period-chip {
+        height: 36px;
+        padding: 0 13px;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        background: var(--panel);
+        color: var(--muted);
+        font-size: 13px;
+        font-weight: 760;
+        white-space: nowrap;
+        cursor: pointer;
+      }
+      .chip.active,
+      .period-chip.active {
+        background: #e5e7eb;
+        color: #111827;
+        border-color: #e5e7eb;
+      }
+      .chip.refresh {
+        border-color: rgba(96, 165, 250, 0.24);
+        color: #bfdbfe;
+        background: rgba(96, 165, 250, 0.09);
+      }
+      .card {
+        position: relative;
+        background: linear-gradient(
+          180deg,
+          rgba(28, 32, 40, 0.98),
+          rgba(18, 21, 27, 0.98)
+        );
+        border: 1px solid rgba(75, 85, 99, 0.32);
+        border-radius: var(--r);
+        padding: 14px;
+        margin-bottom: 10px;
+        box-shadow: 0 10px 28px rgba(0, 0, 0, 0.15);
+        overflow: hidden;
+      }
+      .card-head {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 10px;
+        margin-bottom: 11px;
+      }
+      .user-line {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .avatar {
+        width: 42px;
+        height: 42px;
+        border-radius: 14px;
+        background: var(--panel3);
+        border: 1px solid var(--line);
+        display: grid;
+        place-items: center;
+        color: var(--muted);
+        overflow: hidden;
+        flex: 0 0 auto;
+      }
+      .avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+      .user-name {
+        font-size: 15px;
+        font-weight: 880;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .user-meta {
+        margin-top: 3px;
+        color: var(--muted);
+        font-size: 12px;
+      }
+      .amount {
+        font-size: 19px;
+        font-weight: 930;
+        white-space: nowrap;
+        text-align: right;
+      }
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 7px 10px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 820;
+        white-space: nowrap;
+        background: rgba(255, 255, 255, 0.055);
+        color: var(--muted);
+      }
+      .badge.pending {
+        color: var(--orange);
+        background: var(--orangeBg);
+      }
+      .badge.approved {
+        color: var(--green);
+        background: var(--greenBg);
+      }
+      .badge.declined,
+      .badge.cancelled {
+        color: var(--red);
+        background: var(--redBg);
+      }
+      .badge.deposit {
+        color: var(--green);
+        background: var(--greenBg);
+      }
+      .badge.withdraw {
+        color: var(--blue);
+        background: var(--blueBg);
+      }
+      .grid-info {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 8px;
+        margin-top: 10px;
+      }
+      .info {
+        background: #11141a;
+        border: 1px solid #252b35;
+        border-radius: 14px;
+        padding: 10px;
+      }
+      .info span {
+        display: block;
+        color: var(--muted2);
+        font-size: 11px;
+        margin-bottom: 5px;
+      }
+      .info b {
+        display: block;
+        font-size: 13px;
+        overflow-wrap: anywhere;
+      }
+      .actions {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+        margin-top: 12px;
+      }
+      .btn {
+        min-height: 42px;
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        background: var(--panel2);
+        color: var(--text);
+        font-weight: 830;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+      }
+      .btn.good {
+        color: var(--green);
+        background: var(--greenBg);
+        border-color: rgba(52, 211, 153, 0.18);
+      }
+      .btn.bad {
+        color: var(--red);
+        background: var(--redBg);
+        border-color: rgba(251, 113, 133, 0.18);
+      }
+      .btn.small {
+        min-height: 40px;
+        font-size: 13px;
+      }
+      .card-tools {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        display: flex;
+        gap: 7px;
+        z-index: 3;
+      }
+      .trash-btn {
+        width: 32px;
+        height: 32px;
+        border: 1px solid rgba(251, 113, 133, 0.22);
+        border-radius: 12px;
+        background: rgba(251, 113, 133, 0.1);
+        color: var(--red);
+        display: grid;
+        place-items: center;
+        cursor: pointer;
+      }
+      .details-btn {
+        height: 32px;
+        border: 1px solid rgba(96, 165, 250, 0.22);
+        border-radius: 12px;
+        background: rgba(96, 165, 250, 0.08);
+        color: #bfdbfe;
+        font-size: 12px;
+        font-weight: 800;
+        padding: 0 10px;
+        cursor: pointer;
+      }
+      .balance-edit {
+        display: grid;
+        grid-template-columns: 1fr 106px;
+        gap: 8px;
+        margin-top: 12px;
+      }
+      .empty {
+        text-align: center;
+        color: var(--muted);
+        border: 1px dashed var(--line);
+        border-radius: var(--r);
+        padding: 30px 18px;
+        background: rgba(21, 25, 34, 0.5);
+      }
+      .search {
+        margin-bottom: 12px;
+      }
+      .toast {
+        position: fixed;
+        left: 14px;
+        right: 14px;
+        bottom: calc(env(safe-area-inset-bottom) + 14px);
+        max-width: 492px;
+        margin: 0 auto;
+        background: #e5e7eb;
+        color: #111827;
+        border-radius: 17px;
+        padding: 13px 15px;
+        font-weight: 830;
+        box-shadow: var(--shadow);
+        z-index: 100;
+      }
+      .loader {
+        display: inline-block;
+        width: 16px;
+        height: 16px;
+        border: 2px solid rgba(255, 255, 255, 0.2);
+        border-top-color: currentColor;
+        border-radius: 50%;
+        animation: spin 0.75s linear infinite;
+      }
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+      svg {
+        width: 18px;
+        height: 18px;
+        stroke: currentColor;
+        stroke-width: 2;
+        fill: none;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+      }
+      .user-details {
+        margin-top: 12px;
+        border-top: 1px solid var(--line);
+        padding-top: 12px;
+        display: none;
+      }
+      .user-details.open {
+        display: block;
+      }
+      .detail-stats {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 8px;
+      }
+      .detail-stat {
+        background: #11141a;
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        padding: 10px;
+      }
+      .detail-stat span {
+        display: block;
+        color: var(--muted2);
+        font-size: 11px;
+        margin-bottom: 5px;
+      }
+      .detail-stat b {
+        font-size: 14px;
+      }
+      .mini-list {
+        display: grid;
+        gap: 7px;
+        margin-top: 10px;
+      }
+      .mini-row {
+        display: flex;
+        justify-content: space-between;
+        gap: 10px;
+        padding: 9px 10px;
+        border-radius: 13px;
+        background: rgba(255, 255, 255, 0.04);
+        color: var(--muted);
+        font-size: 12px;
+      }
+      .mini-row b {
+        color: var(--text);
+        white-space: nowrap;
+      }
+      .section-panel {
+        background: rgba(21, 25, 34, 0.72);
+        border: 1px solid var(--line);
+        border-radius: 22px;
+        padding: 14px;
+        box-shadow: 0 10px 28px rgba(0, 0, 0, 0.14);
+      }
+      .section-title {
+        margin: 0 0 4px;
+        font-size: 20px;
+        font-weight: 920;
+      }
+      .section-sub {
+        margin: 0 0 14px;
+        color: var(--muted);
+        font-size: 12px;
+      }
+      .metric-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 9px;
+      }
+      .metric {
+        background: linear-gradient(
+          180deg,
+          rgba(31, 35, 44, 0.96),
+          rgba(17, 20, 26, 0.96)
+        );
+        border: 1px solid rgba(75, 85, 99, 0.3);
+        border-radius: 18px;
+        padding: 13px;
+        min-height: 86px;
+      }
+      .metric span {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        color: var(--muted);
+        font-size: 12px;
+      }
+      .metric b {
+        display: block;
+        margin-top: 9px;
+        font-size: 22px;
+        letter-spacing: -0.03em;
+      }
+      .metric small {
+        display: block;
+        color: var(--muted2);
+        font-size: 11px;
+        margin-top: 3px;
+      }
+      .divider {
+        height: 1px;
+        background: var(--line);
+        margin: 13px 0;
+      }
+      .profit {
+        color: var(--green);
+      }
+      .loss {
+        color: var(--red);
+      }
+
+
+      .games-list {
+        display: grid;
+        gap: 12px;
+      }
+      .game-card {
+        position: relative;
+        padding: 14px;
+        border-radius: var(--r);
+        background: linear-gradient(180deg, rgba(28, 32, 40, 0.98), rgba(18, 21, 27, 0.98));
+        border: 1px solid rgba(75, 85, 99, 0.32);
+        overflow: hidden;
+      }
+      .game-card-top {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 12px;
+      }
+      .game-title {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .game-icon {
+        width: 42px;
+        height: 42px;
+        border-radius: 15px;
+        display: grid;
+        place-items: center;
+        background: rgba(96, 165, 250, 0.10);
+        color: #bfdbfe;
+        border: 1px solid rgba(96, 165, 250, 0.18);
+      }
+      .game-name {
+        font-size: 17px;
+        font-weight: 930;
+      }
+      .game-meta {
+        margin-top: 4px;
+        color: var(--muted);
+        font-size: 12px;
+      }
+      .chance-value {
+        font-size: 28px;
+        line-height: 1;
+        font-weight: 950;
+        letter-spacing: -0.04em;
+        white-space: nowrap;
+      }
+      .chance-box {
+        margin-top: 12px;
+        padding: 12px;
+        border-radius: 17px;
+        background: #11141a;
+        border: 1px solid var(--line);
+      }
+      .range-head {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        align-items: center;
+        margin-bottom: 10px;
+      }
+      .range-head span {
+        color: var(--muted);
+        font-size: 12px;
+      }
+      .range-head b {
+        font-size: 15px;
+      }
+      .range {
+        width: 100%;
+        accent-color: #e5e7eb;
+      }
+      .game-edit-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 8px;
+        margin-top: 10px;
+      }
+      .game-actions {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+        margin-top: 12px;
+      }
+      @media (min-width: 768px) {
+        .games-list {
+          grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+        }
+      }
+      @media (max-width: 420px) {
+        .game-edit-grid,
+        .game-actions {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      .voucher-form {
+        display: grid;
+        gap: 10px;
+        margin-bottom: 14px;
+        padding: 13px;
+        border-radius: 18px;
+        background: #11141a;
+        border: 1px solid var(--line);
+      }
+      .voucher-form-row {
+        display: grid;
+        grid-template-columns: 1fr 118px;
+        gap: 8px;
+      }
+      .voucher-list {
+        display: grid;
+        gap: 10px;
+      }
+      .voucher-card {
+        position: relative;
+        padding: 14px;
+        border-radius: var(--r);
+        background: linear-gradient(180deg, rgba(28, 32, 40, 0.98), rgba(18, 21, 27, 0.98));
+        border: 1px solid rgba(75, 85, 99, 0.32);
+        overflow: hidden;
+      }
+      .voucher-card-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 10px;
+        padding-right: 38px;
+      }
+      .voucher-code {
+        font-size: 17px;
+        font-weight: 930;
+        letter-spacing: 0.04em;
+        overflow-wrap: anywhere;
+      }
+      .voucher-meta {
+        margin-top: 5px;
+        color: var(--muted);
+        font-size: 12px;
+      }
+      .voucher-progress {
+        margin-top: 12px;
+        height: 8px;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.06);
+        overflow: hidden;
+      }
+      .voucher-progress span {
+        display: block;
+        height: 100%;
+        width: 0%;
+        border-radius: inherit;
+        background: linear-gradient(90deg, var(--blue), var(--green));
+      }
+      .switch-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        margin-top: 10px;
+      }
+      .switch-btn {
+        height: 34px;
+        padding: 0 12px;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        background: var(--panel2);
+        color: var(--muted);
+        font-size: 12px;
+        font-weight: 820;
+        cursor: pointer;
+      }
+      .switch-btn.active {
+        color: var(--green);
+        border-color: rgba(52, 211, 153, 0.18);
+        background: var(--greenBg);
+      }
+      .switch-btn.inactive {
+        color: var(--red);
+        border-color: rgba(251, 113, 133, 0.18);
+        background: var(--redBg);
+      }
+
+      .voucher-actions {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 8px;
+        margin-top: 10px;
+      }
+      .voucher-activations {
+        display: none;
+        margin-top: 11px;
+        padding-top: 11px;
+        border-top: 1px solid var(--line);
+      }
+      .voucher-activations.open {
+        display: grid;
+        gap: 7px;
+      }
+      .activation-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        padding: 9px 10px;
+        border-radius: 13px;
+        background: rgba(255, 255, 255, 0.04);
+        color: var(--muted);
+        font-size: 12px;
+      }
+      .activation-row strong {
+        display: block;
+        color: var(--text);
+        font-size: 12px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+      .activation-row span {
+        display: block;
+        margin-top: 2px;
+        color: var(--muted2);
+        font-size: 11px;
+      }
+      .activation-row b {
+        color: var(--text);
+        white-space: nowrap;
+      }
+      .voucher-activation-empty {
+        padding: 12px;
+        border-radius: 14px;
+        border: 1px dashed var(--line);
+        color: var(--muted);
+        font-size: 12px;
+        text-align: center;
+        background: rgba(255, 255, 255, 0.025);
+      }
+      @media (min-width: 768px) {
+        .app {
+          max-width: 1040px;
+          padding-left: 18px;
+          padding-right: 18px;
+        }
+        .summary {
+          grid-template-columns: repeat(4, minmax(0, 1fr));
+        }
+        #txList,
+        #usersList,
+        .voucher-list {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+          gap: 12px;
+          align-items: start;
+        }
+        #txList .empty,
+        #usersList .empty,
+        .voucher-list .empty {
+          grid-column: 1 / -1;
+        }
+        .metric-grid {
+          grid-template-columns: repeat(4, minmax(0, 1fr));
+        }
+        .detail-stats {
+          grid-template-columns: repeat(4, minmax(0, 1fr));
+        }
+        .voucher-form {
+          grid-template-columns: minmax(230px, 1.15fr) minmax(270px, 1fr) auto;
+          align-items: end;
+        }
+        .voucher-form .field {
+          margin-bottom: 0;
+        }
+        .voucher-form-row {
+          grid-template-columns: 1fr 1fr;
+        }
+        .voucher-form .primary {
+          width: auto;
+          min-width: 174px;
+          padding: 0 18px;
+        }
+      }
+      @media (min-width: 1100px) {
+        .app {
+          max-width: 1180px;
+        }
+      }
+
+      @media (max-width: 370px) {
+        .summary,
+        .metric-grid,
+        .detail-stats {
+          grid-template-columns: 1fr;
+        }
+        .grid-info {
+          grid-template-columns: 1fr;
+        }
+        .actions,
+        .balance-edit {
+          grid-template-columns: 1fr;
+        }
+        .tab {
+          font-size: 12px;
+          padding: 0 10px;
+        }
+        .title p {
+          display: none;
+        }
+        .amount {
+          font-size: 17px;
+        }
+        .app {
+          padding-left: 10px;
+          padding-right: 10px;
+        }
+      }
+
+      .partner-subtabs{
+        display:flex;
+        gap:8px;
+        overflow-x:auto;
+        padding-bottom:10px;
+        scrollbar-width:none;
+      }
+      .partner-subtabs::-webkit-scrollbar{display:none;}
+      .partner-list{display:grid;gap:10px;}
+      .partner-code{
+        display:inline-flex;
+        align-items:center;
+        justify-content:center;
+        min-height:30px;
+        padding:0 10px;
+        border-radius:999px;
+        background:rgba(96,165,250,.10);
+        color:#bfdbfe;
+        border:1px solid rgba(96,165,250,.18);
+        font-size:12px;
+        font-weight:900;
+        letter-spacing:.04em;
+      }
+      .partner-action-grid{
+        display:grid;
+        grid-template-columns:1fr 1fr;
+        gap:8px;
+        margin-top:12px;
+      }
+      .partner-percent-row{
+        display:grid;
+        grid-template-columns:1fr 110px;
+        gap:8px;
+        margin-top:12px;
+      }
+      .partner-note{
+        color:var(--muted2);
+        font-size:11px;
+        line-height:1.45;
+        margin-top:10px;
+      }
+      @media (min-width:768px){
+        .partner-list{
+          grid-template-columns:repeat(auto-fit,minmax(320px,1fr));
+          align-items:start;
+        }
+        .partner-list .empty{grid-column:1 / -1;}
+      }
+      @media (max-width:420px){
+        .partner-action-grid,
+        .partner-percent-row{grid-template-columns:1fr;}
+      }
+
+    </style>
+  </head>
+  <body>
+    <div class="app">
+      <section id="loginView" class="login-wrap">
+        <form id="loginForm" class="login-card">
+          <div class="logo">
+            <svg viewBox="0 0 24 24">
+              <path d="M12 3l7 4v5c0 5-3 8-7 9-4-1-7-4-7-9V7l7-4z" />
+              <path d="M9.5 12l1.7 1.7L15 10" />
+            </svg>
+          </div>
+          <h1>Admin Panel</h1>
+          <p>Вход для управления заявками, пользователями и финансами.</p>
+          <div class="field">
+            <label class="label" for="passwordInput">Пароль</label
+            ><input
+              id="passwordInput"
+              class="input"
+              type="password"
+              autocomplete="current-password"
+              placeholder="Введите пароль"
+              required
+            />
+          </div>
+          <button id="loginBtn" class="primary" type="submit">
+            <svg viewBox="0 0 24 24">
+              <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" />
+              <path d="M10 17l5-5-5-5" />
+              <path d="M15 12H3" /></svg
+            >Войти
+          </button>
+        </form>
+      </section>
+      <section id="adminView" class="hidden">
+        <header class="top">
+          <div class="brand">
+            <div class="logo">
+              <svg viewBox="0 0 24 24">
+                <path d="M4 13h6V4H4v9z" />
+                <path d="M14 20h6V4h-6v16z" />
+                <path d="M4 20h6v-3H4v3z" />
+              </svg>
+            </div>
+            <div class="title">
+              <h1>Vezus Admin</h1>
+              <p>Заявки, пользователи, финансы, ваучеры, игры</p>
+            </div>
+          </div>
+          <div class="top-actions">
+            <button id="refreshBtn" class="icon-btn" title="Обновить"></button
+            ><button id="logoutBtn" class="icon-btn" title="Выйти">
+              <svg viewBox="0 0 24 24">
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                <path d="M16 17l5-5-5-5" />
+                <path d="M21 12H9" />
+              </svg>
+            </button>
+          </div>
+        </header>
+        <section class="summary">
+          <div class="stat">
+            <div class="stat-head">
+              <span class="stat-label">Пользователи</span
+              ><span class="pill-icon"
+                ><svg viewBox="0 0 24 24">
+                  <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+                  <circle cx="9" cy="7" r="4" />
+                  <path d="M22 21v-2a4 4 0 0 0-3-3.87" /></svg
+              ></span>
+            </div>
+            <div id="statUsers" class="stat-value">0</div>
+            <div class="stat-sub">Всего</div>
+          </div>
+          <div class="stat">
+            <div class="stat-head">
+              <span class="stat-label">Баланс</span
+              ><span class="pill-icon"
+                ><svg viewBox="0 0 24 24">
+                  <path d="M3 7h18v13H3z" />
+                  <circle cx="17" cy="14" r="1" /></svg
+              ></span>
+            </div>
+            <div id="statBalance" class="stat-value">0 ₽</div>
+            <div class="stat-sub">Сумма балансов</div>
+          </div>
+          <div class="stat">
+            <div class="stat-head">
+              <span class="stat-label">В ожидании</span
+              ><span class="pill-icon"
+                ><svg viewBox="0 0 24 24">
+                  <circle cx="12" cy="12" r="10" />
+                  <path d="M12 6v6l4 2" /></svg
+              ></span>
+            </div>
+            <div id="statPending" class="stat-value">0</div>
+            <div class="stat-sub">Все заявки</div>
+          </div>
+          <div class="stat">
+            <div class="stat-head">
+              <span class="stat-label">Выводы</span
+              ><span class="pill-icon"
+                ><svg viewBox="0 0 24 24">
+                  <path d="M12 3v12" />
+                  <path d="M7 10l5 5 5-5" />
+                  <path d="M5 21h14" /></svg
+              ></span>
+            </div>
+            <div id="statWithdraws" class="stat-value">0</div>
+            <div class="stat-sub">Pending</div>
+          </div>
+        </section>
+        <nav class="tabs">
+          <button id="tabTx" class="tab active" type="button">
+            <svg viewBox="0 0 24 24">
+              <path d="M8 6h13" />
+              <path d="M8 12h13" />
+              <path d="M8 18h13" />
+              <path d="M3 6h.01" />
+              <path d="M3 12h.01" />
+              <path d="M3 18h.01" /></svg
+            >Заявки</button
+          ><button id="tabUsers" class="tab" type="button">
+            <svg viewBox="0 0 24 24">
+              <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+              <circle cx="9" cy="7" r="4" /></svg
+            >Пользователи</button
+          ><button id="tabStats" class="tab" type="button">
+            <svg viewBox="0 0 24 24">
+              <path d="M3 3v18h18" />
+              <path d="M7 14l3-3 3 2 5-6" /></svg
+            >Статистика</button
+          ><button id="tabFinance" class="tab" type="button">
+            <svg viewBox="0 0 24 24">
+              <path d="M3 7h18v13H3z" />
+              <path d="M7 7V5h10v2" />
+              <path d="M12 11v5" />
+              <path d="M9.5 13.5h5" /></svg
+            >Финансы
+          </button><button id="tabVouchers" class="tab" type="button">
+            <svg viewBox="0 0 24 24">
+              <path d="M4 7h16v4H4z" />
+              <path d="M4 13h16v4H4z" />
+              <path d="M8 7v10" />
+              <path d="M16 7v10" />
+              <path d="M12 7v10" /></svg
+            >Ваучеры
+          </button><button id="tabGames" class="tab" type="button">
+            <svg viewBox="0 0 24 24">
+              <path d="M6 12h4" />
+              <path d="M8 10v4" />
+              <path d="M15 11h.01" />
+              <path d="M18 13h.01" />
+              <path d="M7 18h10a5 5 0 0 0 4.8-6.4l-1.1-3.8A4 4 0 0 0 16.9 5H7.1a4 4 0 0 0-3.8 2.8l-1.1 3.8A5 5 0 0 0 7 18Z" /></svg
+            >Игры
+          </button>
+          <button id="tabPartners" class="tab" type="button">
+            <svg viewBox="0 0 24 24">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+              <circle cx="9" cy="7" r="4" />
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+              <path d="M16 3.13a4 4 0 0 1 0 7.75" /></svg
+            >Партнёрка
+          </button>
+        </nav>
+        <section id="txView">
+          <div class="toolbar">
+            <button id="refreshInlineBtn" class="chip refresh" type="button">
+              Обновить</button
+            ><button class="chip active" data-filter="pending">Новые</button
+            ><button class="chip" data-filter="all">Все</button
+            ><button class="chip" data-filter="deposit">Пополнения</button
+            ><button class="chip" data-filter="withdraw">Выводы</button>
+          </div>
+          <div id="txList"></div>
+        </section>
+        <section id="usersView" class="hidden">
+          <div class="search">
+            <input
+              id="userSearch"
+              class="input"
+              type="search"
+              placeholder="Поиск: id, username, имя, баланс"
+            />
+          </div>
+          <div id="usersList"></div>
+        </section>
+        <section id="statsView" class="hidden">
+          <div class="section-panel">
+            <h2 class="section-title">Статистика пользователей</h2>
+            <p class="section-sub">Новые пользователи за выбранный период</p>
+            <div id="statsPeriods" class="periods"></div>
+            <div class="metric-grid">
+              <div class="metric">
+                <span>Новые за период</span><b id="mNewUsers">0</b
+                ><small id="mPeriodLabel">—</small>
+              </div>
+              <div class="metric">
+                <span>Сегодня</span><b id="mTodayUsers">0</b
+                ><small>по дате регистрации</small>
+              </div>
+              <div class="metric">
+                <span>Среднее</span><b id="mAvgUsers">0</b
+                ><small>за день / час</small>
+              </div>
+              <div class="metric">
+                <span>Всего пользователей</span><b id="mAllUsers">0</b
+                ><small>в базе</small>
+              </div>
+            </div>
+          </div>
+        </section>
+        <section id="financeView" class="hidden">
+          <div class="section-panel">
+            <h2 class="section-title">Финансы</h2>
+            <p class="section-sub">Обороты по подтверждённым заявкам</p>
+            <div id="financePeriods" class="periods"></div>
+            <div class="metric-grid">
+              <div class="metric">
+                <span
+                  ><svg viewBox="0 0 24 24">
+                    <path d="M12 3v12" />
+                    <path d="m7 10 5 5 5-5" /></svg
+                  >Приход</span
+                ><b id="fDeposits">0 ₽</b
+                ><small id="fDepositCount">0 депозитов</small>
+              </div>
+              <div class="metric">
+                <span
+                  ><svg viewBox="0 0 24 24">
+                    <path d="M12 21V9" />
+                    <path d="m7 14 5-5 5 5" /></svg
+                  >Выводы</span
+                ><b id="fWithdraws">0 ₽</b
+                ><small id="fWithdrawCount">0 выводов</small>
+              </div>
+              <div class="metric">
+                <span>Разница</span><b id="fNet">0 ₽</b
+                ><small>приход минус вывод</small>
+              </div>
+              <div class="metric">
+                <span>В ожидании</span><b id="fPending">0 ₽</b
+                ><small id="fPendingCount">0 заявок</small>
+              </div>
+            </div>
+            <div class="divider"></div>
+            <div class="metric-grid">
+              <div class="metric">
+                <span>Средний депозит</span><b id="fAvgDeposit">0 ₽</b
+                ><small>approved</small>
+              </div>
+              <div class="metric">
+                <span>Средний вывод</span><b id="fAvgWithdraw">0 ₽</b
+                ><small>approved</small>
+              </div>
+            </div>
+          </div>
+        </section>
+        <section id="vouchersView" class="hidden">
+          <div class="section-panel">
+            <h2 class="section-title">Ваучеры</h2>
+            <p class="section-sub">Создание, лимиты использований и удаление кодов</p>
+            <form id="voucherForm" class="voucher-form">
+              <div class="field">
+                <label class="label" for="voucherCode">Код</label>
+                <input id="voucherCode" class="input" type="text" placeholder="Например VEZUS100" autocomplete="off" required />
+              </div>
+              <div class="voucher-form-row">
+                <div class="field">
+                  <label class="label" for="voucherAmount">Сумма</label>
+                  <input id="voucherAmount" class="input" type="number" inputmode="numeric" min="1" placeholder="100" required />
+                </div>
+                <div class="field">
+                  <label class="label" for="voucherMaxUses">Использований</label>
+                  <input id="voucherMaxUses" class="input" type="number" inputmode="numeric" min="1" value="1" required />
+                </div>
+              </div>
+              <button id="voucherCreateBtn" class="primary" type="submit">Создать ваучер</button>
+            </form>
+            <div id="vouchersList" class="voucher-list"></div>
+          </div>
+        </section>
+
+        <section id="gamesView" class="hidden">
+          <div class="section-panel">
+            <h2 class="section-title">Игры</h2>
+            <p class="section-sub">Настройка шанса выигрыша, коэффициента и лимитов ставок</p>
+            <div id="gamesList" class="games-list"></div>
+          </div>
+        </section>
+
+        <section id="partnersView" class="hidden">
+          <div class="section-panel">
+            <h2 class="section-title">Партнёрская система</h2>
+            <p class="section-sub">Промокоды, рефералы, начисления и выводы партнёров</p>
+            <div class="partner-subtabs">
+              <button class="chip active" data-partner-mode="overview" onclick="setPartnerMode('overview')">Обзор</button>
+              <button class="chip" data-partner-mode="partners" onclick="setPartnerMode('partners')">Партнёры</button>
+              <button class="chip" data-partner-mode="referrals" onclick="setPartnerMode('referrals')">Рефералы</button>
+              <button class="chip" data-partner-mode="earnings" onclick="setPartnerMode('earnings')">Начисления</button>
+              <button class="chip" data-partner-mode="payouts" onclick="setPartnerMode('payouts')">Выводы</button>
+            </div>
+            <div id="partnersContent"></div>
+          </div>
+        </section>
+      </section>
+    </div>
+    <div id="toast" class="toast hidden"></div>
+    <script>
+      document.addEventListener("gesturestart", (e) => e.preventDefault(), {
+        passive: false,
+      });
+      document.addEventListener("gesturechange", (e) => e.preventDefault(), {
+        passive: false,
+      });
+      document.addEventListener("gestureend", (e) => e.preventDefault(), {
+        passive: false,
+      });
+      let __lastTouchEnd = 0;
+      document.addEventListener(
+        "touchend",
+        (e) => {
+          const n = Date.now();
+          if (n - __lastTouchEnd <= 300) e.preventDefault();
+          __lastTouchEnd = n;
+        },
+        { passive: false },
+      );
+      document.addEventListener(
+        "wheel",
+        (e) => {
+          if (e.ctrlKey) e.preventDefault();
+        },
+        { passive: false },
+      );
+      const SUPABASE_URL = "https://xcsjedwhqcrwdzmuahjl.supabase.co";
+      const SUPABASE_ANON_KEY =
+        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhjc2plZHdocWNyd2R6bXVhaGpsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgyNzk0ODYsImV4cCI6MjA5Mzg1NTQ4Nn0.M2ksKeWwDt0BQxgjxpGhLKLMNP_ve1dcZvQ0Ix88Ock";
+      const ADMIN_URL = SUPABASE_URL + "/functions/v1/admin-wallet";
+      const TOKEN_KEY = "vezus_admin_token_v2";
+      const $ = (id) => document.getElementById(id);
+      const state = {
+        token: localStorage.getItem(TOKEN_KEY) || "",
+        transactions: [],
+        users: [],
+        vouchers: [],
+        games: [],
+        partners: [],
+        partnerReferrals: [],
+        partnerEarnings: [],
+        partnerPayoutRequests: [],
+        partnerOverview: {},
+        stats: {},
+        filter: "pending",
+        tab: "tx",
+        periodStats: 7,
+        periodFinance: 7,
+        partnerMode: "overview",
+        openUsers: new Set(),
+        openVouchers: new Set(),
+      };
+      const icons = {
+        check: '<svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>',
+        x: '<svg viewBox="0 0 24 24"><path d="M18 6L6 18"/><path d="M6 6l12 12"/></svg>',
+        user: '<svg viewBox="0 0 24 24"><path d="M20 21a8 8 0 1 0-16 0"/><circle cx="12" cy="7" r="4"/></svg>',
+        plus: '<svg viewBox="0 0 24 24"><path d="M12 5v14"/><path d="M5 12h14"/></svg>',
+        out: '<svg viewBox="0 0 24 24"><path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M5 21h14"/></svg>',
+        edit: '<svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"/></svg>',
+        trash:
+          '<svg viewBox="0 0 24 24"><path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v5"/><path d="M14 11v5"/></svg>',
+        voucher:
+          '<svg viewBox="0 0 24 24"><path d="M4 7h16v4H4z"/><path d="M4 13h16v4H4z"/><path d="M8 7v10"/><path d="M16 7v10"/></svg>',
+        game:
+          '<svg viewBox="0 0 24 24"><path d="M6 12h4"/><path d="M8 10v4"/><path d="M15 11h.01"/><path d="M18 13h.01"/><path d="M7 18h10a5 5 0 0 0 4.8-6.4l-1.1-3.8A4 4 0 0 0 16.9 5H7.1a4 4 0 0 0-3.8 2.8l-1.1 3.8A5 5 0 0 0 7 18Z"/></svg>',
+        refresh:
+          '<svg viewBox="0 0 24 24"><path d="M21 12a9 9 0 0 1-9 9 9.8 9.8 0 0 1-6.74-2.74L3 16"/><path d="M3 21v-5h5"/><path d="M3 12a9 9 0 0 1 9-9 9.8 9.8 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/></svg>',
+      };
+      $("refreshBtn").innerHTML = icons.refresh;
+      function money(v) {
+        return (
+          new Intl.NumberFormat("ru-RU").format(Math.floor(Number(v) || 0)) +
+          " ₽"
+        );
+      }
+      function dateText(v) {
+        if (!v) return "—";
+        return new Date(v).toLocaleString("ru-RU", {
+          day: "2-digit",
+          month: "2-digit",
+          year: "2-digit",
+          hour: "2-digit",
+          minute: "2-digit",
+        });
+      }
+      function esc(v) {
+        return String(v ?? "").replace(
+          /[&<>'"]/g,
+          (ch) =>
+            ({
+              "&": "&amp;",
+              "<": "&lt;",
+              ">": "&gt;",
+              "'": "&#39;",
+              '"': "&quot;",
+            })[ch],
+        );
+      }
+      function toast(m) {
+        const el = $("toast");
+        el.textContent = m;
+        el.classList.remove("hidden");
+        clearTimeout(window.__toastTimer);
+        window.__toastTimer = setTimeout(
+          () => el.classList.add("hidden"),
+          2600,
+        );
+      }
+      async function api(payload) {
+        const res = await fetch(ADMIN_URL, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: "Bearer " + SUPABASE_ANON_KEY,
+            apikey: SUPABASE_ANON_KEY,
+          },
+          body: JSON.stringify(payload),
+        });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok || data.error)
+          throw new Error(data.error || "Ошибка сервера");
+        return data;
+      }
+      async function login(password) {
+        const data = await api({ action: "login", password });
+        state.token = data.token;
+        localStorage.setItem(TOKEN_KEY, data.token);
+        $("loginView").classList.add("hidden");
+        $("adminView").classList.remove("hidden");
+        await load(true);
+      }
+      async function load(silent) {
+        if (!state.token) return;
+        try {
+          $("refreshBtn").disabled = true;
+          $("refreshBtn").innerHTML = '<span class="loader"></span>';
+          if ($("refreshInlineBtn")) {
+            $("refreshInlineBtn").disabled = true;
+            $("refreshInlineBtn").textContent = "Обновляю...";
+          }
+          const data = await api({ action: "get", token: state.token });
+          state.transactions = data.transactions || [];
+          state.users = data.users || [];
+          state.vouchers = data.vouchers || [];
+          state.games = data.games || [];
+          state.partners = data.partners || [];
+          state.partnerReferrals = data.partner_referrals || [];
+          state.partnerEarnings = data.partner_earnings || [];
+          state.partnerPayoutRequests = data.partner_payout_requests || [];
+          state.partnerOverview = data.partner_overview || {};
+          state.stats = data.stats || {};
+          renderStats(state.stats);
+          render();
+          if (!silent) toast("Данные обновлены");
+        } catch (e) {
+          if (String(e.message).includes("token")) logout();
+          toast(e.message);
+        } finally {
+          $("refreshBtn").disabled = false;
+          $("refreshBtn").innerHTML = icons.refresh;
+          if ($("refreshInlineBtn")) {
+            $("refreshInlineBtn").disabled = false;
+            $("refreshInlineBtn").textContent = "Обновить";
+          }
+        }
+      }
+      async function doAction(action, extra) {
+        try {
+          toast("Выполняю...");
+          const data = await api({ action, token: state.token, ...extra });
+          state.transactions = data.transactions || [];
+          state.users = data.users || [];
+          state.vouchers = data.vouchers || [];
+          state.games = data.games || [];
+          state.partners = data.partners || [];
+          state.partnerReferrals = data.partner_referrals || [];
+          state.partnerEarnings = data.partner_earnings || [];
+          state.partnerPayoutRequests = data.partner_payout_requests || [];
+          state.partnerOverview = data.partner_overview || {};
+          state.stats = data.stats || {};
+          renderStats(state.stats);
+          render();
+          toast("Готово");
+        } catch (e) {
+          toast(e.message);
+        }
+      }
+      function logout() {
+        state.token = "";
+        localStorage.removeItem(TOKEN_KEY);
+        $("adminView").classList.add("hidden");
+        $("loginView").classList.remove("hidden");
+      }
+      function renderStats(s) {
+        $("statUsers").textContent = s.users_total || 0;
+        $("statBalance").textContent = money(s.users_balance_total || 0);
+        $("statPending").textContent = s.pending || 0;
+        $("statWithdraws").textContent = s.pending_withdraws || 0;
+      }
+      function nameOf(u) {
+        if (!u) return "Пользователь";
+        return (
+          [u.first_name, u.last_name].filter(Boolean).join(" ") ||
+          (u.username ? "@" + u.username : "Пользователь")
+        );
+      }
+      function statusText(s) {
+        return (
+          {
+            pending: "В ожидании",
+            approved: "Одобрено",
+            declined: "Отклонено",
+            cancelled: "Отменено",
+          }[s] || s
+        );
+      }
+      function renderTx() {
+        const list = $("txList");
+        let items = state.transactions.slice();
+        if (state.filter === "pending")
+          items = items.filter((x) => x.status === "pending");
+        if (state.filter === "deposit")
+          items = items.filter((x) => x.type === "deposit");
+        if (state.filter === "withdraw")
+          items = items.filter((x) => x.type === "withdraw");
+        if (!items.length) {
+          list.innerHTML = '<div class="empty">Заявок нет</div>';
+          return;
+        }
+        list.innerHTML = items
+          .map((tx) => {
+            const dep = tx.type === "deposit",
+              pend = tx.status === "pending",
+              u = tx.user || { telegram_id: tx.telegram_id },
+              avatar = u.photo_url
+                ? `<img src="${esc(u.photo_url)}" alt="">`
+                : icons.user,
+              details = dep
+                ? `<div class="info"><span>Отправитель</span><b>${esc(tx.sender_fio || "—")}</b></div><div class="info"><span>Метод</span><b>${esc(tx.method || "—")}</b></div>`
+                : `<div class="info"><span>Получатель</span><b>${esc(tx.recipient_fio || "—")}</b></div><div class="info"><span>Банк</span><b>${esc(tx.recipient_bank || "—")}</b></div>`,
+              buttons = !pend
+                ? ""
+                : dep
+                  ? `<div class="actions"><button class="btn good" onclick="txAction('approve_deposit','${tx.id}')">${icons.check}Подтвердить</button><button class="btn bad" onclick="txAction('decline_deposit','${tx.id}')">${icons.x}Отклонить</button></div>`
+                  : `<div class="actions"><button class="btn good" onclick="txAction('approve_withdraw','${tx.id}')">${icons.check}Оплачен</button><button class="btn bad" onclick="txAction('decline_withdraw','${tx.id}')">${icons.x}Вернуть</button></div>`;
+            return `<article class="card"><div class="card-tools"><button class="trash-btn" title="Удалить заявку" onclick="deleteTransaction('${tx.id}')">${icons.trash}</button></div><div class="card-head" style="padding-right:34px"><div class="user-line"><div class="avatar">${avatar}</div><div><div class="user-name">${esc(nameOf(u))}</div><div class="user-meta">ID ${tx.telegram_id || "—"} · ${dateText(tx.created_at)}</div></div></div><div><div class="amount">${money(tx.amount)}</div><div class="badge ${tx.type}">${dep ? icons.plus : icons.out}${dep ? "Пополнение" : "Вывод"}</div></div></div><div style="display:flex;gap:8px;flex-wrap:wrap"><span class="badge ${tx.status}">${statusText(tx.status)}</span><span class="badge">Баланс: ${money(tx.current_balance || 0)}</span></div><div class="grid-info">${details}<div class="info"><span>До</span><b>${money(tx.balance_before || 0)}</b></div><div class="info"><span>После</span><b>${money(tx.balance_after || 0)}</b></div></div>${buttons}</article>`;
+          })
+          .join("");
+      }
+      function userTx(uid) {
+        return state.transactions.filter(
+          (t) => String(t.user_id) === String(uid),
+        );
+      }
+      function renderUsers() {
+        const list = $("usersList"),
+          q = ($("userSearch").value || "").trim().toLowerCase();
+        let items = state.users.slice();
+        if (q)
+          items = items.filter((u) =>
+            [u.telegram_id, u.username, u.first_name, u.last_name, u.balance]
+              .join(" ")
+              .toLowerCase()
+              .includes(q),
+          );
+        if (!items.length) {
+          list.innerHTML = '<div class="empty">Пользователей нет</div>';
+          return;
+        }
+        list.innerHTML = items
+          .map((u) => {
+            const avatar = u.photo_url
+                ? `<img src="${esc(u.photo_url)}" alt="">`
+                : icons.user,
+              txs = userTx(u.id),
+              deps = txs.filter(
+                (t) => t.type === "deposit" && t.status === "approved",
+              ),
+              outs = txs.filter(
+                (t) => t.type === "withdraw" && t.status === "approved",
+              ),
+              pend = txs.filter((t) => t.status === "pending"),
+              sum = (a) => a.reduce((s, t) => s + Number(t.amount || 0), 0),
+              open = state.openUsers.has(u.id);
+            return `<article class="card"><div class="card-tools"><button class="trash-btn" title="Удалить пользователя" onclick="deleteUser('${u.id}','${String(u.telegram_id).replace(/'/g, "")}')">${icons.trash}</button></div><div class="card-head" style="padding-right:34px"><div class="user-line"><div class="avatar">${avatar}</div><div><div class="user-name">${esc(nameOf(u))}</div><div class="user-meta">${u.username ? "@" + esc(u.username) + " · " : ""}ID ${u.telegram_id}</div></div></div><div class="amount">${money(u.balance)}</div></div><div class="grid-info"><div class="info"><span>Создан</span><b>${dateText(u.created_at)}</b></div><div class="info"><span>Язык</span><b>${esc(u.language_code || "—")}</b></div></div><div class="balance-edit"><input id="bal_${u.id}" class="input" inputmode="numeric" type="number" min="0" value="${Math.floor(Number(u.balance) || 0)}"><button class="btn small" onclick="setBalance('${u.id}')">${icons.edit}Сохранить</button></div><button class="details-btn" style="margin-top:10px" onclick="toggleUserDetails('${u.id}')">${open ? "Скрыть" : "Подробнее"}</button><div id="details_${u.id}" class="user-details ${open ? "open" : ""}"><div class="detail-stats"><div class="detail-stat"><span>Депозиты</span><b>${money(sum(deps))}</b></div><div class="detail-stat"><span>Выводы</span><b>${money(sum(outs))}</b></div><div class="detail-stat"><span>Заявок</span><b>${txs.length}</b></div><div class="detail-stat"><span>В ожидании</span><b>${pend.length}</b></div></div><div class="mini-list">${
+              txs
+                .slice(0, 5)
+                .map(
+                  (t) =>
+                    `<div class="mini-row"><span>${t.type === "deposit" ? "Пополнение" : "Вывод"} · ${statusText(t.status)}</span><b>${money(t.amount)}</b></div>`,
+                )
+                .join("") ||
+              '<div class="mini-row"><span>Операций пока нет</span><b>—</b></div>'
+            }</div></div></article>`;
+          })
+          .join("");
+      }
+      const periods = [
+        ["1", "День"],
+        ["3", "3 дня"],
+        ["7", "7 дней"],
+        ["30", "30 дней"],
+        ["180", "Полгода"],
+        ["365", "Год"],
+      ];
+      function periodStart(days) {
+        return new Date(Date.now() - Number(days) * 86400000);
+      }
+      function inPeriod(date, days) {
+        if (!date) return false;
+        return new Date(date) >= periodStart(days);
+      }
+      function renderPeriodButtons(id, current, handler) {
+        $(id).innerHTML = periods
+          .map(
+            ([v, t]) =>
+              `<button class="period-chip ${String(current) === v ? "active" : ""}" data-period="${v}" onclick="${handler}(${v})">${t}</button>`,
+          )
+          .join("");
+      }
+      function renderAnalytics() {
+        renderPeriodButtons(
+          "statsPeriods",
+          state.periodStats,
+          "setStatsPeriod",
+        );
+        const days = Number(state.periodStats),
+          users = state.users || [],
+          newUsers = users.filter((u) => inPeriod(u.created_at, days)).length,
+          today = users.filter(
+            (u) =>
+              new Date(u.created_at || 0).toISOString().slice(0, 10) ===
+              new Date().toISOString().slice(0, 10),
+          ).length,
+          avg = days === 1 ? newUsers / 24 : newUsers / days;
+        $("mNewUsers").textContent = newUsers;
+        $("mTodayUsers").textContent = today;
+        $("mAvgUsers").textContent =
+          avg >= 10 ? avg.toFixed(1) : avg.toFixed(2).replace(/\.00$/, "");
+        $("mAllUsers").textContent = users.length;
+        $("mPeriodLabel").textContent =
+          periods.find((p) => p[0] === String(days))?.[1] || "Период";
+      }
+      function renderFinance() {
+        renderPeriodButtons(
+          "financePeriods",
+          state.periodFinance,
+          "setFinancePeriod",
+        );
+        const days = Number(state.periodFinance),
+          tx = state.transactions.filter((t) => inPeriod(t.created_at, days)),
+          deposits = tx.filter(
+            (t) => t.type === "deposit" && t.status === "approved",
+          ),
+          withdraws = tx.filter(
+            (t) => t.type === "withdraw" && t.status === "approved",
+          ),
+          pending = tx.filter((t) => t.status === "pending"),
+          sum = (a) => a.reduce((s, t) => s + Number(t.amount || 0), 0),
+          d = sum(deposits),
+          w = sum(withdraws),
+          p = sum(pending),
+          net = d - w;
+        $("fDeposits").textContent = money(d);
+        $("fWithdraws").textContent = money(w);
+        $("fNet").textContent = money(net);
+        $("fNet").className = net >= 0 ? "profit" : "loss";
+        $("fPending").textContent = money(p);
+        $("fDepositCount").textContent = deposits.length + " депозитов";
+        $("fWithdrawCount").textContent = withdraws.length + " выводов";
+        $("fPendingCount").textContent = pending.length + " заявок";
+        $("fAvgDeposit").textContent = money(
+          deposits.length ? d / deposits.length : 0,
+        );
+        $("fAvgWithdraw").textContent = money(
+          withdraws.length ? w / withdraws.length : 0,
+        );
+      }
+      function voucherRedeemName(redeem) {
+        const u = redeem.user || null;
+        if (u) return nameOf(u);
+        return redeem.username ? "@" + redeem.username : "Пользователь";
+      }
+      function renderVoucherActivations(v) {
+        const open = state.openVouchers.has(v.id);
+        const redeems = (v.redeems || []).slice();
+        if (!open) return "";
+        if (!redeems.length) {
+          return `<div id="voucher_activations_${v.id}" class="voucher-activations open"><div class="voucher-activation-empty">Этот ваучер пока никто не активировал</div></div>`;
+        }
+        return `<div id="voucher_activations_${v.id}" class="voucher-activations open">${redeems
+          .map((r) => {
+            const who = voucherRedeemName(r);
+            const tg = r.telegram_id || r.user?.telegram_id || "—";
+            return `<div class="activation-row"><div><strong>${esc(who)}</strong><span>ID ${esc(tg)} · ${dateText(r.created_at)}</span></div><b>${money(r.amount || v.amount)}</b></div>`;
+          })
+          .join("")}</div>`;
+      }
+      function renderVouchers() {
+        const list = $("vouchersList");
+        const items = (state.vouchers || []).slice();
+        if (!items.length) {
+          list.innerHTML = '<div class="empty">Ваучеров пока нет</div>';
+          return;
+        }
+        list.innerHTML = items
+          .map((v) => {
+            const used = Number(v.used_count || 0);
+            const max = Math.max(1, Number(v.max_uses || 1));
+            const percent = Math.min(100, Math.round((used / max) * 100));
+            const active = !!v.is_active;
+            const opened = state.openVouchers.has(v.id);
+            const activationsCount = (v.redeems || []).length;
+            return `<article class="voucher-card"><div class="card-tools"><button class="trash-btn" title="Удалить ваучер" onclick="deleteVoucher('${v.id}','${String(v.code).replace(/'/g, "")}')">${icons.trash}</button></div><div class="voucher-card-top"><div><div class="voucher-code">${esc(v.code)}</div><div class="voucher-meta">Создан: ${dateText(v.created_at)}</div></div><div class="amount">${money(v.amount)}</div></div><div class="grid-info"><div class="info"><span>Использовано</span><b>${used} / ${max}</b></div><div class="info"><span>Статус</span><b>${active ? "Активен" : "Выключен"}</b></div></div><div class="voucher-progress"><span style="width:${percent}%"></span></div><div class="switch-row"><span class="badge ${active ? "approved" : "declined"}">${active ? "Доступен для активации" : "Отключён"}</span></div><div class="voucher-actions"><button class="btn small" onclick="toggleVoucherActivations('${v.id}')">${icons.user}${opened ? "Скрыть" : "Активации"} ${activationsCount ? `(${activationsCount})` : ""}</button><button class="switch-btn ${active ? "active" : "inactive"}" onclick="toggleVoucher('${v.id}', ${active ? "false" : "true"})">${active ? "Отключить" : "Включить"}</button></div>${renderVoucherActivations(v)}</article>`;
+          })
+          .join("");
+      }
+
+
+      function renderGames() {
+        const list = $("gamesList");
+        const items = (state.games || []).slice();
+        if (!items.length) {
+          list.innerHTML = '<div class="empty">Настроек игр пока нет. Проверь таблицу GameSetting.</div>';
+          return;
+        }
+        list.innerHTML = items
+          .map((g) => {
+            const key = String(g.game_key || "");
+            const title = g.title || key || "Игра";
+            const winChance = Number(g.win_chance ?? 50);
+            const multiplier = Number(g.multiplier ?? 1.88);
+            const minBet = Math.floor(Number(g.min_bet ?? 1));
+            const maxBet = Math.floor(Number(g.max_bet ?? 10000));
+            const active = !!g.is_active;
+            return `<article class="game-card">
+              <div class="game-card-top">
+                <div class="game-title">
+                  <div class="game-icon">${icons.game}</div>
+                  <div>
+                    <div class="game-name">${esc(title)}</div>
+                    <div class="game-meta">${esc(key)} · обновлено ${dateText(g.updated_at)}</div>
+                  </div>
+                </div>
+                <div class="chance-value" id="gameChanceText_${esc(key)}">${winChance}%</div>
+              </div>
+
+              <div class="grid-info">
+                <div class="info"><span>Коэффициент</span><b>x${multiplier.toFixed(2)}</b></div>
+                <div class="info"><span>Мин. ставка</span><b>${money(minBet)}</b></div>
+                <div class="info"><span>Макс. ставка</span><b>${money(maxBet)}</b></div>
+                <div class="info"><span>Статус</span><b>${active ? "Активна" : "Отключена"}</b></div>
+              </div>
+
+              <div class="chance-box">
+                <div class="range-head">
+                  <span>Шанс выигрыша игрока</span>
+                  <b id="rangeValue_${esc(key)}">${winChance}%</b>
+                </div>
+                <input
+                  id="gameChance_${esc(key)}"
+                  class="range"
+                  type="range"
+                  min="0"
+                  max="100"
+                  step="1"
+                  value="${winChance}"
+                  oninput="syncGameChance('${esc(key)}')"
+                />
+              </div>
+
+              <div class="game-edit-grid">
+                <div class="field">
+                  <label class="label" for="gameMultiplier_${esc(key)}">Коэффициент</label>
+                  <input id="gameMultiplier_${esc(key)}" class="input" type="number" inputmode="decimal" step="0.01" min="1.01" value="${multiplier}">
+                </div>
+                <div class="field">
+                  <label class="label" for="gameMinBet_${esc(key)}">Мин. ставка</label>
+                  <input id="gameMinBet_${esc(key)}" class="input" type="number" inputmode="numeric" min="1" value="${minBet}">
+                </div>
+                <div class="field">
+                  <label class="label" for="gameMaxBet_${esc(key)}">Макс. ставка</label>
+                  <input id="gameMaxBet_${esc(key)}" class="input" type="number" inputmode="numeric" min="1" value="${maxBet}">
+                </div>
+              </div>
+
+              <div class="game-actions">
+                <button class="btn small ${active ? "bad" : "good"}" onclick="toggleGame('${esc(key)}', ${active ? "false" : "true"})">${active ? "Отключить игру" : "Включить игру"}</button>
+                <button class="btn small" onclick="saveGameSetting('${esc(key)}')">${icons.edit}Сохранить настройки</button>
+              </div>
+            </article>`;
+          })
+          .join("");
+      }
+
+
+      function partnerUserName(u) {
+        return u ? nameOf(u) : "Пользователь";
+      }
+      function partnerStatusText(status) {
+        return ({
+          pending: "В ожидании",
+          available: "Доступно",
+          paid: "Выплачено",
+          cancelled: "Отменено",
+          approved: "Одобрено",
+          rejected: "Отклонено"
+        }[status] || status || "—");
+      }
+      function partnerStatusClass(status) {
+        if (status === "available" || status === "paid" || status === "approved") return "approved";
+        if (status === "cancelled" || status === "rejected") return "declined";
+        return "pending";
+      }
+      function refreshPartnerSubtabs() {
+        document.querySelectorAll("[data-partner-mode]").forEach((btn) => {
+          btn.classList.toggle("active", btn.dataset.partnerMode === state.partnerMode);
+        });
+      }
+      function renderPartnerOverview() {
+        const o = state.partnerOverview || {};
+        return `<div class="metric-grid">
+          <div class="metric"><span>Партнёры</span><b>${Number(o.partners_total || 0)}</b><small>пользователей с кодом</small></div>
+          <div class="metric"><span>Рефералы</span><b>${Number(o.referrals_total || 0)}</b><small>активаций промокодов</small></div>
+          <div class="metric"><span>В ожидании</span><b>${money(o.earnings_pending || 0)}</b><small>нужно одобрить</small></div>
+          <div class="metric"><span>Доступно</span><b>${money(o.earnings_available || 0)}</b><small>можно выплатить</small></div>
+          <div class="metric"><span>Всего начислено</span><b>${money(o.earnings_total || 0)}</b><small>pending + available + paid</small></div>
+          <div class="metric"><span>Выплачено</span><b>${money(o.earnings_paid || 0)}</b><small>уже закрыто</small></div>
+          <div class="metric"><span>Заявки на вывод</span><b>${money(o.payout_pending || 0)}</b><small>если подключены</small></div>
+        </div><div class="partner-note">Начисления сначала попадают в ожидание. После проверки нажми “Одобрить pending”, затем после фактической выплаты — “Отметить выплаченным”.</div>`;
+      }
+      function renderPartnerCards() {
+        const items = (state.partners || []).slice();
+        if (!items.length) return '<div class="empty">Партнёров пока нет</div>';
+        return `<div class="partner-list">${items.map((p) => {
+          const avatar = p.photo_url ? `<img src="${esc(p.photo_url)}" alt="">` : icons.user;
+          const totals = p.earnings_totals || {};
+          const active = p.is_partner_active !== false;
+          return `<article class="card">
+            <div class="card-head">
+              <div class="user-line"><div class="avatar">${avatar}</div><div><div class="user-name">${esc(partnerUserName(p))}</div><div class="user-meta">ID ${esc(p.telegram_id || "—")}</div></div></div>
+              <span class="partner-code">${esc(p.referral_code || "—")}</span>
+            </div>
+            <div class="grid-info">
+              <div class="info"><span>Рефералов</span><b>${Number(p.referral_count || 0)}</b></div>
+              <div class="info"><span>Процент</span><b>${Number(p.partner_percent || 10)}%</b></div>
+              <div class="info"><span>Pending</span><b>${money(p.partner_pending_balance || totals.pending || 0)}</b></div>
+              <div class="info"><span>Доступно</span><b>${money(p.partner_balance || totals.available || 0)}</b></div>
+              <div class="info"><span>Выплачено</span><b>${money(totals.paid || 0)}</b></div>
+              <div class="info"><span>Статус</span><b>${active ? "Активен" : "Отключён"}</b></div>
+            </div>
+            <div class="partner-percent-row">
+              <input id="partnerPercent_${p.id}" class="input" type="number" min="0" max="100" step="0.1" value="${Number(p.partner_percent || 10)}">
+              <button class="btn small" onclick="updatePartnerPercent('${p.id}')">Сохранить %</button>
+            </div>
+            <div class="partner-action-grid">
+              <button class="btn good" onclick="approvePartnerEarnings('${p.id}')">Одобрить pending</button>
+              <button class="btn ${active ? "bad" : "good"}" onclick="togglePartnerActive('${p.id}', ${active ? "false" : "true"})">${active ? "Отключить" : "Включить"}</button>
+              <button class="btn" onclick="markPartnerPaid('${p.id}')">Отметить выплаченным</button>
+            </div>
+          </article>`;
+        }).join("")}</div>`;
+      }
+      function renderPartnerReferrals() {
+        const items = (state.partnerReferrals || []).slice();
+        if (!items.length) return '<div class="empty">Рефералов пока нет</div>';
+        return `<div class="partner-list">${items.map((r) => `<article class="card">
+          <div class="card-head"><div><div class="user-name">${esc(partnerUserName(r.partner))}</div><div class="user-meta">Партнёр · код ${esc(r.referral_code || r.partner?.referral_code || "—")}</div></div><span class="badge approved">Реферал</span></div>
+          <div class="grid-info">
+            <div class="info"><span>Приглашённый</span><b>${esc(partnerUserName(r.referral))}</b></div>
+            <div class="info"><span>ID игрока</span><b>${esc(r.referral?.telegram_id || "—")}</b></div>
+            <div class="info"><span>Партнёр ID</span><b>${esc(r.partner?.telegram_id || "—")}</b></div>
+            <div class="info"><span>Дата привязки</span><b>${dateText(r.created_at)}</b></div>
+          </div>
+        </article>`).join("")}</div>`;
+      }
+      function renderPartnerEarnings() {
+        const items = (state.partnerEarnings || []).slice();
+        if (!items.length) return '<div class="empty">Начислений пока нет</div>';
+        return `<div class="partner-list">${items.map((e) => {
+          const status = String(e.status || "pending");
+          const buttons = status === "pending" ? `<div class="actions"><button class="btn bad" onclick="cancelPartnerEarning('${e.id}')">Отменить</button></div>` : "";
+          return `<article class="card">
+            <div class="card-head"><div><div class="user-name">${esc(partnerUserName(e.partner))}</div><div class="user-meta">Партнёр · ${dateText(e.created_at)}</div></div><div><div class="amount">${money(e.commission_amount || 0)}</div><span class="badge ${partnerStatusClass(status)}">${partnerStatusText(status)}</span></div></div>
+            <div class="grid-info">
+              <div class="info"><span>Реферал</span><b>${esc(partnerUserName(e.referral))}</b></div>
+              <div class="info"><span>Чистый проигрыш</span><b>${money(e.base_loss_amount || 0)}</b></div>
+              <div class="info"><span>Процент</span><b>${Number(e.percent || 0)}%</b></div>
+              <div class="info"><span>ID реферала</span><b>${esc(e.referral?.telegram_id || "—")}</b></div>
+            </div>${buttons}
+          </article>`;
+        }).join("")}</div>`;
+      }
+      function renderPartnerPayouts() {
+        const items = (state.partnerPayoutRequests || []).slice();
+        if (!items.length) return '<div class="empty">Заявок на вывод партнёрских средств пока нет. Для них нужна таблица PartnerPayoutRequest и кнопка “Запросить вывод” в partner.html.</div>';
+        return `<div class="partner-list">${items.map((p) => {
+          const status = String(p.status || "pending");
+          const buttons = status === "pending" ? `<div class="actions"><button class="btn good" onclick="approvePartnerPayout('${p.id}')">Одобрить</button><button class="btn bad" onclick="rejectPartnerPayout('${p.id}')">Отклонить</button></div>` : status === "approved" ? `<div class="actions"><button class="btn good" onclick="markPartnerPayoutPaid('${p.id}')">Оплачено</button><button class="btn bad" onclick="rejectPartnerPayout('${p.id}')">Отклонить</button></div>` : "";
+          return `<article class="card">
+            <div class="card-head"><div><div class="user-name">${esc(partnerUserName(p.partner))}</div><div class="user-meta">${dateText(p.created_at)}</div></div><div><div class="amount">${money(p.amount || 0)}</div><span class="badge ${partnerStatusClass(status)}">${partnerStatusText(status)}</span></div></div>
+            <div class="grid-info"><div class="info"><span>Метод</span><b>${esc(p.method || "—")}</b></div><div class="info"><span>Реквизиты</span><b>${esc(p.requisites || "—")}</b></div><div class="info"><span>Комментарий</span><b>${esc(p.admin_comment || "—")}</b></div><div class="info"><span>Партнёр ID</span><b>${esc(p.partner?.telegram_id || "—")}</b></div></div>${buttons}
+          </article>`;
+        }).join("")}</div>`;
+      }
+      function renderPartners() {
+        refreshPartnerSubtabs();
+        const target = $("partnersContent");
+        if (!target) return;
+        if (state.partnerMode === "partners") target.innerHTML = renderPartnerCards();
+        else if (state.partnerMode === "referrals") target.innerHTML = renderPartnerReferrals();
+        else if (state.partnerMode === "earnings") target.innerHTML = renderPartnerEarnings();
+        else if (state.partnerMode === "payouts") target.innerHTML = renderPartnerPayouts();
+        else target.innerHTML = renderPartnerOverview();
+      }
+      window.setPartnerMode = (mode) => {
+        state.partnerMode = mode;
+        renderPartners();
+      };
+      window.updatePartnerPercent = (id) => {
+        const value = Number($("partnerPercent_" + id)?.value || 0);
+        if (!Number.isFinite(value) || value < 0 || value > 100) return toast("Процент должен быть от 0 до 100");
+        doAction("update_partner_percent", { partner_user_id: id, percent: value });
+      };
+      window.approvePartnerEarnings = (id) => {
+        if (!confirm("Одобрить все pending-начисления этого партнёра и перенести их в доступный баланс?")) return;
+        doAction("approve_partner_earnings", { partner_user_id: id });
+      };
+      window.markPartnerPaid = (id) => {
+        if (!confirm("Ты уже реально выплатил доступную сумму партнёру? После подтверждения она спишется из партнёрского баланса.")) return;
+        doAction("mark_partner_paid", { partner_user_id: id });
+      };
+      window.togglePartnerActive = (id, active) => {
+        doAction("toggle_partner_active", { partner_user_id: id, is_partner_active: active });
+      };
+      window.cancelPartnerEarning = (id) => {
+        if (!confirm("Отменить это pending-начисление?")) return;
+        doAction("cancel_partner_earning", { partner_earning_id: id });
+      };
+      window.approvePartnerPayout = (id) => {
+        const comment = prompt("Комментарий к одобрению", "");
+        if (comment === null) return;
+        doAction("approve_partner_payout", { partner_payout_id: id, comment });
+      };
+      window.rejectPartnerPayout = (id) => {
+        const comment = prompt("Причина отклонения", "");
+        if (comment === null) return;
+        doAction("reject_partner_payout", { partner_payout_id: id, comment });
+      };
+      window.markPartnerPayoutPaid = (id) => {
+        const comment = prompt("Комментарий к выплате", "Выплачено");
+        if (comment === null) return;
+        doAction("mark_partner_payout_paid", { partner_payout_id: id, comment });
+      };
+
+      function render() {
+        if (state.tab === "tx") renderTx();
+        else if (state.tab === "users") renderUsers();
+        else if (state.tab === "stats") renderAnalytics();
+        else if (state.tab === "finance") renderFinance();
+        else if (state.tab === "vouchers") renderVouchers();
+        else if (state.tab === "games") renderGames();
+        else renderPartners();
+      }
+      window.setStatsPeriod = (d) => {
+        state.periodStats = d;
+        renderAnalytics();
+      };
+      window.setFinancePeriod = (d) => {
+        state.periodFinance = d;
+        renderFinance();
+      };
+      window.toggleUserDetails = (id) => {
+        state.openUsers.has(id)
+          ? state.openUsers.delete(id)
+          : state.openUsers.add(id);
+        renderUsers();
+      };
+      window.toggleVoucherActivations = (id) => {
+        state.openVouchers.has(id)
+          ? state.openVouchers.delete(id)
+          : state.openVouchers.add(id);
+        renderVouchers();
+      };
+
+      window.syncGameChance = (key) => {
+        const value = Number($("gameChance_" + key)?.value || 0);
+        if ($("rangeValue_" + key)) $("rangeValue_" + key).textContent = value + "%";
+        if ($("gameChanceText_" + key)) $("gameChanceText_" + key).textContent = value + "%";
+      };
+      window.saveGameSetting = (key) => {
+        const winChance = Number($("gameChance_" + key)?.value || 0);
+        const multiplier = Number($("gameMultiplier_" + key)?.value || 0);
+        const minBet = Math.floor(Number($("gameMinBet_" + key)?.value || 0));
+        const maxBet = Math.floor(Number($("gameMaxBet_" + key)?.value || 0));
+        if (!Number.isFinite(winChance) || winChance < 0 || winChance > 100) return toast("Шанс должен быть от 0 до 100");
+        if (!Number.isFinite(multiplier) || multiplier <= 1) return toast("Коэффициент должен быть больше 1");
+        if (!minBet || minBet < 1) return toast("Минимальная ставка должна быть больше 0");
+        if (!maxBet || maxBet < minBet) return toast("Максимальная ставка должна быть больше минимальной");
+        doAction("update_game_setting", {
+          game_key: key,
+          win_chance: winChance,
+          multiplier,
+          min_bet: minBet,
+          max_bet: maxBet
+        });
+      };
+      window.toggleGame = (key, active) => {
+        doAction("update_game_setting", {
+          game_key: key,
+          is_active: active
+        });
+      };
+
+      window.txAction = (action, id) => {
+        const comment = prompt(
+          action.includes("decline")
+            ? "Комментарий для отклонения"
+            : "Комментарий",
+          "",
+        );
+        if (comment === null) return;
+        doAction(action, { transaction_id: id, comment });
+      };
+      window.setBalance = (id) => {
+        const input = $("bal_" + id),
+          balance = Number(input.value || 0);
+        if (!Number.isFinite(balance) || balance < 0)
+          return toast("Некорректный баланс");
+        if (!confirm("Установить новый баланс: " + money(balance) + "?"))
+          return;
+        doAction("set_balance", { user_id: id, balance });
+      };
+      window.deleteTransaction = (id) => {
+        if (!confirm("Удалить эту заявку из базы? Действие нельзя отменить."))
+          return;
+        doAction("delete_transaction", { transaction_id: id });
+      };
+      window.deleteUser = (id, tg) => {
+        if (
+          !confirm(
+            "Удалить пользователя" +
+              (tg ? " ID " + tg : "") +
+              " из базы? Баланс и заявки тоже будут удалены.",
+          )
+        )
+          return;
+        doAction("delete_user", { user_id: id });
+      };
+      window.createVoucher = () => {
+        const code = ($("voucherCode").value || "").trim().toUpperCase();
+        const amount = Math.floor(Number($("voucherAmount").value || 0));
+        const maxUses = Math.floor(Number($("voucherMaxUses").value || 0));
+        if (!code) return toast("Введите код ваучера");
+        if (!amount || amount < 1) return toast("Введите сумму ваучера");
+        if (!maxUses || maxUses < 1) return toast("Введите количество использований");
+        doAction("create_voucher", { code, amount, max_uses: maxUses });
+        $("voucherCode").value = "";
+        $("voucherAmount").value = "";
+        $("voucherMaxUses").value = "1";
+      };
+      window.deleteVoucher = (id, code) => {
+        if (!confirm("Удалить ваучер " + code + "? История активаций тоже удалится.")) return;
+        doAction("delete_voucher", { voucher_id: id });
+      };
+      window.toggleVoucher = (id, active) => {
+        doAction("toggle_voucher", { voucher_id: id, is_active: active });
+      };
+
+      function setTab(tab) {
+        state.tab = tab;
+        ["tx", "users", "stats", "finance", "vouchers", "games", "partners"].forEach((t) => {
+          $(
+            "tab" + (t === "tx" ? "Tx" : t[0].toUpperCase() + t.slice(1)),
+          ).classList.toggle("active", tab === t);
+          $(t + "View").classList.toggle("hidden", tab !== t);
+        });
+        render();
+      }
+      $("loginForm").addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const btn = $("loginBtn");
+        btn.disabled = true;
+        btn.innerHTML = '<span class="loader"></span> Проверка';
+        try {
+          await login($("passwordInput").value);
+        } catch (err) {
+          toast(err.message);
+        } finally {
+          btn.disabled = false;
+          btn.innerHTML = icons.check + "Войти";
+        }
+      });
+      $("logoutBtn").addEventListener("click", logout);
+      $("refreshBtn").addEventListener("click", () => load(false));
+      $("refreshInlineBtn").addEventListener("click", () => load(false));
+      $("tabTx").addEventListener("click", () => setTab("tx"));
+      $("tabUsers").addEventListener("click", () => setTab("users"));
+      $("tabStats").addEventListener("click", () => setTab("stats"));
+      $("tabFinance").addEventListener("click", () => setTab("finance"));
+      $("tabVouchers").addEventListener("click", () => setTab("vouchers"));
+      $("tabGames").addEventListener("click", () => setTab("games"));
+      $("tabPartners").addEventListener("click", () => setTab("partners"));
+      $("voucherForm").addEventListener("submit", (e) => { e.preventDefault(); createVoucher(); });
+      $("userSearch").addEventListener("input", renderUsers);
+      document.querySelectorAll(".chip[data-filter]").forEach((chip) =>
+        chip.addEventListener("click", () => {
+          document
+            .querySelectorAll(".chip[data-filter]")
+            .forEach((x) => x.classList.remove("active"));
+          chip.classList.add("active");
+          state.filter = chip.dataset.filter;
+          renderTx();
+        }),
+      );
+      if (state.token) {
+        $("loginView").classList.add("hidden");
+        $("adminView").classList.remove("hidden");
+        load(true);
+      }
+    </script>
+  </body>
+</html>
