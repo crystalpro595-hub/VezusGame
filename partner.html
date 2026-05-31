@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <title>Партнёрство — VezusGame</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800;900&display=swap" rel="stylesheet">
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <style>
+    :root{
+      --bg:#050509;
+      --panel:#101016;
+      --panel2:#15151d;
+      --row:#121219;
+      --row2:#171720;
+      --line:rgba(255,255,255,.08);
+      --line2:rgba(255,255,255,.12);
+      --text:#ffffff;
+      --muted:rgba(255,255,255,.58);
+      --muted2:rgba(255,255,255,.36);
+      --white-soft:rgba(255,255,255,.92);
+      --radius:18px;
+    }
+    *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;min-width:0}
+    html{min-height:100%;background:var(--bg);overflow-x:hidden;-webkit-text-size-adjust:100%}
+    body{
+      margin:0;
+      min-height:100vh;
+      overflow-x:hidden;
+      color:var(--text);
+      font-family:"Montserrat",system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+      background:
+        radial-gradient(circle at 50% -180px,rgba(255,255,255,.10),transparent 42%),
+        linear-gradient(180deg,#09090f 0%,#050509 72%);
+      padding:calc(12px + env(safe-area-inset-top)) 10px calc(86px + env(safe-area-inset-bottom));
+    }
+    button,input,textarea,select{font:inherit}
+    button{cursor:pointer;touch-action:manipulation}
+    a{color:inherit;text-decoration:none}
+    svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2.1;stroke-linecap:round;stroke-linejoin:round}
+    .page{width:min(100%,470px);margin:0 auto}
+    .top{display:flex;align-items:center;gap:9px;margin-bottom:10px}
+    .icon-btn,.back{
+      width:38px;height:38px;border:1px solid var(--line);border-radius:14px;
+      background:rgba(255,255,255,.035);color:#fff;display:grid;place-items:center;flex:0 0 auto;
+    }
+    .icon-btn:disabled{opacity:.45}
+    .brand{display:flex;align-items:center;gap:10px;flex:1;min-width:0}
+    .logo{
+      width:40px;height:40px;border-radius:0;display:grid;place-items:center;overflow:visible;
+      border:0;background:transparent;flex:0 0 auto;
+    }
+    .logo img{width:100%;height:100%;object-fit:contain;padding:0;display:block}
+    .logo-fallback{display:none;width:100%;height:100%;place-items:center;font-weight:950;color:#fff;background:transparent}
+    .logo img.logo-error{display:none}.logo img.logo-error + .logo-fallback{display:grid}
+    .brand-title{font-size:16px;font-weight:950;letter-spacing:-.02em;line-height:1}
+    .brand-sub{margin-top:3px;color:var(--muted2);font-size:10.5px;font-weight:750;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .hero{
+      border:1px solid var(--line);
+      border-radius:22px;
+      background:linear-gradient(180deg,rgba(255,255,255,.055),rgba(255,255,255,.025));
+      padding:13px;
+      margin-bottom:9px;
+    }
+    .hero-inner{display:flex;align-items:center;gap:11px}
+    .hero-logo{width:54px;height:54px;border-radius:0;display:grid;place-items:center;overflow:visible;border:0;background:transparent;flex:0 0 auto}
+    .hero-logo img{width:100%;height:100%;object-fit:contain;padding:0;display:block}
+    h1{margin:0;font-size:22px;line-height:1.03;font-weight:950;letter-spacing:-.04em}
+    .lead{margin:5px 0 0;color:var(--muted);font-size:11.5px;font-weight:700;line-height:1.35}
+    .card{
+      border:1px solid var(--line);
+      border-radius:20px;
+      background:rgba(16,16,22,.86);
+      padding:11px;
+      margin-top:9px;
+    }
+    .card-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px}
+    .card-title{display:flex;align-items:center;gap:8px;font-size:13.5px;font-weight:950;letter-spacing:-.01em;color:#fff}
+    .card-title svg{width:17px;height:17px;color:#fff;opacity:.92}
+    .table{display:grid;gap:6px}
+    .row{
+      display:grid;
+      grid-template-columns:32px minmax(0,1fr) auto;
+      gap:9px;
+      align-items:center;
+      min-height:46px;
+      padding:8px;
+      border:1px solid rgba(255,255,255,.065);
+      border-radius:15px;
+      background:rgba(255,255,255,.025);
+    }
+    .row-icon{width:32px;height:32px;border-radius:12px;display:grid;place-items:center;background:rgba(255,255,255,.052);color:#fff;opacity:.94;flex:0 0 auto}
+    .row-icon svg{width:16px;height:16px}
+    .row-title{font-size:12px;font-weight:900;color:rgba(255,255,255,.88);line-height:1.2}
+    .row-sub{margin-top:2px;color:var(--muted2);font-size:10.5px;font-weight:700;line-height:1.25;overflow-wrap:anywhere}
+    .row-value{font-size:13.5px;font-weight:950;text-align:right;white-space:nowrap;color:#fff;overflow-wrap:anywhere}
+    .row-value.code{max-width:142px;overflow:hidden;text-overflow:ellipsis;letter-spacing:.045em}
+    .btn{
+      min-height:35px;padding:0 11px;border:1px solid var(--line2);border-radius:13px;
+      background:rgba(255,255,255,.065);color:#fff;font-size:11.5px;font-weight:900;display:inline-flex;align-items:center;justify-content:center;gap:7px;
+    }
+    .btn.primary{background:#f4f4f5;color:#08080c;border-color:#f4f4f5}
+    .btn.ghost{background:transparent;color:#fff}
+    .btn.full{width:100%;min-height:42px;margin-top:9px}
+    .btn:disabled{opacity:.42;cursor:not-allowed}
+    .field{display:grid;gap:6px;margin-top:8px}
+    .label{font-size:10.5px;font-weight:850;color:var(--muted2)}
+    .input,.select,.textarea{
+      width:100%;border:1px solid rgba(255,255,255,.08);border-radius:14px;background:rgba(0,0,0,.18);color:#fff;outline:none;font-size:14px;font-weight:750;
+    }
+    .input,.select{height:42px;padding:0 11px}.textarea{min-height:64px;padding:11px;resize:none;line-height:1.35}.input::placeholder,.textarea::placeholder{color:rgba(255,255,255,.28)}
+    .two{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+    .message{margin-top:8px;font-size:11px;font-weight:800;line-height:1.35;color:var(--muted)}
+    .message.ok{color:#fff}.message.err{color:#ffb4b4}
+    .bound{display:flex;gap:8px;align-items:flex-start;padding:10px;border-radius:14px;border:1px solid rgba(255,255,255,.09);background:rgba(255,255,255,.035);color:rgba(255,255,255,.78);font-size:11.5px;font-weight:750;line-height:1.35}.bound svg{color:#fff;flex:0 0 auto}
+    .empty{padding:13px;border:1px dashed rgba(255,255,255,.10);border-radius:14px;background:rgba(255,255,255,.018);color:var(--muted);text-align:center;font-size:11.5px;font-weight:750}
+    .badge{display:inline-flex;align-items:center;min-height:22px;padding:0 8px;border-radius:999px;background:rgba(255,255,255,.08);color:#fff;font-size:10px;font-weight:950;white-space:nowrap}
+    .history-row{align-items:flex-start}.history-row .row-value{padding-top:2px}
+    .rule-row{grid-template-columns:32px minmax(0,1fr)}.rule-row .row-title{font-size:11.5px;line-height:1.35;color:rgba(255,255,255,.76);font-weight:800}
+    .mini-note{margin:8px 0 0;color:var(--muted2);font-size:10.8px;font-weight:750;line-height:1.35}
+    .loader{display:inline-block;width:15px;height:15px;border-radius:50%;border:2px solid rgba(255,255,255,.22);border-top-color:currentColor;animation:spin .75s linear infinite}@keyframes spin{to{transform:rotate(360deg)}}
+    .hidden{display:none!important}
+    .support-btn{
+      position:fixed;right:16px;bottom:calc(16px + env(safe-area-inset-bottom));z-index:50;
+      width:46px;height:46px;border-radius:50%;display:grid;place-items:center;
+      color:#fff;background:#171720;border:1px solid rgba(255,255,255,.16);
+      box-shadow:0 12px 30px rgba(0,0,0,.35);
+    }
+    .support-btn svg{width:20px;height:20px}
+    @media(max-width:370px){.two{grid-template-columns:1fr}.row{grid-template-columns:32px minmax(0,1fr)}.row-value{grid-column:2;text-align:left}.row-value.code{max-width:100%}.hero-logo{width:50px;height:50px}h1{font-size:20px}.support-btn{right:12px;bottom:calc(12px + env(safe-area-inset-bottom))}}
+  </style>
+</head>
+<body>
+  <main class="page">
+    <header class="top">
+      <a class="back" href="index.html" aria-label="Назад"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/><path d="M20 12H9"/></svg></a>
+      <div class="brand">
+        <div class="logo"><img src="images/Logovezusgame.png" alt="VezusGame" onerror="this.classList.add('logo-error')"><div class="logo-fallback">V</div></div>
+        <div><div class="brand-title">Партнёрство</div><div class="brand-sub">Статистика и вывод средств</div></div>
+      </div>
+    </header>
+    <section class="card">
+      <div class="card-head"><div class="card-title"><svg viewBox="0 0 24 24"><path d="M4 7h16v10H4z"/><path d="M8 7V5h8v2"/><path d="M8 12h8"/></svg>Основное</div><button class="btn" id="copyCode" type="button">Копировать</button></div>
+      <div class="table">
+        <div class="row"><div class="row-icon"><svg viewBox="0 0 24 24"><path d="M7 7h10v10H7z"/><path d="M3 3h6"/><path d="M15 3h6"/><path d="M3 21h6"/><path d="M15 21h6"/></svg></div><div><div class="row-title">Мой промокод</div><div class="row-sub">Передай его игроку</div></div><div class="row-value code" id="myCode">Загрузка...</div></div>
+        <div class="row"><div class="row-icon"><svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.9"/></svg></div><div><div class="row-title">Приглашено</div><div class="row-sub">Игроков по коду</div></div><div class="row-value" id="partnerCount">—</div></div>
+        <div class="row"><div class="row-icon"><svg viewBox="0 0 24 24"><path d="M3 7h18v13H3z"/><path d="M7 7V5h10v2"/><circle cx="17" cy="14" r="1"/></svg></div><div><div class="row-title">Доступно к выводу</div><div class="row-sub">Можно создать заявку</div></div><div class="row-value" id="availableBalance">—</div></div>
+        <div class="row"><div class="row-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></div><div><div class="row-title">В ожидании</div><div class="row-sub">Ожидает одобрения</div></div><div class="row-value" id="pendingBalance">—</div></div>
+        <div class="row"><div class="row-icon"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></div><div><div class="row-title">Выплачено</div><div class="row-sub">Закрытые выплаты</div></div><div class="row-value" id="paidBalance">—</div></div>
+      </div>
+    </section>
+    <section class="card">
+      <div class="card-head"><div class="card-title"><svg viewBox="0 0 24 24"><path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M5 21h14"/></svg>Запросить вывод</div></div>
+      <div class="two">
+        <div class="field" style="margin-top:0"><label class="label" for="payoutAmount">Сумма</label><input id="payoutAmount" class="input" type="number" inputmode="numeric" min="1" placeholder="500"></div>
+        <div class="field" style="margin-top:0"><label class="label" for="payoutMethod">Метод</label><select id="payoutMethod" class="select"><option value="sbp">СБП</option><option value="card">Карта</option><option value="manual">Другое</option></select></div>
+      </div>
+      <div class="field"><label class="label" for="payoutRequisites">Реквизиты</label><textarea id="payoutRequisites" class="textarea" placeholder="Телефон СБП / карта / комментарий"></textarea></div>
+      <button class="btn primary full" id="payoutBtn" type="button">Создать заявку</button>
+      <p class="mini-note" id="payoutHint">Доступная сумма будет показана после загрузки.</p>
+      <div id="payoutMessage" class="message"></div>
+    </section>
+
+    <section class="card">
+      <div class="card-head"><div class="card-title"><svg viewBox="0 0 24 24"><path d="M8 6h13"/><path d="M8 12h13"/><path d="M8 18h13"/><path d="M3 6h.01"/><path d="M3 12h.01"/><path d="M3 18h.01"/></svg>Заявки на вывод</div></div>
+      <div id="payoutRequests" class="table"><div class="empty">Загрузка...</div></div>
+    </section>
+
+    <section class="card">
+      <div class="card-head"><div class="card-title"><svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"/></svg>Правила</div></div>
+      <div class="table">
+        <div class="row rule-row"><div class="row-icon"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></div><div class="row-title">Партнёр получает 10% только с чистого проигрыша приглашённого игрока.</div></div>
+        <div class="row rule-row"><div class="row-icon"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></div><div class="row-title">Старые проигрыши до активации промокода не учитываются.</div></div>
+        <div class="row rule-row"><div class="row-icon"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></div><div class="row-title">Один игрок может быть привязан только к одному партнёру.</div></div>
+      </div>
+    </section>
+
+    <section class="card" id="activateCard">
+          <div class="card-head"><div class="card-title"><svg viewBox="0 0 24 24"><path d="M12 5v14"/><path d="M5 12h14"/></svg>Ввести код партнёра</div></div>
+          <div id="alreadyBound" class="bound hidden"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg><span></span></div>
+          <div id="activateForm">
+            <div class="field"><label class="label" for="partnerCodeInput">Промокод</label><input id="partnerCodeInput" class="input" type="text" placeholder="Например VEZUS777" autocomplete="off"></div>
+            <button class="btn primary full" id="activateBtn" type="button">Активировать</button>
+            <div id="activateMessage" class="message"></div>
+          </div>
+        </section>
+  </main>
+
+  <a class="support-btn" href="https://t.me/vezusmanager" target="_blank" rel="noopener" aria-label="Поддержка">
+    <svg viewBox="0 0 24 24"><path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z"/><path d="M8 9h8"/><path d="M8 13h5"/></svg>
+  </a>
+
+  <script>
+    const SUPABASE_URL = 'https://xcsjedwhqcrwdzmuahjl.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhjc2plZHdocWNyd2R6bXVhaGpsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgyNzk0ODYsImV4cCI6MjA5Mzg1NTQ4Nn0.M2ksKeWwDt0BQxgjxpGhLKLMNP_ve1dcZvQ0Ix88Ock';
+    const PARTNER_URL = SUPABASE_URL + '/functions/v1/partner-code';
+
+    const tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
+    if(tg){ tg.ready(); tg.expand(); }
+
+    const $ = (id) => document.getElementById(id);
+    const state = { data:null };
+
+    function money(v){ return new Intl.NumberFormat('ru-RU').format(Math.floor(Number(v)||0)) + ' ₽'; }
+    function esc(v){ return String(v ?? '').replace(/[&<>'"]/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[ch])); }
+    function dateText(v){ if(!v) return '—'; return new Date(v).toLocaleString('ru-RU',{day:'2-digit',month:'2-digit',year:'2-digit',hour:'2-digit',minute:'2-digit'}); }
+    function statusText(s){ return ({pending:'В ожидании',available:'Доступно',approved:'Одобрено',paid:'Выплачено',cancelled:'Отменено',rejected:'Отклонено'}[s] || s || '—'); }
+    function setMsg(id, text, ok){ const el=$(id); if(!el) return; el.textContent=text||''; el.className='message ' + (text ? (ok?'ok':'err') : ''); }
+    function sumByStatus(items, status){ return (items || []).filter(x => String(x.status || '') === status).reduce((s,x) => s + Number(x.amount || x.commission_amount || 0), 0); }
+
+    async function api(payload){
+      const initData = tg && tg.initData ? tg.initData : '';
+      const res = await fetch(PARTNER_URL, {
+        method:'POST',
+        headers:{'Content-Type':'application/json','Authorization':'Bearer '+SUPABASE_ANON_KEY,'apikey':SUPABASE_ANON_KEY},
+        body:JSON.stringify({...payload, initData})
+      });
+      const data = await res.json().catch(() => ({}));
+      if(!res.ok || data.error || data.ok === false){ throw new Error(data.message || data.error || 'Ошибка сервера'); }
+      return data;
+    }
+
+    function setButtonLoading(button, loading, text){
+      if(!button) return;
+      button.disabled = !!loading;
+      button.innerHTML = loading ? '<span class="loader"></span>' : text;
+    }
+
+    function syncPayoutButton(){
+      const data = state.data || {};
+      const min = Number(data.min_payout_amount || 500);
+      const available = Number(data.available_to_request || 0);
+      $('payoutHint').textContent = `Доступно к заявке: ${money(available)}. Минимальная сумма: ${money(min)}.`;
+      $('payoutBtn').disabled = available < min;
+    }
+
+    function renderDashboard(data){
+      state.data = data;
+      const user = data.user || {};
+      const totals = data.totals || {};
+      const payouts = data.payout_requests || [];
+      const paidPayouts = sumByStatus(payouts, 'paid');
+      const paidFallback = Number(totals.paid || 0);
+      const paidDisplay = paidPayouts > 0 ? paidPayouts : paidFallback;
+      const code = user.referral_code || '—';
+
+      $('myCode').textContent = code;
+      $('partnerCount').textContent = data.referrals_count || 0;
+      $('availableBalance').textContent = money(data.available_to_request ?? user.partner_balance ?? 0);
+      $('pendingBalance').textContent = money(user.partner_pending_balance ?? totals.pending ?? 0);
+      $('paidBalance').textContent = money(paidDisplay);
+
+      syncPayoutButton();
+
+      if(user.partner_code_used || user.invited_by_user_id){
+        $('activateForm').classList.add('hidden');
+        $('alreadyBound').classList.remove('hidden');
+        $('alreadyBound').querySelector('span').textContent = 'Ты уже привязан к партнёру' + (user.partner_code_used ? ': ' + user.partner_code_used : '') + '. Изменить промокод нельзя.';
+      }else{
+        $('activateForm').classList.remove('hidden');
+        $('alreadyBound').classList.add('hidden');
+      }
+
+      renderPayoutRequests(payouts);
+    }
+
+    function renderPayoutRequests(items){
+      const list = $('payoutRequests');
+      if(!items.length){ list.innerHTML = '<div class="empty">Заявок на вывод пока нет</div>'; return; }
+      list.innerHTML = items.map(item => `
+        <div class="row history-row">
+          <div class="row-icon"><svg viewBox="0 0 24 24"><path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M5 21h14"/></svg></div>
+          <div>
+            <div class="row-title">${esc(String(item.method || '').toUpperCase())} · ${money(item.amount)}</div>
+            <div class="row-sub">${dateText(item.created_at)}${item.admin_comment ? ' · ' + esc(item.admin_comment) : ''}</div>
+          </div>
+          <div class="row-value"><span class="badge ${esc(item.status)}">${esc(statusText(item.status))}</span></div>
+        </div>`).join('');
+    }
+
+    async function load(){
+      try{
+        const data = await api({action:'dashboard'});
+        renderDashboard(data);
+      }catch(error){
+        $('myCode').textContent = 'Ошибка';
+        $('payoutRequests').innerHTML = '<div class="empty">' + esc(error.message) + '</div>';
+      }finally{}
+    }
+
+
+    $('copyCode').addEventListener('click', async () => {
+      const text = $('myCode').textContent.trim();
+      try{ await navigator.clipboard.writeText(text); }
+      catch(_e){ const input=document.createElement('input'); input.value=text; document.body.appendChild(input); input.select(); document.execCommand('copy'); input.remove(); }
+      $('copyCode').textContent = 'Готово';
+      setTimeout(() => $('copyCode').textContent = 'Копировать', 900);
+    });
+
+    $('activateBtn').addEventListener('click', async () => {
+      const code = $('partnerCodeInput').value.trim();
+      if(!code) return setMsg('activateMessage','Введите промокод партнёра',false);
+      setButtonLoading($('activateBtn'), true, 'Активировать');
+      try{
+        const data = await api({action:'activate', code});
+        setMsg('activateMessage', data.message || 'Промокод активирован', true);
+        await load();
+      }catch(error){ setMsg('activateMessage', error.message, false); }
+      finally{ setButtonLoading($('activateBtn'), false, 'Активировать'); }
+    });
+
+    $('payoutBtn').addEventListener('click', async () => {
+      const amount = Math.floor(Number($('payoutAmount').value || 0));
+      const method = $('payoutMethod').value;
+      const requisites = $('payoutRequisites').value.trim();
+      if(!amount) return setMsg('payoutMessage','Введите сумму вывода',false);
+      if(!requisites) return setMsg('payoutMessage','Введите реквизиты',false);
+      setButtonLoading($('payoutBtn'), true, 'Создать заявку');
+      try{
+        const data = await api({action:'request_payout', amount, method, requisites});
+        setMsg('payoutMessage', data.message || 'Заявка создана', true);
+        $('payoutAmount').value = '';
+        $('payoutRequisites').value = '';
+        await load();
+      }catch(error){ setMsg('payoutMessage', error.message, false); }
+      finally{ setButtonLoading($('payoutBtn'), false, 'Создать заявку'); syncPayoutButton(); }
+    });
+
+    load();
+  </script>
+</body>
+</html>
