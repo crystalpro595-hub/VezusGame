@@ -8202,6 +8202,106 @@
   }
 </style>
 
+
+
+<style id="vezus-ipad-cards-banner-consistent-final">
+  /* SAFE FINAL: меняем только размеры карточек на iPad и отображение баннерных картинок.
+     Свайп карточек не трогаем: без новых touch/pointer обработчиков. */
+
+  /* Баннеры: как карточки игр — картинка показывается целиком, без crop на разных устройствах. */
+  .hero-slider{
+    --vezus-banner-height:214px !important;
+    border-radius:14px !important;
+    background:
+      radial-gradient(circle at 50% 0%, rgba(157,77,255,.16), transparent 46%),
+      linear-gradient(160deg, rgba(12,3,34,.96), rgba(2,0,10,.98)) !important;
+  }
+
+  .banner,
+  .banner.banner-image-slot,
+  .banner-image-slot{
+    border-radius:14px !important;
+    background-size:contain !important;
+    background-position:center center !important;
+    background-repeat:no-repeat !important;
+    background-color:#05000f !important;
+  }
+
+  .banner img,
+  .banner-image-slot img{
+    object-fit:contain !important;
+    object-position:center center !important;
+    border-radius:14px !important;
+  }
+
+  @media (max-width:719px){
+    .hero-slider{
+      --vezus-banner-height:214px !important;
+      --vezus-banner-width:100% !important;
+    }
+  }
+
+  /* iPad / планшеты: баннер чуть больше, но изображение всё равно видно целиком. */
+  @media (min-width:720px) and (max-width:1366px){
+    .hero-slider{
+      --vezus-banner-height:218px !important;
+      --vezus-banner-gap:14px !important;
+      --vezus-banner-width:clamp(350px, 44vw, 430px) !important;
+      margin-top:12px !important;
+    }
+
+    .banner,
+    .banner.banner-image-slot,
+    .banner-image-slot{
+      background-size:contain !important;
+    }
+  }
+
+  /* iPad: игровые карточки меньше, чтобы выглядели аккуратнее и не были огромными. */
+  @media (min-width:720px) and (max-width:1366px){
+    .cards-row,
+    .games-row,
+    .slots-row,
+    .card-games-row{
+      gap:12px !important;
+      padding-bottom:26px !important;
+    }
+
+    .cards-row > *,
+    .games-row > *,
+    .slots-row > *,
+    .card-games-row > *{
+      flex:0 0 148px !important;
+      width:148px !important;
+      min-width:148px !important;
+      max-width:148px !important;
+      height:206px !important;
+      min-height:206px !important;
+      max-height:206px !important;
+      border-radius:18px !important;
+      box-shadow:
+        0 15px 32px rgba(0,0,0,.28),
+        inset 0 0 0 1px rgba(255,255,255,.035) !important;
+    }
+  }
+
+  /* Большой iPad в landscape: можно дать карточкам совсем немного больше, но меньше прежних 188x260. */
+  @media (min-width:1180px) and (max-width:1366px){
+    .cards-row > *,
+    .games-row > *,
+    .slots-row > *,
+    .card-games-row > *{
+      flex-basis:156px !important;
+      width:156px !important;
+      min-width:156px !important;
+      max-width:156px !important;
+      height:216px !important;
+      min-height:216px !important;
+      max-height:216px !important;
+    }
+  }
+</style>
+
 </head>
 <!-- DB READY BUILD: no demo balance buttons, local fallback only until Supabase/API is connected -->
 <body class="site-unlocked">
