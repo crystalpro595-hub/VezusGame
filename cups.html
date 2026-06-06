@@ -1575,6 +1575,31 @@
     }
   </style>
 
+
+  <style id="cups-toast-bottom-and-hide-status-v11">
+    /* Убираем текстовые подсказки под полем */
+    .status{
+      display:none !important;
+    }
+
+    /* Уведомление теперь появляется снизу панели со ставками */
+    .toast{
+      top:auto;
+      bottom:auto;
+      transform:translate(-50%, -8px) scale(.98) !important;
+    }
+
+    .toast.show{
+      transform:translate(-50%, 0) scale(1) !important;
+    }
+
+    @media (max-width:480px){
+      .toast{
+        max-width:calc(100vw - 28px);
+      }
+    }
+  </style>
+
 </head>
 <body>
   <main class="game">
@@ -1722,11 +1747,16 @@
         `;
       }
 
-      function placeToastAbovePanel(){
+      function placeToastBelowPanel(){
         if(!toast || !controls) return;
+
         const rect = controls.getBoundingClientRect();
-        const bottom = Math.max(20, window.innerHeight - rect.top + 10);
-        toast.style.bottom = `${bottom}px`;
+        const gap = 10;
+        const toastHeight = toast.offsetHeight || 40;
+        const safeTop = Math.min(rect.bottom + gap, window.innerHeight - toastHeight - 12);
+
+        toast.style.top = `${Math.max(12, safeTop)}px`;
+        toast.style.bottom = 'auto';
       }
 
       function showToast(text, type = 'info'){
@@ -1735,7 +1765,7 @@
         toastText.textContent = text;
         toastIcon.innerHTML = getToastIcon(type);
         toast.className = 'toast ' + type;
-        placeToastAbovePanel();
+        placeToastBelowPanel();
 
         requestAnimationFrame(() => toast.classList.add('show'));
         clearTimeout(showToast.timer);
@@ -2043,7 +2073,7 @@
 
       window.addEventListener('resize', () => {
         positionElements(false);
-        if(toast && toast.classList.contains('show')) placeToastAbovePanel();
+        if(toast && toast.classList.contains('show')) placeToastBelowPanel();
       }, { passive: true });
 
       requestAnimationFrame(() => positionElements(false));
