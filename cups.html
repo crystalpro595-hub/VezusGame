@@ -1713,6 +1713,334 @@
     }
   </style>
 
+
+  <style id="cups-final-responsive-preview-v15">
+    :root{
+      --cups-top:max(56px, calc(env(safe-area-inset-top) + 46px));
+      --stage-w:min(calc(100vw - 22px),430px);
+      --stage-h:292px;
+      --cup-w:clamp(86px,24vw,122px);
+      --cup-h:148px;
+      --cup-bottom:48px;
+      --ball-size:28px;
+      --panel-w:min(calc(100vw - 34px),360px);
+    }
+
+    html,body{
+      width:100%!important;
+      min-height:100%!important;
+      overflow-x:hidden!important;
+      -webkit-text-size-adjust:100%!important;
+      overscroll-behavior:none!important;
+    }
+
+    body{
+      background:
+        radial-gradient(circle at 50% -10%, rgba(157,85,255,.20), transparent 32%),
+        radial-gradient(circle at 50% 110%, rgba(95,35,190,.14), transparent 38%),
+        linear-gradient(180deg,#080210 0%,#15031f 58%,#07020d 100%)!important;
+    }
+
+    .game{
+      min-height:100dvh!important;
+      overflow:hidden!important;
+      padding-bottom:max(10px, env(safe-area-inset-bottom))!important;
+      contain:layout style paint;
+    }
+
+    .game::before{opacity:.52!important;filter:none!important;}
+
+    .topbar{
+      top:max(10px, env(safe-area-inset-top))!important;
+      left:14px!important;
+      z-index:30!important;
+    }
+
+    .balance{
+      min-height:36px!important;
+      padding:0 10px!important;
+      gap:7px!important;
+      font-size:15px!important;
+      line-height:1!important;
+    }
+
+    .wallet{width:18px!important;height:18px!important;}
+
+    .content{
+      width:min(100%,620px)!important;
+      margin:0 auto!important;
+      padding:var(--cups-top) 8px max(8px, env(safe-area-inset-bottom))!important;
+      min-height:100dvh!important;
+      display:flex!important;
+      flex-direction:column!important;
+      align-items:center!important;
+      justify-content:flex-start!important;
+      overflow:hidden!important;
+      position:relative!important;
+      z-index:1!important;
+    }
+
+    .game-heading,.status,.demo-note{display:none!important;}
+
+    .cups-stage{
+      width:var(--stage-w)!important;
+      height:var(--stage-h)!important;
+      flex:0 0 auto!important;
+      margin:clamp(8px,2dvh,22px) auto 0!important;
+      border-radius:clamp(22px,5vw,30px)!important;
+      border:1px solid rgba(255,255,255,.075)!important;
+      background:
+        radial-gradient(ellipse at 50% 80%, rgba(157,85,255,.15), transparent 45%),
+        radial-gradient(circle at 18% 16%, rgba(255,255,255,.04), transparent 24%),
+        linear-gradient(180deg, rgba(28,12,52,.88) 0%, rgba(16,7,34,.94) 58%, rgba(8,3,21,.98) 100%)!important;
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.04),
+        inset 0 -18px 30px rgba(0,0,0,.14),
+        0 12px 28px rgba(0,0,0,.22)!important;
+      contain:layout paint style!important;
+      overflow:hidden!important;
+      touch-action:manipulation!important;
+    }
+
+    .cups-stage::before{
+      content:""!important;
+      position:absolute!important;
+      inset:0!important;
+      z-index:0!important;
+      pointer-events:none!important;
+      opacity:.22!important;
+      background:
+        repeating-linear-gradient(0deg,rgba(255,255,255,.018) 0 1px,transparent 1px 34px),
+        repeating-linear-gradient(90deg,rgba(255,255,255,.015) 0 1px,transparent 1px 34px)!important;
+    }
+
+    .cups-stage::after{
+      content:""!important;
+      position:absolute!important;
+      left:10%!important;
+      right:10%!important;
+      bottom:22px!important;
+      height:54px!important;
+      border-radius:50%!important;
+      z-index:1!important;
+      pointer-events:none!important;
+      opacity:.70!important;
+      display:block!important;
+      background:radial-gradient(ellipse at center,rgba(0,0,0,.22),rgba(0,0,0,.07) 46%,transparent 74%)!important;
+    }
+
+    .stage-glow{opacity:.60!important;pointer-events:none!important;}
+
+    .cup{
+      width:var(--cup-w)!important;
+      height:var(--cup-h)!important;
+      bottom:var(--cup-bottom)!important;
+      contain:layout paint style!important;
+      will-change:auto!important;
+      backface-visibility:hidden!important;
+      -webkit-backface-visibility:hidden!important;
+      transform:translateZ(0);
+    }
+
+    .cups-stage.is-shuffling .cup{will-change:left,transform!important;}
+
+    .cup-image{
+      filter:drop-shadow(0 10px 12px rgba(0,0,0,.30))!important;
+      transform:translateZ(0);
+      backface-visibility:hidden!important;
+      -webkit-backface-visibility:hidden!important;
+    }
+
+    .ball{
+      bottom:var(--cup-bottom)!important;
+      width:var(--ball-size)!important;
+      height:var(--ball-size)!important;
+      contain:layout paint style!important;
+    }
+
+    .cup.lifted{transform:translateY(calc(var(--cup-h) * -0.40))!important;}
+
+    .payout-preview{
+      width:var(--panel-w)!important;
+      margin:clamp(7px,1.3dvh,10px) auto 0!important;
+      display:grid!important;
+      grid-template-columns:1fr 1fr!important;
+      gap:8px!important;
+      flex:0 0 auto!important;
+    }
+
+    .preview-card{
+      min-width:0;
+      min-height:46px;
+      padding:8px 10px;
+      border-radius:14px;
+      border:1px solid rgba(153,95,255,.13);
+      background:
+        radial-gradient(circle at 0% 0%,rgba(152,89,255,.10),transparent 42%),
+        linear-gradient(180deg,rgba(32,19,58,.94),rgba(19,10,37,.97));
+      box-shadow:0 8px 18px rgba(0,0,0,.20);
+      display:flex;
+      flex-direction:column;
+      align-items:flex-start;
+      justify-content:center;
+      gap:4px;
+      contain:layout paint style;
+    }
+
+    .preview-label{
+      color:rgba(255,255,255,.46);
+      font-size:9px;
+      font-weight:800;
+      line-height:1;
+      text-transform:uppercase;
+      letter-spacing:.10em;
+    }
+
+    .preview-card strong{
+      max-width:100%;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      white-space:nowrap;
+      color:#fff;
+      font-size:16px;
+      line-height:1;
+      font-weight:900;
+      letter-spacing:-.03em;
+    }
+
+    .bet-wrap{
+      width:var(--panel-w)!important;
+      flex:0 0 auto!important;
+      margin:8px auto 0!important;
+      padding:8px!important;
+      border-radius:14px!important;
+      border:1px solid rgba(153,95,255,.13)!important;
+      background:
+        radial-gradient(circle at 0% 0%,rgba(152,89,255,.07),transparent 40%),
+        linear-gradient(180deg,rgba(32,19,58,.94),rgba(19,10,37,.97))!important;
+      box-shadow:0 10px 22px rgba(0,0,0,.22)!important;
+      contain:layout paint style!important;
+    }
+
+    .bet-layout{grid-template-columns:1.08fr .92fr!important;gap:7px!important;}
+    .amount-top{gap:6px!important;}
+
+    .amount-display{
+      min-height:44px!important;
+      border-radius:10px!important;
+      padding:0 10px!important;
+      font-size:16px!important;
+      background:linear-gradient(180deg,rgba(46,35,72,.94),rgba(35,26,60,.98))!important;
+    }
+
+    .stepper{gap:5px!important;}
+    .mini-btn{width:30px!important;height:20px!important;border-radius:7px!important;font-size:15px!important;}
+    .quick-row{gap:6px!important;margin-top:6px!important;}
+    .quick-btn{min-height:25px!important;border-radius:8px!important;font-size:12px!important;}
+
+    .play-btn{
+      min-height:72px!important;
+      border-radius:12px!important;
+      background:linear-gradient(180deg,rgba(95,55,178,.96),rgba(38,16,71,.98))!important;
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.07),0 8px 16px rgba(38,16,71,.18)!important;
+    }
+
+    .play-btn strong{font-size:17px!important;}
+    .play-btn span{font-size:10px!important;}
+
+    .toast{
+      max-width:calc(100vw - 28px)!important;
+      min-height:36px!important;
+      padding:6px 11px 6px 7px!important;
+      font-size:11px!important;
+    }
+
+    .toast-icon{width:22px!important;height:22px!important;min-width:22px!important;}
+
+    /* маленькие экраны */
+    @media (max-width:390px){
+      :root{
+        --cups-top:max(48px, calc(env(safe-area-inset-top) + 40px));
+        --stage-w:min(calc(100vw - 16px),370px);
+        --stage-h:248px;
+        --cup-w:clamp(78px,25.5vw,104px);
+        --cup-h:132px;
+        --cup-bottom:38px;
+        --ball-size:24px;
+        --panel-w:min(calc(100vw - 24px),360px);
+      }
+
+      .topbar{left:12px!important;}
+      .balance{min-height:34px!important;padding:0 8px!important;gap:6px!important;font-size:14px!important;}
+      .wallet{width:17px!important;height:17px!important;}
+      .content{padding-left:6px!important;padding-right:6px!important;}
+      .cups-stage{margin-top:7px!important;}
+      .payout-preview{margin-top:7px!important;gap:7px!important;}
+      .preview-card{min-height:42px!important;padding:7px 9px!important;border-radius:13px!important;}
+      .preview-label{font-size:8px!important;}
+      .preview-card strong{font-size:15px!important;}
+      .bet-wrap{margin-top:7px!important;padding:7px!important;}
+      .amount-display{min-height:40px!important;font-size:15px!important;}
+      .quick-btn{min-height:23px!important;font-size:11px!important;}
+      .play-btn{min-height:62px!important;}
+      .play-btn strong{font-size:16px!important;}
+      .play-btn span{font-size:9px!important;}
+    }
+
+    /* низкие экраны */
+    @media (max-height:720px){
+      :root{
+        --cups-top:max(44px, calc(env(safe-area-inset-top) + 36px));
+        --stage-h:218px;
+        --cup-w:86px;
+        --cup-h:122px;
+        --cup-bottom:34px;
+        --ball-size:23px;
+      }
+
+      .cups-stage{margin-top:5px!important;}
+      .payout-preview{margin-top:6px!important;}
+      .preview-card{min-height:38px!important;padding-top:6px!important;padding-bottom:6px!important;}
+      .bet-wrap{margin-top:6px!important;padding:7px!important;}
+      .amount-display{min-height:38px!important;}
+      .mini-btn{height:18px!important;}
+      .quick-row{margin-top:5px!important;}
+      .quick-btn{min-height:22px!important;}
+      .play-btn{min-height:56px!important;}
+    }
+
+    /* средние телефоны */
+    @media (min-width:391px) and (max-width:719px){
+      :root{
+        --stage-w:min(calc(100vw - 22px),430px);
+        --stage-h:clamp(270px,38dvh,300px);
+        --cup-w:clamp(92px,25vw,120px);
+        --cup-h:148px;
+        --cup-bottom:46px;
+        --panel-w:min(calc(100vw - 34px),380px);
+      }
+    }
+
+    /* большие экраны / iPad */
+    @media (min-width:720px){
+      :root{
+        --cups-top:max(64px, calc(env(safe-area-inset-top) + 54px));
+        --stage-w:540px;
+        --stage-h:318px;
+        --cup-w:130px;
+        --cup-h:158px;
+        --cup-bottom:52px;
+        --ball-size:30px;
+        --panel-w:420px;
+      }
+
+      .content{width:min(100%,650px)!important;}
+      .payout-preview{gap:10px!important;}
+      .preview-card{min-height:50px!important;}
+      .bet-wrap{padding:9px!important;}
+    }
+  </style>
+
 </head>
 <body>
   <main class="game">
@@ -1758,6 +2086,17 @@
       </section>
 
       <div class="status" id="status">Нажми «Играть», чтобы начать</div>
+
+      <section class="payout-preview" aria-label="Коэффициент и предварительный выигрыш">
+        <div class="preview-card">
+          <span class="preview-label">Коэффициент</span>
+          <strong id="previewCoef">2.00x</strong>
+        </div>
+        <div class="preview-card">
+          <span class="preview-label">Выигрыш</span>
+          <strong id="previewWin">40 ₽</strong>
+        </div>
+      </section>
 
       <section class="bet-wrap" aria-label="Панель ставки">
         <div class="bet-layout">
@@ -1812,6 +2151,8 @@
       const halfBtn = document.getElementById('halfBtn');
       const doubleBtn = document.getElementById('doubleBtn');
       const playSubText = document.getElementById('playSubText');
+      const previewCoef = document.getElementById('previewCoef');
+      const previewWin = document.getElementById('previewWin');
       const controls = document.querySelector('.bet-wrap');
       const toast = document.getElementById('toast');
       const toastIcon = document.getElementById('toastIcon');
@@ -1831,6 +2172,15 @@
 
       function formatRub(value){
         return `${Math.floor(value).toLocaleString('ru-RU')} ₽`;
+      }
+
+      function updatePreview(){
+        if(!previewCoef || !previewWin) return;
+        const raw = Number(String(betInput.value).replace(/[^\d]/g, ''));
+        const safe = Number.isFinite(raw) ? Math.floor(raw) : state.currentBet;
+        const bet = Math.max(MIN_BET, Math.min(MAX_BET, safe || MIN_BET));
+        previewCoef.textContent = '2.00x';
+        previewWin.textContent = formatRub(bet * 2);
       }
 
 
@@ -1890,6 +2240,7 @@
         const safe = Number.isFinite(raw) ? Math.floor(raw) : MIN_BET;
         const value = Math.max(MIN_BET, Math.min(MAX_BET, safe));
         betInput.value = `${value} ₽`;
+        updatePreview();
         return value;
       }
 
@@ -2133,6 +2484,7 @@
         }
         const value = Math.max(MIN_BET, current - 1);
         betInput.value = `${value} ₽`;
+        updatePreview();
       });
 
       plusBtn.addEventListener('click', () => {
@@ -2143,6 +2495,7 @@
         }
         const value = Math.min(MAX_BET, current + 1);
         betInput.value = `${value} ₽`;
+        updatePreview();
       });
 
       halfBtn.addEventListener('click', () => {
@@ -2153,6 +2506,7 @@
         }
         const value = Math.max(MIN_BET, Math.floor(current / 2));
         betInput.value = `${value} ₽`;
+        updatePreview();
       });
 
       doubleBtn.addEventListener('click', () => {
@@ -2163,6 +2517,7 @@
         }
         const value = Math.min(MAX_BET, current * 2);
         betInput.value = `${value} ₽`;
+        updatePreview();
       });
 
       betInput.addEventListener('focus', () => {
@@ -2173,6 +2528,8 @@
       betInput.addEventListener('input', () => {
         betInput.value = betInput.value.replace(/[^\d]/g, '').slice(0, 5);
       });
+
+      betInput.addEventListener('input', updatePreview);
 
       betInput.addEventListener('blur', () => {
         const raw = Number(String(betInput.value).replace(/[^\d]/g, ''));
@@ -2191,6 +2548,7 @@
         if(toast && toast.classList.contains('show')) placeToastBelowPanel();
       }, { passive: true });
 
+      updatePreview();
       requestAnimationFrame(() => positionElements(false));
     })();
   </script>
