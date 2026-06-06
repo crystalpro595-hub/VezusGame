@@ -995,61 +995,7 @@
           padding-right: 10px;
         }
       }
-
-      .partner-subtabs{
-        display:flex;
-        gap:8px;
-        overflow-x:auto;
-        padding-bottom:10px;
-        scrollbar-width:none;
-      }
-      .partner-subtabs::-webkit-scrollbar{display:none;}
-      .partner-list{display:grid;gap:10px;}
-      .partner-code{
-        display:inline-flex;
-        align-items:center;
-        justify-content:center;
-        min-height:30px;
-        padding:0 10px;
-        border-radius:999px;
-        background:rgba(96,165,250,.10);
-        color:#bfdbfe;
-        border:1px solid rgba(96,165,250,.18);
-        font-size:12px;
-        font-weight:900;
-        letter-spacing:.04em;
-      }
-      .partner-action-grid{
-        display:grid;
-        grid-template-columns:1fr 1fr;
-        gap:8px;
-        margin-top:12px;
-      }
-      .partner-percent-row{
-        display:grid;
-        grid-template-columns:1fr 110px;
-        gap:8px;
-        margin-top:12px;
-      }
-      .partner-note{
-        color:var(--muted2);
-        font-size:11px;
-        line-height:1.45;
-        margin-top:10px;
-      }
-      @media (min-width:768px){
-        .partner-list{
-          grid-template-columns:repeat(auto-fit,minmax(320px,1fr));
-          align-items:start;
-        }
-        .partner-list .empty{grid-column:1 / -1;}
-      }
-      @media (max-width:420px){
-        .partner-action-grid,
-        .partner-percent-row{grid-template-columns:1fr;}
-      }
-
-    </style>
+</style>
   </head>
   <body>
     <div class="app">
@@ -1205,15 +1151,7 @@
               <path d="M7 18h10a5 5 0 0 0 4.8-6.4l-1.1-3.8A4 4 0 0 0 16.9 5H7.1a4 4 0 0 0-3.8 2.8l-1.1 3.8A5 5 0 0 0 7 18Z" /></svg
             >Игры
           </button>
-          <button id="tabPartners" class="tab" type="button">
-            <svg viewBox="0 0 24 24">
-              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
-              <circle cx="9" cy="7" r="4" />
-              <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
-              <path d="M16 3.13a4 4 0 0 1 0 7.75" /></svg
-            >Партнёрка
-          </button>
-        </nav>
+</nav>
         <section id="txView">
           <div class="toolbar">
             <button id="refreshInlineBtn" class="chip refresh" type="button">
@@ -1339,22 +1277,7 @@
             <div id="gamesList" class="games-list"></div>
           </div>
         </section>
-
-        <section id="partnersView" class="hidden">
-          <div class="section-panel">
-            <h2 class="section-title">Партнёрская система</h2>
-            <p class="section-sub">Промокоды, рефералы, начисления и выводы партнёров</p>
-            <div class="partner-subtabs">
-              <button class="chip active" data-partner-mode="overview" onclick="setPartnerMode('overview')">Обзор</button>
-              <button class="chip" data-partner-mode="partners" onclick="setPartnerMode('partners')">Партнёры</button>
-              <button class="chip" data-partner-mode="referrals" onclick="setPartnerMode('referrals')">Рефералы</button>
-              <button class="chip" data-partner-mode="earnings" onclick="setPartnerMode('earnings')">Начисления</button>
-              <button class="chip" data-partner-mode="payouts" onclick="setPartnerMode('payouts')">Выводы</button>
-            </div>
-            <div id="partnersContent"></div>
-          </div>
-        </section>
-      </section>
+</section>
     </div>
     <div id="toast" class="toast hidden"></div>
     <script>
@@ -1396,17 +1319,11 @@
         users: [],
         vouchers: [],
         games: [],
-        partners: [],
-        partnerReferrals: [],
-        partnerEarnings: [],
-        partnerPayoutRequests: [],
-        partnerOverview: {},
         stats: {},
         filter: "pending",
         tab: "tx",
         periodStats: 7,
         periodFinance: 7,
-        partnerMode: "overview",
         openUsers: new Set(),
         openVouchers: new Set(),
       };
@@ -1503,11 +1420,6 @@
           state.users = data.users || [];
           state.vouchers = data.vouchers || [];
           state.games = data.games || [];
-          state.partners = data.partners || [];
-          state.partnerReferrals = data.partner_referrals || [];
-          state.partnerEarnings = data.partner_earnings || [];
-          state.partnerPayoutRequests = data.partner_payout_requests || [];
-          state.partnerOverview = data.partner_overview || {};
           state.stats = data.stats || {};
           renderStats(state.stats);
           render();
@@ -1532,11 +1444,6 @@
           state.users = data.users || [];
           state.vouchers = data.vouchers || [];
           state.games = data.games || [];
-          state.partners = data.partners || [];
-          state.partnerReferrals = data.partner_referrals || [];
-          state.partnerEarnings = data.partner_earnings || [];
-          state.partnerPayoutRequests = data.partner_payout_requests || [];
-          state.partnerOverview = data.partner_overview || {};
           state.stats = data.stats || {};
           renderStats(state.stats);
           render();
@@ -1852,173 +1759,6 @@
           })
           .join("");
       }
-
-
-      function partnerUserName(u) {
-        return u ? nameOf(u) : "Пользователь";
-      }
-      function partnerStatusText(status) {
-        return ({
-          pending: "В ожидании",
-          available: "Доступно",
-          paid: "Выплачено",
-          cancelled: "Отменено",
-          approved: "Одобрено",
-          rejected: "Отклонено"
-        }[status] || status || "—");
-      }
-      function partnerStatusClass(status) {
-        if (status === "available" || status === "paid" || status === "approved") return "approved";
-        if (status === "cancelled" || status === "rejected") return "declined";
-        return "pending";
-      }
-      function refreshPartnerSubtabs() {
-        document.querySelectorAll("[data-partner-mode]").forEach((btn) => {
-          btn.classList.toggle("active", btn.dataset.partnerMode === state.partnerMode);
-        });
-      }
-      function renderPartnerOverview() {
-        const o = state.partnerOverview || {};
-        const pendingAmount = o.pending_balance_total ?? o.earnings_pending ?? 0;
-        const availableAmount = o.available_balance_total ?? o.earnings_available ?? 0;
-        const paidAmount = o.paid_total ?? ((Number(o.payout_paid || 0) || 0) + (Number(o.earnings_paid || 0) || 0));
-        const payoutPending = o.payout_pending ?? 0;
-        const payoutApproved = o.payout_approved ?? 0;
-        return `<div class="metric-grid">
-          <div class="metric"><span>Партнёры</span><b>${Number(o.partners_total || 0)}</b><small>пользователей с кодом</small></div>
-          <div class="metric"><span>Рефералы</span><b>${Number(o.referrals_total || 0)}</b><small>активаций промокодов</small></div>
-          <div class="metric"><span>В ожидании</span><b>${money(pendingAmount)}</b><small>pending-баланс партнёров</small></div>
-          <div class="metric"><span>Доступно к выплате</span><b>${money(availableAmount)}</b><small>partner_balance</small></div>
-          <div class="metric"><span>Всего начислено</span><b>${money(o.earnings_total || 0)}</b><small>без отменённых начислений</small></div>
-          <div class="metric"><span>Уже выплачено</span><b>${money(paidAmount)}</b><small>paid-заявки + ручные выплаты</small></div>
-          <div class="metric"><span>Заявки pending</span><b>${money(payoutPending)}</b><small>ожидают решения</small></div>
-          <div class="metric"><span>Заявки approved</span><b>${money(payoutApproved)}</b><small>одобрены, но не оплачены</small></div>
-        </div><div class="partner-note">Финальная логика: “В ожидании” берётся из partner_pending_balance, “Доступно” — из partner_balance, “Уже выплачено” — из оплаченных заявок на вывод и ручных paid-начислений. Поэтому обзор не зависит от старых статусов и не занижает выплаченные суммы.</div>`;
-      }
-      function renderPartnerCards() {
-        const items = (state.partners || []).slice();
-        if (!items.length) return '<div class="empty">Партнёров пока нет</div>';
-        return `<div class="partner-list">${items.map((p) => {
-          const avatar = p.photo_url ? `<img src="${esc(p.photo_url)}" alt="">` : icons.user;
-          const totals = p.earnings_totals || {};
-          const active = p.is_partner_active !== false;
-          return `<article class="card">
-            <div class="card-head">
-              <div class="user-line"><div class="avatar">${avatar}</div><div><div class="user-name">${esc(partnerUserName(p))}</div><div class="user-meta">ID ${esc(p.telegram_id || "—")}</div></div></div>
-              <span class="partner-code">${esc(p.referral_code || "—")}</span>
-            </div>
-            <div class="grid-info">
-              <div class="info"><span>Рефералов</span><b>${Number(p.referral_count || 0)}</b></div>
-              <div class="info"><span>Процент</span><b>${Number(p.partner_percent || 10)}%</b></div>
-              <div class="info"><span>Pending</span><b>${money(p.partner_pending_balance || totals.pending || 0)}</b></div>
-              <div class="info"><span>Доступно</span><b>${money(p.partner_balance || totals.available || 0)}</b></div>
-              <div class="info"><span>Выплачено</span><b>${money(p.paid_total ?? (((p.payout_totals || {}).paid || 0) + (totals.paid || 0)))}</b></div>
-              <div class="info"><span>Статус</span><b>${active ? "Активен" : "Отключён"}</b></div>
-            </div>
-            <div class="partner-percent-row">
-              <input id="partnerPercent_${p.id}" class="input" type="number" min="0" max="100" step="0.1" value="${Number(p.partner_percent || 10)}">
-              <button class="btn small" onclick="updatePartnerPercent('${p.id}')">Сохранить %</button>
-            </div>
-            <div class="partner-action-grid">
-              <button class="btn good" onclick="approvePartnerEarnings('${p.id}')">Одобрить pending</button>
-              <button class="btn ${active ? "bad" : "good"}" onclick="togglePartnerActive('${p.id}', ${active ? "false" : "true"})">${active ? "Отключить" : "Включить"}</button>
-              <button class="btn" onclick="markPartnerPaid('${p.id}')">Отметить выплаченным</button>
-            </div>
-          </article>`;
-        }).join("")}</div>`;
-      }
-      function renderPartnerReferrals() {
-        const items = (state.partnerReferrals || []).slice();
-        if (!items.length) return '<div class="empty">Рефералов пока нет</div>';
-        return `<div class="partner-list">${items.map((r) => `<article class="card">
-          <div class="card-head"><div><div class="user-name">${esc(partnerUserName(r.partner))}</div><div class="user-meta">Партнёр · код ${esc(r.referral_code || r.partner?.referral_code || "—")}</div></div><span class="badge approved">Реферал</span></div>
-          <div class="grid-info">
-            <div class="info"><span>Приглашённый</span><b>${esc(partnerUserName(r.referral))}</b></div>
-            <div class="info"><span>ID игрока</span><b>${esc(r.referral?.telegram_id || "—")}</b></div>
-            <div class="info"><span>Партнёр ID</span><b>${esc(r.partner?.telegram_id || "—")}</b></div>
-            <div class="info"><span>Дата привязки</span><b>${dateText(r.created_at)}</b></div>
-          </div>
-        </article>`).join("")}</div>`;
-      }
-      function renderPartnerEarnings() {
-        const items = (state.partnerEarnings || []).slice();
-        if (!items.length) return '<div class="empty">Начислений пока нет</div>';
-        return `<div class="partner-list">${items.map((e) => {
-          const status = String(e.status || "pending");
-          const buttons = status === "pending" ? `<div class="actions"><button class="btn bad" onclick="cancelPartnerEarning('${e.id}')">Отменить</button></div>` : "";
-          return `<article class="card">
-            <div class="card-head"><div><div class="user-name">${esc(partnerUserName(e.partner))}</div><div class="user-meta">Партнёр · ${dateText(e.created_at)}</div></div><div><div class="amount">${money(e.commission_amount || 0)}</div><span class="badge ${partnerStatusClass(status)}">${partnerStatusText(status)}</span></div></div>
-            <div class="grid-info">
-              <div class="info"><span>Реферал</span><b>${esc(partnerUserName(e.referral))}</b></div>
-              <div class="info"><span>Чистый проигрыш</span><b>${money(e.base_loss_amount || 0)}</b></div>
-              <div class="info"><span>Процент</span><b>${Number(e.percent || 0)}%</b></div>
-              <div class="info"><span>ID реферала</span><b>${esc(e.referral?.telegram_id || "—")}</b></div>
-            </div>${buttons}
-          </article>`;
-        }).join("")}</div>`;
-      }
-      function renderPartnerPayouts() {
-        const items = (state.partnerPayoutRequests || []).slice();
-        if (!items.length) return '<div class="empty">Заявок на вывод партнёрских средств пока нет. Для них нужна таблица PartnerPayoutRequest и кнопка “Запросить вывод” в partner.html.</div>';
-        return `<div class="partner-list">${items.map((p) => {
-          const status = String(p.status || "pending");
-          const buttons = status === "pending" ? `<div class="actions"><button class="btn good" onclick="approvePartnerPayout('${p.id}')">Одобрить</button><button class="btn bad" onclick="rejectPartnerPayout('${p.id}')">Отклонить</button></div>` : status === "approved" ? `<div class="actions"><button class="btn good" onclick="markPartnerPayoutPaid('${p.id}')">Оплачено</button><button class="btn bad" onclick="rejectPartnerPayout('${p.id}')">Отклонить</button></div>` : "";
-          return `<article class="card">
-            <div class="card-head"><div><div class="user-name">${esc(partnerUserName(p.partner))}</div><div class="user-meta">${dateText(p.created_at)}</div></div><div><div class="amount">${money(p.amount || 0)}</div><span class="badge ${partnerStatusClass(status)}">${partnerStatusText(status)}</span></div></div>
-            <div class="grid-info"><div class="info"><span>Метод</span><b>${esc(p.method || "—")}</b></div><div class="info"><span>Реквизиты</span><b>${esc(p.requisites || "—")}</b></div><div class="info"><span>Комментарий</span><b>${esc(p.admin_comment || "—")}</b></div><div class="info"><span>Партнёр ID</span><b>${esc(p.partner?.telegram_id || "—")}</b></div></div>${buttons}
-          </article>`;
-        }).join("")}</div>`;
-      }
-      function renderPartners() {
-        refreshPartnerSubtabs();
-        const target = $("partnersContent");
-        if (!target) return;
-        if (state.partnerMode === "partners") target.innerHTML = renderPartnerCards();
-        else if (state.partnerMode === "referrals") target.innerHTML = renderPartnerReferrals();
-        else if (state.partnerMode === "earnings") target.innerHTML = renderPartnerEarnings();
-        else if (state.partnerMode === "payouts") target.innerHTML = renderPartnerPayouts();
-        else target.innerHTML = renderPartnerOverview();
-      }
-      window.setPartnerMode = (mode) => {
-        state.partnerMode = mode;
-        renderPartners();
-      };
-      window.updatePartnerPercent = (id) => {
-        const value = Number($("partnerPercent_" + id)?.value || 0);
-        if (!Number.isFinite(value) || value < 0 || value > 100) return toast("Процент должен быть от 0 до 100");
-        doAction("update_partner_percent", { partner_user_id: id, percent: value });
-      };
-      window.approvePartnerEarnings = (id) => {
-        if (!confirm("Одобрить все pending-начисления этого партнёра и перенести их в доступный баланс?")) return;
-        doAction("approve_partner_earnings", { partner_user_id: id });
-      };
-      window.markPartnerPaid = (id) => {
-        if (!confirm("Ты уже реально выплатил доступную сумму партнёру? После подтверждения она спишется из партнёрского баланса.")) return;
-        doAction("mark_partner_paid", { partner_user_id: id });
-      };
-      window.togglePartnerActive = (id, active) => {
-        doAction("toggle_partner_active", { partner_user_id: id, is_partner_active: active });
-      };
-      window.cancelPartnerEarning = (id) => {
-        if (!confirm("Отменить это pending-начисление?")) return;
-        doAction("cancel_partner_earning", { partner_earning_id: id });
-      };
-      window.approvePartnerPayout = (id) => {
-        const comment = prompt("Комментарий к одобрению", "");
-        if (comment === null) return;
-        doAction("approve_partner_payout", { partner_payout_id: id, comment });
-      };
-      window.rejectPartnerPayout = (id) => {
-        const comment = prompt("Причина отклонения", "");
-        if (comment === null) return;
-        doAction("reject_partner_payout", { partner_payout_id: id, comment });
-      };
-      window.markPartnerPayoutPaid = (id) => {
-        const comment = prompt("Комментарий к выплате", "Выплачено");
-        if (comment === null) return;
-        doAction("mark_partner_payout_paid", { partner_payout_id: id, comment });
-      };
-
       function render() {
         if (state.tab === "tx") renderTx();
         else if (state.tab === "users") renderUsers();
@@ -2026,7 +1766,6 @@
         else if (state.tab === "finance") renderFinance();
         else if (state.tab === "vouchers") renderVouchers();
         else if (state.tab === "games") renderGames();
-        else renderPartners();
       }
       window.setStatsPeriod = (d) => {
         state.periodStats = d;
@@ -2135,7 +1874,7 @@
 
       function setTab(tab) {
         state.tab = tab;
-        ["tx", "users", "stats", "finance", "vouchers", "games", "partners"].forEach((t) => {
+        ["tx", "users", "stats", "finance", "vouchers", "games"].forEach((t) => {
           $(
             "tab" + (t === "tx" ? "Tx" : t[0].toUpperCase() + t.slice(1)),
           ).classList.toggle("active", tab === t);
@@ -2166,7 +1905,6 @@
       $("tabFinance").addEventListener("click", () => setTab("finance"));
       $("tabVouchers").addEventListener("click", () => setTab("vouchers"));
       $("tabGames").addEventListener("click", () => setTab("games"));
-      $("tabPartners").addEventListener("click", () => setTab("partners"));
       $("voucherForm").addEventListener("submit", (e) => { e.preventDefault(); createVoucher(); });
       $("userSearch").addEventListener("input", renderUsers);
       document.querySelectorAll(".chip[data-filter]").forEach((chip) =>
