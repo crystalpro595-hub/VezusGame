@@ -1297,6 +1297,147 @@
     }
   </style>
 
+
+  <style id="cups-stage-and-speed-v9">
+    /* Чуть быстрее, но без тряски */
+    .cup{
+      transition:
+        left .30s cubic-bezier(.22,.78,.22,1),
+        transform .30s cubic-bezier(.22,.78,.22,1),
+        filter .18s ease !important;
+    }
+
+    .cup.shuffle-front{
+      transform:translateY(10px) scale(1.03) !important;
+      z-index:9 !important;
+      filter:brightness(1.02) drop-shadow(0 16px 18px rgba(0,0,0,.34)) !important;
+    }
+
+    .cup.shuffle-back{
+      transform:translateY(-8px) scale(.975) !important;
+      z-index:4 !important;
+      filter:brightness(.95) drop-shadow(0 9px 12px rgba(0,0,0,.26)) !important;
+    }
+
+    .cup.shuffle-side-left{
+      transform:translateX(-7px) rotate(-1.2deg) !important;
+    }
+
+    .cup.shuffle-side-right{
+      transform:translateX(7px) rotate(1.2deg) !important;
+    }
+
+    .cup.shuffle-settle{
+      transform:translateY(0) scale(1) !important;
+      transition:transform .14s cubic-bezier(.18,.86,.24,1) !important;
+    }
+
+    .cup.lifted{
+      transform:translateY(-68px) !important;
+    }
+
+    /* Более красивое поле */
+    .cups-stage{
+      margin-top:34px !important;
+      height:322px !important;
+      border-radius:32px !important;
+      border:1px solid rgba(255,255,255,.08) !important;
+      background:
+        radial-gradient(ellipse at 50% 78%, rgba(157,85,255,.18), transparent 46%),
+        radial-gradient(circle at 16% 18%, rgba(255,255,255,.06), transparent 24%),
+        radial-gradient(circle at 86% 12%, rgba(208,130,255,.10), transparent 26%),
+        linear-gradient(180deg, rgba(32,14,56,.88) 0%, rgba(18,8,38,.92) 54%, rgba(10,4,24,.96) 100%) !important;
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.055),
+        inset 0 -24px 42px rgba(0,0,0,.20),
+        0 18px 44px rgba(0,0,0,.28) !important;
+      overflow:hidden !important;
+    }
+
+    .cups-stage::before{
+      content:"" !important;
+      position:absolute !important;
+      inset:0 !important;
+      pointer-events:none !important;
+      z-index:0 !important;
+      background:
+        linear-gradient(135deg, rgba(255,255,255,.035), transparent 30%),
+        repeating-linear-gradient(
+          0deg,
+          rgba(255,255,255,.026) 0px,
+          rgba(255,255,255,.026) 1px,
+          transparent 1px,
+          transparent 34px
+        ),
+        repeating-linear-gradient(
+          90deg,
+          rgba(255,255,255,.022) 0px,
+          rgba(255,255,255,.022) 1px,
+          transparent 1px,
+          transparent 34px
+        );
+      opacity:.38 !important;
+    }
+
+    .cups-stage::after{
+      content:"" !important;
+      position:absolute !important;
+      left:10% !important;
+      right:10% !important;
+      bottom:28px !important;
+      height:62px !important;
+      border-radius:50% !important;
+      background:radial-gradient(ellipse at center, rgba(0,0,0,.26), rgba(0,0,0,.08) 44%, transparent 72%) !important;
+      pointer-events:none !important;
+      z-index:1 !important;
+      display:block !important;
+    }
+
+    .stage-glow{
+      position:absolute !important;
+      inset:0 !important;
+      pointer-events:none !important;
+      z-index:0 !important;
+      background:
+        radial-gradient(circle at 50% 88%, rgba(157,85,255,.16), transparent 36%),
+        radial-gradient(circle at 50% 14%, rgba(255,255,255,.03), transparent 28%) !important;
+    }
+
+    .cup{
+      z-index:5 !important;
+    }
+
+    .ball{
+      z-index:3 !important;
+    }
+
+    @media (max-width:480px){
+      .cup.lifted{
+        transform:translateY(-58px) !important;
+      }
+
+      .cups-stage{
+        height:292px !important;
+        border-radius:26px !important;
+      }
+
+      .cups-stage::after{
+        left:9% !important;
+        right:9% !important;
+        bottom:24px !important;
+        height:52px !important;
+      }
+
+      .cup.shuffle-front{
+        transform:translateY(8px) scale(1.026) !important;
+      }
+
+      .cup.shuffle-back{
+        transform:translateY(-6px) scale(.98) !important;
+      }
+    }
+  </style>
+
 </head>
 <body>
   <main class="game">
@@ -1497,19 +1638,19 @@
 
       async function swapCups(cupA, cupB){
         applyDepthForSwap(cupA, cupB);
-        await wait(60);
+        await wait(34);
 
         const temp = state.slots[cupA];
         state.slots[cupA] = state.slots[cupB];
         state.slots[cupB] = temp;
 
         positionElements(true);
-        await wait(430);
+        await wait(305);
 
         clearCupManeuvers();
         cups[cupA].classList.add('shuffle-settle');
         cups[cupB].classList.add('shuffle-settle');
-        await wait(120);
+        await wait(72);
 
         clearCupManeuvers();
       }
@@ -1521,14 +1662,14 @@
         const directionClass = Math.random() > 0.5 ? 'shuffle-side-left' : 'shuffle-side-right';
 
         cups[cupId].classList.add(directionClass);
-        await wait(150);
+        await wait(88);
         clearCupManeuvers();
-        await wait(45);
+        await wait(22);
       }
 
       async function shuffle(){
         let previousPair = '';
-        const rounds = 7 + Math.floor(Math.random() * 2);
+        const rounds = 9;
 
         for(let i = 0; i < rounds; i++){
           let a;
@@ -1539,17 +1680,17 @@
             a = Math.floor(Math.random() * 3);
             do b = Math.floor(Math.random() * 3); while(b === a);
             key = [a, b].sort().join('-');
-          }while(key === previousPair && Math.random() < 0.82);
+          }while(key === previousPair && Math.random() < 0.84);
 
           previousPair = key;
 
           await swapCups(a, b);
 
-          if(i === 2 || i === 5){
+          if(i === 2 || i === 5 || i === 7){
             await softFakeReadjust();
           }
 
-          await wait(70 + Math.floor(Math.random() * 45));
+          await wait(22 + Math.floor(Math.random() * 24));
         }
 
         clearCupManeuvers();
