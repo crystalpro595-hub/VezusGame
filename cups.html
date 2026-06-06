@@ -1438,6 +1438,143 @@
     }
   </style>
 
+
+  <style id="cups-toast-and-staged-shuffle-v10">
+    :root{
+      --cup-move-duration:.28s;
+    }
+
+    .toast{
+      position:fixed;
+      left:50%;
+      bottom:220px;
+      z-index:80;
+      transform:translate(-50%, 10px) scale(.98);
+      opacity:0;
+      pointer-events:none;
+      min-height:38px;
+      padding:7px 12px 7px 8px;
+      border-radius:13px;
+      border:1px solid rgba(255,255,255,.10);
+      background:linear-gradient(180deg, rgba(28,21,43,.96), rgba(14,10,24,.96));
+      box-shadow:
+        inset 0 0 0 1px rgba(255,255,255,.04),
+        0 12px 32px rgba(0,0,0,.42),
+        0 0 20px rgba(140,35,255,.16);
+      display:flex;
+      align-items:center;
+      gap:8px;
+      color:#fff;
+      font-size:12px;
+      line-height:1;
+      font-weight:700;
+      white-space:nowrap;
+      transition:opacity .20s ease, transform .20s ease;
+    }
+
+    .toast.show{
+      opacity:1;
+      transform:translate(-50%, 0) scale(1);
+    }
+
+    .toast-icon{
+      width:24px;
+      height:24px;
+      min-width:24px;
+      border-radius:8px;
+      display:grid;
+      place-items:center;
+      background:rgba(255,255,255,.08);
+      color:#fff;
+    }
+
+    .toast-icon svg{
+      width:15px;
+      height:15px;
+      display:block;
+    }
+
+    .toast.win{
+      border-color:rgba(38,255,120,.34);
+      box-shadow:
+        inset 0 0 0 1px rgba(255,255,255,.04),
+        0 12px 32px rgba(0,0,0,.42),
+        0 0 22px rgba(38,255,120,.22);
+    }
+
+    .toast.win .toast-icon{
+      background:linear-gradient(180deg, #31ff86, #089e45);
+      box-shadow:0 0 14px rgba(38,255,120,.40);
+    }
+
+    .toast.lose{
+      border-color:rgba(255,59,59,.34);
+      box-shadow:
+        inset 0 0 0 1px rgba(255,255,255,.04),
+        0 12px 32px rgba(0,0,0,.42),
+        0 0 22px rgba(255,59,59,.22);
+    }
+
+    .toast.lose .toast-icon{
+      background:linear-gradient(180deg, #ff5a5a, #b80f23);
+      box-shadow:0 0 14px rgba(255,59,59,.40);
+    }
+
+    .toast.error .toast-icon,
+    .toast.info .toast-icon{
+      background:linear-gradient(180deg, #b35cff, #6a1fd0);
+      box-shadow:0 0 14px rgba(179,92,255,.34);
+    }
+
+    .cup{
+      transition:
+        left var(--cup-move-duration) cubic-bezier(.22,.78,.22,1),
+        transform var(--cup-move-duration) cubic-bezier(.22,.78,.22,1),
+        filter .16s ease !important;
+    }
+
+    .cup.shuffle-front{
+      transform:translateY(9px) scale(1.028) !important;
+      z-index:9 !important;
+      filter:brightness(1.02) drop-shadow(0 16px 18px rgba(0,0,0,.34)) !important;
+    }
+
+    .cup.shuffle-back{
+      transform:translateY(-7px) scale(.978) !important;
+      z-index:4 !important;
+      filter:brightness(.95) drop-shadow(0 9px 12px rgba(0,0,0,.26)) !important;
+    }
+
+    .cup.shuffle-side-left{
+      transform:translateX(-7px) rotate(-1.1deg) !important;
+    }
+
+    .cup.shuffle-side-right{
+      transform:translateX(7px) rotate(1.1deg) !important;
+    }
+
+    .cup.shuffle-settle{
+      transform:translateY(0) scale(1) !important;
+      transition:transform .14s cubic-bezier(.18,.86,.24,1) !important;
+    }
+
+    @media (max-width:480px){
+      .toast{
+        max-width:calc(100vw - 28px);
+        overflow:hidden;
+        text-overflow:ellipsis;
+      }
+
+      .cup.shuffle-front{
+        transform:translateY(7px) scale(1.024) !important;
+      }
+
+      .cup.shuffle-back{
+        transform:translateY(-5px) scale(.982) !important;
+      }
+    }
+  </style>
+
 </head>
 <body>
   <main class="game">
@@ -1509,6 +1646,18 @@
         </div>
       </section>
     </div>
+
+    <div class="toast info" id="toast" aria-live="polite">
+      <span class="toast-icon" id="toastIcon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none">
+          <path d="M12 8.2V12.6" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/>
+          <path d="M12 16.2H12.01" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+          <path d="M12 3.5C7.3 3.5 3.5 7.3 3.5 12S7.3 20.5 12 20.5 20.5 16.7 20.5 12 16.7 3.5 12 3.5Z" stroke="currentColor" stroke-width="2"/>
+        </svg>
+      </span>
+      <span id="toastText">Уведомление</span>
+    </div>
+
   </main>
 
   <script>
@@ -1525,6 +1674,10 @@
       const halfBtn = document.getElementById('halfBtn');
       const doubleBtn = document.getElementById('doubleBtn');
       const playSubText = document.getElementById('playSubText');
+      const controls = document.querySelector('.bet-wrap');
+      const toast = document.getElementById('toast');
+      const toastIcon = document.getElementById('toastIcon');
+      const toastText = document.getElementById('toastText');
 
       const state = {
         balance: 10000,
@@ -1540,6 +1693,53 @@
 
       function formatRub(value){
         return `${Math.floor(value).toLocaleString('ru-RU')} ₽`;
+      }
+
+
+      function getToastIcon(type){
+        if(type === 'win'){
+          return `
+            <svg viewBox="0 0 24 24" fill="none">
+              <path d="M5 12.6L9.3 16.8L19 7.2" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          `;
+        }
+
+        if(type === 'lose'){
+          return `
+            <svg viewBox="0 0 24 24" fill="none">
+              <path d="M7 7L17 17M17 7L7 17" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"/>
+            </svg>
+          `;
+        }
+
+        return `
+          <svg viewBox="0 0 24 24" fill="none">
+            <path d="M12 8.2V12.6" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/>
+            <path d="M12 16.2H12.01" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+            <path d="M12 3.5C7.3 3.5 3.5 7.3 3.5 12S7.3 20.5 12 20.5 20.5 16.7 20.5 12 16.7 3.5 12 3.5Z" stroke="currentColor" stroke-width="2"/>
+          </svg>
+        `;
+      }
+
+      function placeToastAbovePanel(){
+        if(!toast || !controls) return;
+        const rect = controls.getBoundingClientRect();
+        const bottom = Math.max(20, window.innerHeight - rect.top + 10);
+        toast.style.bottom = `${bottom}px`;
+      }
+
+      function showToast(text, type = 'info'){
+        if(!toast || !toastIcon || !toastText) return;
+
+        toastText.textContent = text;
+        toastIcon.innerHTML = getToastIcon(type);
+        toast.className = 'toast ' + type;
+        placeToastAbovePanel();
+
+        requestAnimationFrame(() => toast.classList.add('show'));
+        clearTimeout(showToast.timer);
+        showToast.timer = setTimeout(() => toast.classList.remove('show'), 1500);
       }
 
       function normalizeBet(){
@@ -1623,6 +1823,10 @@
         });
       }
 
+      function setCupMoveDuration(ms){
+        document.documentElement.style.setProperty('--cup-move-duration', `${ms}ms`);
+      }
+
       function applyDepthForSwap(cupA, cupB){
         const slotA = state.slots[cupA];
         const slotB = state.slots[cupB];
@@ -1636,64 +1840,65 @@
         cups[rightCup].classList.add('shuffle-back', 'shuffle-side-left');
       }
 
-      async function swapCups(cupA, cupB){
+      async function swapCups(cupA, cupB, speed = 260){
+        setCupMoveDuration(speed);
         applyDepthForSwap(cupA, cupB);
-        await wait(34);
+        await wait(Math.max(18, Math.floor(speed * 0.10)));
 
         const temp = state.slots[cupA];
         state.slots[cupA] = state.slots[cupB];
         state.slots[cupB] = temp;
 
         positionElements(true);
-        await wait(305);
-
-        clearCupManeuvers();
-        cups[cupA].classList.add('shuffle-settle');
-        cups[cupB].classList.add('shuffle-settle');
-        await wait(72);
+        await wait(speed + 18);
 
         clearCupManeuvers();
       }
 
-      async function softFakeReadjust(){
-        clearCupManeuvers();
+      function getNextPair(previousPair){
+        let a;
+        let b;
+        let key;
 
-        const cupId = Math.floor(Math.random() * 3);
-        const directionClass = Math.random() > 0.5 ? 'shuffle-side-left' : 'shuffle-side-right';
+        do{
+          a = Math.floor(Math.random() * 3);
+          do b = Math.floor(Math.random() * 3); while(b === a);
+          key = [a, b].sort().join('-');
+        }while(key === previousPair && Math.random() < 0.74);
 
-        cups[cupId].classList.add(directionClass);
-        await wait(88);
-        clearCupManeuvers();
-        await wait(22);
+        return { a, b, key };
       }
 
       async function shuffle(){
         let previousPair = '';
-        const rounds = 9;
+        const startedAt = performance.now();
 
-        for(let i = 0; i < rounds; i++){
-          let a;
-          let b;
-          let key;
+        // 1–2 секунда: быстро, но ещё читаемо
+        while(performance.now() - startedAt < 1700){
+          const pair = getNextPair(previousPair);
+          previousPair = pair.key;
+          await swapCups(pair.a, pair.b, 245);
+          await wait(18 + Math.floor(Math.random() * 18));
+        }
 
-          do{
-            a = Math.floor(Math.random() * 3);
-            do b = Math.floor(Math.random() * 3); while(b === a);
-            key = [a, b].sort().join('-');
-          }while(key === previousPair && Math.random() < 0.84);
+        // 3–4 секунда: мега-быстро, но без дрожания
+        while(performance.now() - startedAt < 3350){
+          const pair = getNextPair(previousPair);
+          previousPair = pair.key;
+          await swapCups(pair.a, pair.b, 135);
+          await wait(6 + Math.floor(Math.random() * 10));
+        }
 
-          previousPair = key;
-
-          await swapCups(a, b);
-
-          if(i === 2 || i === 5 || i === 7){
-            await softFakeReadjust();
-          }
-
-          await wait(22 + Math.floor(Math.random() * 24));
+        // Короткая физичная остановка
+        for(const speed of [210, 300]){
+          const pair = getNextPair(previousPair);
+          previousPair = pair.key;
+          await swapCups(pair.a, pair.b, speed);
+          await wait(28);
         }
 
         clearCupManeuvers();
+        setCupMoveDuration(300);
         positionElements(true);
       }
 
@@ -1702,8 +1907,9 @@
 
         const bet = normalizeBet();
         if(bet > state.balance || state.balance < MIN_BET){
-          statusEl.textContent = 'Недостаточно демо-баланса';
+          statusEl.textContent = 'Недостаточно средств';
           statusEl.className = 'status result-lose';
+          showToast('Недостаточно средств', 'error');
           return;
         }
 
@@ -1752,11 +1958,14 @@
 
         if(win){
           state.balance += state.currentBet * 2;
+          const prize = state.currentBet;
           statusEl.textContent = `Верно! Выигрыш ${formatRub(state.currentBet * 2)}`;
           statusEl.className = 'status result-win';
+          showToast(`Возврат ${formatRub(state.currentBet)} + приз ${formatRub(prize)}`, 'win');
         }else{
           statusEl.textContent = 'Не угадал. Шарик был под другим стаканчиком';
           statusEl.className = 'status result-lose';
+          showToast(`Списано ${formatRub(state.currentBet)} • Проигрыш`, 'lose');
         }
 
         balanceEl.textContent = formatRub(state.balance);
@@ -1772,22 +1981,42 @@
       playBtn.addEventListener('click', startRound);
 
       minusBtn.addEventListener('click', () => {
-        const value = Math.max(MIN_BET, normalizeBet() - 1);
+        const current = normalizeBet();
+        if(current <= MIN_BET){
+          showToast('Минимум ' + formatRub(MIN_BET), 'error');
+          return;
+        }
+        const value = Math.max(MIN_BET, current - 1);
         betInput.value = `${value} ₽`;
       });
 
       plusBtn.addEventListener('click', () => {
-        const value = Math.min(MAX_BET, normalizeBet() + 1);
+        const current = normalizeBet();
+        if(current >= MAX_BET){
+          showToast('Максимум ' + formatRub(MAX_BET), 'error');
+          return;
+        }
+        const value = Math.min(MAX_BET, current + 1);
         betInput.value = `${value} ₽`;
       });
 
       halfBtn.addEventListener('click', () => {
-        const value = Math.max(MIN_BET, Math.floor(normalizeBet() / 2));
+        const current = normalizeBet();
+        if(current <= MIN_BET){
+          showToast('Минимум ' + formatRub(MIN_BET), 'error');
+          return;
+        }
+        const value = Math.max(MIN_BET, Math.floor(current / 2));
         betInput.value = `${value} ₽`;
       });
 
       doubleBtn.addEventListener('click', () => {
-        const value = Math.min(MAX_BET, normalizeBet() * 2);
+        const current = normalizeBet();
+        if(current >= MAX_BET){
+          showToast('Максимум ' + formatRub(MAX_BET), 'error');
+          return;
+        }
+        const value = Math.min(MAX_BET, current * 2);
         betInput.value = `${value} ₽`;
       });
 
@@ -1800,14 +2029,22 @@
         betInput.value = betInput.value.replace(/[^\d]/g, '').slice(0, 5);
       });
 
-      betInput.addEventListener('blur', normalizeBet);
+      betInput.addEventListener('blur', () => {
+        const raw = Number(String(betInput.value).replace(/[^\d]/g, ''));
+        if(Number.isFinite(raw) && raw > MAX_BET) showToast('Максимум ' + formatRub(MAX_BET), 'error');
+        if(Number.isFinite(raw) && raw > 0 && raw < MIN_BET) showToast('Минимум ' + formatRub(MIN_BET), 'error');
+        normalizeBet();
+      });
       ball.hidden = true;
 
       ['contextmenu', 'selectstart', 'dragstart'].forEach(type => {
         stage.addEventListener(type, event => event.preventDefault());
       });
 
-      window.addEventListener('resize', () => positionElements(false), { passive: true });
+      window.addEventListener('resize', () => {
+        positionElements(false);
+        if(toast && toast.classList.contains('show')) placeToastAbovePanel();
+      }, { passive: true });
 
       requestAnimationFrame(() => positionElements(false));
     })();
