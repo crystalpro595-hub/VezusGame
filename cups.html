@@ -1230,6 +1230,73 @@
     }
   </style>
 
+
+  <style id="cups-physical-shuffle-v8">
+    /*
+      Физичное перемешивание:
+      без тряски, без резких скачков, стаканчики плавно проходят друг мимо друга.
+    */
+    .cup{
+      transition:
+        left .42s cubic-bezier(.22,.78,.22,1),
+        transform .42s cubic-bezier(.22,.78,.22,1),
+        filter .24s ease !important;
+    }
+
+    .cup.fake-move-left,
+    .cup.fake-move-right,
+    .cup.fake-hop,
+    .cup.shuffle-fast-left,
+    .cup.shuffle-fast-right,
+    .cup.shuffle-blur{
+      transform:none !important;
+      filter:none !important;
+    }
+
+    .cup.shuffle-front{
+      transform:translateY(12px) scale(1.035) !important;
+      z-index:9 !important;
+      filter:brightness(1.03) drop-shadow(0 18px 20px rgba(0,0,0,.36)) !important;
+    }
+
+    .cup.shuffle-back{
+      transform:translateY(-10px) scale(.97) !important;
+      z-index:4 !important;
+      filter:brightness(.94) drop-shadow(0 10px 14px rgba(0,0,0,.28)) !important;
+    }
+
+    .cup.shuffle-side-left{
+      transform:translateX(-8px) rotate(-1.4deg) !important;
+    }
+
+    .cup.shuffle-side-right{
+      transform:translateX(8px) rotate(1.4deg) !important;
+    }
+
+    .cup.shuffle-settle{
+      transform:translateY(0) scale(1) !important;
+      transition:transform .20s cubic-bezier(.18,.86,.24,1) !important;
+    }
+
+    .cup.lifted{
+      transform:translateY(-68px) !important;
+    }
+
+    @media (max-width:480px){
+      .cup.shuffle-front{
+        transform:translateY(9px) scale(1.03) !important;
+      }
+
+      .cup.shuffle-back{
+        transform:translateY(-8px) scale(.975) !important;
+      }
+
+      .cup.lifted{
+        transform:translateY(-58px) !important;
+      }
+    }
+  </style>
+
 </head>
 <body>
   <main class="game">
@@ -1405,45 +1472,63 @@
             'shuffle-low',
             'shuffle-fast-left',
             'shuffle-fast-right',
-            'shuffle-blur'
+            'shuffle-blur',
+            'shuffle-front',
+            'shuffle-back',
+            'shuffle-side-left',
+            'shuffle-side-right',
+            'shuffle-settle'
           );
         });
       }
 
-      async function fastFakeDirection(){
+      function applyDepthForSwap(cupA, cupB){
+        const slotA = state.slots[cupA];
+        const slotB = state.slots[cupB];
+
         clearCupManeuvers();
 
-        const a = Math.floor(Math.random() * 3);
-        const b = (a + 1 + Math.floor(Math.random() * 2)) % 3;
+        const leftCup = slotA < slotB ? cupA : cupB;
+        const rightCup = slotA < slotB ? cupB : cupA;
 
-        cups[a].classList.add('shuffle-fast-left');
-        cups[b].classList.add('shuffle-fast-right');
-
-        await wait(55);
-        clearCupManeuvers();
-        await wait(10);
+        cups[leftCup].classList.add('shuffle-front', 'shuffle-side-right');
+        cups[rightCup].classList.add('shuffle-back', 'shuffle-side-left');
       }
 
       async function swapCups(cupA, cupB){
-        clearCupManeuvers();
-
-        cups[cupA].classList.add('shuffle-blur');
-        cups[cupB].classList.add('shuffle-blur');
+        applyDepthForSwap(cupA, cupB);
+        await wait(60);
 
         const temp = state.slots[cupA];
         state.slots[cupA] = state.slots[cupB];
         state.slots[cupB] = temp;
 
         positionElements(true);
+        await wait(430);
 
-        await wait(112);
         clearCupManeuvers();
-        await wait(8);
+        cups[cupA].classList.add('shuffle-settle');
+        cups[cupB].classList.add('shuffle-settle');
+        await wait(120);
+
+        clearCupManeuvers();
+      }
+
+      async function softFakeReadjust(){
+        clearCupManeuvers();
+
+        const cupId = Math.floor(Math.random() * 3);
+        const directionClass = Math.random() > 0.5 ? 'shuffle-side-left' : 'shuffle-side-right';
+
+        cups[cupId].classList.add(directionClass);
+        await wait(150);
+        clearCupManeuvers();
+        await wait(45);
       }
 
       async function shuffle(){
         let previousPair = '';
-        const rounds = 18;
+        const rounds = 7 + Math.floor(Math.random() * 2);
 
         for(let i = 0; i < rounds; i++){
           let a;
@@ -1454,15 +1539,17 @@
             a = Math.floor(Math.random() * 3);
             do b = Math.floor(Math.random() * 3); while(b === a);
             key = [a, b].sort().join('-');
-          }while(key === previousPair && Math.random() < 0.60);
+          }while(key === previousPair && Math.random() < 0.82);
 
           previousPair = key;
 
-          if(i === 4 || i === 9 || i === 14){
-            await fastFakeDirection();
+          await swapCups(a, b);
+
+          if(i === 2 || i === 5){
+            await softFakeReadjust();
           }
 
-          await swapCups(a, b);
+          await wait(70 + Math.floor(Math.random() * 45));
         }
 
         clearCupManeuvers();
