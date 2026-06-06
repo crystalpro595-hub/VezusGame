@@ -1600,6 +1600,119 @@
     }
   </style>
 
+
+  <style id="cups-optimization-bigger-cups-v12">
+    /*
+      Оптимизация:
+      - стаканчики чуть больше;
+      - меньше постоянных тяжёлых теней/фильтров;
+      - will-change включается только во время перемешивания;
+      - фон поля легче, но визуально остаётся красивым.
+    */
+
+    .cups-stage{
+      background:
+        radial-gradient(ellipse at 50% 78%, rgba(157,85,255,.16), transparent 46%),
+        radial-gradient(circle at 18% 16%, rgba(255,255,255,.045), transparent 25%),
+        linear-gradient(180deg, rgba(31,14,56,.88) 0%, rgba(17,8,37,.94) 58%, rgba(9,4,23,.97) 100%) !important;
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.045),
+        inset 0 -20px 34px rgba(0,0,0,.16),
+        0 14px 34px rgba(0,0,0,.24) !important;
+      contain:layout paint style;
+    }
+
+    .cups-stage::before{
+      opacity:.30 !important;
+      background:
+        repeating-linear-gradient(
+          0deg,
+          rgba(255,255,255,.022) 0px,
+          rgba(255,255,255,.022) 1px,
+          transparent 1px,
+          transparent 34px
+        ),
+        repeating-linear-gradient(
+          90deg,
+          rgba(255,255,255,.018) 0px,
+          rgba(255,255,255,.018) 1px,
+          transparent 1px,
+          transparent 34px
+        ) !important;
+    }
+
+    .stage-glow{
+      opacity:.72 !important;
+    }
+
+    .cup{
+      width:clamp(96px, 24vw, 136px) !important;
+      height:164px !important;
+      contain:layout paint style;
+      will-change:auto !important;
+      backface-visibility:hidden;
+      -webkit-backface-visibility:hidden;
+      transform:translateZ(0);
+    }
+
+    .cups-stage.is-shuffling .cup{
+      will-change:left, transform !important;
+    }
+
+    .cup-image{
+      filter:drop-shadow(0 12px 14px rgba(0,0,0,.32)) !important;
+      transform:translateZ(0);
+      backface-visibility:hidden;
+      -webkit-backface-visibility:hidden;
+    }
+
+    .cups-stage.is-shuffling .cup-image{
+      filter:drop-shadow(0 10px 12px rgba(0,0,0,.28)) !important;
+    }
+
+    .cup-choice-glow{
+      display:none !important;
+    }
+
+    .ball{
+      filter:none !important;
+      contain:layout paint style;
+    }
+
+    .toast{
+      will-change:opacity, transform;
+    }
+
+    @media (max-width:480px){
+      .cup{
+        width:clamp(88px, 27vw, 118px) !important;
+        height:146px !important;
+      }
+
+      .cups-stage{
+        height:300px !important;
+      }
+    }
+
+    @media (max-width:365px){
+      .cup{
+        width:84px !important;
+        height:134px !important;
+      }
+    }
+
+    @media (prefers-reduced-motion:reduce){
+      .cup,
+      .toast,
+      .preloader,
+      .cups-preloader-logo,
+      .cups-loader-line span{
+        transition-duration:.01ms !important;
+        animation-duration:.01ms !important;
+      }
+    }
+  </style>
+
 </head>
 <body>
   <main class="game">
@@ -1900,6 +2013,7 @@
       }
 
       async function shuffle(){
+        stage.classList.add('is-shuffling');
         let previousPair = '';
         const startedAt = performance.now();
 
@@ -1930,6 +2044,7 @@
         clearCupManeuvers();
         setCupMoveDuration(300);
         positionElements(true);
+        stage.classList.remove('is-shuffling');
       }
 
       async function startRound(){
