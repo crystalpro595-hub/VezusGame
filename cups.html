@@ -1183,6 +1183,53 @@
     }
   </style>
 
+
+  <style id="cups-fast-flat-shuffle-v7">
+    /*
+      Перемешивание без подскоков и подъёмов:
+      стаканчики двигаются только по горизонтали, быстро и коротко.
+    */
+    .cup{
+      transition:
+        left .105s cubic-bezier(.16,.86,.24,1),
+        transform .105s cubic-bezier(.16,.86,.24,1),
+        filter .12s ease !important;
+    }
+
+    .cup.fake-move-left,
+    .cup.fake-move-right,
+    .cup.fake-hop,
+    .cup.shuffle-top,
+    .cup.shuffle-low{
+      transform:none !important;
+    }
+
+    .cup.shuffle-fast-left{
+      transform:translateX(-10px) !important;
+      transition:transform .08s ease !important;
+    }
+
+    .cup.shuffle-fast-right{
+      transform:translateX(10px) !important;
+      transition:transform .08s ease !important;
+    }
+
+    .cup.shuffle-blur{
+      filter:drop-shadow(0 14px 18px rgba(0,0,0,.34)) brightness(.98) !important;
+    }
+
+    /* Подъём оставляем только для показа шарика до/после раунда */
+    .cup.lifted{
+      transform:translateY(-68px) !important;
+    }
+
+    @media (max-width:480px){
+      .cup.lifted{
+        transform:translateY(-58px) !important;
+      }
+    }
+  </style>
+
 </head>
 <body>
   <main class="game">
@@ -1350,55 +1397,55 @@
 
       function clearCupManeuvers(){
         cups.forEach(cup => {
-          cup.classList.remove('fake-move-left', 'fake-move-right', 'fake-hop', 'shuffle-top', 'shuffle-low');
+          cup.classList.remove(
+            'fake-move-left',
+            'fake-move-right',
+            'fake-hop',
+            'shuffle-top',
+            'shuffle-low',
+            'shuffle-fast-left',
+            'shuffle-fast-right',
+            'shuffle-blur'
+          );
         });
       }
 
-      async function fakeManeuver(){
-        const first = Math.floor(Math.random() * 3);
-        const second = (first + 1 + Math.floor(Math.random() * 2)) % 3;
+      async function fastFakeDirection(){
         clearCupManeuvers();
 
-        cups[first].classList.add(Math.random() > 0.5 ? 'fake-move-left' : 'fake-move-right');
-        cups[second].classList.add('fake-hop');
+        const a = Math.floor(Math.random() * 3);
+        const b = (a + 1 + Math.floor(Math.random() * 2)) % 3;
 
-        await wait(155);
-        clearCupManeuvers();
+        cups[a].classList.add('shuffle-fast-left');
+        cups[b].classList.add('shuffle-fast-right');
+
         await wait(55);
+        clearCupManeuvers();
+        await wait(10);
       }
 
-      async function swapCups(cupA, cupB, style = 'normal'){
+      async function swapCups(cupA, cupB){
         clearCupManeuvers();
 
-        if(style === 'cross'){
-          cups[cupA].classList.add('shuffle-top');
-          cups[cupB].classList.add('shuffle-low');
-        }else if(style === 'low'){
-          cups[cupA].classList.add('shuffle-low');
-          cups[cupB].classList.add('shuffle-top');
-        }
-
-        await wait(35);
+        cups[cupA].classList.add('shuffle-blur');
+        cups[cupB].classList.add('shuffle-blur');
 
         const temp = state.slots[cupA];
         state.slots[cupA] = state.slots[cupB];
         state.slots[cupB] = temp;
+
         positionElements(true);
 
-        await wait(style === 'normal' ? 285 : 330);
+        await wait(112);
         clearCupManeuvers();
-        await wait(35);
+        await wait(8);
       }
 
       async function shuffle(){
         let previousPair = '';
-        const rounds = 13 + Math.floor(Math.random() * 4);
+        const rounds = 18;
 
         for(let i = 0; i < rounds; i++){
-          if(i > 1 && Math.random() < 0.38){
-            await fakeManeuver();
-          }
-
           let a;
           let b;
           let key;
@@ -1407,20 +1454,15 @@
             a = Math.floor(Math.random() * 3);
             do b = Math.floor(Math.random() * 3); while(b === a);
             key = [a, b].sort().join('-');
-          }while(key === previousPair && Math.random() < 0.78);
+          }while(key === previousPair && Math.random() < 0.60);
 
           previousPair = key;
 
-          const styleRoll = Math.random();
-          const style = styleRoll > 0.66 ? 'cross' : (styleRoll > 0.33 ? 'low' : 'normal');
-
-          await swapCups(a, b, style);
-
-          if(i % 4 === 2){
-            await fakeManeuver();
+          if(i === 4 || i === 9 || i === 14){
+            await fastFakeDirection();
           }
 
-          await wait(35 + Math.floor(Math.random() * 55));
+          await swapCups(a, b);
         }
 
         clearCupManeuvers();
