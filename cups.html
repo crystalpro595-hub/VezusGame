@@ -2546,9 +2546,12 @@
 
   </main>
 
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
   <script>
     (() => {
       const CUPS_FUNCTION_URL = 'https://xcsjedwhqcrwdzmuahjl.supabase.co/functions/v1/cups';
+      const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJIUzI1NiIsInJlZiI6Inhjc2plZHdocWNyd2R6bXVhaGpsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgyNzk0ODYsImV4cCI6MjA5Mzg1NTQ4Nn0.M2ksKeWwDt0BQxgjxpGhLKLMNP_ve1dcZvQ0Ix88Ock';
 
       const stage = document.getElementById('stage');
       const cups = [...document.querySelectorAll('.cup')];
@@ -2582,6 +2585,16 @@
       let MIN_BET = 8;
       let MAX_BET = 10000;
 
+      const tg = window.Telegram?.WebApp || null;
+      if(tg){
+        try{
+          tg.ready();
+          tg.expand();
+          tg.BackButton.show();
+          tg.BackButton.onClick(() => { window.location.href = 'index.html'; });
+        }catch(_error){}
+      }
+
       const wait = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
       function formatRub(value){
@@ -2613,12 +2626,18 @@
         const timeoutId = setTimeout(() => controller.abort(), 8000);
 
         try{
+          const initData = getTelegramInitData();
+
           const response = await fetch(CUPS_FUNCTION_URL, {
             method:'POST',
-            headers:{'Content-Type':'application/json'},
+            headers:{
+              'Content-Type':'application/json',
+              'apikey':SUPABASE_ANON_KEY,
+              'Authorization':`Bearer ${SUPABASE_ANON_KEY}`
+            },
             body:JSON.stringify({
               action,
-              initData:getTelegramInitData(),
+              initData,
               ...payload
             }),
             signal:controller.signal
@@ -2661,6 +2680,23 @@
         updatePreview();
       }
 
+      function normalizeGameError(error){
+        const message = String(error?.message || error || '').trim();
+        const lower = message.toLowerCase();
+
+        if(!getTelegramInitData()) return 'Открой игру через Telegram';
+        if(lower.includes('failed to fetch') || lower.includes('network')) return 'Ошибка подключения. Попробуй ещё раз';
+        if(lower.includes('unauthorized') || lower.includes('jwt')) return 'Функция Cups не принимает запрос. Проверь Authorization/verify JWT';
+        if(lower.includes('telegram')) return 'Ошибка авторизации Telegram';
+        if(lower.includes('пользователь')) return 'Пользователь не найден';
+        if(lower.includes('недостаточно')) return 'Недостаточно средств';
+        if(lower.includes('минимальная ставка')) return message;
+        if(lower.includes('максимальная ставка')) return message;
+        if(lower.includes('временно недоступна')) return 'Игра временно недоступна';
+
+        return message || 'Ошибка подключения. Попробуй ещё раз';
+      }
+
       async function loadState(){
         playSubText.textContent = 'Загрузка';
         setControlsDisabled(true);
@@ -2675,7 +2711,7 @@
           state.phase = 'idle';
           playSubText.textContent = 'Проверь вход';
           setControlsDisabled(false);
-          showToast(error?.message || 'Ошибка загрузки баланса', 'error');
+          showToast(normalizeGameError(error), 'error');
         }
       }
 
@@ -2956,7 +2992,7 @@
         }catch(error){
           state.phase = 'guessing';
           setCupsPickable(true);
-          showToast(error?.message || 'Ошибка результата', 'error');
+          showToast(normalizeGameError(error), 'error');
           return;
         }
 
