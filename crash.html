@@ -1144,6 +1144,369 @@
     }
   </style>
 
+
+
+  <style id="crash-center-smooth-v4">
+    /* CRASH PATCH v4: ракета строго по центру, маленький множитель над ней, без рывков */
+    .flight-card{
+      --rocket-size:clamp(118px, 34vw, 168px);
+      --mult-size:clamp(21px, 5.8vw, 31px);
+      --mult-offset:clamp(24px, 7.2vw, 36px);
+    }
+
+    .rocket-wrap{
+      left:50% !important;
+      top:50% !important;
+      width:var(--rocket-size) !important;
+      opacity:1;
+      transform:translate3d(-50%, -50%, 0);
+      transform-origin:center center !important;
+      animation:none !important;
+      will-change:transform, opacity !important;
+      filter:none !important;
+    }
+
+    .multiplier{
+      position:absolute !important;
+      left:50% !important;
+      top:calc(-1 * var(--mult-offset)) !important;
+      z-index:8 !important;
+      min-width:0 !important;
+      padding:0 !important;
+      border:0 !important;
+      border-radius:0 !important;
+      background:transparent !important;
+      box-shadow:none !important;
+      transform:translate3d(-50%, 0, 0) !important;
+      color:#fff !important;
+      font-size:var(--mult-size) !important;
+      line-height:1 !important;
+      font-weight:900 !important;
+      letter-spacing:-.045em !important;
+      text-align:center !important;
+      white-space:nowrap !important;
+      pointer-events:none !important;
+      text-shadow:0 4px 13px rgba(0,0,0,.42) !important;
+      animation:none !important;
+    }
+
+    .multiplier.win,
+    .multiplier.crash{
+      color:#fff !important;
+      text-shadow:0 4px 13px rgba(0,0,0,.42) !important;
+      animation:none !important;
+    }
+
+    .rocket-img{
+      width:100% !important;
+      height:auto !important;
+      display:block !important;
+      transform-origin:center center !important;
+      animation:rocketImageCalmIdle 3.4s ease-in-out infinite !important;
+      filter:drop-shadow(0 11px 13px rgba(0,0,0,.30)) !important;
+      will-change:transform !important;
+    }
+
+    .flight-card.starting .rocket-wrap{
+      opacity:0 !important;
+      transform:translate3d(-148%, -50%, 0) rotate(-5deg) scale(.92) !important;
+      animation:none !important;
+    }
+
+    .flight-card.running .rocket-wrap{
+      animation:rocketEnterCenterSmooth .72s cubic-bezier(.16,.84,.24,1) both !important;
+      filter:none !important;
+    }
+
+    .flight-card.running .rocket-img{
+      animation:rocketImageCalmFlight 3.1s ease-in-out .72s infinite !important;
+    }
+
+    .flight-card.crashed .rocket-wrap{
+      animation:rocketExitRightSmoothV4 .88s cubic-bezier(.18,.72,.16,1) both !important;
+      filter:none !important;
+    }
+
+    .flight-card.crashed .rocket-img{
+      animation:rocketImageExitSoft .88s ease both !important;
+    }
+
+    .flight-card.cashed .rocket-wrap{
+      animation:rocketCashoutCenterSoft .72s cubic-bezier(.2,.78,.22,1) both !important;
+    }
+
+    .flight-card.cashed .rocket-img{
+      animation:rocketImageCalmIdle 3.4s ease-in-out infinite !important;
+    }
+
+    .flight-card.running .speed-lines{
+      opacity:.20 !important;
+      animation-duration:.84s !important;
+    }
+
+    .flight-card.running .grid-floor{
+      animation-duration:.92s !important;
+    }
+
+    @keyframes rocketImageCalmIdle{
+      0%,100%{transform:translate3d(0,0,0) rotate(-.45deg) scale(1);}
+      50%{transform:translate3d(0,-3px,0) rotate(.45deg) scale(1.002);}
+    }
+
+    @keyframes rocketImageCalmFlight{
+      0%,100%{transform:translate3d(0,0,0) rotate(-.65deg) scale(1);}
+      50%{transform:translate3d(2px,-4px,0) rotate(.65deg) scale(1.004);}
+    }
+
+    @keyframes rocketEnterCenterSmooth{
+      0%{
+        opacity:0;
+        transform:translate3d(-148%, -50%, 0) rotate(-5deg) scale(.92);
+      }
+      72%{
+        opacity:1;
+        transform:translate3d(-52%, -50%, 0) rotate(.6deg) scale(1.004);
+      }
+      100%{
+        opacity:1;
+        transform:translate3d(-50%, -50%, 0) rotate(0deg) scale(1);
+      }
+    }
+
+    @keyframes rocketExitRightSmoothV4{
+      0%{
+        opacity:1;
+        transform:translate3d(-50%, -50%, 0) rotate(0deg) scale(1);
+      }
+      40%{
+        opacity:1;
+        transform:translate3d(calc(-50% + 26px), -50%, 0) rotate(5deg) scale(1.01);
+      }
+      100%{
+        opacity:0;
+        transform:translate3d(calc(-50% + 120vw), -50%, 0) rotate(16deg) scale(.92);
+      }
+    }
+
+    @keyframes rocketImageExitSoft{
+      0%,100%{transform:translate3d(0,0,0) rotate(0deg) scale(1);}
+    }
+
+    @keyframes rocketCashoutCenterSoft{
+      0%{opacity:1;transform:translate3d(-50%, -50%, 0) rotate(0deg) scale(1);}
+      100%{opacity:1;transform:translate3d(-50%, -50%, 0) rotate(0deg) scale(1.018);}
+    }
+
+    @media (max-width:380px), (max-height:690px){
+      .flight-card{
+        --rocket-size:clamp(106px, 36vw, 136px);
+        --mult-size:clamp(19px, 6.2vw, 24px);
+        --mult-offset:clamp(21px, 7vw, 28px);
+      }
+    }
+
+    @media (min-width:381px) and (max-width:719px) and (min-height:691px){
+      .flight-card{
+        --rocket-size:clamp(126px, 36vw, 164px);
+        --mult-size:clamp(22px, 5.9vw, 29px);
+        --mult-offset:clamp(25px, 7vw, 34px);
+      }
+    }
+
+    @media (min-width:720px){
+      .flight-card{
+        --rocket-size:clamp(150px, 22vw, 198px);
+        --mult-size:clamp(25px, 3.8vw, 34px);
+        --mult-offset:clamp(30px, 4.8vw, 40px);
+      }
+    }
+  </style>
+
+  <style id="crash-beach-ui-v5">
+    /* CRASH PATCH v5: оранжевый пляжный фон, ракета выше, панели ближе к полю */
+    .playfield{
+      padding:52px 14px 0 !important;
+      height:calc(100dvh - 214px - max(8px,var(--safe-bottom))) !important;
+      max-height:640px !important;
+    }
+
+    .flight-card{
+      --rocket-size:clamp(118px, 34vw, 168px);
+      --mult-size:clamp(19px, 5.2vw, 28px);
+      --mult-offset:clamp(34px, 8vw, 46px);
+      background:
+        radial-gradient(circle at 72% 16%, rgba(255,252,224,.34) 0, rgba(255,187,96,.28) 12%, rgba(255,153,58,.16) 24%, transparent 38%),
+        radial-gradient(circle at 18% 14%, rgba(255,228,171,.16), transparent 22%),
+        linear-gradient(180deg, #ffbf69 0%, #ff9a57 16%, #ff7c4f 34%, #d96b57 52%, #8f5363 67%, #3d2745 100%) !important;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.08), inset 0 -26px 44px rgba(86,28,12,.22), 0 18px 44px rgba(0,0,0,.28) !important;
+    }
+
+    .flight-card::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      z-index:0;
+      pointer-events:none;
+      background:
+        radial-gradient(circle at 74% 20%, rgba(255,244,205,.28) 0 10%, rgba(255,184,90,.18) 18%, transparent 34%),
+        radial-gradient(circle at 28% 36%, rgba(255,255,255,.12) 0 3%, transparent 10%),
+        radial-gradient(circle at 42% 28%, rgba(255,247,228,.10) 0 4%, transparent 12%),
+        linear-gradient(180deg, rgba(255,255,255,.10), transparent 22%);
+      mix-blend-mode:screen;
+      animation:beachGlowPulse 6.6s ease-in-out infinite;
+    }
+
+    .flight-card::after{
+      content:"";
+      position:absolute;
+      left:-4%;
+      right:-4%;
+      bottom:-3%;
+      height:45%;
+      z-index:0;
+      pointer-events:none;
+      background:
+        linear-gradient(180deg, rgba(255,236,204,.05) 0%, rgba(255,206,154,.08) 16%, rgba(255,163,91,.16) 30%, rgba(206,113,70,.22) 46%, rgba(96,48,39,.45) 100%),
+        repeating-linear-gradient(-8deg, rgba(255,229,193,.14) 0 8px, rgba(255,178,106,.04) 8px 22px, transparent 22px 40px);
+      opacity:.9;
+      mask-image:linear-gradient(transparent 0%, #000 18%, #000 100%);
+      -webkit-mask-image:linear-gradient(transparent 0%, #000 18%, #000 100%);
+      animation:beachShoreFlow 7.5s linear infinite;
+    }
+
+    .space-layer{ inset:-12% !important; }
+
+    .stars-one{
+      opacity:.72 !important;
+      background-image:
+        radial-gradient(circle, rgba(255,250,240,.95) 0 1px, transparent 1.7px),
+        radial-gradient(circle, rgba(255,214,149,.52) 0 2px, transparent 2.8px),
+        radial-gradient(circle, rgba(255,255,255,.28) 0 4px, transparent 7px) !important;
+      background-size:54px 54px, 96px 96px, 180px 180px !important;
+      background-position:0 0, 18px 30px, 30px 24px !important;
+      animation:beachSparkDriftA 15s linear infinite !important;
+    }
+
+    .stars-two{
+      opacity:.44 !important;
+      background-image:
+        radial-gradient(circle, rgba(255,247,232,.78) 0 1px, transparent 1.7px),
+        radial-gradient(circle, rgba(255,191,115,.38) 0 2px, transparent 2.8px) !important;
+      background-size:88px 88px, 132px 132px !important;
+      background-position:12px 18px, 52px 40px !important;
+      animation:beachSparkDriftB 24s linear infinite !important;
+    }
+
+    .speed-lines{
+      inset:-8% -8% !important;
+      opacity:.17 !important;
+      background:repeating-linear-gradient(102deg, transparent 0 30px, rgba(255,244,222,.62) 31px 33px, rgba(255,188,111,.36) 34px 35px, transparent 36px 92px) !important;
+      filter:blur(.25px) !important;
+      animation:beachSpeedRight 1.6s linear infinite !important;
+    }
+
+    .flight-card.running .speed-lines{
+      opacity:.28 !important;
+      animation-duration:.92s !important;
+    }
+
+    .grid-floor{
+      left:-4% !important;
+      right:-4% !important;
+      bottom:-10% !important;
+      height:34% !important;
+      opacity:.24 !important;
+      background-image:
+        linear-gradient(rgba(255,236,213,.18) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,215,170,.14) 1px, transparent 1px) !important;
+      background-size:38px 38px !important;
+      transform:perspective(360px) rotateX(73deg) !important;
+      animation:beachHorizonMove 2.8s linear infinite !important;
+    }
+
+    .flight-card.running .grid-floor{
+      animation-duration:1.4s !important;
+    }
+
+    .rocket-wrap{
+      top:45% !important;
+    }
+
+    .multiplier{
+      top:calc(-1 * var(--mult-offset)) !important;
+      font-size:var(--mult-size) !important;
+      text-shadow:0 3px 10px rgba(0,0,0,.28) !important;
+    }
+
+    .flight-status{
+      display:none !important;
+    }
+
+    .history-panel{
+      margin:-14px auto 0 !important;
+    }
+
+    .controls{
+      margin:4px auto max(12px,calc(var(--safe-bottom) + 8px)) !important;
+      gap:6px !important;
+    }
+
+    .profit-panel{
+      min-height:41px !important;
+    }
+
+    @keyframes beachGlowPulse{
+      0%,100%{transform:translate3d(0,0,0) scale(1);opacity:1;}
+      50%{transform:translate3d(1%,1%,0) scale(1.03);opacity:.92;}
+    }
+
+    @keyframes beachSparkDriftA{
+      from{transform:translate3d(0,0,0);}
+      to{transform:translate3d(-14%,8%,0);}
+    }
+
+    @keyframes beachSparkDriftB{
+      from{transform:translate3d(0,0,0);}
+      to{transform:translate3d(-18%,10%,0);}
+    }
+
+    @keyframes beachSpeedRight{
+      from{transform:translate3d(0,0,0);}
+      to{transform:translate3d(-18%,10%,0);}
+    }
+
+    @keyframes beachHorizonMove{
+      from{background-position:0 0, 0 0;}
+      to{background-position:-54px 18px, -54px 18px;}
+    }
+
+    @keyframes beachShoreFlow{
+      from{transform:translate3d(0,0,0);background-position:0 0, 0 0;}
+      to{transform:translate3d(-4%,0,0);background-position:-120px 0, -80px 0;}
+    }
+
+    @media (max-width:380px), (max-height:690px){
+      .playfield{ height:calc(100dvh - 204px - max(8px,var(--safe-bottom))) !important; padding-top:48px !important; }
+      .flight-card{ --rocket-size:clamp(104px, 34vw, 132px); --mult-size:clamp(18px, 5.8vw, 23px); --mult-offset:clamp(30px, 7vw, 36px); }
+      .rocket-wrap{ top:44% !important; }
+      .history-panel{ margin:-18px auto 0 !important; }
+      .controls{ margin:3px auto max(10px,calc(var(--safe-bottom) + 6px)) !important; }
+    }
+
+    @media (min-width:381px) and (max-width:719px) and (min-height:691px){
+      .flight-card{ --rocket-size:clamp(122px, 34vw, 156px); --mult-size:clamp(20px, 5.2vw, 27px); --mult-offset:clamp(34px, 7vw, 42px); }
+      .rocket-wrap{ top:45% !important; }
+    }
+
+    @media (min-width:720px){
+      .playfield{ height:calc(100dvh - 224px - max(8px,var(--safe-bottom))) !important; }
+      .flight-card{ --rocket-size:clamp(146px, 22vw, 188px); --mult-size:clamp(22px, 3vw, 30px); --mult-offset:clamp(38px, 4vw, 50px); }
+      .rocket-wrap{ top:44% !important; }
+      .history-panel{ margin:-10px auto 0 !important; }
+      .controls{ margin:2px auto max(14px,calc(var(--safe-bottom) + 10px)) !important; }
+    }
+  </style>
+
 </head>
 <body>
   <main class="game">
@@ -1173,14 +1536,13 @@
         <div class="speed-lines"></div>
         <div class="grid-floor"></div>
 
-        <div class="multiplier" id="multiplier">x1.00</div>
-
         <div class="rocket-wrap" id="rocketWrap" aria-hidden="true">
+          <div class="multiplier" id="multiplier">x1.00</div>
           <img class="rocket-img" src="images/Crushgirl.webp" alt="" decoding="async" draggable="false">
         </div>
 
         <div class="boom" aria-hidden="true"></div>
-        <div class="flight-status" id="statusText">Нажми «Играть», ракета полетит, а ты успей забрать выигрыш до взрыва</div>
+        <div class="flight-status" id="statusText"></div>
       </div>
     </section>
 
@@ -1337,7 +1699,7 @@
       }
 
       function resetVisuals(){
-        flightCard.classList.remove('running', 'crashed', 'cashed');
+        flightCard.classList.remove('running', 'crashed', 'cashed', 'starting');
         multiplierEl.classList.remove('win', 'crash');
         state.multiplier = 1;
         multiplierEl.textContent = formatX(1);
@@ -1374,14 +1736,16 @@
         state.multiplier = 1;
 
         resetVisuals();
-        // Перезапускаем CSS-анимацию входа ракеты из левого угла даже после прошлого краша
+        // Сначала ставим ракету в левую стартовую позицию, затем запускаем плавный въезд к центру.
+        flightCard.classList.add('starting');
         void flightCard.offsetWidth;
+        flightCard.classList.remove('starting');
         flightCard.classList.add('running');
         setControlsLocked(true);
         actionBtn.classList.add('cashout');
         actionMain.textContent = 'Забрать';
         actionSub.textContent = formatRub(state.bet * state.multiplier);
-        statusText.textContent = 'Ракета летит — забери выигрыш до краша';
+        statusText.textContent = '';
         showToast('Раунд начался', 'info');
 
         loop();
@@ -1422,7 +1786,7 @@
         actionBtn.classList.remove('cashout');
         actionMain.textContent = 'Играть';
         actionSub.textContent = '';
-        statusText.textContent = `Успел забрать на ${formatX(cashoutMultiplier)} — начислено ${formatRub(payout)}`;
+        statusText.textContent = '';
         addHistory(cashoutMultiplier, 'win');
         showToast(`Выигрыш ${formatRub(payout)}`, 'win');
       }
@@ -1443,7 +1807,7 @@
         actionBtn.classList.remove('cashout');
         actionMain.textContent = 'Играть';
         actionSub.textContent = '';
-        statusText.textContent = `Краш на ${formatX(state.crashPoint)} — ракета улетела, ставка сгорела`;
+        statusText.textContent = '';
         addHistory(state.crashPoint, 'lose');
         showToast(`Краш на ${formatX(state.crashPoint)}`, 'lose');
       }
