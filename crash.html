@@ -812,6 +812,101 @@
       }
     }
   </style>
+
+
+  <style id="crash-visual-patch-v2">
+    /* CRASH PATCH v2: оранжевая кнопка забрать, чистая ракета, множитель над фото без рамки */
+    .multiplier{
+      top:clamp(82px, 22dvh, 126px) !important;
+      min-width:0 !important;
+      padding:0 !important;
+      border:0 !important;
+      border-radius:0 !important;
+      background:transparent !important;
+      box-shadow:none !important;
+      color:#fff !important;
+      font-size:clamp(35px, 9.5vw, 58px) !important;
+      line-height:.92 !important;
+      font-weight:900 !important;
+      letter-spacing:-.065em !important;
+      text-shadow:0 5px 18px rgba(0,0,0,.38) !important;
+    }
+
+    .multiplier.win,
+    .multiplier.crash{
+      color:#fff !important;
+      text-shadow:0 5px 18px rgba(0,0,0,.42) !important;
+    }
+
+    .rocket-wrap{
+      width:clamp(138px, 36vw, 218px) !important;
+      top:59% !important;
+    }
+
+    .rocket-glow,
+    .flame{
+      display:none !important;
+    }
+
+    .flight-card.running .rocket-wrap{
+      filter:none !important;
+    }
+
+    .rocket-img{
+      filter:drop-shadow(0 14px 16px rgba(0,0,0,.32)) !important;
+    }
+
+    .action-btn.cashout{
+      background:
+        linear-gradient(90deg, rgba(255,255,255,.16), transparent 30%),
+        linear-gradient(180deg, #ffb23a 0%, #ff7a1f 52%, #b94a0a 100%) !important;
+      border-color:rgba(255,190,92,.32) !important;
+      box-shadow:
+        inset 0 3px 5px rgba(255,255,255,.16),
+        inset 0 -4px 8px rgba(92,36,0,.26),
+        0 0 18px rgba(255,126,31,.28) !important;
+    }
+
+    .action-btn.cashout strong{
+      font-size:clamp(15px, 3.8vw, 18px) !important;
+      font-weight:900 !important;
+    }
+
+    .action-btn.cashout span{
+      display:block !important;
+      color:#fff !important;
+      opacity:1 !important;
+      font-size:clamp(13px, 3.5vw, 17px) !important;
+      line-height:1 !important;
+      font-weight:900 !important;
+      letter-spacing:-.03em !important;
+    }
+
+    @media (max-width:480px){
+      .multiplier{
+        top:clamp(72px, 19dvh, 104px) !important;
+        font-size:clamp(33px, 9vw, 46px) !important;
+      }
+
+      .rocket-wrap{
+        width:clamp(126px, 42vw, 178px) !important;
+        top:60% !important;
+      }
+    }
+
+    @media (max-width:360px), (max-height:690px){
+      .multiplier{
+        top:clamp(60px, 16dvh, 82px) !important;
+        font-size:34px !important;
+      }
+
+      .rocket-wrap{
+        width:clamp(112px, 39vw, 154px) !important;
+        top:61% !important;
+      }
+    }
+  </style>
+
 </head>
 <body>
   <main class="game">
@@ -844,8 +939,6 @@
         <div class="multiplier" id="multiplier">x1.00</div>
 
         <div class="rocket-wrap" id="rocketWrap" aria-hidden="true">
-          <div class="rocket-glow"></div>
-          <div class="flame"></div>
           <img class="rocket-img" src="images/Crushgirl.webp" alt="" decoding="async" draggable="false">
         </div>
 
@@ -1048,7 +1141,7 @@
         setControlsLocked(true);
         actionBtn.classList.add('cashout');
         actionMain.textContent = 'Забрать';
-        actionSub.textContent = 'До взрыва';
+        actionSub.textContent = formatRub(state.bet * state.multiplier);
         statusText.textContent = 'Ракета летит — забери выигрыш до взрыва';
         showToast('Раунд начался', 'info');
 
@@ -1064,6 +1157,7 @@
 
         multiplierEl.textContent = formatX(state.multiplier);
         updatePreview();
+        actionSub.textContent = formatRub(state.bet * state.multiplier);
 
         if(current >= state.crashPoint){
           crashRound();
@@ -1088,7 +1182,7 @@
         setControlsLocked(false);
         actionBtn.classList.remove('cashout');
         actionMain.textContent = 'Играть';
-        actionSub.textContent = 'Локальный раунд';
+        actionSub.textContent = '';
         statusText.textContent = `Успел забрать на ${formatX(cashoutMultiplier)} — начислено ${formatRub(payout)}`;
         addHistory(cashoutMultiplier, 'win');
         showToast(`Выигрыш ${formatRub(payout)}`, 'win');
@@ -1109,7 +1203,7 @@
         setControlsLocked(false);
         actionBtn.classList.remove('cashout');
         actionMain.textContent = 'Играть';
-        actionSub.textContent = 'Локальный раунд';
+        actionSub.textContent = '';
         statusText.textContent = `Взрыв на ${formatX(state.crashPoint)} — ставка сгорела`;
         addHistory(state.crashPoint, 'lose');
         showToast(`Взрыв на ${formatX(state.crashPoint)}`, 'lose');
