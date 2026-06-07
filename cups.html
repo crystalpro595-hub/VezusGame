@@ -2453,6 +2453,28 @@
     }
   </style>
 
+
+  <style id="cups-clean-controls-v5">
+    /* Убираем внешний большой блок вокруг коэффициента и ставки */
+    .controls.cups-controls{
+      padding:0 !important;
+      border:0 !important;
+      background:transparent !important;
+      box-shadow:none !important;
+      border-radius:0 !important;
+    }
+
+    /* На кнопке остаётся только текст "Играть" / "Ещё раз" без подписи снизу */
+    .choice.cups-play-btn{
+      gap:0 !important;
+    }
+
+    .choice.cups-play-btn span,
+    #playSubText{
+      display:none !important;
+    }
+  </style>
+
 </head>
 <body>
   <main class="game">
@@ -2526,7 +2548,7 @@
           <div class="choice-side cups-play-side">
             <button class="choice cups-play-btn" id="playBtn" type="button">
               <strong>Играть</strong>
-              <span id="playSubText">Демо-раунд</span>
+              <span id="playSubText"></span>
             </button>
           </div>
         </div>
@@ -2698,18 +2720,18 @@
       }
 
       async function loadState(){
-        playSubText.textContent = 'Загрузка';
+        playSubText.textContent = '';
         setControlsDisabled(true);
 
         try{
           const data = await cupsApi('state');
           applyServerState(data);
           state.phase = 'idle';
-          playSubText.textContent = 'Реальный раунд';
+          playSubText.textContent = '';
           setControlsDisabled(false);
         }catch(error){
           state.phase = 'idle';
-          playSubText.textContent = 'Проверь вход';
+          playSubText.textContent = '';
           setControlsDisabled(false);
           showToast(normalizeGameError(error), 'error');
         }
@@ -2954,7 +2976,7 @@
         lowerAll();
         statusEl.className = 'status';
         statusEl.textContent = 'Запоминай, где шарик';
-        playSubText.textContent = 'Раунд идёт';
+        playSubText.textContent = '';
 
         state.slots = [0, 1, 2];
         // Это только визуальный стартовый шарик. Финальный результат всегда приходит с сервера.
@@ -3022,7 +3044,7 @@
         }
 
         playBtn.querySelector('strong').textContent = 'Ещё раз';
-        playSubText.textContent = 'Реальный раунд';
+        playSubText.textContent = '';
         state.pendingSelectedCup = null;
         setControlsDisabled(false);
       }
