@@ -2548,6 +2548,8 @@
 
   <script>
     (() => {
+      const CUPS_FUNCTION_URL = 'https://xcsjedwhqcrwdzmuahjl.supabase.co/functions/v1/cups';
+
       const stage = document.getElementById('stage');
       const cups = [...document.querySelectorAll('.cup')];
       const ball = document.getElementById('ball');
@@ -2568,19 +2570,113 @@
       const toastText = document.getElementById('toastText');
 
       const state = {
-        balance: 10000,
+        balance: 0,
         ballCupId: 0,
         slots: [0, 1, 2],
-        phase: 'idle',
-        currentBet: 20
+        phase: 'loading',
+        currentBet: 20,
+        multiplier: 2,
+        pendingSelectedCup: null
       };
 
-      const MIN_BET = 8;
-      const MAX_BET = 10000;
+      let MIN_BET = 8;
+      let MAX_BET = 10000;
+
       const wait = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
       function formatRub(value){
-        return `${Math.floor(value).toLocaleString('ru-RU')} ₽`;
+        return `${Math.floor(Number(value) || 0).toLocaleString('ru-RU')} ₽`;
+      }
+
+      function formatCoef(value){
+        const number = Number(value);
+        const safe = Number.isFinite(number) && number > 0 ? number : 2;
+        return `x${safe.toFixed(2)}`;
+      }
+
+      function getTelegramInitData(){
+        try{
+          if(window.Telegram?.WebApp?.initData) return window.Telegram.WebApp.initData;
+        }catch(_error){}
+
+        try{
+          if(window.parent && window.parent !== window && window.parent.Telegram?.WebApp?.initData){
+            return window.parent.Telegram.WebApp.initData;
+          }
+        }catch(_error){}
+
+        return '';
+      }
+
+      async function cupsApi(action, payload = {}){
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 8000);
+
+        try{
+          const response = await fetch(CUPS_FUNCTION_URL, {
+            method:'POST',
+            headers:{'Content-Type':'application/json'},
+            body:JSON.stringify({
+              action,
+              initData:getTelegramInitData(),
+              ...payload
+            }),
+            signal:controller.signal
+          });
+
+          const data = await response.json().catch(() => ({}));
+          if(!response.ok || !data.ok){
+            throw new Error(data.error || 'Ошибка ответа сервера');
+          }
+
+          return data;
+        }catch(error){
+          if(error?.name === 'AbortError'){
+            throw new Error('Сервер не ответил. Попробуй ещё раз');
+          }
+          throw error;
+        }finally{
+          clearTimeout(timeoutId);
+        }
+      }
+
+      function applyServerState(data){
+        if(Number.isFinite(Number(data.balance))){
+          state.balance = Number(data.balance);
+          balanceEl.textContent = formatRub(state.balance);
+        }
+
+        if(Number.isFinite(Number(data.multiplier)) && Number(data.multiplier) > 1){
+          state.multiplier = Number(data.multiplier);
+        }
+
+        if(Number.isFinite(Number(data.min_bet)) && Number(data.min_bet) > 0){
+          MIN_BET = Math.floor(Number(data.min_bet));
+        }
+
+        if(Number.isFinite(Number(data.max_bet)) && Number(data.max_bet) >= MIN_BET){
+          MAX_BET = Math.floor(Number(data.max_bet));
+        }
+
+        updatePreview();
+      }
+
+      async function loadState(){
+        playSubText.textContent = 'Загрузка';
+        setControlsDisabled(true);
+
+        try{
+          const data = await cupsApi('state');
+          applyServerState(data);
+          state.phase = 'idle';
+          playSubText.textContent = 'Реальный раунд';
+          setControlsDisabled(false);
+        }catch(error){
+          state.phase = 'idle';
+          playSubText.textContent = 'Проверь вход';
+          setControlsDisabled(false);
+          showToast(error?.message || 'Ошибка загрузки баланса', 'error');
+        }
       }
 
       function updatePreview(){
@@ -2588,10 +2684,9 @@
         const raw = Number(String(betInput.value).replace(/[^\d]/g, ''));
         const safe = Number.isFinite(raw) ? Math.floor(raw) : state.currentBet;
         const bet = Math.max(MIN_BET, Math.min(MAX_BET, safe || MIN_BET));
-        previewCoef.textContent = 'x2.00';
-        previewWin.textContent = formatRub(bet * 2);
+        previewCoef.textContent = formatCoef(state.multiplier);
+        previewWin.textContent = formatRub(bet * state.multiplier);
       }
-
 
       function getToastIcon(type){
         if(type === 'win'){
@@ -2641,7 +2736,7 @@
 
         requestAnimationFrame(() => toast.classList.add('show'));
         clearTimeout(showToast.timer);
-        showToast.timer = setTimeout(() => toast.classList.remove('show'), 1500);
+        showToast.timer = setTimeout(() => toast.classList.remove('show'), 1800);
       }
 
       function normalizeBet(){
@@ -2777,7 +2872,6 @@
         let previousPair = '';
         const startedAt = performance.now();
 
-        // 1–2 секунда: быстро, но ещё читаемо
         while(performance.now() - startedAt < 1700){
           const pair = getNextPair(previousPair);
           previousPair = pair.key;
@@ -2785,7 +2879,6 @@
           await wait(18 + Math.floor(Math.random() * 18));
         }
 
-        // 3–4 секунда: мега-быстро, но без дрожания
         while(performance.now() - startedAt < 3350){
           const pair = getNextPair(previousPair);
           previousPair = pair.key;
@@ -2793,7 +2886,6 @@
           await wait(6 + Math.floor(Math.random() * 10));
         }
 
-        // Короткая физичная остановка
         for(const speed of [210, 300]){
           const pair = getNextPair(previousPair);
           previousPair = pair.key;
@@ -2818,10 +2910,9 @@
           return;
         }
 
-        state.currentBet = bet;
-        state.balance -= bet;
-        balanceEl.textContent = formatRub(state.balance);
         state.phase = 'showing';
+        state.currentBet = bet;
+        state.pendingSelectedCup = null;
         setControlsDisabled(true);
         setCupsPickable(false);
         lowerAll();
@@ -2830,6 +2921,7 @@
         playSubText.textContent = 'Раунд идёт';
 
         state.slots = [0, 1, 2];
+        // Это только визуальный стартовый шарик. Финальный результат всегда приходит с сервера.
         state.ballCupId = Math.floor(Math.random() * 3);
         positionElements(true);
 
@@ -2851,31 +2943,51 @@
       async function chooseCup(selectedCupId){
         if(state.phase !== 'guessing') return;
 
-        state.phase = 'result';
+        state.phase = 'resolving';
+        state.pendingSelectedCup = selectedCupId;
         setCupsPickable(false);
+
+        let result;
+        try{
+          result = await cupsApi('play', {
+            selected_cup: selectedCupId,
+            bet: state.currentBet
+          });
+        }catch(error){
+          state.phase = 'guessing';
+          setCupsPickable(true);
+          showToast(error?.message || 'Ошибка результата', 'error');
+          return;
+        }
+
+        state.phase = 'result';
+        applyServerState(result);
+        state.ballCupId = Math.max(0, Math.min(2, Math.floor(Number(result.final_ball_cup))));
+        positionElements(true);
+
+        const win = Boolean(result.is_win);
         revealCup(selectedCupId, selectedCupId === state.ballCupId);
 
-        const win = selectedCupId === state.ballCupId;
         if(!win){
           await wait(360);
           revealCup(state.ballCupId, true);
         }
 
         if(win){
-          state.balance += state.currentBet * 2;
-          const prize = state.currentBet;
-          statusEl.textContent = `Верно! Выигрыш ${formatRub(state.currentBet * 2)}`;
+          const payout = Number(result.payout_amount || state.currentBet * state.multiplier);
+          const profit = Number(result.profit_amount || (payout - state.currentBet));
+          statusEl.textContent = `Верно! Выигрыш ${formatRub(payout)}`;
           statusEl.className = 'status result-win';
-          showToast(`Возврат ${formatRub(state.currentBet)} + приз ${formatRub(prize)}`, 'win');
+          showToast(`Возврат ${formatRub(state.currentBet)} + приз ${formatRub(profit)}`, 'win');
         }else{
           statusEl.textContent = 'Не угадал. Шарик был под другим стаканчиком';
           statusEl.className = 'status result-lose';
           showToast(`Списано ${formatRub(state.currentBet)} • Проигрыш`, 'lose');
         }
 
-        balanceEl.textContent = formatRub(state.balance);
         playBtn.querySelector('strong').textContent = 'Ещё раз';
-        playSubText.textContent = 'Демо-раунд';
+        playSubText.textContent = 'Реальный раунд';
+        state.pendingSelectedCup = null;
         setControlsDisabled(false);
       }
 
@@ -2936,9 +3048,8 @@
 
       betInput.addEventListener('input', () => {
         betInput.value = betInput.value.replace(/[^\d]/g, '').slice(0, 5);
+        updatePreview();
       });
-
-      betInput.addEventListener('input', updatePreview);
 
       betInput.addEventListener('blur', () => {
         const raw = Number(String(betInput.value).replace(/[^\d]/g, ''));
@@ -2946,6 +3057,7 @@
         if(Number.isFinite(raw) && raw > 0 && raw < MIN_BET) showToast('Минимум ' + formatRub(MIN_BET), 'error');
         normalizeBet();
       });
+
       ball.hidden = true;
 
       ['contextmenu', 'selectstart', 'dragstart'].forEach(type => {
@@ -2959,6 +3071,7 @@
 
       updatePreview();
       requestAnimationFrame(() => positionElements(false));
+      loadState();
     })();
   </script>
 <script id="cups-preloader-script">
