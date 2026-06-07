@@ -2145,6 +2145,314 @@
     }
   </style>
 
+
+  <style id="cups-exact-coinflip-controls-v17">
+    /*
+      CUPS v17:
+      Панель коэффициента и ставки перенесена в стиль CoinFlip:
+      profit-panel + bet-panel + stake-side + stake-box + pm + quick.
+    */
+
+    :root{
+      --panel-side:16px;
+      --panel-width:410px;
+      --stroke:rgba(166,77,255,.35);
+    }
+
+    .payout-preview,
+    .bet-wrap{
+      display:none !important;
+    }
+
+    .controls.cups-controls{
+      position:relative !important;
+      left:auto !important;
+      right:auto !important;
+      bottom:auto !important;
+      width:min(calc(100% - (var(--panel-side) * 2)), var(--panel-width)) !important;
+      margin:8px auto 0 !important;
+      z-index:15 !important;
+      display:flex !important;
+      flex-direction:column !important;
+      gap:7px !important;
+      flex:0 0 auto !important;
+      contain:layout paint style !important;
+    }
+
+    .profit-panel,
+    .bet-panel{
+      border:1px solid var(--stroke) !important;
+      background:linear-gradient(180deg, rgba(34,27,52,.94), rgba(22,15,34,.94)) !important;
+      box-shadow:
+        inset 0 0 0 1px rgba(255,255,255,.04),
+        0 18px 40px rgba(0,0,0,.44),
+        0 0 22px rgba(140,35,255,.14) !important;
+    }
+
+    .profit-panel{
+      min-height:43px !important;
+      padding:7px 10px !important;
+      display:grid !important;
+      grid-template-columns:.9fr 1.1fr !important;
+      gap:8px !important;
+      align-items:center !important;
+      border-radius:14px !important;
+    }
+
+    .profit-item{
+      min-width:0 !important;
+      display:flex !important;
+      flex-direction:column !important;
+      gap:3px !important;
+    }
+
+    .profit-item span{
+      color:#fff !important;
+      font-size:10px !important;
+      line-height:1 !important;
+      font-weight:600 !important;
+      white-space:nowrap !important;
+    }
+
+    .profit-item strong{
+      color:#fff !important;
+      font-size:clamp(13px, 3.5vw, 16px) !important;
+      line-height:1 !important;
+      font-weight:700 !important;
+      letter-spacing:-.03em !important;
+      white-space:nowrap !important;
+      overflow:hidden !important;
+      text-overflow:ellipsis !important;
+    }
+
+    .bet-panel{
+      min-height:126px !important;
+      padding:10px !important;
+      display:grid !important;
+      grid-template-columns:1.12fr .88fr !important;
+      gap:10px !important;
+      border-radius:17px !important;
+    }
+
+    .stake-side{
+      min-width:0 !important;
+      display:grid !important;
+      grid-template-rows:1fr 36px !important;
+      gap:8px !important;
+    }
+
+    .stake-box{
+      position:relative !important;
+      min-height:68px !important;
+      display:flex !important;
+      align-items:center !important;
+      padding:10px 40px 10px 12px !important;
+      border:1px solid rgba(255,255,255,.06) !important;
+      border-radius:8px !important;
+      background:linear-gradient(180deg, rgba(50,47,83,.98), rgba(43,39,70,.98)) !important;
+      box-shadow:inset 0 0 0 1px rgba(255,255,255,.035) !important;
+    }
+
+    .amount{
+      width:100% !important;
+      border:0 !important;
+      outline:none !important;
+      background:transparent !important;
+      color:#fff !important;
+      font-size:clamp(18px, 5vw, 24px) !important;
+      line-height:1 !important;
+      font-weight:700 !important;
+      letter-spacing:-.06em !important;
+      appearance:none !important;
+      -webkit-appearance:none !important;
+    }
+
+    .amount::placeholder{
+      color:rgba(255,255,255,.45) !important;
+    }
+
+    .pm{
+      position:absolute !important;
+      right:9px !important;
+      width:28px !important;
+      height:25px !important;
+      display:grid !important;
+      place-items:center !important;
+      border:1px solid rgba(255,255,255,.10) !important;
+      border-radius:6px !important;
+      background:linear-gradient(180deg, rgba(61,51,91,.96), rgba(29,21,48,.96)) !important;
+      color:#d3baff !important;
+      font-size:18px !important;
+      line-height:1 !important;
+      font-weight:700 !important;
+      cursor:pointer !important;
+    }
+
+    .pm.plus{top:7px !important;}
+    .pm.minus{bottom:7px !important;}
+
+    .quick-row{
+      display:grid !important;
+      grid-template-columns:1fr 1fr !important;
+      gap:6px !important;
+      margin:0 !important;
+    }
+
+    .quick{
+      min-height:36px !important;
+      border:1px solid rgba(255,255,255,.055) !important;
+      border-radius:7px !important;
+      background:linear-gradient(180deg, rgba(42,34,67,.96), rgba(29,23,47,.96)) !important;
+      color:rgba(226,204,255,.90) !important;
+      font-size:17px !important;
+      line-height:1 !important;
+      font-weight:700 !important;
+      cursor:pointer !important;
+    }
+
+    .choice-side{
+      min-width:0 !important;
+      display:grid !important;
+      grid-template-rows:1fr !important;
+      gap:8px !important;
+    }
+
+    .choice.cups-play-btn{
+      width:100% !important;
+      min-height:100% !important;
+      border-radius:7px !important;
+      color:#fff !important;
+      display:flex !important;
+      flex-direction:column !important;
+      align-items:center !important;
+      justify-content:center !important;
+      gap:5px !important;
+      background:
+        linear-gradient(90deg, rgba(255,255,255,.12), transparent 32%),
+        linear-gradient(180deg, #6f45c9 0%, #4b238f 54%, #2d1354 100%) !important;
+      box-shadow:
+        inset 0 3px 5px rgba(255,255,255,.10),
+        inset 0 -4px 8px rgba(23,8,45,.32),
+        0 0 16px rgba(140,35,255,.34) !important;
+      border:1px solid rgba(211,186,255,.22) !important;
+      cursor:pointer !important;
+      transform:translateZ(0);
+      transition:transform .12s ease, filter .12s ease !important;
+    }
+
+    .choice.cups-play-btn strong{
+      font-size:clamp(16px, 4vw, 20px) !important;
+      line-height:1 !important;
+      font-weight:800 !important;
+      letter-spacing:-.03em !important;
+    }
+
+    .choice.cups-play-btn span{
+      font-size:11px !important;
+      line-height:1 !important;
+      font-weight:700 !important;
+      opacity:.72 !important;
+    }
+
+    .choice.cups-play-btn:active,
+    .quick:active,
+    .pm:active{
+      transform:scale(.97) !important;
+      filter:brightness(.93) !important;
+    }
+
+    .choice.cups-play-btn:disabled,
+    .quick:disabled,
+    .pm:disabled,
+    .amount:disabled{
+      cursor:default !important;
+      opacity:.72 !important;
+    }
+
+    @media (max-width:390px){
+      :root{
+        --panel-side:16px;
+      }
+
+      .profit-panel{
+        min-height:40px !important;
+        padding:7px 9px !important;
+        border-radius:13px !important;
+      }
+
+      .profit-item span{
+        font-size:9px !important;
+      }
+
+      .profit-item strong{
+        font-size:13px !important;
+      }
+
+      .bet-panel{
+        min-height:120px !important;
+        padding:9px !important;
+        grid-template-columns:1.08fr .92fr !important;
+      }
+
+      .stake-box{
+        min-height:64px !important;
+      }
+    }
+
+    @media (max-width:340px), (max-height:670px){
+      :root{
+        --panel-side:12px;
+      }
+
+      .controls.cups-controls{
+        gap:5px !important;
+        margin-top:6px !important;
+      }
+
+      .profit-panel{
+        min-height:36px !important;
+        padding:6px 8px !important;
+      }
+
+      .bet-panel{
+        min-height:108px !important;
+        padding:8px !important;
+        gap:8px !important;
+      }
+
+      .stake-side{
+        grid-template-rows:1fr 31px !important;
+        gap:6px !important;
+      }
+
+      .stake-box{
+        min-height:58px !important;
+        padding:8px 36px 8px 10px !important;
+      }
+
+      .pm{
+        right:8px !important;
+        width:25px !important;
+        height:22px !important;
+      }
+
+      .pm.plus{top:6px !important;}
+      .pm.minus{bottom:6px !important;}
+
+      .quick{
+        min-height:31px !important;
+        font-size:15px !important;
+      }
+    }
+
+    @media (min-width:700px){
+      :root{
+        --panel-side:24px;
+        --panel-width:410px;
+      }
+    }
+  </style>
+
 </head>
 <body>
   <main class="game">
@@ -2190,36 +2498,33 @@
       </section>
 
       <div class="status" id="status">Нажми «Играть», чтобы начать</div>
-
-      <section class="payout-preview" aria-label="Коэффициент и предварительный выигрыш">
-        <div class="preview-card">
-          <span class="preview-label">Коэффициент</span>
-          <strong id="previewCoef">2.00x</strong>
+      <section class="controls cups-controls">
+        <div class="profit-panel" aria-label="Коэффициент и предварительный выигрыш">
+          <div class="profit-item">
+            <span>Коэффициент</span>
+            <strong id="previewCoef">x2.00</strong>
+          </div>
+          <div class="profit-item">
+            <span>Предварительный выигрыш</span>
+            <strong id="previewWin">40 ₽</strong>
+          </div>
         </div>
-        <div class="preview-card">
-          <span class="preview-label">Выигрыш</span>
-          <strong id="previewWin">40 ₽</strong>
-        </div>
-      </section>
 
-      <section class="bet-wrap" aria-label="Панель ставки">
-        <div class="bet-layout">
-          <div class="amount-box">
-            <div class="amount-top">
-              <input class="amount-display" id="betInput" value="20 ₽" inputmode="numeric" autocomplete="off" aria-label="Ставка">
-              <div class="stepper">
-                <button class="mini-btn" id="plusBtn" type="button" aria-label="Увеличить ставку">+</button>
-                <button class="mini-btn" id="minusBtn" type="button" aria-label="Уменьшить ставку">−</button>
-              </div>
+        <div class="bet-panel" aria-label="Панель ставки">
+          <div class="stake-side">
+            <div class="stake-box">
+              <input class="amount" id="betInput" value="20 ₽" inputmode="numeric" autocomplete="off" aria-label="Ставка">
+              <button class="pm plus" id="plusBtn" type="button" aria-label="Увеличить ставку">+</button>
+              <button class="pm minus" id="minusBtn" type="button" aria-label="Уменьшить ставку">−</button>
             </div>
             <div class="quick-row">
-              <button class="quick-btn" id="halfBtn" type="button">/2</button>
-              <button class="quick-btn" id="doubleBtn" type="button">x2</button>
+              <button class="quick" id="halfBtn" type="button">/2</button>
+              <button class="quick" id="doubleBtn" type="button">x2</button>
             </div>
           </div>
 
-          <div class="play-box">
-            <button class="play-btn" id="playBtn" type="button">
+          <div class="choice-side cups-play-side">
+            <button class="choice cups-play-btn" id="playBtn" type="button">
               <strong>Играть</strong>
               <span id="playSubText">Демо-раунд</span>
             </button>
@@ -2257,7 +2562,7 @@
       const playSubText = document.getElementById('playSubText');
       const previewCoef = document.getElementById('previewCoef');
       const previewWin = document.getElementById('previewWin');
-      const controls = document.querySelector('.bet-wrap');
+      const controls = document.querySelector('.controls');
       const toast = document.getElementById('toast');
       const toastIcon = document.getElementById('toastIcon');
       const toastText = document.getElementById('toastText');
@@ -2283,7 +2588,7 @@
         const raw = Number(String(betInput.value).replace(/[^\d]/g, ''));
         const safe = Number.isFinite(raw) ? Math.floor(raw) : state.currentBet;
         const bet = Math.max(MIN_BET, Math.min(MAX_BET, safe || MIN_BET));
-        previewCoef.textContent = '2.00x';
+        previewCoef.textContent = 'x2.00';
         previewWin.textContent = formatRub(bet * 2);
       }
 
