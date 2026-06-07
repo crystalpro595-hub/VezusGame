@@ -1431,6 +1431,262 @@
     }
   </style>
 
+  <style id="crash-v8-clean-optimized">
+    /* CRASH PATCH v8: убран блок коэффициента/возможного выигрыша, пустая подсказка скрыта, фон оранжево-фиолетовый и легче для FPS */
+
+    .flight-status{
+      display:none !important;
+      visibility:hidden !important;
+      opacity:0 !important;
+      pointer-events:none !important;
+      width:0 !important;
+      height:0 !important;
+      min-height:0 !important;
+      padding:0 !important;
+      margin:0 !important;
+      border:0 !important;
+      background:transparent !important;
+      box-shadow:none !important;
+      backdrop-filter:none !important;
+      -webkit-backdrop-filter:none !important;
+    }
+
+    .profit-panel{
+      display:none !important;
+      visibility:hidden !important;
+      opacity:0 !important;
+      height:0 !important;
+      min-height:0 !important;
+      padding:0 !important;
+      margin:0 !important;
+      border:0 !important;
+      overflow:hidden !important;
+      pointer-events:none !important;
+    }
+
+    .playfield{
+      height:calc(100dvh - 150px - max(8px,var(--safe-bottom))) !important;
+      min-height:306px !important;
+      max-height:660px !important;
+      padding:44px 12px 0 !important;
+    }
+
+    .flight-card{
+      height:min(54dvh, 430px) !important;
+      min-height:286px !important;
+      background:
+        linear-gradient(115deg,
+          #ffb35f 0%,
+          #ff884d 22%,
+          #f06755 42%,
+          #b04a68 62%,
+          #6a2f73 81%,
+          #25153f 100%
+        ) !important;
+      background-size:240% 100% !important;
+      background-position:0% 50% !important;
+      animation:crashGradientFlowV8 8s linear infinite !important;
+      border-color:rgba(255,255,255,.08) !important;
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.07),
+        inset 0 -20px 36px rgba(50,14,48,.18),
+        0 14px 32px rgba(0,0,0,.24) !important;
+      will-change:background-position !important;
+      contain:layout paint style !important;
+    }
+
+    .flight-card.running{
+      animation-duration:4.2s !important;
+    }
+
+    .flight-card::before{
+      content:"" !important;
+      position:absolute !important;
+      inset:0 !important;
+      z-index:0 !important;
+      display:block !important;
+      pointer-events:none !important;
+      opacity:.22 !important;
+      background:
+        linear-gradient(115deg,
+          rgba(255,244,210,.28) 0%,
+          rgba(255,170,91,.08) 30%,
+          transparent 52%,
+          rgba(130,54,140,.16) 100%
+        ) !important;
+      background-size:190% 100% !important;
+      animation:crashGradientLightV8 9.5s linear infinite !important;
+      mix-blend-mode:normal !important;
+      will-change:background-position !important;
+    }
+
+    .flight-card::after,
+    .space-layer,
+    .stars-one,
+    .stars-two,
+    .speed-lines,
+    .grid-floor,
+    .boom,
+    .rocket-glow,
+    .flame{
+      display:none !important;
+      opacity:0 !important;
+      animation:none !important;
+      visibility:hidden !important;
+    }
+
+    .rocket-wrap,
+    .flight-card.countdown .rocket-wrap,
+    .flight-card.running .rocket-wrap{
+      top:54% !important;
+      transform:translate3d(-50%, -50%, 0) rotate(0deg) scale(1) !important;
+      animation:none !important;
+      filter:none !important;
+      will-change:transform, opacity !important;
+    }
+
+    .rocket-img{
+      filter:drop-shadow(0 10px 12px rgba(0,0,0,.24)) !important;
+      will-change:transform !important;
+      animation:rocketReadyV8 4.2s ease-in-out infinite !important;
+    }
+
+    .flight-card.countdown .rocket-img{
+      animation:rocketReadyV8 4.2s ease-in-out infinite !important;
+    }
+
+    .flight-card.running .rocket-img{
+      animation:rocketFlightV8 2.9s ease-in-out infinite !important;
+    }
+
+    .flight-card.crashed .rocket-wrap{
+      animation:rocketExitRightV8 .88s cubic-bezier(.18,.72,.16,1) both !important;
+    }
+
+    .flight-card.crashed .rocket-img{
+      animation:none !important;
+    }
+
+    .multiplier{
+      top:clamp(17px, 4vw, 29px) !important;
+      font-size:clamp(18px, 4.8vw, 26px) !important;
+      text-shadow:0 3px 8px rgba(0,0,0,.30) !important;
+    }
+
+    .history-panel{
+      display:block !important;
+      margin:-30px auto 0 !important;
+      min-height:32px !important;
+      padding:4px 7px !important;
+      background:linear-gradient(180deg,rgba(42,24,52,.80),rgba(22,13,31,.86)) !important;
+      border-color:rgba(255,255,255,.09) !important;
+      box-shadow:none !important;
+      backdrop-filter:none !important;
+      -webkit-backdrop-filter:none !important;
+    }
+
+    .history-list{min-height:23px !important;}
+
+    .controls{
+      margin:2px auto max(8px,calc(var(--safe-bottom) + 5px)) !important;
+      gap:0 !important;
+    }
+
+    .bet-panel{
+      min-height:106px !important;
+      padding:8px !important;
+      gap:8px !important;
+      box-shadow:none !important;
+      background:linear-gradient(180deg,rgba(34,27,52,.94),rgba(22,15,34,.94)) !important;
+      backdrop-filter:none !important;
+      -webkit-backdrop-filter:none !important;
+    }
+
+    .stake-side{grid-template-rows:1fr 31px !important;gap:6px !important;}
+    .stake-box{min-height:58px !important;padding:8px 36px 8px 10px !important;}
+    .quick{min-height:31px !important;font-size:15px !important;}
+    .pm{width:25px !important;height:22px !important;right:8px !important;}
+    .pm.plus{top:6px !important;}
+    .pm.minus{bottom:6px !important;}
+
+    .toast,
+    .action-btn,
+    .quick,
+    .pm,
+    .stake-box,
+    .bet-panel,
+    .history-panel{
+      backface-visibility:hidden !important;
+      -webkit-backface-visibility:hidden !important;
+    }
+
+    @keyframes crashGradientFlowV8{
+      0%{background-position:0% 50%;}
+      100%{background-position:100% 50%;}
+    }
+
+    @keyframes crashGradientLightV8{
+      0%{background-position:0% 50%;}
+      100%{background-position:100% 50%;}
+    }
+
+    @keyframes rocketReadyV8{
+      0%,100%{transform:translate3d(0,0,0) rotate(-.18deg) scale(1);}
+      50%{transform:translate3d(1px,-1.5px,0) rotate(.18deg) scale(1.001);}
+    }
+
+    @keyframes rocketFlightV8{
+      0%{transform:translate3d(-2px,1px,0) rotate(-1.2deg) scale(1);}
+      38%{transform:translate3d(3px,-2.5px,0) rotate(1deg) scale(1.004);}
+      72%{transform:translate3d(4px,-1px,0) rotate(1.4deg) scale(1.003);}
+      100%{transform:translate3d(-2px,1px,0) rotate(-1.2deg) scale(1);}
+    }
+
+    @keyframes rocketExitRightV8{
+      0%{opacity:1;transform:translate3d(-50%, -50%, 0) rotate(0deg) scale(1);}
+      100%{opacity:0;transform:translate3d(calc(-50% + 118vw), -50%, 0) rotate(10deg) scale(.96);}
+    }
+
+    @media (max-width:380px), (max-height:690px){
+      .playfield{
+        height:calc(100dvh - 142px - max(8px,var(--safe-bottom))) !important;
+        min-height:258px !important;
+        padding-top:40px !important;
+      }
+
+      .flight-card{
+        height:min(45dvh, 326px) !important;
+        min-height:238px !important;
+        --rocket-size:clamp(128px, 40vw, 166px) !important;
+      }
+
+      .rocket-wrap{top:55% !important;}
+      .history-panel{margin:-34px auto 0 !important;min-height:30px !important;padding:3px 7px !important;}
+      .controls{margin:1px auto max(6px,calc(var(--safe-bottom) + 4px)) !important;}
+      .bet-panel{min-height:98px !important;padding:7px !important;}
+      .stake-box{min-height:54px !important;}
+      .quick{min-height:29px !important;}
+      .amount{font-size:17px !important;}
+      .action-btn strong{font-size:16px !important;}
+    }
+
+    @media (min-width:720px){
+      .playfield{
+        height:calc(100dvh - 174px - max(8px,var(--safe-bottom))) !important;
+        padding-top:54px !important;
+      }
+
+      .flight-card{
+        height:min(55dvh, 440px) !important;
+        min-height:330px !important;
+        --rocket-size:clamp(190px, 28vw, 270px) !important;
+      }
+
+      .history-panel{margin:-26px auto 0 !important;}
+      .bet-panel{min-height:112px !important;}
+    }
+  </style>
+
 </head>
 <body>
   <main class="game">
@@ -1467,7 +1723,7 @@
         </div>
 
         <div class="boom" aria-hidden="true"></div>
-        <div class="flight-status" id="statusText">Нажми «Играть», ракета полетит, а ты успей забрать выигрыш до взрыва</div>
+        <div class="flight-status" id="statusText"></div>
       </div>
     </section>
 
