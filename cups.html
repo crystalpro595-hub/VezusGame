@@ -2041,6 +2041,110 @@
     }
   </style>
 
+
+  <style id="cups-coinflip-preview-panel-v16">
+    /*
+      Верхняя панель коэффициента и выигрыша — в стиле CoinFlip.
+      Только внешний вид блока preview, логика не меняется.
+    */
+
+    .payout-preview{
+      width:var(--panel-w, min(calc(100vw - 34px), 360px)) !important;
+      margin:clamp(7px,1.3dvh,10px) auto 0 !important;
+      display:grid !important;
+      grid-template-columns:repeat(2, minmax(0, 1fr)) !important;
+      gap:8px !important;
+      flex:0 0 auto !important;
+    }
+
+    .preview-card{
+      min-width:0 !important;
+      min-height:46px !important;
+      padding:8px 10px !important;
+      border-radius:14px !important;
+      border:1px solid rgba(255,255,255,.055) !important;
+      background:
+        radial-gradient(circle at 30% 0%, rgba(255,255,255,.055), transparent 36%),
+        linear-gradient(180deg, rgba(46,35,72,.96), rgba(36,27,61,.98)) !important;
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.045),
+        0 6px 14px rgba(0,0,0,.18) !important;
+      display:flex !important;
+      flex-direction:column !important;
+      align-items:flex-start !important;
+      justify-content:center !important;
+      gap:4px !important;
+      contain:layout paint style !important;
+    }
+
+    .preview-label{
+      color:rgba(255,255,255,.42) !important;
+      font-size:9px !important;
+      font-weight:800 !important;
+      line-height:1 !important;
+      text-transform:uppercase !important;
+      letter-spacing:.10em !important;
+    }
+
+    .preview-card strong{
+      max-width:100% !important;
+      overflow:hidden !important;
+      text-overflow:ellipsis !important;
+      white-space:nowrap !important;
+      color:#fff !important;
+      font-size:16px !important;
+      line-height:1 !important;
+      font-weight:900 !important;
+      letter-spacing:-.035em !important;
+      text-shadow:0 0 10px rgba(255,255,255,.08) !important;
+    }
+
+    @media (max-width:390px){
+      .payout-preview{
+        width:var(--panel-w, min(calc(100vw - 24px), 360px)) !important;
+        margin-top:7px !important;
+        gap:7px !important;
+      }
+
+      .preview-card{
+        min-height:40px !important;
+        padding:7px 9px !important;
+        border-radius:13px !important;
+      }
+
+      .preview-label{
+        font-size:8px !important;
+      }
+
+      .preview-card strong{
+        font-size:15px !important;
+      }
+    }
+
+    @media (max-height:720px){
+      .payout-preview{
+        margin-top:6px !important;
+      }
+
+      .preview-card{
+        min-height:38px !important;
+        padding-top:6px !important;
+        padding-bottom:6px !important;
+      }
+    }
+
+    @media (min-width:720px){
+      .payout-preview{
+        width:var(--panel-w, 420px) !important;
+        gap:8px !important;
+      }
+
+      .preview-card{
+        min-height:46px !important;
+      }
+    }
+  </style>
+
 </head>
 <body>
   <main class="game">
