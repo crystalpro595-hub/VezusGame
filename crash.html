@@ -1144,235 +1144,204 @@
     }
   </style>
 
-  <style id="crash-final-clean-v6">
+  <style id="crash-v7-countdown-continue">
     /*
-      CRASH PATCH v6:
-      1) множитель больше не привязан к ракете;
-      2) ракета ниже и крупнее;
-      3) фон — простой движущийся оранжевый градиент без эффектов;
-      4) панели подняты ближе к полю;
-      5) появление ракеты плавное, без резких скачков.
+      CRASH PATCH v7:
+      - нет рывка на старте: ракета стоит в центре во время отсчёта и начинает мягкий полёт без translate-прыжка;
+      - история видна на iPhone 12;
+      - полёт заметнее: фон движется вправо-налево, ракета мягко наклоняется;
+      - кнопка показывает 3,2,1 перед стартом;
+      - после cashout раунд продолжается до финального crashPoint.
     */
 
     .playfield{
-      height:calc(100dvh - 198px - max(8px,var(--safe-bottom))) !important;
-      padding:50px 14px 0 !important;
-      min-height:318px !important;
-      max-height:640px !important;
+      height:calc(100dvh - 178px - max(8px,var(--safe-bottom))) !important;
+      min-height:292px !important;
+      padding:44px 12px 0 !important;
     }
 
     .flight-card{
-      --rocket-size:clamp(150px, 42vw, 218px) !important;
-      --mult-fixed-top:clamp(18px, 4.6vw, 30px) !important;
-      --mult-fixed-size:clamp(18px, 5vw, 27px) !important;
-      background:
-        linear-gradient(100deg,
-          #ffb45f 0%,
-          #ff8f45 20%,
-          #ff7048 42%,
-          #d95845 62%,
-          #8e3f43 82%,
-          #4a2438 100%
-        ) !important;
-      background-size:220% 100% !important;
-      background-position:0% 50% !important;
-      animation:crashOrangeBgMove 8.5s linear infinite !important;
-      box-shadow:
-        inset 0 1px 0 rgba(255,255,255,.07),
-        inset 0 -22px 38px rgba(80,26,20,.18),
-        0 16px 38px rgba(0,0,0,.26) !important;
+      height:min(49dvh, 405px) !important;
+      min-height:270px !important;
+      --rocket-size:clamp(150px, 43vw, 220px) !important;
+      --mult-fixed-top:clamp(16px, 4.2vw, 28px) !important;
+      background-size:260% 100% !important;
+      animation:crashOrangeBgMoveV7 6.8s linear infinite !important;
     }
 
     .flight-card.running{
-      animation-duration:4.6s !important;
+      animation-duration:3.4s !important;
     }
 
     .flight-card::before{
-      content:"" !important;
-      position:absolute !important;
-      inset:0 !important;
-      z-index:0 !important;
-      pointer-events:none !important;
-      display:block !important;
-      opacity:.34 !important;
-      mix-blend-mode:normal !important;
       background:
         linear-gradient(100deg,
-          rgba(255,242,205,.18) 0%,
-          rgba(255,185,99,.06) 28%,
+          rgba(255,240,196,.18) 0%,
+          rgba(255,179,84,.07) 30%,
           transparent 52%,
-          rgba(133,53,54,.12) 100%
+          rgba(120,45,43,.12) 100%
         ) !important;
-      background-size:180% 100% !important;
-      animation:crashOrangeBgLightMove 9.6s linear infinite !important;
+      background-size:220% 100% !important;
+      animation:crashOrangeLightV7 7.8s linear infinite !important;
+      opacity:.28 !important;
     }
 
-    .flight-card::after{
-      display:none !important;
-      content:none !important;
-    }
-
-    .space-layer,
-    .stars-one,
-    .stars-two,
-    .speed-lines,
-    .grid-floor,
-    .boom,
-    .rocket-glow,
-    .flame,
-    .flight-card.crashed .boom{
-      display:none !important;
-      opacity:0 !important;
-      animation:none !important;
-    }
-
-    .flight-status{
-      display:none !important;
-    }
-
-    .multiplier{
-      position:absolute !important;
-      left:50% !important;
-      top:var(--mult-fixed-top) !important;
-      z-index:8 !important;
-      min-width:0 !important;
-      padding:0 !important;
-      border:0 !important;
-      border-radius:0 !important;
-      background:transparent !important;
-      box-shadow:none !important;
-      transform:translate3d(-50%, 0, 0) !important;
-      color:#fff !important;
-      font-size:var(--mult-fixed-size) !important;
-      line-height:1 !important;
-      font-weight:900 !important;
-      letter-spacing:-.04em !important;
-      text-align:center !important;
-      white-space:nowrap !important;
-      pointer-events:none !important;
-      text-shadow:0 3px 9px rgba(0,0,0,.30) !important;
-      animation:none !important;
-    }
-
-    .multiplier.win,
-    .multiplier.crash{
-      color:#fff !important;
-      text-shadow:0 3px 9px rgba(0,0,0,.30) !important;
-      animation:none !important;
-    }
-
+    .flight-card.countdown .rocket-wrap,
     .rocket-wrap{
-      left:50% !important;
-      top:54% !important;
-      z-index:4 !important;
-      width:var(--rocket-size) !important;
       opacity:1 !important;
       transform:translate3d(-50%, -50%, 0) rotate(0deg) scale(1) !important;
-      transform-origin:center center !important;
-      will-change:transform, opacity !important;
-      filter:none !important;
-      animation:none !important;
-      pointer-events:none !important;
-    }
-
-    .rocket-img{
-      width:100% !important;
-      height:auto !important;
-      display:block !important;
-      transform-origin:center center !important;
-      filter:drop-shadow(0 12px 14px rgba(0,0,0,.28)) !important;
-      will-change:transform !important;
-      animation:rocketCalmIdleV6 4.2s ease-in-out infinite !important;
-    }
-
-    .flight-card.starting .rocket-wrap{
-      opacity:0 !important;
-      transform:translate3d(-132%, -50%, 0) rotate(-2deg) scale(.96) !important;
       animation:none !important;
     }
 
     .flight-card.running .rocket-wrap{
-      animation:rocketEnterSmoothV6 1.08s cubic-bezier(.16,.84,.24,1) both !important;
-      filter:none !important;
+      opacity:1 !important;
+      transform:translate3d(-50%, -50%, 0) rotate(0deg) scale(1) !important;
+      animation:none !important;
+    }
+
+    .rocket-img{
+      animation:rocketReadyV7 3.6s ease-in-out infinite !important;
+      filter:drop-shadow(0 13px 15px rgba(0,0,0,.28)) !important;
     }
 
     .flight-card.running .rocket-img{
-      animation:rocketCalmFlightV6 3.7s ease-in-out 1.08s infinite !important;
+      animation:rocketFlightRealV7 2.65s ease-in-out infinite !important;
+    }
+
+    .flight-card.countdown .rocket-img{
+      animation:rocketCountdownV7 2.8s ease-in-out infinite !important;
     }
 
     .flight-card.crashed .rocket-wrap{
-      animation:rocketExitRightSmoothV6 .96s cubic-bezier(.2,.72,.18,1) both !important;
-      filter:none !important;
+      animation:rocketExitRightSmoothV7 .96s cubic-bezier(.18,.72,.16,1) both !important;
     }
 
     .flight-card.crashed .rocket-img{
       animation:none !important;
     }
 
-    .flight-card.cashed .rocket-wrap{
-      animation:rocketCashoutSoftV6 .72s cubic-bezier(.2,.78,.22,1) both !important;
+    .multiplier{
+      top:var(--mult-fixed-top) !important;
+      font-size:clamp(18px, 4.8vw, 26px) !important;
     }
 
-    .flight-card.cashed .rocket-img{
-      animation:rocketCalmIdleV6 4.2s ease-in-out infinite !important;
+    .action-btn:disabled{
+      opacity:1 !important;
+      filter:none !important;
+    }
+
+    .action-btn[disabled] strong{
+      opacity:1 !important;
+    }
+
+    .action-btn[disabled]:not(.cashout){
+      background:
+        linear-gradient(90deg,rgba(255,255,255,.14),transparent 32%),
+        linear-gradient(180deg,#6f45c9 0%,#4b238f 54%,#2d1354 100%) !important;
+    }
+
+    .action-btn span{
+      display:block !important;
+      min-height:11px;
+      font-size:10px !important;
+      line-height:1 !important;
+      font-weight:750 !important;
+      opacity:.78 !important;
     }
 
     .history-panel{
-      margin:-28px auto 0 !important;
-      padding:5px 8px !important;
+      display:block !important;
+      margin:-34px auto 0 !important;
+      padding:4px 7px !important;
+      min-height:34px !important;
+    }
+
+    .history-list{
+      min-height:24px !important;
+    }
+
+    .history-chip{
+      min-width:44px !important;
+      padding:5px 7px !important;
+      font-size:10.5px !important;
     }
 
     .controls{
-      margin:2px auto max(10px,calc(var(--safe-bottom) + 6px)) !important;
-      gap:5px !important;
+      margin:1px auto max(8px,calc(var(--safe-bottom) + 5px)) !important;
+      gap:4px !important;
     }
 
     .profit-panel{
-      min-height:39px !important;
-      padding:6px 10px !important;
+      min-height:35px !important;
+      padding:5px 9px !important;
+    }
+
+    .profit-item span{
+      font-size:9px !important;
+    }
+
+    .profit-item strong{
+      font-size:13px !important;
     }
 
     .bet-panel{
-      min-height:118px !important;
-      padding:9px !important;
+      min-height:104px !important;
+      padding:8px !important;
+      gap:8px !important;
     }
 
-    @keyframes crashOrangeBgMove{
+    .stake-side{
+      grid-template-rows:1fr 31px !important;
+      gap:6px !important;
+    }
+
+    .stake-box{
+      min-height:57px !important;
+      padding:8px 36px 8px 10px !important;
+    }
+
+    .quick{
+      min-height:31px !important;
+      font-size:15px !important;
+    }
+
+    .pm{
+      width:25px !important;
+      height:22px !important;
+      right:8px !important;
+    }
+
+    .pm.plus{top:6px !important;}
+    .pm.minus{bottom:6px !important;}
+
+    @keyframes crashOrangeBgMoveV7{
       0%{background-position:0% 50%;}
       100%{background-position:100% 50%;}
     }
 
-    @keyframes crashOrangeBgLightMove{
+    @keyframes crashOrangeLightV7{
       0%{background-position:0% 50%;}
       100%{background-position:100% 50%;}
     }
 
-    @keyframes rocketCalmIdleV6{
+    @keyframes rocketReadyV7{
       0%,100%{transform:translate3d(0,0,0) rotate(-.25deg) scale(1);}
       50%{transform:translate3d(1px,-2px,0) rotate(.25deg) scale(1.002);}
     }
 
-    @keyframes rocketCalmFlightV6{
-      0%,100%{transform:translate3d(0,0,0) rotate(-.35deg) scale(1);}
-      50%{transform:translate3d(2px,-3px,0) rotate(.35deg) scale(1.003);}
+    @keyframes rocketCountdownV7{
+      0%,100%{transform:translate3d(0,0,0) rotate(-.18deg) scale(1);}
+      50%{transform:translate3d(1px,-1.5px,0) rotate(.18deg) scale(1.001);}
     }
 
-    @keyframes rocketEnterSmoothV6{
-      0%{
-        opacity:0;
-        transform:translate3d(-132%, -50%, 0) rotate(-2deg) scale(.96);
-      }
-      58%{
-        opacity:1;
-        transform:translate3d(-58%, -50%, 0) rotate(.35deg) scale(1.002);
-      }
-      100%{
-        opacity:1;
-        transform:translate3d(-50%, -50%, 0) rotate(0deg) scale(1);
-      }
+    @keyframes rocketFlightRealV7{
+      0%{transform:translate3d(-2px,1px,0) rotate(-1.4deg) scale(1);}
+      28%{transform:translate3d(2px,-3px,0) rotate(.9deg) scale(1.006);}
+      58%{transform:translate3d(4px,-1px,0) rotate(1.7deg) scale(1.004);}
+      100%{transform:translate3d(-2px,1px,0) rotate(-1.4deg) scale(1);}
     }
 
-    @keyframes rocketExitRightSmoothV6{
+    @keyframes rocketExitRightSmoothV7{
       0%{
         opacity:1;
         transform:translate3d(-50%, -50%, 0) rotate(0deg) scale(1);
@@ -1383,79 +1352,81 @@
       }
     }
 
-    @keyframes rocketCashoutSoftV6{
-      0%{opacity:1;transform:translate3d(-50%, -50%, 0) rotate(0deg) scale(1);}
-      100%{opacity:1;transform:translate3d(-50%, -50%, 0) rotate(0deg) scale(1.012);}
-    }
-
     @media (max-width:380px), (max-height:690px){
       .playfield{
-        height:calc(100dvh - 188px - max(8px,var(--safe-bottom))) !important;
-        padding-top:46px !important;
-        min-height:286px !important;
+        height:calc(100dvh - 164px - max(8px,var(--safe-bottom))) !important;
+        min-height:260px !important;
+        padding-top:40px !important;
       }
 
       .flight-card{
-        --rocket-size:clamp(132px, 42vw, 170px) !important;
-        --mult-fixed-top:clamp(16px, 4.4vw, 23px) !important;
-        --mult-fixed-size:clamp(17px, 5.2vw, 22px) !important;
+        height:min(43dvh, 320px) !important;
+        min-height:236px !important;
+        --rocket-size:clamp(128px, 40vw, 168px) !important;
+        --mult-fixed-top:14px !important;
       }
 
       .rocket-wrap{
         top:55% !important;
       }
 
+      .multiplier{
+        font-size:clamp(17px, 4.9vw, 22px) !important;
+      }
+
       .history-panel{
-        margin:-30px auto 0 !important;
+        margin:-38px auto 0 !important;
+        min-height:31px !important;
+        padding:3px 7px !important;
+      }
+
+      .history-list{
+        min-height:22px !important;
       }
 
       .controls{
-        margin:1px auto max(8px,calc(var(--safe-bottom) + 5px)) !important;
+        margin:0 auto max(6px,calc(var(--safe-bottom) + 4px)) !important;
       }
 
       .profit-panel{
-        min-height:36px !important;
+        min-height:33px !important;
       }
 
       .bet-panel{
-        min-height:106px !important;
-      }
-    }
-
-    @media (min-width:381px) and (max-width:719px) and (min-height:691px){
-      .flight-card{
-        --rocket-size:clamp(150px, 41vw, 205px) !important;
-        --mult-fixed-top:clamp(18px, 4.5vw, 28px) !important;
-        --mult-fixed-size:clamp(18px, 5vw, 26px) !important;
+        min-height:99px !important;
       }
 
-      .rocket-wrap{
-        top:54% !important;
+      .amount{
+        font-size:17px !important;
+      }
+
+      .action-btn strong{
+        font-size:16px !important;
       }
     }
 
     @media (min-width:720px){
       .playfield{
-        height:calc(100dvh - 204px - max(8px,var(--safe-bottom))) !important;
-        padding-top:58px !important;
+        height:calc(100dvh - 194px - max(8px,var(--safe-bottom))) !important;
+        padding-top:54px !important;
       }
 
       .flight-card{
-        --rocket-size:clamp(188px, 28vw, 260px) !important;
-        --mult-fixed-top:clamp(22px, 3vw, 34px) !important;
-        --mult-fixed-size:clamp(21px, 2.8vw, 30px) !important;
+        height:min(50dvh, 430px) !important;
+        min-height:330px !important;
+        --rocket-size:clamp(190px, 28vw, 270px) !important;
       }
 
       .rocket-wrap{
-        top:53% !important;
+        top:54% !important;
       }
 
       .history-panel{
-        margin:-24px auto 0 !important;
+        margin:-28px auto 0 !important;
       }
 
-      .controls{
-        margin:2px auto max(12px,calc(var(--safe-bottom) + 8px)) !important;
+      .bet-panel{
+        min-height:112px !important;
       }
     }
   </style>
@@ -1576,8 +1547,13 @@
         crashPoint: 1,
         raf: 0,
         startedAt: 0,
+        hasCashedOut: false,
+        cashoutMultiplier: 0,
+        cashoutPayout: 0,
         history: []
       };
+
+      const wait = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
       function formatRub(value){
         return `${Math.floor(Number(value) || 0).toLocaleString('ru-RU')} ₽`;
@@ -1653,10 +1629,16 @@
       }
 
       function resetVisuals(){
-        flightCard.classList.remove('running', 'crashed', 'cashed');
+        flightCard.classList.remove('running', 'crashed', 'cashed', 'countdown');
         multiplierEl.classList.remove('win', 'crash');
         state.multiplier = 1;
+        state.hasCashedOut = false;
+        state.cashoutMultiplier = 0;
+        state.cashoutPayout = 0;
         multiplierEl.textContent = formatX(1);
+        profitCoef.textContent = formatX(1);
+        possibleWin.textContent = formatRub(readBet());
+        actionBtn.disabled = false;
         updatePreview();
       }
 
@@ -1673,7 +1655,7 @@
         });
       }
 
-      function startRound(){
+      async function startRound(){
         if(state.phase !== 'idle') return;
 
         const bet = normalizeBet();
@@ -1684,23 +1666,38 @@
 
         setBalance(state.balance - bet);
         state.bet = bet;
-        state.phase = 'running';
+        state.phase = 'countdown';
         state.crashPoint = generateCrashPoint();
-        state.startedAt = performance.now();
         state.multiplier = 1;
 
         resetVisuals();
-        // Перезапускаем CSS-анимацию входа ракеты из левого угла даже после прошлого краша
-        void flightCard.offsetWidth;
-        flightCard.classList.add('running');
+        flightCard.classList.add('countdown');
         setControlsLocked(true);
+        actionBtn.classList.remove('cashout');
+        actionBtn.disabled = true;
+        actionSub.textContent = '';
+        statusText.textContent = '';
+
+        for(const count of [3, 2, 1]){
+          actionMain.textContent = String(count);
+          multiplierEl.textContent = `x1.00`;
+          await wait(620);
+        }
+
+        if(state.phase !== 'countdown') return;
+
+        state.phase = 'running';
+        state.startedAt = performance.now();
+        flightCard.classList.remove('countdown');
+        flightCard.classList.add('running');
+        actionBtn.disabled = false;
         actionBtn.classList.add('cashout');
         actionMain.textContent = 'Забрать';
-        actionSub.textContent = formatRub(state.bet * state.multiplier);
-        statusText.textContent = 'Ракета летит — забери выигрыш до краша';
+        actionSub.textContent = formatRub(state.bet);
+        statusText.textContent = '';
         showToast('Раунд начался', 'info');
 
-        loop();
+        state.raf = requestAnimationFrame(loop);
       }
 
       function loop(now = performance.now()){
@@ -1712,7 +1709,13 @@
 
         multiplierEl.textContent = formatX(state.multiplier);
         updatePreview();
-        actionSub.textContent = formatRub(state.bet * state.multiplier);
+
+        if(state.hasCashedOut){
+          actionMain.textContent = 'Забрано';
+          actionSub.textContent = formatRub(state.cashoutPayout);
+        }else{
+          actionSub.textContent = formatRub(state.bet * state.multiplier);
+        }
 
         if(current >= state.crashPoint){
           crashRound();
@@ -1723,24 +1726,24 @@
       }
 
       function cashout(){
-        if(state.phase !== 'running') return;
+        if(state.phase !== 'running' || state.hasCashedOut) return;
 
-        cancelAnimationFrame(state.raf);
-        state.phase = 'idle';
         const cashoutMultiplier = Math.max(1.01, state.multiplier);
         const payout = Math.floor(state.bet * cashoutMultiplier);
+
+        state.hasCashedOut = true;
+        state.cashoutMultiplier = cashoutMultiplier;
+        state.cashoutPayout = payout;
         setBalance(state.balance + payout);
 
-        flightCard.classList.remove('running');
-        flightCard.classList.add('cashed');
         multiplierEl.classList.add('win');
-        setControlsLocked(false);
         actionBtn.classList.remove('cashout');
-        actionMain.textContent = 'Играть';
-        actionSub.textContent = '';
-        statusText.textContent = `Успел забрать на ${formatX(cashoutMultiplier)} — начислено ${formatRub(payout)}`;
+        actionBtn.disabled = true;
+        actionMain.textContent = 'Забрано';
+        actionSub.textContent = formatRub(payout);
+        statusText.textContent = '';
         addHistory(cashoutMultiplier, 'win');
-        showToast(`Выигрыш ${formatRub(payout)}`, 'win');
+        showToast(`Забрал ${formatRub(payout)} на ${formatX(cashoutMultiplier)}`, 'win');
       }
 
       function crashRound(){
@@ -1748,25 +1751,33 @@
         state.phase = 'idle';
         state.multiplier = state.crashPoint;
 
-        flightCard.classList.remove('running');
+        flightCard.classList.remove('running', 'countdown');
         flightCard.classList.add('crashed');
+        multiplierEl.classList.remove('win');
         multiplierEl.classList.add('crash');
         multiplierEl.textContent = formatX(state.crashPoint);
         profitCoef.textContent = formatX(state.crashPoint);
-        possibleWin.textContent = '0 ₽';
+
+        if(state.hasCashedOut){
+          possibleWin.textContent = formatRub(state.cashoutPayout);
+          showToast(`Краш был на ${formatX(state.crashPoint)}`, 'info');
+        }else{
+          possibleWin.textContent = '0 ₽';
+          showToast(`Краш на ${formatX(state.crashPoint)}`, 'lose');
+        }
 
         setControlsLocked(false);
+        actionBtn.disabled = false;
         actionBtn.classList.remove('cashout');
         actionMain.textContent = 'Играть';
         actionSub.textContent = '';
-        statusText.textContent = `Краш на ${formatX(state.crashPoint)} — ракета улетела, ставка сгорела`;
+        statusText.textContent = '';
         addHistory(state.crashPoint, 'lose');
-        showToast(`Краш на ${formatX(state.crashPoint)}`, 'lose');
       }
 
       actionBtn.addEventListener('click', () => {
         if(state.phase === 'running') cashout();
-        else startRound();
+        else if(state.phase === 'idle') startRound();
       });
 
       minusBtn.addEventListener('click', () => {
