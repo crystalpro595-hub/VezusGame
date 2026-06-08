@@ -7233,6 +7233,150 @@
   }
 </style>
 
+  <style id="game-frame-top-center-close-v1">
+    /*
+      IFRAME CLOSE BUTTON UPDATE:
+      - кнопка закрытия не справа и не крестиком;
+      - кнопка по центру сверху рамки;
+      - красивая фиолетовая градиентная капсула;
+      - размер самого iframe-окна не меняется.
+    */
+
+    .game-frame-header{
+      position:relative !important;
+      min-height:56px !important;
+      padding:10px 12px 8px !important;
+      display:flex !important;
+      align-items:center !important;
+      justify-content:center !important;
+      border-bottom:1px solid rgba(255,255,255,.075) !important;
+      background:
+        radial-gradient(circle at 50% 0%, rgba(157,77,255,.16), transparent 48%),
+        linear-gradient(180deg, rgba(18,6,48,.98), rgba(7,1,24,.98)) !important;
+    }
+
+    .game-frame-brand{
+      position:absolute !important;
+      left:12px !important;
+      top:50% !important;
+      transform:translateY(-50%) !important;
+      max-width:34% !important;
+      opacity:.72 !important;
+      pointer-events:none !important;
+    }
+
+    .game-frame-logo{
+      height:22px !important;
+      max-width:88px !important;
+    }
+
+    .game-frame-meta{
+      display:none !important;
+    }
+
+    .game-frame-actions{
+      position:static !important;
+      flex:0 0 auto !important;
+      display:flex !important;
+      align-items:center !important;
+      justify-content:center !important;
+      width:auto !important;
+      margin:0 auto !important;
+    }
+
+    .game-frame-close{
+      min-width:148px !important;
+      height:38px !important;
+      padding:0 18px !important;
+      display:inline-flex !important;
+      align-items:center !important;
+      justify-content:center !important;
+      gap:0 !important;
+      border:1px solid rgba(255,255,255,.18) !important;
+      border-radius:999px !important;
+      color:#fff !important;
+      cursor:pointer !important;
+      font-family:inherit !important;
+      font-size:12px !important;
+      font-weight:950 !important;
+      letter-spacing:.01em !important;
+      text-transform:none !important;
+      background:
+        linear-gradient(90deg, rgba(255,255,255,.18), transparent 34%),
+        linear-gradient(135deg, #9d4dff 0%, #d946ef 100%) !important;
+      box-shadow:
+        0 10px 24px rgba(157,77,255,.28),
+        inset 0 0 0 1px rgba(255,255,255,.12) !important;
+      transition:transform .14s ease, filter .16s ease, box-shadow .16s ease !important;
+      -webkit-appearance:none !important;
+      appearance:none !important;
+    }
+
+    .game-frame-close:hover{
+      background:
+        linear-gradient(90deg, rgba(255,255,255,.20), transparent 34%),
+        linear-gradient(135deg, #a85cff 0%, #e14df4 100%) !important;
+      border-color:rgba(255,255,255,.22) !important;
+      box-shadow:
+        0 12px 28px rgba(157,77,255,.34),
+        inset 0 0 0 1px rgba(255,255,255,.13) !important;
+    }
+
+    .game-frame-close:active{
+      transform:scale(.965) !important;
+      filter:brightness(.96) !important;
+    }
+
+    .game-frame-close svg{
+      display:none !important;
+    }
+
+    .game-frame-close .game-frame-close-text{
+      display:inline !important;
+      visibility:visible !important;
+      opacity:1 !important;
+      white-space:nowrap !important;
+    }
+
+    .game-frame-stage{
+      padding-top:8px !important;
+    }
+
+    @media (max-width:560px){
+      .game-frame-header{
+        min-height:50px !important;
+        padding:7px 10px 7px !important;
+      }
+
+      .game-frame-brand{
+        left:10px !important;
+        max-width:28% !important;
+        opacity:.55 !important;
+      }
+
+      .game-frame-logo{
+        height:19px !important;
+        max-width:70px !important;
+      }
+
+      .game-frame-close{
+        min-width:136px !important;
+        height:34px !important;
+        padding:0 15px !important;
+        font-size:11px !important;
+        border-radius:999px !important;
+      }
+
+      .game-frame-close .game-frame-close-text{
+        display:inline !important;
+      }
+
+      .game-frame-stage{
+        padding-top:7px !important;
+      }
+    }
+  </style>
+
 </head>
 <!-- DB READY BUILD: no demo balance buttons, local fallback only until Supabase/API is connected -->
 <body class="site-unlocked">
@@ -11541,7 +11685,7 @@ function resetWithdrawStep(){
       <div class="game-frame-actions">
         <button class="game-frame-close" id="gameFrameClose" type="button" aria-label="Закрыть игру">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
-          <span class="game-frame-close-text">Закрыть</span>
+          <span class="game-frame-close-text">Закрыть игру</span>
         </button>
       </div>
     </header>
