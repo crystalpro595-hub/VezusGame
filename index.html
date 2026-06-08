@@ -8049,10 +8049,22 @@
           stopAuto();
           if(total < 2) return;
           autoTimer = setInterval(() => {
-            if(document.hidden || isDragging) return;
+            if(document.hidden || isDragging || document.body.classList.contains('main-frame-paused')) return;
             goNext();
           }, 10500);
         }
+
+        document.addEventListener('vezus:main-pause', () => {
+          stopAuto();
+          cancelDragRender();
+          isDragging = false;
+          horizontalGesture = false;
+        });
+
+        document.addEventListener('vezus:main-resume', () => {
+          render(0, false);
+          startAuto();
+        });
 
         function finishDrag(){
           if(!isDragging) return;
@@ -10924,7 +10936,7 @@ function resetWithdrawStep(){
 
     if(intervalId) clearInterval(intervalId);
     intervalId = setInterval(function(){
-      if(document.hidden) return;
+      if(document.hidden || document.body.classList.contains('main-frame-paused')) return;
       refreshBalance('interval', false);
     }, 5000);
   }
@@ -11248,6 +11260,14 @@ function resetWithdrawStep(){
         event.stopPropagation();
       }
     }, true);
+
+    document.addEventListener('vezus:main-pause', function(){
+      stopMomentum();
+      tracking = false;
+      locked = false;
+      moved = false;
+      row.classList.remove('vezus-row-moving');
+    });
   }
 
   function init(){
@@ -11678,6 +11698,175 @@ function resetWithdrawStep(){
         }
       }catch(error){}
     });
+  }
+})();
+</script>
+
+
+<!-- FRAME SLEEP MODE: при открытом iframe главная страница засыпает и не грузит FPS -->
+<style id="vezus-frame-sleep-style">
+  body.main-frame-paused{
+    overflow:hidden !important;
+    touch-action:none !important;
+  }
+
+  body.main-frame-paused::before,
+  body.main-frame-paused::after{
+    display:none !important;
+    animation:none !important;
+  }
+
+  body.main-frame-paused .app,
+  body.main-frame-paused .bottom-nav{
+    content-visibility:hidden !important;
+    visibility:hidden !important;
+    pointer-events:none !important;
+  }
+
+  body.main-frame-paused .app *,
+  body.main-frame-paused .bottom-nav *,
+  body.main-frame-paused .side-menu *,
+  body.main-frame-paused .profile-sheet *,
+  body.main-frame-paused .notification-sheet *,
+  body.main-frame-paused .deposit-sheet *,
+  body.main-frame-paused .voucher-sheet *,
+  body.main-frame-paused .withdraw-sheet *,
+  body.main-frame-paused .bonus-sheet *{
+    animation-play-state:paused !important;
+    transition:none !important;
+  }
+
+  body.main-frame-paused .game-frame-overlay,
+  body.main-frame-paused .wallet-frame-overlay{
+    backdrop-filter:none !important;
+    -webkit-backdrop-filter:none !important;
+  }
+
+  body.main-frame-paused .banner-track{
+    transition:none !important;
+    will-change:auto !important;
+  }
+</style>
+
+<script id="vezus-frame-sleep-script">
+(function(){
+  var scrollTopBeforeFrame = 0;
+  var frameReasons = Object.create(null);
+  var paused = false;
+
+  function isAnyFrameOpen(){
+    var gameOpen = document.body.classList.contains('game-frame-open') || !!document.querySelector('.game-frame-shell.active');
+    var walletOpen = document.body.classList.contains('wallet-frame-open') || !!document.querySelector('.wallet-frame-box.active');
+    return gameOpen || walletOpen;
+  }
+
+  function closeHeavyHomePanels(){
+    document.body.classList.remove(
+      'menu-open', 'profile-open', 'notifications-open', 'deposit-open',
+      'voucher-open', 'history-open', 'withdraw-open', 'bonus-open'
+    );
+
+    var selectors = [
+      '.side-menu.active', '.side-panel-overlay.active',
+      '.profile-sheet.active', '.profile-sheet-overlay.active',
+      '.notification-sheet.active', '.notification-sheet-overlay.active',
+      '.deposit-sheet.active', '.deposit-sheet-overlay.active',
+      '.voucher-sheet.active', '.voucher-sheet-overlay.active',
+      '.history-sheet.active', '.history-sheet-overlay.active',
+      '.withdraw-sheet.active', '.withdraw-sheet-overlay.active',
+      '.bonus-sheet.active', '.bonus-sheet-overlay.active',
+      '.ask-sheet.active', '.ask-sheet-overlay.active'
+    ];
+
+    document.querySelectorAll(selectors.join(',')).forEach(function(el){
+      el.classList.remove('active', 'open');
+    });
+  }
+
+  function setMainPaused(active, reason){
+    reason = reason || 'frame';
+
+    if(active){
+      frameReasons[reason] = true;
+    }else{
+      delete frameReasons[reason];
+    }
+
+    var shouldPause = Object.keys(frameReasons).length > 0 || isAnyFrameOpen();
+    if(shouldPause === paused) return;
+
+    paused = shouldPause;
+
+    if(paused){
+      scrollTopBeforeFrame = window.scrollY || document.documentElement.scrollTop || 0;
+      closeHeavyHomePanels();
+      document.body.classList.add('main-frame-paused');
+      document.dispatchEvent(new CustomEvent('vezus:main-pause'));
+    }else{
+      document.body.classList.remove('main-frame-paused');
+      document.dispatchEvent(new CustomEvent('vezus:main-resume'));
+      requestAnimationFrame(function(){
+        try{ window.scrollTo(0, scrollTopBeforeFrame); }catch(error){}
+      });
+    }
+  }
+
+  function syncFramePause(){
+    setMainPaused(isAnyFrameOpen(), 'sync');
+  }
+
+  window.vezusSetMainPaused = setMainPaused;
+  window.vezusSyncFramePause = syncFramePause;
+
+  function wrapOpenClose(openName, closeName, reason){
+    var openFn = window[openName];
+    var closeFn = window[closeName];
+
+    if(typeof openFn === 'function' && !openFn.__vezusSleepWrapped){
+      window[openName] = function(){
+        setMainPaused(true, reason);
+        return openFn.apply(this, arguments);
+      };
+      window[openName].__vezusSleepWrapped = true;
+    }
+
+    if(typeof closeFn === 'function' && !closeFn.__vezusSleepWrapped){
+      window[closeName] = function(){
+        var result = closeFn.apply(this, arguments);
+        setTimeout(syncFramePause, 260);
+        return result;
+      };
+      window[closeName].__vezusSleepWrapped = true;
+    }
+  }
+
+  function observeFrameNodes(){
+    if(!window.MutationObserver) return;
+
+    var nodes = [
+      document.getElementById('gameFrameShell'),
+      document.getElementById('gameFrameOverlay'),
+      document.getElementById('walletFrameBox'),
+      document.getElementById('walletFrameOverlay')
+    ].filter(Boolean);
+
+    var observer = new MutationObserver(syncFramePause);
+    nodes.forEach(function(node){
+      observer.observe(node, { attributes:true, attributeFilter:['class'] });
+    });
+  }
+
+  function init(){
+    wrapOpenClose('openGameFrame', 'closeGameFrame', 'game');
+    wrapOpenClose('openWalletOverlay', 'closeWalletOverlay', 'wallet');
+    observeFrameNodes();
+    syncFramePause();
+  }
+
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', init, { once:true });
+  }else{
+    init();
   }
 })();
 </script>
