@@ -7233,6 +7233,154 @@
   }
 </style>
 
+  <style id="iframe-bottom-panel-compact-v2">
+    /* Compact iframe bottom panel: меньше панель, больше места игре */
+    .game-frame-box,
+    .iframe-game-box,
+    .wallet-frame-box.game-frame-box{
+      height:min(80vh, 720px) !important;
+      max-height:calc(100vh - 76px - env(safe-area-inset-top) - env(safe-area-inset-bottom)) !important;
+      top:calc(42px + env(safe-area-inset-top)) !important;
+      border-radius:24px !important;
+    }
+
+    .game-frame,
+    .iframe-game,
+    .wallet-frame.game-frame{
+      height:calc(100% - 50px) !important;
+    }
+
+    .game-frame-bottom-panel,
+    .iframe-bottom-panel,
+    .game-bottom-panel{
+      min-height:50px !important;
+      height:50px !important;
+      padding:6px 8px !important;
+      gap:8px !important;
+      border-radius:0 0 22px 22px !important;
+    }
+
+    .game-frame-panel-logo,
+    .iframe-panel-logo,
+    .game-bottom-logo{
+      width:30px !important;
+      height:30px !important;
+      min-width:30px !important;
+      border-radius:10px !important;
+    }
+
+    .game-frame-panel-logo img,
+    .iframe-panel-logo img,
+    .game-bottom-logo img{
+      max-width:24px !important;
+      max-height:24px !important;
+    }
+
+    .game-frame-panel-info,
+    .iframe-panel-info,
+    .game-bottom-info{
+      gap:1px !important;
+    }
+
+    .game-frame-panel-title,
+    .iframe-panel-title,
+    .game-bottom-title{
+      font-size:12px !important;
+      line-height:1.05 !important;
+      font-weight:900 !important;
+    }
+
+    .game-frame-panel-subtitle,
+    .iframe-panel-subtitle,
+    .game-bottom-subtitle{
+      font-size:9px !important;
+      line-height:1 !important;
+      opacity:.54 !important;
+    }
+
+    .game-frame-close-btn,
+    .iframe-close-game-btn,
+    .game-bottom-close{
+      min-height:32px !important;
+      height:32px !important;
+      padding:0 11px !important;
+      border-radius:12px !important;
+      font-size:11px !important;
+      font-weight:900 !important;
+      white-space:nowrap !important;
+    }
+
+    .game-frame-handle,
+    .iframe-game-handle{
+      display:none !important;
+    }
+
+    @media (max-width:390px){
+      .game-frame-box,
+      .iframe-game-box,
+      .wallet-frame-box.game-frame-box{
+        top:calc(32px + env(safe-area-inset-top)) !important;
+        width:calc(100vw - 14px) !important;
+        height:min(82vh, 680px) !important;
+        max-height:calc(100vh - 62px - env(safe-area-inset-top) - env(safe-area-inset-bottom)) !important;
+        border-radius:22px !important;
+      }
+
+      .game-frame,
+      .iframe-game,
+      .wallet-frame.game-frame{
+        height:calc(100% - 46px) !important;
+      }
+
+      .game-frame-bottom-panel,
+      .iframe-bottom-panel,
+      .game-bottom-panel{
+        min-height:46px !important;
+        height:46px !important;
+        padding:5px 7px !important;
+      }
+
+      .game-frame-panel-logo,
+      .iframe-panel-logo,
+      .game-bottom-logo{
+        width:28px !important;
+        height:28px !important;
+        min-width:28px !important;
+      }
+
+      .game-frame-panel-title,
+      .iframe-panel-title,
+      .game-bottom-title{
+        font-size:11.5px !important;
+      }
+
+      .game-frame-panel-subtitle,
+      .iframe-panel-subtitle,
+      .game-bottom-subtitle{
+        display:none !important;
+      }
+
+      .game-frame-close-btn,
+      .iframe-close-game-btn,
+      .game-bottom-close{
+        min-height:30px !important;
+        height:30px !important;
+        padding:0 10px !important;
+        font-size:10.5px !important;
+      }
+    }
+
+    @media (min-width:720px){
+      .game-frame-box,
+      .iframe-game-box,
+      .wallet-frame-box.game-frame-box{
+        top:calc(48px + env(safe-area-inset-top)) !important;
+        height:min(82vh, 760px) !important;
+        max-height:calc(100vh - 82px - env(safe-area-inset-top) - env(safe-area-inset-bottom)) !important;
+      }
+    }
+  </style>
+
 </head>
 <!-- DB READY BUILD: no demo balance buttons, local fallback only until Supabase/API is connected -->
 <body class="site-unlocked">
