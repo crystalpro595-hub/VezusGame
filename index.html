@@ -11530,7 +11530,13 @@ function resetWithdrawStep(){
 <div class="game-frame-overlay" id="gameFrameOverlay" aria-hidden="true"></div>
 <div class="game-frame-shell" id="gameFrameShell" aria-hidden="true">
   <section class="game-frame-box" id="gameFrameBox" aria-label="Окно игры" aria-hidden="true">
-    <header class="game-frame-header">
+    <div class="game-frame-stage">
+      <div class="game-frame-inner">
+        <iframe class="game-frame" id="gameFrame" title="Игра" src="about:blank" allow="autoplay; fullscreen" loading="eager"></iframe>
+      </div>
+    </div>
+
+    <footer class="game-frame-bottom" aria-label="Панель игры">
       <div class="game-frame-brand">
         <img class="game-frame-logo" id="gameFrameLogo" src="images/Logovezusgame.png" alt="Vezus Game" decoding="async">
         <div class="game-frame-meta">
@@ -11538,18 +11544,10 @@ function resetWithdrawStep(){
           <span class="game-frame-title" id="gameFrameTitle">Игра</span>
         </div>
       </div>
-      <div class="game-frame-actions">
-        <button class="game-frame-close" id="gameFrameClose" type="button" aria-label="Закрыть игру">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
-          <span class="game-frame-close-text">Закрыть</span>
-        </button>
-      </div>
-    </header>
-    <div class="game-frame-stage">
-      <div class="game-frame-inner">
-        <iframe class="game-frame" id="gameFrame" title="Игра" src="about:blank" allow="autoplay; fullscreen" loading="eager"></iframe>
-      </div>
-    </div>
+      <button class="game-frame-close" id="gameFrameClose" type="button" aria-label="Закрыть игру">
+        <span class="game-frame-close-text">Закрыть игру</span>
+      </button>
+    </footer>
   </section>
 </div>
 
@@ -11702,6 +11700,229 @@ function resetWithdrawStep(){
 })();
 </script>
 
+
+
+
+<!-- GAME IFRAME BOTTOM DOCK PATCH: красивая нижняя панель вместо крестика -->
+<style id="vezus-game-frame-bottom-dock-style">
+  .game-frame-shell{
+    top:calc(42px + env(safe-area-inset-top)) !important;
+    height:min(88vh, 900px) !important;
+    max-height:calc(100vh - 54px - env(safe-area-inset-top) - env(safe-area-inset-bottom)) !important;
+  }
+
+  .game-frame-box{
+    border-radius:30px !important;
+    border:1px solid rgba(255,255,255,.13) !important;
+    background:linear-gradient(180deg, rgba(13,4,34,.98), rgba(4,1,14,.99)) !important;
+    box-shadow:0 22px 62px rgba(0,0,0,.54) !important;
+  }
+
+  .game-frame-header{
+    display:none !important;
+  }
+
+  .game-frame-stage{
+    flex:1 1 auto !important;
+    min-height:0 !important;
+    padding:10px 10px 0 !important;
+    display:flex !important;
+  }
+
+  .game-frame-inner{
+    border-radius:22px 22px 18px 18px !important;
+    border:1px solid rgba(255,255,255,.07) !important;
+    background:#05000f !important;
+  }
+
+  .game-frame-bottom{
+    flex:0 0 auto;
+    min-height:74px;
+    margin:8px 10px 10px;
+    padding:10px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    border:1px solid rgba(255,255,255,.11);
+    border-radius:22px;
+    background:
+      radial-gradient(circle at 12% 0%, rgba(157,77,255,.24), transparent 42%),
+      linear-gradient(135deg, rgba(255,255,255,.095), rgba(255,255,255,.035));
+    box-shadow:inset 0 0 0 1px rgba(255,255,255,.035), 0 10px 24px rgba(0,0,0,.25);
+  }
+
+  .game-frame-bottom .game-frame-brand{
+    min-width:0;
+    flex:1 1 auto;
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+
+  .game-frame-bottom .game-frame-logo{
+    width:auto;
+    height:30px;
+    max-width:104px;
+    object-fit:contain;
+    display:block;
+    flex:0 0 auto;
+    filter:none !important;
+  }
+
+  .game-frame-bottom .game-frame-meta{
+    min-width:0;
+    display:flex;
+    flex-direction:column;
+    gap:3px;
+  }
+
+  .game-frame-bottom .game-frame-wordmark{
+    color:rgba(255,255,255,.48);
+    font-size:9px;
+    line-height:1;
+    font-weight:850;
+    letter-spacing:.12em;
+    text-transform:uppercase;
+  }
+
+  .game-frame-bottom .game-frame-title{
+    max-width:100%;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+    color:#fff;
+    font-size:16px;
+    line-height:1;
+    font-weight:950;
+    letter-spacing:-.02em;
+  }
+
+  .game-frame-bottom .game-frame-close{
+    flex:0 0 auto;
+    min-width:126px;
+    height:46px;
+    padding:0 16px;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    border:0;
+    border-radius:17px;
+    color:#fff;
+    cursor:pointer;
+    font-family:inherit;
+    font-size:13px;
+    line-height:1;
+    font-weight:950;
+    background:linear-gradient(135deg, #9d4dff, #d946ef);
+    box-shadow:0 12px 24px rgba(157,77,255,.24), inset 0 0 0 1px rgba(255,255,255,.13);
+    transition:transform .12s ease, filter .12s ease;
+  }
+
+  .game-frame-bottom .game-frame-close:active{
+    transform:scale(.975);
+    filter:brightness(.96);
+  }
+
+  .game-frame-bottom .game-frame-close svg{
+    display:none !important;
+  }
+
+  .game-frame-bottom .game-frame-close-text{
+    display:inline !important;
+    white-space:nowrap;
+  }
+
+  @media (max-width:560px){
+    .game-frame-shell{
+      top:calc(34px + env(safe-area-inset-top)) !important;
+      width:calc(100vw - 10px) !important;
+      height:min(91vh, 850px) !important;
+      max-height:calc(100vh - 42px - env(safe-area-inset-top) - env(safe-area-inset-bottom)) !important;
+    }
+
+    .game-frame-box{
+      border-radius:24px !important;
+    }
+
+    .game-frame-stage{
+      padding:7px 7px 0 !important;
+    }
+
+    .game-frame-inner{
+      border-radius:18px 18px 15px 15px !important;
+    }
+
+    .game-frame-bottom{
+      min-height:66px;
+      margin:7px;
+      padding:8px;
+      border-radius:19px;
+      gap:8px;
+    }
+
+    .game-frame-bottom .game-frame-logo{
+      height:25px;
+      max-width:76px;
+    }
+
+    .game-frame-bottom .game-frame-wordmark{
+      font-size:8px;
+      letter-spacing:.09em;
+    }
+
+    .game-frame-bottom .game-frame-title{
+      font-size:14px;
+    }
+
+    .game-frame-bottom .game-frame-close{
+      min-width:112px;
+      height:42px;
+      padding:0 13px;
+      border-radius:15px;
+      font-size:12px;
+    }
+  }
+
+  @media (max-width:350px){
+    .game-frame-bottom .game-frame-logo{
+      height:23px;
+      max-width:64px;
+    }
+
+    .game-frame-bottom .game-frame-close{
+      min-width:104px;
+      padding:0 10px;
+      font-size:11px;
+    }
+
+    .game-frame-bottom .game-frame-title{
+      font-size:13px;
+    }
+  }
+
+  @media (min-width:720px){
+    .game-frame-shell{
+      width:min(84vw, 600px) !important;
+      height:min(88vh, 940px) !important;
+    }
+
+    .game-frame-bottom{
+      min-height:78px;
+      margin:9px 10px 10px;
+      padding:11px;
+    }
+
+    .game-frame-bottom .game-frame-logo{
+      height:32px;
+      max-width:118px;
+    }
+
+    .game-frame-bottom .game-frame-title{
+      font-size:17px;
+    }
+  }
+</style>
 
 <!-- FRAME SLEEP MODE: при открытом iframe главная страница засыпает и не грузит FPS -->
 <style id="vezus-frame-sleep-style">
