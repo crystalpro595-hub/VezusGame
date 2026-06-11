@@ -12346,7 +12346,572 @@ function resetWithdrawStep(){
       margin-top:26px !important;
     }
   }
+
+  /* Clean pass: no layout/grid lines, logo has no inner frame, banner swipes horizontally only. */
+  body{
+    background:
+      linear-gradient(116deg, rgba(157,77,255,.22) 0%, rgba(157,77,255,0) 34%),
+      linear-gradient(246deg, rgba(217,70,239,.13) 0%, rgba(217,70,239,0) 30%),
+      linear-gradient(180deg, rgba(196,181,253,.055) 0%, rgba(196,181,253,0) 30%),
+      linear-gradient(180deg, #05020c 0%, #0d061b 46%, #06020d 100%) !important;
+  }
+
+  .brand-pill{
+    width:128px !important;
+    height:48px !important;
+    padding:0 !important;
+    border:0 !important;
+    border-radius:0 !important;
+    background:transparent !important;
+    box-shadow:none !important;
+  }
+
+  .brand-pill img{
+    height:100% !important;
+    max-width:100% !important;
+    object-fit:contain !important;
+    object-position:left center !important;
+  }
+
+  .hero-slider,
+  .banner-track,
+  .banner{
+    touch-action:pan-x !important;
+    overscroll-behavior:contain !important;
+  }
+
+  .banner::before{
+    background:linear-gradient(90deg, rgba(255,255,255,.12), rgba(255,255,255,0) 38%) !important;
+  }
+
+  .cards-row > *,
+  .game-card{
+    background:
+      linear-gradient(135deg, rgba(255,255,255,.11), rgba(255,255,255,.032)),
+      linear-gradient(160deg, rgba(24,14,42,.98), rgba(9,4,19,.98)) !important;
+  }
+
+  .game-card.image-card:not(:has(img)){
+    background:
+      linear-gradient(135deg, rgba(157,77,255,.20), rgba(217,70,239,.12)),
+      linear-gradient(160deg, rgba(24,14,42,.98), rgba(8,4,17,.98)) !important;
+  }
+
+  .profile-head,
+  .profile-balance-box,
+  .menu-user,
+  .menu-link,
+  .support-subitem,
+  .voucher-box,
+  .deposit-card,
+  .withdraw-card.sbp-withdraw-card,
+  .history-item,
+  .history-empty,
+  .payment-summary,
+  .withdraw-summary,
+  .deposit-requisites-card,
+  .deposit-requisites-loading,
+  .payment-bank-row,
+  .deposit-confirm-box,
+  .withdraw-confirm-box,
+  .support-faq-item{
+    background:linear-gradient(135deg, rgba(255,255,255,.10), rgba(255,255,255,.035)) !important;
+  }
+
+  .notification-sheet,
+  .bonus-sheet{
+    color:#14111a !important;
+    border:1px solid rgba(20,17,26,.08) !important;
+    background:#fff !important;
+    box-shadow:0 -22px 64px rgba(0,0,0,.34), inset 0 1px 0 rgba(255,255,255,.9) !important;
+    backdrop-filter:none !important;
+    -webkit-backdrop-filter:none !important;
+  }
+
+  .notification-sheet-handle,
+  .bonus-sheet-handle{
+    background:rgba(20,17,26,.16) !important;
+  }
+
+  .notification-empty,
+  .bonus-empty{
+    color:#14111a !important;
+    border:0 !important;
+    background:transparent !important;
+    box-shadow:none !important;
+  }
+
+  .notification-empty p,
+  .bonus-empty p{
+    color:rgba(20,17,26,.68) !important;
+  }
+
+  .notification-empty-icon,
+  .bonus-empty-icon{
+    color:#fff !important;
+    border:0 !important;
+    background:linear-gradient(135deg, #9d4dff, #d946ef) !important;
+    box-shadow:0 14px 30px rgba(157,77,255,.28), inset 0 1px 0 rgba(255,255,255,.28) !important;
+  }
+
+  .notification-empty-icon svg,
+  .bonus-empty-icon svg{
+    stroke:#fff !important;
+  }
+
+  @media (max-width:390px){
+    .brand-pill{
+      width:108px !important;
+      padding:0 !important;
+    }
+  }
+
+  .profile-head,
+  .profile-balance-box,
+  .profile-id-row,
+  .menu-user,
+  .notification-empty,
+  .bonus-empty{
+    border-color:transparent !important;
+    box-shadow:none !important;
+  }
+
+  .profile-head,
+  .profile-balance-box{
+    border:0 !important;
+    background:rgba(255,255,255,.045) !important;
+  }
+
+  .profile-balance-box{
+    padding:16px !important;
+  }
+
+  .notification-empty,
+  .bonus-empty{
+    background:transparent !important;
+  }
+
+  /* No-outline pass requested: remove container frames/highlight blocks. */
+  .top-row{
+    padding:0 !important;
+    border:0 !important;
+    border-radius:0 !important;
+    background:transparent !important;
+    box-shadow:none !important;
+    backdrop-filter:none !important;
+    -webkit-backdrop-filter:none !important;
+  }
+
+  .footer-logo{
+    border:0 !important;
+    border-radius:0 !important;
+    background:transparent !important;
+    box-shadow:none !important;
+  }
+
+  .profile-head,
+  .profile-balance-box,
+  .profile-id-row,
+  .menu-user{
+    border:0 !important;
+    background:transparent !important;
+    box-shadow:none !important;
+  }
+
+  .profile-head{
+    padding:0 !important;
+  }
+
+  .profile-balance-box{
+    padding:10px 0 0 !important;
+  }
+
+  .profile-balance-box::before,
+  .profile-head::before,
+  .menu-user::before{
+    content:none !important;
+    display:none !important;
+  }
+
+  .side-menu .menu-user{
+    padding:0 !important;
+  }
+
+  .menu-list > button.menu-link:nth-of-type(3){
+    border:0 !important;
+    background:transparent !important;
+    box-shadow:none !important;
+  }
+
+  /* Burger menu polish + centered iframe close button. */
+  .side-menu{
+    border-right:1px solid rgba(255,255,255,.12) !important;
+    background:
+      linear-gradient(180deg, rgba(27,13,49,.98), rgba(9,3,20,.99)),
+      radial-gradient(circle at 20% 0%, rgba(157,77,255,.24), transparent 36%) !important;
+    box-shadow:26px 0 70px rgba(0,0,0,.46), inset -1px 0 0 rgba(255,255,255,.04) !important;
+  }
+
+  .side-menu-header{
+    padding:22px 16px 16px !important;
+    border-bottom:1px solid rgba(255,255,255,.08) !important;
+  }
+
+  .side-menu .menu-user{
+    width:100% !important;
+    min-height:64px !important;
+    padding:10px !important;
+    border:1px solid rgba(255,255,255,.12) !important;
+    border-radius:20px !important;
+    background:linear-gradient(135deg, rgba(255,255,255,.09), rgba(255,255,255,.025)) !important;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.08), 0 14px 34px rgba(0,0,0,.18) !important;
+  }
+
+  .side-menu .menu-user-avatar{
+    width:44px !important;
+    height:44px !important;
+    border-radius:16px !important;
+    border:1px solid rgba(255,255,255,.14) !important;
+    background:linear-gradient(135deg, rgba(157,77,255,.55), rgba(217,70,239,.28)) !important;
+    box-shadow:0 12px 26px rgba(157,77,255,.20), inset 0 1px 0 rgba(255,255,255,.16) !important;
+  }
+
+  .side-menu .menu-list{
+    gap:10px !important;
+    padding:14px 16px 0 !important;
+  }
+
+  .side-menu .menu-link{
+    min-height:58px !important;
+    padding:10px 12px !important;
+    border:1px solid rgba(255,255,255,.12) !important;
+    border-radius:19px !important;
+    background:linear-gradient(135deg, rgba(255,255,255,.085), rgba(255,255,255,.026)) !important;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.08), 0 12px 26px rgba(0,0,0,.14) !important;
+  }
+
+  .side-menu .menu-link:hover,
+  .side-menu .menu-link:active{
+    background:linear-gradient(135deg, rgba(157,77,255,.24), rgba(217,70,239,.10)) !important;
+    border-color:rgba(196,181,253,.28) !important;
+  }
+
+  .side-menu .menu-link-icon{
+    width:36px !important;
+    height:36px !important;
+    border-radius:14px !important;
+    border:1px solid rgba(255,255,255,.12) !important;
+    background:linear-gradient(135deg, rgba(157,77,255,.42), rgba(217,70,239,.18)) !important;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.10) !important;
+  }
+
+  .side-menu .menu-arrow{
+    opacity:.58 !important;
+    stroke:#c4b5fd !important;
+  }
+
+  .side-menu .menu-list > button.menu-link:nth-of-type(3){
+    border:1px solid rgba(196,181,253,.25) !important;
+    background:
+      linear-gradient(135deg, rgba(157,77,255,.22), rgba(217,70,239,.09)),
+      linear-gradient(135deg, rgba(255,255,255,.075), rgba(255,255,255,.025)) !important;
+    box-shadow:0 14px 32px rgba(157,77,255,.16), inset 0 1px 0 rgba(255,255,255,.10) !important;
+  }
+
+  .game-frame-header{
+    display:grid !important;
+    grid-template-columns:minmax(0, 1fr) auto minmax(0, 1fr) !important;
+    align-items:center !important;
+    gap:10px !important;
+    position:relative !important;
+  }
+
+  .game-frame-brand{
+    grid-column:1 !important;
+    justify-self:start !important;
+    min-width:0 !important;
+  }
+
+  .game-frame-actions{
+    grid-column:2 !important;
+    justify-self:center !important;
+    position:static !important;
+  }
+
+  .game-frame-close{
+    min-width:108px !important;
+    justify-content:center !important;
+  }
+
+  @media (max-width:520px){
+    .game-frame-header{
+      grid-template-columns:minmax(0, 1fr) auto minmax(0, 1fr) !important;
+      padding-left:10px !important;
+      padding-right:10px !important;
+    }
+
+    .game-frame-brand{
+      max-width:78px !important;
+    }
+
+    .game-frame-meta{
+      display:none !important;
+    }
+
+    .game-frame-close{
+      min-width:92px !important;
+    }
+  }
+
+  /* Minimal burger refinement + device status in the game iframe header. */
+  .side-menu{
+    background:linear-gradient(180deg, rgba(18,8,34,.98), rgba(7,3,15,.99)) !important;
+    border-right:1px solid rgba(255,255,255,.10) !important;
+    box-shadow:18px 0 54px rgba(0,0,0,.38) !important;
+  }
+
+  .side-menu::before,
+  .side-menu::after{
+    content:none !important;
+    display:none !important;
+  }
+
+  .side-menu-header{
+    padding:22px 16px 14px !important;
+    border-bottom:0 !important;
+  }
+
+  .side-menu .menu-user{
+    min-height:60px !important;
+    border-radius:18px !important;
+    border:1px solid rgba(255,255,255,.10) !important;
+    background:rgba(255,255,255,.045) !important;
+    box-shadow:none !important;
+  }
+
+  .side-menu .menu-user-avatar{
+    border-radius:15px !important;
+    box-shadow:none !important;
+  }
+
+  .side-menu .menu-list{
+    gap:8px !important;
+    padding:10px 16px 0 !important;
+  }
+
+  .side-menu .menu-link{
+    min-height:54px !important;
+    border-radius:17px !important;
+    border:1px solid rgba(255,255,255,.095) !important;
+    background:rgba(255,255,255,.038) !important;
+    box-shadow:none !important;
+  }
+
+  .side-menu .menu-link:hover,
+  .side-menu .menu-link:active{
+    background:rgba(157,77,255,.13) !important;
+    border-color:rgba(196,181,253,.22) !important;
+  }
+
+  .side-menu .menu-list > button.menu-link:nth-of-type(3){
+    background:rgba(157,77,255,.15) !important;
+    border-color:rgba(196,181,253,.24) !important;
+    box-shadow:none !important;
+  }
+
+  .side-menu .menu-link-icon{
+    width:34px !important;
+    height:34px !important;
+    border-radius:13px !important;
+    background:rgba(157,77,255,.18) !important;
+    box-shadow:none !important;
+  }
+
+  .side-menu .menu-link-title{
+    font-size:13px !important;
+    font-weight:850 !important;
+  }
+
+  .side-menu .menu-link-desc{
+    display:none !important;
+  }
+
+  .game-frame-device-status{
+    grid-column:3 !important;
+    justify-self:end !important;
+    display:flex !important;
+    align-items:center !important;
+    gap:8px !important;
+    min-width:74px !important;
+    height:32px !important;
+    padding:0 8px !important;
+    border:1px solid rgba(255,255,255,.10) !important;
+    border-radius:12px !important;
+    color:rgba(255,255,255,.88) !important;
+    background:rgba(255,255,255,.045) !important;
+    font-size:11px !important;
+    font-weight:850 !important;
+    line-height:1 !important;
+    white-space:nowrap !important;
+  }
+
+  .game-frame-device-time{
+    min-width:31px !important;
+    text-align:right !important;
+    font-variant-numeric:tabular-nums !important;
+  }
+
+  .game-frame-battery{
+    display:flex !important;
+    align-items:center !important;
+    gap:2px !important;
+  }
+
+  .game-frame-battery-body{
+    width:22px !important;
+    height:11px !important;
+    padding:1px !important;
+    border:1.5px solid rgba(255,255,255,.74) !important;
+    border-radius:4px !important;
+    display:block !important;
+  }
+
+  .game-frame-battery-fill{
+    display:block !important;
+    height:100% !important;
+    width:58%;
+    border-radius:2px !important;
+    background:linear-gradient(90deg, #c4b5fd, #d946ef) !important;
+    transition:width .25s ease !important;
+  }
+
+  .game-frame-battery-cap{
+    width:2px !important;
+    height:5px !important;
+    border-radius:0 2px 2px 0 !important;
+    background:rgba(255,255,255,.74) !important;
+    display:block !important;
+  }
+
+  .game-frame-device-status.is-low .game-frame-battery-fill{
+    background:#ff7898 !important;
+  }
+
+  .game-frame-device-status.is-charging .game-frame-battery-fill{
+    background:linear-gradient(90deg, #9d4dff, #f0abfc) !important;
+  }
+
+  @media (max-width:360px){
+    .game-frame-device-status{
+      min-width:66px !important;
+      gap:5px !important;
+      padding:0 6px !important;
+      font-size:10px !important;
+    }
+
+    .game-frame-battery-body{
+      width:19px !important;
+    }
+  }
 </style>
+
+<script id="vezus-device-status-script">
+(function(){
+  var timer = null;
+  var batteryRef = null;
+
+  function two(value){
+    return String(value).padStart(2, '0');
+  }
+
+  function ensureStatus(){
+    var header = document.querySelector('.game-frame-header');
+    if(!header) return null;
+
+    var status = document.getElementById('gameFrameDeviceStatus');
+    if(status) return status;
+
+    status = document.createElement('div');
+    status.className = 'game-frame-device-status is-unknown';
+    status.id = 'gameFrameDeviceStatus';
+    status.setAttribute('aria-label', 'Время и батарея устройства');
+    status.innerHTML =
+      '<span class="game-frame-device-time" id="gameFrameDeviceTime">--:--</span>' +
+      '<span class="game-frame-battery" id="gameFrameBattery" aria-hidden="true">' +
+        '<span class="game-frame-battery-body">' +
+          '<span class="game-frame-battery-fill" id="gameFrameBatteryFill"></span>' +
+        '</span>' +
+        '<span class="game-frame-battery-cap"></span>' +
+      '</span>';
+
+    header.appendChild(status);
+    return status;
+  }
+
+  function updateTime(){
+    var status = ensureStatus();
+    if(!status) return;
+
+    var time = document.getElementById('gameFrameDeviceTime');
+    if(!time) return;
+
+    var now = new Date();
+    time.textContent = two(now.getHours()) + ':' + two(now.getMinutes());
+  }
+
+  function renderBattery(level, charging, known){
+    var status = ensureStatus();
+    if(!status) return;
+
+    var fill = document.getElementById('gameFrameBatteryFill');
+    if(!fill) return;
+
+    var percent = known ? Math.max(0, Math.min(100, Math.round(level * 100))) : 58;
+    fill.style.width = percent + '%';
+
+    status.classList.toggle('is-unknown', !known);
+    status.classList.toggle('is-low', known && percent <= 20 && !charging);
+    status.classList.toggle('is-charging', !!charging);
+    status.title = known ? ('Батарея: ' + percent + '%' + (charging ? ', зарядка' : '')) : 'Батарея недоступна';
+  }
+
+  function bindBattery(){
+    if(!navigator.getBattery){
+      renderBattery(0.58, false, false);
+      return;
+    }
+
+    navigator.getBattery().then(function(battery){
+      batteryRef = battery;
+
+      function update(){
+        renderBattery(batteryRef.level, batteryRef.charging, true);
+      }
+
+      update();
+      batteryRef.addEventListener('levelchange', update);
+      batteryRef.addEventListener('chargingchange', update);
+    }).catch(function(){
+      renderBattery(0.58, false, false);
+    });
+  }
+
+  function init(){
+    ensureStatus();
+    updateTime();
+    bindBattery();
+
+    if(timer) clearInterval(timer);
+    timer = setInterval(updateTime, 15000);
+  }
+
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', init);
+  }else{
+    init();
+  }
+})();
+</script>
 
 </body>
 </html>
