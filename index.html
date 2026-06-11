@@ -11849,129 +11849,77 @@ function resetWithdrawStep(){
 
 <!-- FRAME SLEEP MODE: при открытом iframe главная страница засыпает и не грузит FPS -->
 <style id="vezus-frame-sleep-style">
-  /*
-    FRAME SLEEP MODE FIX:
-    Теперь полная заморозка главной страницы включается только для iframe с играми.
-    Кошелёк, история платежей, ваучеры и другие wallet-frame страницы больше не прячут .app/.bottom-nav.
-  */
-
   body.main-frame-paused{
     overflow:hidden !important;
     touch-action:none !important;
   }
 
-  body.main-frame-paused.game-frame-open::before,
-  body.main-frame-paused.game-frame-open::after{
+  body.main-frame-paused::before,
+  body.main-frame-paused::after{
     display:none !important;
     animation:none !important;
   }
 
-  body.main-frame-paused.game-frame-open .app,
-  body.main-frame-paused.game-frame-open .bottom-nav{
+  body.main-frame-paused .app,
+  body.main-frame-paused .bottom-nav{
     content-visibility:hidden !important;
     visibility:hidden !important;
     pointer-events:none !important;
   }
 
-  body.main-frame-paused.game-frame-open .app *,
-  body.main-frame-paused.game-frame-open .bottom-nav *,
-  body.main-frame-paused.game-frame-open .side-menu *,
-  body.main-frame-paused.game-frame-open .profile-sheet *,
-  body.main-frame-paused.game-frame-open .notification-sheet *,
-  body.main-frame-paused.game-frame-open .deposit-sheet *,
-  body.main-frame-paused.game-frame-open .voucher-sheet *,
-  body.main-frame-paused.game-frame-open .withdraw-sheet *,
-  body.main-frame-paused.game-frame-open .bonus-sheet *{
+  body.main-frame-paused .app *,
+  body.main-frame-paused .bottom-nav *,
+  body.main-frame-paused .side-menu *,
+  body.main-frame-paused .profile-sheet *,
+  body.main-frame-paused .notification-sheet *,
+  body.main-frame-paused .deposit-sheet *,
+  body.main-frame-paused .voucher-sheet *,
+  body.main-frame-paused .withdraw-sheet *,
+  body.main-frame-paused .bonus-sheet *{
     animation-play-state:paused !important;
     transition:none !important;
   }
 
-  body.main-frame-paused.game-frame-open .game-frame-overlay{
+  body.main-frame-paused .game-frame-overlay,
+  body.main-frame-paused .wallet-frame-overlay{
     backdrop-filter:none !important;
     -webkit-backdrop-filter:none !important;
   }
 
-  body.main-frame-paused.game-frame-open .banner-track{
+  body.main-frame-paused .banner-track{
     transition:none !important;
     will-change:auto !important;
-  }
-
-  /*
-    Safety: если main-frame-paused случайно остался после кошелька/истории,
-    главная страница всё равно видна.
-  */
-  body.main-frame-paused:not(.game-frame-open) .app,
-  body.main-frame-paused:not(.game-frame-open) .bottom-nav{
-    content-visibility:visible !important;
-    visibility:visible !important;
-    pointer-events:auto !important;
-  }
-
-  body.main-frame-paused:not(.game-frame-open)::before,
-  body.main-frame-paused:not(.game-frame-open)::after{
-    display:block !important;
   }
 </style>
 
 <script id="vezus-frame-sleep-script">
 (function(){
   var scrollTopBeforeFrame = 0;
+  var frameReasons = Object.create(null);
   var paused = false;
-  var gameOpenReason = false;
 
-  function isGameFrameOpen(){
-    var shell = document.getElementById('gameFrameShell');
-    var overlay = document.getElementById('gameFrameOverlay');
-
-    return !!(
-      document.body.classList.contains('game-frame-open') ||
-      (shell && shell.classList.contains('active')) ||
-      (overlay && overlay.classList.contains('active'))
-    );
-  }
-
-  function isWalletFrameOpen(){
-    var box = document.getElementById('walletFrameBox');
-    var overlay = document.getElementById('walletFrameOverlay');
-
-    return !!(
-      document.body.classList.contains('wallet-frame-open') ||
-      (box && box.classList.contains('active')) ||
-      (overlay && overlay.classList.contains('active'))
-    );
+  function isAnyFrameOpen(){
+    var gameOpen = document.body.classList.contains('game-frame-open') || !!document.querySelector('.game-frame-shell.active');
+    var walletOpen = document.body.classList.contains('wallet-frame-open') || !!document.querySelector('.wallet-frame-box.active');
+    return gameOpen || walletOpen;
   }
 
   function closeHeavyHomePanels(){
     document.body.classList.remove(
-      'menu-open',
-      'profile-open',
-      'notifications-open',
-      'deposit-open',
-      'voucher-open',
-      'history-open',
-      'withdraw-open',
-      'bonus-open'
+      'menu-open', 'profile-open', 'notifications-open', 'deposit-open',
+      'voucher-open', 'history-open', 'withdraw-open', 'bonus-open'
     );
 
     var selectors = [
-      '.side-menu.active',
-      '.side-panel-overlay.active',
-      '.profile-sheet.active',
-      '.profile-sheet-overlay.active',
-      '.notification-sheet.active',
-      '.notification-sheet-overlay.active',
-      '.deposit-sheet.active',
-      '.deposit-sheet-overlay.active',
-      '.voucher-sheet.active',
-      '.voucher-sheet-overlay.active',
-      '.history-sheet.active',
-      '.history-sheet-overlay.active',
-      '.withdraw-sheet.active',
-      '.withdraw-sheet-overlay.active',
-      '.bonus-sheet.active',
-      '.bonus-sheet-overlay.active',
-      '.ask-sheet.active',
-      '.ask-sheet-overlay.active'
+      '.side-menu.active', '.side-panel-overlay.active',
+      '.profile-sheet.active', '.profile-sheet-overlay.active',
+      '.notification-sheet.active', '.notification-sheet-overlay.active',
+      '.deposit-sheet.active', '.deposit-sheet-overlay.active',
+      '.voucher-sheet.active', '.voucher-sheet-overlay.active',
+      '.history-sheet.active', '.history-sheet-overlay.active',
+      '.withdraw-sheet.active', '.withdraw-sheet-overlay.active',
+      '.bonus-sheet.active', '.bonus-sheet-overlay.active',
+      '.ask-sheet.active', '.ask-sheet-overlay.active'
     ];
 
     document.querySelectorAll(selectors.join(',')).forEach(function(el){
@@ -11979,38 +11927,19 @@ function resetWithdrawStep(){
     });
   }
 
-  function resumeMainIfNoGame(){
-    if(isGameFrameOpen()) return;
+  function setMainPaused(active, reason){
+    reason = reason || 'frame';
 
-    gameOpenReason = false;
-    paused = false;
-    document.body.classList.remove('main-frame-paused');
-
-    var app = document.querySelector('.app');
-    var nav = document.querySelector('.bottom-nav');
-
-    if(app){
-      app.style.removeProperty('content-visibility');
-      app.style.removeProperty('visibility');
-      app.style.removeProperty('pointer-events');
+    if(active){
+      frameReasons[reason] = true;
+    }else{
+      delete frameReasons[reason];
     }
 
-    if(nav){
-      nav.style.removeProperty('content-visibility');
-      nav.style.removeProperty('visibility');
-      nav.style.removeProperty('pointer-events');
-    }
-
-    document.dispatchEvent(new CustomEvent('vezus:main-resume'));
-  }
-
-  function setMainPaused(active){
-    var shouldPause = !!active && isGameFrameOpen();
-
+    var shouldPause = Object.keys(frameReasons).length > 0 || isAnyFrameOpen();
     if(shouldPause === paused) return;
 
     paused = shouldPause;
-    gameOpenReason = shouldPause;
 
     if(paused){
       scrollTopBeforeFrame = window.scrollY || document.documentElement.scrollTop || 0;
@@ -12027,69 +11956,31 @@ function resetWithdrawStep(){
   }
 
   function syncFramePause(){
-    if(isGameFrameOpen()){
-      setMainPaused(true);
-    }else{
-      resumeMainIfNoGame();
-    }
+    setMainPaused(isAnyFrameOpen(), 'sync');
   }
 
-  function wrapGameOpenClose(){
-    var openFn = window.openGameFrame;
-    var closeFn = window.closeGameFrame;
+  window.vezusSetMainPaused = setMainPaused;
+  window.vezusSyncFramePause = syncFramePause;
+
+  function wrapOpenClose(openName, closeName, reason){
+    var openFn = window[openName];
+    var closeFn = window[closeName];
 
     if(typeof openFn === 'function' && !openFn.__vezusSleepWrapped){
-      window.openGameFrame = function(){
-        var result = openFn.apply(this, arguments);
-        setTimeout(syncFramePause, 30);
-        return result;
+      window[openName] = function(){
+        setMainPaused(true, reason);
+        return openFn.apply(this, arguments);
       };
-      window.openGameFrame.__vezusSleepWrapped = true;
+      window[openName].__vezusSleepWrapped = true;
     }
 
     if(typeof closeFn === 'function' && !closeFn.__vezusSleepWrapped){
-      window.closeGameFrame = function(){
+      window[closeName] = function(){
         var result = closeFn.apply(this, arguments);
-        setTimeout(syncFramePause, 40);
-        setTimeout(syncFramePause, 280);
+        setTimeout(syncFramePause, 260);
         return result;
       };
-      window.closeGameFrame.__vezusSleepWrapped = true;
-    }
-  }
-
-  function wrapWalletCleanup(){
-    var openWallet = window.openWalletOverlay;
-    var closeWallet = window.closeWalletOverlay;
-
-    if(typeof openWallet === 'function' && !openWallet.__vezusWalletCleanupWrapped){
-      window.openWalletOverlay = function(){
-        /*
-          Кошелёк/history.html не должны включать main-frame-paused.
-          Перед открытием кошелька снимаем зависшую заморозку, если игры нет.
-        */
-        resumeMainIfNoGame();
-        return openWallet.apply(this, arguments);
-      };
-      window.openWalletOverlay.__vezusWalletCleanupWrapped = true;
-    }
-
-    if(typeof closeWallet === 'function' && !closeWallet.__vezusWalletCleanupWrapped){
-      window.closeWalletOverlay = function(){
-        var result = closeWallet.apply(this, arguments);
-
-        setTimeout(function(){
-          /*
-            После закрытия кошелька/истории гарантированно возвращаем главную,
-            но только если не открыта игра.
-          */
-          resumeMainIfNoGame();
-        }, 40);
-
-        setTimeout(resumeMainIfNoGame, 280);
-        return result;
-      };
-      window.closeWalletOverlay.__vezusWalletCleanupWrapped = true;
+      window[closeName].__vezusSleepWrapped = true;
     }
   }
 
@@ -12100,88 +11991,21 @@ function resetWithdrawStep(){
       document.getElementById('gameFrameShell'),
       document.getElementById('gameFrameOverlay'),
       document.getElementById('walletFrameBox'),
-      document.getElementById('walletFrameOverlay'),
-      document.body
+      document.getElementById('walletFrameOverlay')
     ].filter(Boolean);
 
-    var observer = new MutationObserver(function(){
-      if(isGameFrameOpen()){
-        syncFramePause();
-        return;
-      }
-
-      if(!isWalletFrameOpen()){
-        resumeMainIfNoGame();
-        return;
-      }
-
-      /*
-        Wallet открыт, но это не игра. Главная не должна быть скрыта.
-      */
-      resumeMainIfNoGame();
-    });
-
+    var observer = new MutationObserver(syncFramePause);
     nodes.forEach(function(node){
       observer.observe(node, { attributes:true, attributeFilter:['class'] });
     });
   }
 
-  function bindWalletMessages(){
-    window.addEventListener('message', function(event){
-      if(event.origin !== window.location.origin) return;
-
-      var data = event.data || {};
-      var type = String(data.type || '').toUpperCase();
-
-      if(
-        type === 'VEZUS_CLOSE_WALLET' ||
-        type === 'CLOSE_WALLET' ||
-        type === 'VEZUS_CLOSE_HISTORY' ||
-        type === 'CLOSE_HISTORY'
-      ){
-        if(typeof window.closeWalletOverlay === 'function'){
-          window.closeWalletOverlay();
-        }else{
-          resumeMainIfNoGame();
-        }
-      }
-
-      if(
-        type === 'VEZUS_WALLET_READY' ||
-        type === 'VEZUS_HISTORY_READY' ||
-        type.indexOf('WALLET') !== -1 ||
-        type.indexOf('HISTORY') !== -1
-      ){
-        resumeMainIfNoGame();
-      }
-    });
-  }
-
   function init(){
-    wrapGameOpenClose();
-    wrapWalletCleanup();
+    wrapOpenClose('openGameFrame', 'closeGameFrame', 'game');
+    wrapOpenClose('openWalletOverlay', 'closeWalletOverlay', 'wallet');
     observeFrameNodes();
-    bindWalletMessages();
     syncFramePause();
-
-    /*
-      При загрузке страницы чистим старое зависшее состояние.
-    */
-    setTimeout(resumeMainIfNoGame, 80);
-    setTimeout(resumeMainIfNoGame, 420);
   }
-
-  window.vezusSetMainPaused = function(active){
-    if(active){
-      if(isGameFrameOpen()) setMainPaused(true);
-      return;
-    }
-
-    resumeMainIfNoGame();
-  };
-
-  window.vezusSyncFramePause = syncFramePause;
-  window.vezusForceMainResume = resumeMainIfNoGame;
 
   if(document.readyState === 'loading'){
     document.addEventListener('DOMContentLoaded', init, { once:true });
@@ -12190,473 +12014,6 @@ function resetWithdrawStep(){
   }
 })();
 </script>
-
-
-<style id="wallet-history-freeze-final-guard">
-  /* Final guard: wallet/history frame must never hide the main page */
-  body.main-frame-paused:not(.game-frame-open) .app,
-  body.main-frame-paused:not(.game-frame-open) .bottom-nav{
-    content-visibility:visible !important;
-    visibility:visible !important;
-    pointer-events:auto !important;
-  }
-
-  body.wallet-frame-open:not(.game-frame-open) .app,
-  body.wallet-frame-open:not(.game-frame-open) .bottom-nav{
-    content-visibility:visible !important;
-    visibility:visible !important;
-  }
-</style>
-
-<style id="vezus-modern-visual-refresh">
-  :root{
-    --modern-bg:#060711;
-    --modern-panel:rgba(16,18,32,.76);
-    --modern-panel-strong:rgba(24,27,45,.88);
-    --modern-line:rgba(255,255,255,.13);
-    --modern-line-soft:rgba(255,255,255,.075);
-    --modern-text:#f8fbff;
-    --modern-muted:rgba(248,251,255,.58);
-    --modern-accent:#8fe7ff;
-    --modern-accent-2:#ffca66;
-    --modern-accent-3:#ff6fcb;
-    --modern-shadow:0 22px 70px rgba(0,0,0,.42);
-  }
-
-  html{
-    background:var(--modern-bg) !important;
-  }
-
-  body{
-    color:var(--modern-text) !important;
-    background:
-      linear-gradient(180deg, rgba(255,255,255,.035), rgba(255,255,255,0) 240px),
-      linear-gradient(135deg, rgba(143,231,255,.10) 0%, transparent 31%),
-      linear-gradient(225deg, rgba(255,111,203,.12) 0%, transparent 28%),
-      linear-gradient(180deg, #080a16 0%, #080716 44%, #04050b 100%) !important;
-  }
-
-  body::before{
-    inset:0 !important;
-    width:auto !important;
-    height:auto !important;
-    border-radius:0 !important;
-    background:
-      linear-gradient(rgba(255,255,255,.035) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(255,255,255,.025) 1px, transparent 1px) !important;
-    background-size:46px 46px !important;
-    opacity:.22 !important;
-    filter:none !important;
-    transform:none !important;
-  }
-
-  body::after{
-    display:none !important;
-  }
-
-  .app{
-    width:min(100%, 1120px) !important;
-    padding-left:16px !important;
-    padding-right:16px !important;
-  }
-
-  .top-row{
-    min-height:62px !important;
-    padding:8px !important;
-    border:1px solid var(--modern-line-soft) !important;
-    border-radius:24px !important;
-    background:linear-gradient(135deg, rgba(255,255,255,.095), rgba(255,255,255,.035)) !important;
-    box-shadow:0 14px 44px rgba(0,0,0,.25), inset 0 1px 0 rgba(255,255,255,.10) !important;
-    backdrop-filter:blur(18px) saturate(1.24) !important;
-    -webkit-backdrop-filter:blur(18px) saturate(1.24) !important;
-  }
-
-  .brand-pill{
-    width:132px !important;
-    height:48px !important;
-    padding:7px 10px !important;
-    border:1px solid rgba(255,255,255,.10) !important;
-    border-radius:18px !important;
-    background:rgba(255,255,255,.055) !important;
-    box-shadow:inset 0 1px 0 rgba(255,255,255,.10) !important;
-  }
-
-  .brand-pill img{
-    height:100% !important;
-    filter:drop-shadow(0 8px 18px rgba(0,0,0,.36)) !important;
-  }
-
-  .balance-pill{
-    min-width:174px !important;
-    height:48px !important;
-    padding:7px 8px 7px 16px !important;
-    border-color:rgba(143,231,255,.18) !important;
-    border-radius:18px !important;
-    background:
-      linear-gradient(135deg, rgba(143,231,255,.13), rgba(255,111,203,.08)),
-      rgba(4,6,16,.62) !important;
-    box-shadow:0 12px 32px rgba(0,0,0,.26), inset 0 1px 0 rgba(255,255,255,.11) !important;
-  }
-
-  .balance-label{
-    color:var(--modern-muted) !important;
-  }
-
-  .balance-value{
-    color:#fff !important;
-    font-size:15px !important;
-  }
-
-  .wallet-btn,
-  .notify-pill{
-    border-color:rgba(255,255,255,.14) !important;
-    background:linear-gradient(135deg, rgba(255,255,255,.16), rgba(255,255,255,.055)) !important;
-    box-shadow:inset 0 1px 0 rgba(255,255,255,.12), 0 10px 24px rgba(0,0,0,.22) !important;
-  }
-
-  .wallet-btn svg,
-  .notify-pill svg{
-    stroke:var(--modern-accent) !important;
-    filter:drop-shadow(0 0 9px rgba(143,231,255,.34)) !important;
-  }
-
-  .hero-slider{
-    border-radius:24px !important;
-    border:1px solid rgba(255,255,255,.14) !important;
-    background:
-      linear-gradient(135deg, rgba(143,231,255,.12), rgba(255,111,203,.08)),
-      rgba(5,6,16,.72) !important;
-    box-shadow:var(--modern-shadow), inset 0 1px 0 rgba(255,255,255,.10) !important;
-    padding:5px !important;
-  }
-
-  .banner,
-  .banner.banner-image-slot,
-  .banner-image-slot,
-  .banner img,
-  .banner-image-slot img{
-    border-radius:19px !important;
-  }
-
-  .banner.banner-image-slot{
-    box-shadow:inset 0 0 0 1px rgba(255,255,255,.08) !important;
-  }
-
-  .banner-activate-btn{
-    right:14px !important;
-    bottom:14px !important;
-    min-height:34px !important;
-    padding:0 14px !important;
-    border-radius:999px !important;
-    border:1px solid rgba(255,255,255,.22) !important;
-    color:#051018 !important;
-    background:linear-gradient(135deg, #fff3bc, #8fe7ff) !important;
-    box-shadow:0 10px 28px rgba(0,0,0,.32), inset 0 1px 0 rgba(255,255,255,.55) !important;
-    font-size:11px !important;
-    font-weight:900 !important;
-  }
-
-  .banner-mini-indicator{
-    margin-top:12px !important;
-    padding:5px 9px !important;
-    border-color:rgba(255,255,255,.10) !important;
-    background:rgba(255,255,255,.055) !important;
-    box-shadow:inset 0 1px 0 rgba(255,255,255,.08) !important;
-  }
-
-  .banner-mini-indicator span{
-    background:rgba(255,255,255,.34) !important;
-  }
-
-  .banner-mini-indicator span.active{
-    background:linear-gradient(90deg, var(--modern-accent), var(--modern-accent-2)) !important;
-  }
-
-  .section{
-    margin-top:30px !important;
-  }
-
-  .section-head{
-    padding:0 2px 12px !important;
-  }
-
-  .section-title{
-    position:relative !important;
-    display:inline-flex !important;
-    align-items:center !important;
-    gap:10px !important;
-    color:#fff !important;
-    font-size:21px !important;
-    line-height:1.1 !important;
-    letter-spacing:0 !important;
-  }
-
-  .section-title::before{
-    content:"" !important;
-    width:7px !important;
-    height:22px !important;
-    flex:0 0 auto !important;
-    border-radius:999px !important;
-    background:linear-gradient(180deg, var(--modern-accent), var(--modern-accent-3)) !important;
-    box-shadow:0 0 22px rgba(143,231,255,.36) !important;
-  }
-
-  .cards-row{
-    gap:14px !important;
-    padding-top:6px !important;
-    padding-bottom:30px !important;
-  }
-
-  .cards-row > *,
-  .game-card.image-card{
-    border-radius:22px !important;
-    border:1px solid rgba(255,255,255,.12) !important;
-    background:
-      linear-gradient(145deg, rgba(255,255,255,.105), rgba(255,255,255,.025)),
-      rgba(12,14,27,.82) !important;
-    box-shadow:
-      0 18px 44px rgba(0,0,0,.34),
-      inset 0 1px 0 rgba(255,255,255,.11) !important;
-  }
-
-  .cards-row img{
-    padding:4px !important;
-    border-radius:20px !important;
-    background:rgba(0,0,0,.18) !important;
-    filter:saturate(1.04) contrast(1.02) !important;
-  }
-
-  article.game-card.image-card:empty{
-    display:grid !important;
-    place-items:center !important;
-    background:
-      linear-gradient(135deg, rgba(143,231,255,.10), transparent 38%),
-      linear-gradient(315deg, rgba(255,202,102,.10), transparent 34%),
-      rgba(13,16,30,.84) !important;
-  }
-
-  article.game-card.image-card:empty::before{
-    content:"" !important;
-    width:46% !important;
-    aspect-ratio:1 !important;
-    border-radius:18px !important;
-    background:
-      linear-gradient(135deg, rgba(255,255,255,.18), rgba(255,255,255,.045)),
-      linear-gradient(135deg, rgba(143,231,255,.15), rgba(255,111,203,.12)) !important;
-    box-shadow:inset 0 1px 0 rgba(255,255,255,.16), 0 18px 34px rgba(0,0,0,.24) !important;
-  }
-
-  article.game-card.image-card:empty::after{
-    content:"" !important;
-    position:absolute !important;
-    left:22% !important;
-    right:22% !important;
-    bottom:20px !important;
-    height:6px !important;
-    border-radius:999px !important;
-    background:rgba(255,255,255,.10) !important;
-  }
-
-  .bottom-nav{
-    width:min(calc(100% - 28px), 500px) !important;
-    min-height:72px !important;
-    padding:8px !important;
-    border-radius:24px !important;
-    border-color:rgba(255,255,255,.13) !important;
-    background:linear-gradient(135deg, rgba(20,23,38,.86), rgba(8,10,20,.82)) !important;
-    box-shadow:0 20px 56px rgba(0,0,0,.48), inset 0 1px 0 rgba(255,255,255,.10) !important;
-    backdrop-filter:blur(22px) saturate(1.26) !important;
-    -webkit-backdrop-filter:blur(22px) saturate(1.26) !important;
-  }
-
-  .nav-item{
-    border-radius:18px !important;
-    color:rgba(248,251,255,.64) !important;
-  }
-
-  .nav-item.active{
-    color:#fff !important;
-    background:
-      linear-gradient(135deg, rgba(143,231,255,.18), rgba(255,202,102,.11)),
-      rgba(255,255,255,.055) !important;
-    box-shadow:inset 0 1px 0 rgba(255,255,255,.13), 0 10px 22px rgba(0,0,0,.18) !important;
-  }
-
-  .nav-item.active .nav-icon{
-    stroke:var(--modern-accent) !important;
-    filter:drop-shadow(0 0 9px rgba(143,231,255,.35)) !important;
-  }
-
-  .project-footer{
-    border-radius:24px !important;
-    border:1px solid rgba(255,255,255,.10) !important;
-    background:linear-gradient(145deg, rgba(255,255,255,.075), rgba(255,255,255,.025)) !important;
-    box-shadow:inset 0 1px 0 rgba(255,255,255,.08), 0 18px 46px rgba(0,0,0,.20) !important;
-  }
-
-  .age-badge,
-  .footer-telegram-link{
-    border-color:rgba(255,255,255,.13) !important;
-    background:rgba(255,255,255,.07) !important;
-    box-shadow:inset 0 1px 0 rgba(255,255,255,.09) !important;
-  }
-
-  .side-menu{
-    border-color:rgba(255,255,255,.12) !important;
-    background:
-      linear-gradient(180deg, rgba(255,255,255,.11), rgba(255,255,255,.035)),
-      #0d1020 !important;
-    color:var(--modern-text) !important;
-    box-shadow:0 28px 80px rgba(0,0,0,.52), inset 0 1px 0 rgba(255,255,255,.11) !important;
-  }
-
-  .notification-sheet,
-  .profile-sheet,
-  .deposit-sheet,
-  .voucher-sheet,
-  .history-sheet,
-  .withdraw-sheet,
-  .bonus-sheet{
-    border-color:rgba(16,20,32,.08) !important;
-    background:
-      linear-gradient(180deg, rgba(255,255,255,1), rgba(244,247,255,.98)) !important;
-    color:#101420 !important;
-    box-shadow:0 28px 80px rgba(0,0,0,.38), inset 0 1px 0 rgba(255,255,255,.9) !important;
-  }
-
-  .profile-sheet,
-  .deposit-sheet,
-  .voucher-sheet,
-  .history-sheet,
-  .withdraw-sheet,
-  .bonus-sheet,
-  .notification-sheet{
-    border-radius:30px 30px 0 0 !important;
-  }
-
-  .menu-link,
-  .support-toggle,
-  .support-submenu,
-  .support-subitem{
-    border-color:rgba(255,255,255,.10) !important;
-    background:rgba(255,255,255,.065) !important;
-    box-shadow:inset 0 1px 0 rgba(255,255,255,.08) !important;
-  }
-
-  .profile-balance-box,
-  .voucher-box,
-  .deposit-card,
-  .withdraw-card,
-  .history-item,
-  .notification-empty-icon,
-  .bonus-empty-icon{
-    border-color:rgba(16,20,32,.08) !important;
-    background:rgba(16,20,32,.045) !important;
-    box-shadow:inset 0 1px 0 rgba(255,255,255,.8) !important;
-  }
-
-  .profile-info h2,
-  .profile-small-title,
-  .deposit-title,
-  .voucher-title,
-  .history-title,
-  .withdraw-title{
-    color:#101420 !important;
-  }
-
-  .profile-id-row span,
-  .voucher-subtitle,
-  .history-subtitle,
-  .withdraw-amount-hint,
-  .deposit-amount-hint,
-  .notification-empty p,
-  .bonus-empty p{
-    color:rgba(16,20,32,.62) !important;
-  }
-
-  .profile-deposit-btn,
-  .deposit-submit-btn,
-  .deposit-paid-btn,
-  .voucher-activate,
-  .withdraw-next-btn,
-  .withdraw-submit-btn{
-    color:#061018 !important;
-    background:linear-gradient(135deg, #fff3bc, #8fe7ff) !important;
-    box-shadow:0 15px 34px rgba(143,231,255,.18), inset 0 1px 0 rgba(255,255,255,.45) !important;
-  }
-
-  .deposit-amount-input,
-  .deposit-payer-input,
-  .voucher-input,
-  .withdraw-amount-input,
-  .withdraw-input{
-    border-color:rgba(16,20,32,.10) !important;
-    color:#101420 !important;
-    background:#fff !important;
-  }
-
-  .deposit-amount-input::placeholder,
-  .deposit-payer-input::placeholder,
-  .voucher-input::placeholder,
-  .withdraw-amount-input::placeholder,
-  .withdraw-input::placeholder{
-    color:rgba(16,20,32,.42) !important;
-  }
-
-  @media (max-width:390px){
-    .app{
-      padding-left:12px !important;
-      padding-right:12px !important;
-    }
-
-    .top-row{
-      border-radius:22px !important;
-      gap:8px !important;
-    }
-
-    .brand-pill{
-      width:106px !important;
-    }
-
-    .balance-pill{
-      min-width:148px !important;
-      padding-left:12px !important;
-    }
-
-    .hero-slider{
-      border-radius:21px !important;
-      padding:4px !important;
-    }
-
-    .banner,
-    .banner.banner-image-slot,
-    .banner-image-slot,
-    .banner img,
-    .banner-image-slot img{
-      border-radius:17px !important;
-    }
-
-    .section-title{
-      font-size:20px !important;
-    }
-  }
-
-  @media (min-width:720px){
-    .app{
-      padding-left:24px !important;
-      padding-right:24px !important;
-    }
-
-    .top-row{
-      max-width:760px !important;
-      margin:0 auto !important;
-    }
-
-    .cards-row{
-      gap:16px !important;
-    }
-  }
-</style>
 
 </body>
 </html>
