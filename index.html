@@ -11849,77 +11849,129 @@ function resetWithdrawStep(){
 
 <!-- FRAME SLEEP MODE: при открытом iframe главная страница засыпает и не грузит FPS -->
 <style id="vezus-frame-sleep-style">
+  /*
+    FRAME SLEEP MODE FIX:
+    Теперь полная заморозка главной страницы включается только для iframe с играми.
+    Кошелёк, история платежей, ваучеры и другие wallet-frame страницы больше не прячут .app/.bottom-nav.
+  */
+
   body.main-frame-paused{
     overflow:hidden !important;
     touch-action:none !important;
   }
 
-  body.main-frame-paused::before,
-  body.main-frame-paused::after{
+  body.main-frame-paused.game-frame-open::before,
+  body.main-frame-paused.game-frame-open::after{
     display:none !important;
     animation:none !important;
   }
 
-  body.main-frame-paused .app,
-  body.main-frame-paused .bottom-nav{
+  body.main-frame-paused.game-frame-open .app,
+  body.main-frame-paused.game-frame-open .bottom-nav{
     content-visibility:hidden !important;
     visibility:hidden !important;
     pointer-events:none !important;
   }
 
-  body.main-frame-paused .app *,
-  body.main-frame-paused .bottom-nav *,
-  body.main-frame-paused .side-menu *,
-  body.main-frame-paused .profile-sheet *,
-  body.main-frame-paused .notification-sheet *,
-  body.main-frame-paused .deposit-sheet *,
-  body.main-frame-paused .voucher-sheet *,
-  body.main-frame-paused .withdraw-sheet *,
-  body.main-frame-paused .bonus-sheet *{
+  body.main-frame-paused.game-frame-open .app *,
+  body.main-frame-paused.game-frame-open .bottom-nav *,
+  body.main-frame-paused.game-frame-open .side-menu *,
+  body.main-frame-paused.game-frame-open .profile-sheet *,
+  body.main-frame-paused.game-frame-open .notification-sheet *,
+  body.main-frame-paused.game-frame-open .deposit-sheet *,
+  body.main-frame-paused.game-frame-open .voucher-sheet *,
+  body.main-frame-paused.game-frame-open .withdraw-sheet *,
+  body.main-frame-paused.game-frame-open .bonus-sheet *{
     animation-play-state:paused !important;
     transition:none !important;
   }
 
-  body.main-frame-paused .game-frame-overlay,
-  body.main-frame-paused .wallet-frame-overlay{
+  body.main-frame-paused.game-frame-open .game-frame-overlay{
     backdrop-filter:none !important;
     -webkit-backdrop-filter:none !important;
   }
 
-  body.main-frame-paused .banner-track{
+  body.main-frame-paused.game-frame-open .banner-track{
     transition:none !important;
     will-change:auto !important;
+  }
+
+  /*
+    Safety: если main-frame-paused случайно остался после кошелька/истории,
+    главная страница всё равно видна.
+  */
+  body.main-frame-paused:not(.game-frame-open) .app,
+  body.main-frame-paused:not(.game-frame-open) .bottom-nav{
+    content-visibility:visible !important;
+    visibility:visible !important;
+    pointer-events:auto !important;
+  }
+
+  body.main-frame-paused:not(.game-frame-open)::before,
+  body.main-frame-paused:not(.game-frame-open)::after{
+    display:block !important;
   }
 </style>
 
 <script id="vezus-frame-sleep-script">
 (function(){
   var scrollTopBeforeFrame = 0;
-  var frameReasons = Object.create(null);
   var paused = false;
+  var gameOpenReason = false;
 
-  function isAnyFrameOpen(){
-    var gameOpen = document.body.classList.contains('game-frame-open') || !!document.querySelector('.game-frame-shell.active');
-    var walletOpen = document.body.classList.contains('wallet-frame-open') || !!document.querySelector('.wallet-frame-box.active');
-    return gameOpen || walletOpen;
+  function isGameFrameOpen(){
+    var shell = document.getElementById('gameFrameShell');
+    var overlay = document.getElementById('gameFrameOverlay');
+
+    return !!(
+      document.body.classList.contains('game-frame-open') ||
+      (shell && shell.classList.contains('active')) ||
+      (overlay && overlay.classList.contains('active'))
+    );
+  }
+
+  function isWalletFrameOpen(){
+    var box = document.getElementById('walletFrameBox');
+    var overlay = document.getElementById('walletFrameOverlay');
+
+    return !!(
+      document.body.classList.contains('wallet-frame-open') ||
+      (box && box.classList.contains('active')) ||
+      (overlay && overlay.classList.contains('active'))
+    );
   }
 
   function closeHeavyHomePanels(){
     document.body.classList.remove(
-      'menu-open', 'profile-open', 'notifications-open', 'deposit-open',
-      'voucher-open', 'history-open', 'withdraw-open', 'bonus-open'
+      'menu-open',
+      'profile-open',
+      'notifications-open',
+      'deposit-open',
+      'voucher-open',
+      'history-open',
+      'withdraw-open',
+      'bonus-open'
     );
 
     var selectors = [
-      '.side-menu.active', '.side-panel-overlay.active',
-      '.profile-sheet.active', '.profile-sheet-overlay.active',
-      '.notification-sheet.active', '.notification-sheet-overlay.active',
-      '.deposit-sheet.active', '.deposit-sheet-overlay.active',
-      '.voucher-sheet.active', '.voucher-sheet-overlay.active',
-      '.history-sheet.active', '.history-sheet-overlay.active',
-      '.withdraw-sheet.active', '.withdraw-sheet-overlay.active',
-      '.bonus-sheet.active', '.bonus-sheet-overlay.active',
-      '.ask-sheet.active', '.ask-sheet-overlay.active'
+      '.side-menu.active',
+      '.side-panel-overlay.active',
+      '.profile-sheet.active',
+      '.profile-sheet-overlay.active',
+      '.notification-sheet.active',
+      '.notification-sheet-overlay.active',
+      '.deposit-sheet.active',
+      '.deposit-sheet-overlay.active',
+      '.voucher-sheet.active',
+      '.voucher-sheet-overlay.active',
+      '.history-sheet.active',
+      '.history-sheet-overlay.active',
+      '.withdraw-sheet.active',
+      '.withdraw-sheet-overlay.active',
+      '.bonus-sheet.active',
+      '.bonus-sheet-overlay.active',
+      '.ask-sheet.active',
+      '.ask-sheet-overlay.active'
     ];
 
     document.querySelectorAll(selectors.join(',')).forEach(function(el){
@@ -11927,19 +11979,38 @@ function resetWithdrawStep(){
     });
   }
 
-  function setMainPaused(active, reason){
-    reason = reason || 'frame';
+  function resumeMainIfNoGame(){
+    if(isGameFrameOpen()) return;
 
-    if(active){
-      frameReasons[reason] = true;
-    }else{
-      delete frameReasons[reason];
+    gameOpenReason = false;
+    paused = false;
+    document.body.classList.remove('main-frame-paused');
+
+    var app = document.querySelector('.app');
+    var nav = document.querySelector('.bottom-nav');
+
+    if(app){
+      app.style.removeProperty('content-visibility');
+      app.style.removeProperty('visibility');
+      app.style.removeProperty('pointer-events');
     }
 
-    var shouldPause = Object.keys(frameReasons).length > 0 || isAnyFrameOpen();
+    if(nav){
+      nav.style.removeProperty('content-visibility');
+      nav.style.removeProperty('visibility');
+      nav.style.removeProperty('pointer-events');
+    }
+
+    document.dispatchEvent(new CustomEvent('vezus:main-resume'));
+  }
+
+  function setMainPaused(active){
+    var shouldPause = !!active && isGameFrameOpen();
+
     if(shouldPause === paused) return;
 
     paused = shouldPause;
+    gameOpenReason = shouldPause;
 
     if(paused){
       scrollTopBeforeFrame = window.scrollY || document.documentElement.scrollTop || 0;
@@ -11956,31 +12027,69 @@ function resetWithdrawStep(){
   }
 
   function syncFramePause(){
-    setMainPaused(isAnyFrameOpen(), 'sync');
+    if(isGameFrameOpen()){
+      setMainPaused(true);
+    }else{
+      resumeMainIfNoGame();
+    }
   }
 
-  window.vezusSetMainPaused = setMainPaused;
-  window.vezusSyncFramePause = syncFramePause;
-
-  function wrapOpenClose(openName, closeName, reason){
-    var openFn = window[openName];
-    var closeFn = window[closeName];
+  function wrapGameOpenClose(){
+    var openFn = window.openGameFrame;
+    var closeFn = window.closeGameFrame;
 
     if(typeof openFn === 'function' && !openFn.__vezusSleepWrapped){
-      window[openName] = function(){
-        setMainPaused(true, reason);
-        return openFn.apply(this, arguments);
+      window.openGameFrame = function(){
+        var result = openFn.apply(this, arguments);
+        setTimeout(syncFramePause, 30);
+        return result;
       };
-      window[openName].__vezusSleepWrapped = true;
+      window.openGameFrame.__vezusSleepWrapped = true;
     }
 
     if(typeof closeFn === 'function' && !closeFn.__vezusSleepWrapped){
-      window[closeName] = function(){
+      window.closeGameFrame = function(){
         var result = closeFn.apply(this, arguments);
-        setTimeout(syncFramePause, 260);
+        setTimeout(syncFramePause, 40);
+        setTimeout(syncFramePause, 280);
         return result;
       };
-      window[closeName].__vezusSleepWrapped = true;
+      window.closeGameFrame.__vezusSleepWrapped = true;
+    }
+  }
+
+  function wrapWalletCleanup(){
+    var openWallet = window.openWalletOverlay;
+    var closeWallet = window.closeWalletOverlay;
+
+    if(typeof openWallet === 'function' && !openWallet.__vezusWalletCleanupWrapped){
+      window.openWalletOverlay = function(){
+        /*
+          Кошелёк/history.html не должны включать main-frame-paused.
+          Перед открытием кошелька снимаем зависшую заморозку, если игры нет.
+        */
+        resumeMainIfNoGame();
+        return openWallet.apply(this, arguments);
+      };
+      window.openWalletOverlay.__vezusWalletCleanupWrapped = true;
+    }
+
+    if(typeof closeWallet === 'function' && !closeWallet.__vezusWalletCleanupWrapped){
+      window.closeWalletOverlay = function(){
+        var result = closeWallet.apply(this, arguments);
+
+        setTimeout(function(){
+          /*
+            После закрытия кошелька/истории гарантированно возвращаем главную,
+            но только если не открыта игра.
+          */
+          resumeMainIfNoGame();
+        }, 40);
+
+        setTimeout(resumeMainIfNoGame, 280);
+        return result;
+      };
+      window.closeWalletOverlay.__vezusWalletCleanupWrapped = true;
     }
   }
 
@@ -11991,21 +12100,88 @@ function resetWithdrawStep(){
       document.getElementById('gameFrameShell'),
       document.getElementById('gameFrameOverlay'),
       document.getElementById('walletFrameBox'),
-      document.getElementById('walletFrameOverlay')
+      document.getElementById('walletFrameOverlay'),
+      document.body
     ].filter(Boolean);
 
-    var observer = new MutationObserver(syncFramePause);
+    var observer = new MutationObserver(function(){
+      if(isGameFrameOpen()){
+        syncFramePause();
+        return;
+      }
+
+      if(!isWalletFrameOpen()){
+        resumeMainIfNoGame();
+        return;
+      }
+
+      /*
+        Wallet открыт, но это не игра. Главная не должна быть скрыта.
+      */
+      resumeMainIfNoGame();
+    });
+
     nodes.forEach(function(node){
       observer.observe(node, { attributes:true, attributeFilter:['class'] });
     });
   }
 
-  function init(){
-    wrapOpenClose('openGameFrame', 'closeGameFrame', 'game');
-    wrapOpenClose('openWalletOverlay', 'closeWalletOverlay', 'wallet');
-    observeFrameNodes();
-    syncFramePause();
+  function bindWalletMessages(){
+    window.addEventListener('message', function(event){
+      if(event.origin !== window.location.origin) return;
+
+      var data = event.data || {};
+      var type = String(data.type || '').toUpperCase();
+
+      if(
+        type === 'VEZUS_CLOSE_WALLET' ||
+        type === 'CLOSE_WALLET' ||
+        type === 'VEZUS_CLOSE_HISTORY' ||
+        type === 'CLOSE_HISTORY'
+      ){
+        if(typeof window.closeWalletOverlay === 'function'){
+          window.closeWalletOverlay();
+        }else{
+          resumeMainIfNoGame();
+        }
+      }
+
+      if(
+        type === 'VEZUS_WALLET_READY' ||
+        type === 'VEZUS_HISTORY_READY' ||
+        type.indexOf('WALLET') !== -1 ||
+        type.indexOf('HISTORY') !== -1
+      ){
+        resumeMainIfNoGame();
+      }
+    });
   }
+
+  function init(){
+    wrapGameOpenClose();
+    wrapWalletCleanup();
+    observeFrameNodes();
+    bindWalletMessages();
+    syncFramePause();
+
+    /*
+      При загрузке страницы чистим старое зависшее состояние.
+    */
+    setTimeout(resumeMainIfNoGame, 80);
+    setTimeout(resumeMainIfNoGame, 420);
+  }
+
+  window.vezusSetMainPaused = function(active){
+    if(active){
+      if(isGameFrameOpen()) setMainPaused(true);
+      return;
+    }
+
+    resumeMainIfNoGame();
+  };
+
+  window.vezusSyncFramePause = syncFramePause;
+  window.vezusForceMainResume = resumeMainIfNoGame;
 
   if(document.readyState === 'loading'){
     document.addEventListener('DOMContentLoaded', init, { once:true });
@@ -12014,6 +12190,23 @@ function resetWithdrawStep(){
   }
 })();
 </script>
+
+
+<style id="wallet-history-freeze-final-guard">
+  /* Final guard: wallet/history frame must never hide the main page */
+  body.main-frame-paused:not(.game-frame-open) .app,
+  body.main-frame-paused:not(.game-frame-open) .bottom-nav{
+    content-visibility:visible !important;
+    visibility:visible !important;
+    pointer-events:auto !important;
+  }
+
+  body.wallet-frame-open:not(.game-frame-open) .app,
+  body.wallet-frame-open:not(.game-frame-open) .bottom-nav{
+    content-visibility:visible !important;
+    visibility:visible !important;
+  }
+</style>
 
 </body>
 </html>
