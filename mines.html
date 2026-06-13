@@ -1515,12 +1515,6 @@ html.mines-ready .game {
           </div>
         </div>
       </div>
-
-      <div class="bombs-wrap">
-        <div class="section-title">Количество мин</div>
-        <div class="mine-grid" id="mineGrid"></div>
-        <div class="status-note">После запуска раунда выбирайте клетки — снизу будут подсвечиваться множители с каждым успешным выбором.</div>
-      </div>
     </section>
     <div id="toastLayer" class="toast-layer" aria-live="polite"></div>
   </main>
@@ -1536,7 +1530,6 @@ html.mines-ready .game {
 
     const boardEl = document.getElementById('board');
     const multiplierRowEl = document.getElementById('multiplierRow');
-    const mineGridEl = document.getElementById('mineGrid');
     const amountDisplayEl = document.getElementById('amountDisplay');
     const playBtn = document.getElementById('playBtn');
     const playSubTextEl = document.getElementById('playSubText');
@@ -1553,11 +1546,11 @@ html.mines-ready .game {
       });
     }
 
-    const mineOptions = [2, 3, 5, 7];
+    const FIXED_MINES = 3;
     let MIN_BET_CLIENT = 8;
     let MAX_BET_CLIENT = 10000;
 
-    let selectedMines = 3;
+    let selectedMines = FIXED_MINES;
     let amount = 20;
     let started = false;
     let openedCount = 0;
@@ -1675,8 +1668,7 @@ html.mines-ready .game {
         document.getElementById('minusBtn'),
         document.getElementById('halfBtn'),
         document.getElementById('doubleBtn'),
-        amountDisplayEl,
-        ...document.querySelectorAll('.mine-btn')
+        amountDisplayEl
       ].filter(Boolean);
 
       controls.forEach((control) => {
@@ -1797,25 +1789,6 @@ html.mines-ready .game {
       scrollMultiplierToCurrent();
     }
 
-    function renderMineOptions() {
-      mineGridEl.innerHTML = '';
-      mineOptions.forEach((count) => {
-        const btn = document.createElement('button');
-        btn.type = 'button';
-        btn.className = 'mine-btn' + (count === selectedMines ? ' active' : '');
-        btn.textContent = count;
-        btn.addEventListener('click', () => {
-          if (started || isRequesting) return;
-          selectedMines = count;
-          renderMineOptions();
-          renderMultipliers();
-          updateTopCounters();
-          resetBoard(false);
-        });
-        mineGridEl.appendChild(btn);
-      });
-    }
-
     function setPlayText() {
       updatePlayButton();
     }
@@ -1848,6 +1821,7 @@ html.mines-ready .game {
     }
 
     function resetBoard(keepStarted = false) {
+      if (!keepStarted) selectedMines = FIXED_MINES;
       openedCount = 0;
       currentPayout = 0;
       currentRoundId = keepStarted ? currentRoundId : null;
@@ -2048,7 +2022,7 @@ html.mines-ready .game {
 
     function restoreActiveRound(round) {
       if (!round) return false;
-      selectedMines = Number(round.mines_count || selectedMines);
+      selectedMines = Number(round.mines_count || FIXED_MINES);
       amount = Number(round.bet_amount || amount);
       currentRoundId = round.round_id;
       started = true;
@@ -2056,7 +2030,6 @@ html.mines-ready .game {
       openedCount = Number(round.opened_count || openedIndexes.size || 0);
       currentPayout = Number(round.current_payout || amount);
       updateAmount();
-      renderMineOptions();
       renderMultipliers();
       updateTopCounters();
       setSettingsLocked(true);
@@ -2126,7 +2099,6 @@ html.mines-ready .game {
 
     updateAmount();
     buildBoard();
-    renderMineOptions();
     renderMultipliers();
     updateTopCounters();
     setSettingsLocked(false);
