@@ -16,7 +16,8 @@
       --panel-width: 410px;
       --safe-bottom: env(safe-area-inset-bottom);
       --track-width: min(92vw, 470px);
-      --tile-size: 72px;
+      --tile-width: 92px;
+      --tile-height: 58px;
       --tile-gap: 10px;
       --visible-height: 116px;
       --red-1: #ff6767;
@@ -326,7 +327,7 @@
       bottom: 7px;
       left: 50%;
       transform: translateX(-50%);
-      width: calc(var(--tile-size) + 16px);
+      width: calc(var(--tile-width) + 16px);
       border-radius: 16px;
       border: 1px solid rgba(255,255,255,.08);
       background: linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.01));
@@ -347,35 +348,36 @@
     }
 
     .tile {
-      width: var(--tile-size);
-      height: var(--tile-size);
+      width: var(--tile-width);
+      height: var(--tile-height);
       flex: 0 0 auto;
       position: relative;
-      border-radius: 20px;
-      display: grid;
-      place-items: center;
+      border-radius: 16px;
+      display: block;
       box-shadow: inset 0 2px 4px rgba(255,255,255,.18), inset 0 -6px 10px rgba(0,0,0,.25), 0 8px 18px rgba(0,0,0,.24);
       transform: translateZ(0);
+      overflow: hidden;
     }
 
     .tile::before {
       content: "";
       position: absolute;
-      inset: 9px;
-      border-radius: 15px;
-      border: 2px dashed rgba(255,255,255,.18);
-      opacity: .8;
+      inset: 7px;
+      border-radius: 11px;
+      border: 1px solid rgba(255,255,255,.18);
+      opacity: .9;
     }
 
-    .tile span {
-      position: relative;
-      z-index: 1;
-      font-size: 26px;
-      font-weight: 900;
-      letter-spacing: -.03em;
-      text-shadow: 0 3px 10px rgba(0,0,0,.28);
-      color: #fff;
-      user-select: none;
+    .tile::after {
+      content: "";
+      position: absolute;
+      left: 8px;
+      right: 8px;
+      top: 8px;
+      height: 34%;
+      border-radius: 999px;
+      background: linear-gradient(180deg, rgba(255,255,255,.30), rgba(255,255,255,0));
+      opacity: .8;
     }
 
     .tile.red {
@@ -567,41 +569,66 @@
 
     .choice {
       width: 100%;
-      min-height: 32px;
-      border-radius: 8px;
+      min-height: 34px;
+      padding: 8px 10px 7px;
+      border-radius: 12px;
       color: #fff;
       font-size: clamp(12px, 3.3vw, 15px);
       line-height: 1;
-      font-weight: 800;
+      font-weight: 900;
       letter-spacing: .01em;
       transform: translateZ(0);
-      transition: transform .12s ease, filter .12s ease, opacity .12s ease;
+      transition: transform .12s ease, filter .12s ease, opacity .12s ease, box-shadow .12s ease;
       text-shadow: 0 1px 8px rgba(0,0,0,.18);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      position: relative;
+      overflow: hidden;
+      isolation: isolate;
     }
+
+    .choice::before {
+      content: "";
+      position: absolute;
+      inset: 1px;
+      border-radius: inherit;
+      background: linear-gradient(180deg, rgba(255,255,255,.22), rgba(255,255,255,0) 48%);
+      opacity: .8;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .choice > * , .choice { position: relative; z-index: 1; }
 
     .choice.red {
       border: 1px solid rgba(255,136,155,.96);
-      background: linear-gradient(90deg, rgba(255,255,255,.24), transparent 28%), linear-gradient(135deg, var(--red-1), var(--red-2) 60%, var(--red-3));
-      box-shadow: inset 0 3px 5px rgba(255,255,255,.28), inset 0 -4px 8px rgba(113,14,41,.34), 0 0 16px rgba(255,82,118,.26);
+      background: linear-gradient(90deg, rgba(255,255,255,.18), transparent 32%), linear-gradient(180deg, #ff6f83, #ff2c54 58%, #8f1534);
+      box-shadow: inset 0 3px 5px rgba(255,255,255,.30), inset 0 -6px 10px rgba(113,14,41,.34), 0 0 18px rgba(255,82,118,.28);
     }
 
     .choice.black {
-      border: 1px solid rgba(210,214,232,.22);
-      background: linear-gradient(90deg, rgba(255,255,255,.10), transparent 30%), linear-gradient(135deg, #4d4f5f, #181922 58%, #090a10);
-      box-shadow: inset 0 3px 5px rgba(255,255,255,.14), inset 0 -4px 8px rgba(0,0,0,.38), 0 0 14px rgba(206,214,246,.08);
+      border: 1px solid rgba(210,214,232,.24);
+      background: linear-gradient(90deg, rgba(255,255,255,.08), transparent 30%), linear-gradient(180deg, #505363, #1b1d28 58%, #090a10);
+      box-shadow: inset 0 3px 5px rgba(255,255,255,.16), inset 0 -6px 10px rgba(0,0,0,.40), 0 0 16px rgba(206,214,246,.10);
     }
 
     .choice.green {
       border: 1px solid rgba(166,255,192,.96);
-      background: linear-gradient(90deg, rgba(255,255,255,.26), transparent 28%), linear-gradient(135deg, var(--green-1), var(--green-2) 56%, var(--green-3));
-      box-shadow: inset 0 3px 5px rgba(255,255,255,.28), inset 0 -4px 8px rgba(8,111,60,.34), 0 0 16px rgba(40,255,125,.22);
+      background: linear-gradient(90deg, rgba(255,255,255,.20), transparent 28%), linear-gradient(180deg, #81ff9a, #19cd68 56%, #0a8440);
+      box-shadow: inset 0 3px 5px rgba(255,255,255,.30), inset 0 -6px 10px rgba(8,111,60,.34), 0 0 18px rgba(40,255,125,.24);
     }
 
     .choice small {
       display: block;
-      margin-top: 2px;
+      margin-top: 3px;
+      padding: 2px 7px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.15);
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.10);
       font-size: 10px;
-      opacity: .95;
+      opacity: .98;
       font-weight: 800;
       letter-spacing: .02em;
     }
@@ -671,17 +698,12 @@
     }
 
     .history-chip {
-      min-width: 34px;
-      width: 34px;
-      height: 34px;
+      min-width: 20px;
+      width: 20px;
+      height: 20px;
       flex: 0 0 auto;
-      border-radius: 50%;
-      display: grid;
-      place-items: center;
-      font-size: 14px;
-      font-weight: 900;
-      color: #fff;
-      text-shadow: 0 2px 8px rgba(0,0,0,.28);
+      border-radius: 6px;
+      display: block;
       box-shadow: inset 0 2px 4px rgba(255,255,255,.20), inset 0 -5px 8px rgba(0,0,0,.24), 0 5px 10px rgba(0,0,0,.20);
     }
 
@@ -807,7 +829,8 @@
         --panel-side: 20px;
         --panel-width: 390px;
         --track-width: min(92vw, 430px);
-        --tile-size: 66px;
+        --tile-width: 84px;
+        --tile-height: 54px;
         --visible-height: 106px;
       }
       .topbar { left: 14px; }
@@ -819,7 +842,8 @@
     @media (max-width: 390px) {
       :root {
         --panel-side: 16px;
-        --tile-size: 60px;
+        --tile-width: 76px;
+        --tile-height: 50px;
         --tile-gap: 8px;
         --visible-height: 98px;
       }
@@ -831,14 +855,15 @@
       .profit-item strong { font-size: 13px; }
       .bet-panel { min-height: 126px; padding: 9px; grid-template-columns: 1.08fr .92fr; }
       .stake-box { min-height: 64px; }
-      .choice { min-height: 31px; }
+      .choice { min-height: 33px; }
       .history-panel { bottom: max(14px, calc(var(--safe-bottom) + 8px)); padding: 6px 7px; }
     }
 
     @media (max-width: 340px), (max-height: 670px) {
       :root {
         --panel-side: 12px;
-        --tile-size: 52px;
+        --tile-width: 68px;
+        --tile-height: 44px;
         --tile-gap: 8px;
         --visible-height: 88px;
       }
@@ -855,7 +880,7 @@
       .pm.plus { top: 6px; }
       .pm.minus { bottom: 6px; }
       .quick { min-height: 31px; font-size: 15px; }
-      .choice { min-height: 29px; }
+      .choice { min-height: 31px; }
       .pointer { top: 36px; }
       .history-panel { bottom: max(10px, calc(var(--safe-bottom) + 6px)); }
     }
@@ -865,7 +890,8 @@
         --panel-side: 24px;
         --panel-width: 410px;
         --track-width: 470px;
-        --tile-size: 72px;
+        --tile-width: 92px;
+        --tile-height: 58px;
       }
     }
 
@@ -991,7 +1017,6 @@
     const REEL_SYMBOLS = ['red', 'black', 'red', 'black', 'red', 'black', 'green', 'red', 'black', 'red', 'black', 'red', 'black', 'red', 'black'];
     const CHOICE_LABELS = { red: 'Красное', black: 'Чёрное', green: 'Зелёное' };
     const CHOICE_MULTIPLIERS = { red: 2, black: 2, green: 14 };
-    const SYMBOL_EMOJI = { red: 'R', black: 'B', green: 'G' };
     const SYMBOL_CLASS = { red: 'red', black: 'black', green: 'green' };
 
     let balance = 5000;
@@ -1082,7 +1107,7 @@
         historyList.innerHTML = '<div class="history-empty">Пока ещё не было выпадений</div>';
       } else {
         historyList.innerHTML = historyResults.map((item) => `
-          <div class="history-chip ${item}" aria-label="${CHOICE_LABELS[item]}">${SYMBOL_EMOJI[item]}</div>
+          <div class="history-chip ${item}" aria-label="${CHOICE_LABELS[item]}"></div>
         `).join('');
       }
       updateHistoryPosition();
@@ -1117,7 +1142,7 @@
     }
 
     function createTileMarkup(type) {
-      return `<div class="tile ${type}" data-type="${type}"><span>${SYMBOL_EMOJI[type]}</span></div>`;
+      return `<div class="tile ${type}" data-type="${type}"></div>`;
     }
 
     function buildTrack() {
@@ -1126,11 +1151,11 @@
       reelTrack.innerHTML = repeated.map(createTileMarkup).join('');
       const firstTile = reelTrack.querySelector('.tile');
       const gap = parseFloat(getComputedStyle(reelTrack).gap) || 0;
-      tileStep = (firstTile ? firstTile.offsetWidth : 72) + gap;
+      tileStep = (firstTile ? firstTile.offsetWidth : 92) + gap;
 
       currentCenteredIndex = 24;
       const centerX = reelWindow.clientWidth / 2;
-      currentTrackX = centerX - (currentCenteredIndex * tileStep + (firstTile ? firstTile.offsetWidth / 2 : 36));
+      currentTrackX = centerX - (currentCenteredIndex * tileStep + (firstTile ? firstTile.offsetWidth / 2 : 46));
       reelTrack.style.transition = 'none';
       reelTrack.style.transform = `translate3d(${currentTrackX}px, -50%, 0)`;
     }
@@ -1149,7 +1174,7 @@
 
     function findNextIndex(resultType) {
       const tiles = [...reelTrack.children];
-      const minIndex = currentCenteredIndex + 18;
+      const minIndex = currentCenteredIndex + 28 + Math.floor(Math.random() * 10);
       for (let i = minIndex; i < tiles.length; i++) {
         if (tiles[i].dataset.type === resultType) return i;
       }
@@ -1163,13 +1188,20 @@
       const targetIndex = findNextIndex(resultType);
       const centerX = reelWindow.clientWidth / 2;
       const targetX = centerX - (targetIndex * tileStep + tileWidth / 2);
+      const overshootX = targetX - 18;
 
-      reelTrack.style.transition = 'transform 2.8s cubic-bezier(.10,.88,.14,1)';
-      reelTrack.style.transform = `translate3d(${targetX}px, -50%, 0)`;
+      reelTrack.style.transition = 'transform 4.35s cubic-bezier(.06,.86,.12,1)';
+      reelTrack.style.transform = `translate3d(${overshootX}px, -50%, 0)`;
+
+      setTimeout(() => {
+        reelTrack.style.transition = 'transform 340ms cubic-bezier(.22,1,.36,1)';
+        reelTrack.style.transform = `translate3d(${targetX}px, -50%, 0)`;
+      }, 4360);
+
       currentCenteredIndex = targetIndex;
       currentTrackX = targetX;
 
-      setTimeout(callback, 2860);
+      setTimeout(callback, 4740);
     }
 
     function settleRound(choice) {
