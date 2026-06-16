@@ -221,6 +221,7 @@
       min-height: 176px;
       display: grid;
       place-items: center;
+      padding-top: 14px;
     }
 
     .grid-glow {
@@ -275,52 +276,19 @@
     .result-dot.black { color: #a9adbc; background: currentColor; }
     .result-dot.green { color: #3ff08b; background: currentColor; }
 
-    .pointer {
-      position: absolute;
-      left: 50%;
-      top: 32px;
-      transform: translateX(-50%);
-      z-index: 5;
-      width: 42px;
-      height: 34px;
-      filter: drop-shadow(0 7px 16px rgba(157,77,255,.32));
-    }
 
-    .pointer::before {
-      content: "";
-      position: absolute;
-      left: 50%;
-      top: 0;
-      transform: translateX(-50%);
-      width: 42px;
-      height: 16px;
-      border-radius: 999px;
-      background: linear-gradient(180deg, #fff 0%, #efe1ff 45%, #b98cff 100%);
-      box-shadow: inset 0 1px 0 rgba(255,255,255,.7), 0 3px 8px rgba(0,0,0,.22);
-    }
 
-    .pointer::after {
-      content: "";
-      position: absolute;
-      left: 50%;
-      bottom: 0;
-      transform: translateX(-50%);
-      width: 22px;
-      height: 22px;
-      clip-path: polygon(50% 100%, 0 0, 100% 0);
-      background: linear-gradient(180deg, #ffffff, #d7bcff 62%, #8c55ff 100%);
-      box-shadow: inset 0 1px 0 rgba(255,255,255,.75);
-    }
 
     .reel-window {
       position: relative;
       width: 100%;
       height: var(--visible-height);
       overflow: hidden;
-      border: 1px solid rgba(171, 103, 255, .42);
+      border: 1px solid rgba(171, 103, 255, .38);
       border-radius: 24px;
       background: linear-gradient(180deg, rgba(39,29,58,.96), rgba(16,12,25,.99));
       box-shadow: inset 0 0 0 1px rgba(255,255,255,.05), inset 0 10px 20px rgba(255,255,255,.03), 0 18px 40px rgba(0,0,0,.44), 0 0 26px rgba(140,35,255,.16);
+      isolation: isolate;
     }
 
     .reel-window::selection { background: transparent; }
@@ -338,27 +306,33 @@
 
     .reel-window::before {
       left: 0;
-      background: linear-gradient(90deg, rgba(17,12,27,.96), rgba(17,12,27,0));
+      background: linear-gradient(90deg, rgba(17,12,27,.98), rgba(17,12,27,.58) 44%, rgba(17,12,27,0));
+      backdrop-filter: blur(3px);
+      -webkit-backdrop-filter: blur(3px);
     }
 
     .reel-window::after {
       right: 0;
-      background: linear-gradient(270deg, rgba(17,12,27,.96), rgba(17,12,27,0));
+      background: linear-gradient(270deg, rgba(17,12,27,.98), rgba(17,12,27,.58) 44%, rgba(17,12,27,0));
+      backdrop-filter: blur(3px);
+      -webkit-backdrop-filter: blur(3px);
     }
 
     .reel-window .center-highlight {
       position: absolute;
-      top: 7px;
-      bottom: 7px;
+      top: 10px;
+      bottom: 10px;
       left: 50%;
       transform: translateX(-50%);
-      width: calc(var(--tile-width) + 18px);
-      border-radius: 18px;
-      border: 1px solid rgba(255,255,255,.12);
-      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.01));
-      box-shadow: inset 0 0 0 1px rgba(255,255,255,.04), 0 0 28px rgba(157,77,255,.14);
+      width: calc(var(--tile-width) + 16px);
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,.16);
+      background: linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.04));
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 0 24px rgba(157,77,255,.16), 0 10px 18px rgba(0,0,0,.16);
+      backdrop-filter: blur(4px) saturate(1.05);
+      -webkit-backdrop-filter: blur(4px) saturate(1.05);
       pointer-events: none;
-      z-index: 2;
+      z-index: 4;
     }
 
     .reel-track {
@@ -838,7 +812,6 @@
       .topbar { left: 14px; }
       .balance { min-height: 36px; gap: 7px; font-size: 15px; }
       .wallet { width: 18px; height: 18px; }
-      .pointer { top: 36px; width: 36px; height: 28px; }
     }
 
     @media (max-width: 390px) {
@@ -877,7 +850,6 @@
       .pm.minus { bottom: 6px; }
       .quick { min-height: 31px; font-size: 15px; }
       .choice { min-height: 29px; }
-      .pointer { top: 36px; }
       .history-panel { bottom: max(10px, calc(var(--safe-bottom) + 6px)); }
     }
 
@@ -1101,7 +1073,6 @@
     <section class="reel-zone" aria-label="Игровая лента">
       <div class="reel-shell">
         <div class="grid-glow"></div>
-        <div class="pointer" aria-hidden="true"></div>
         <div class="reel-window" id="reelWindow">
           <div class="center-highlight" aria-hidden="true"></div>
           <div class="reel-track" id="reelTrack"></div>
@@ -1332,7 +1303,7 @@
     }
 
     function findNextIndex(resultType) {
-      const minIndex = currentCenteredIndex + 34 + Math.floor(Math.random() * 14);
+      const minIndex = currentCenteredIndex + 38 + Math.floor(Math.random() * 16);
       ensureTrackCapacity(minIndex + REEL_SYMBOLS.length * 3);
       const tiles = reelTrack.children;
 
@@ -1353,26 +1324,20 @@
       const targetIndex = findNextIndex(resultType);
       const centerX = reelWindow.clientWidth / 2;
       const targetX = centerX - (targetIndex * tileStep + tileWidth / 2);
-      const launchX = currentTrackX - Math.max(tileStep * 2.1, tileWidth * 1.65);
-      const overshootX = targetX - Math.max(14, tileWidth * 0.16);
+      const overshootX = targetX - Math.max(12, tileWidth * 0.14);
 
-      reelTrack.style.transition = 'transform 280ms cubic-bezier(.32,.02,.67,.26)';
-      reelTrack.style.transform = `translate3d(${launchX}px, -50%, 0)`;
-
-      setTimeout(() => {
-        reelTrack.style.transition = 'transform 5.35s cubic-bezier(.08,.72,.13,1)';
-        reelTrack.style.transform = `translate3d(${overshootX}px, -50%, 0)`;
-      }, 290);
+      reelTrack.style.transition = 'transform 5.45s cubic-bezier(.07,.78,.12,1)';
+      reelTrack.style.transform = `translate3d(${overshootX}px, -50%, 0)`;
 
       setTimeout(() => {
-        reelTrack.style.transition = 'transform 440ms cubic-bezier(.18,1,.28,1)';
+        reelTrack.style.transition = 'transform 420ms cubic-bezier(.20,1,.32,1)';
         reelTrack.style.transform = `translate3d(${targetX}px, -50%, 0)`;
-      }, 5660);
+      }, 5470);
 
       currentCenteredIndex = targetIndex;
       currentTrackX = targetX;
 
-      setTimeout(callback, 6130);
+      setTimeout(callback, 5920);
     }
 
     function settleRound(choice) {
