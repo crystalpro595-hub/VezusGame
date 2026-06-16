@@ -241,40 +241,8 @@
       -webkit-mask-image: radial-gradient(circle, black 38%, transparent 74%);
     }
 
-    .result-badge {
-      position: absolute;
-      top: 4px;
-      left: 50%;
-      transform: translateX(-50%);
-      min-width: 112px;
-      min-height: 34px;
-      padding: 0 14px;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      border: 1px solid rgba(255,255,255,.08);
-      border-radius: 999px;
-      background: linear-gradient(180deg, rgba(29,22,44,.94), rgba(12,9,22,.98));
-      box-shadow: inset 0 0 0 1px rgba(255,255,255,.03), 0 12px 24px rgba(0,0,0,.28), 0 0 18px rgba(140,35,255,.12);
-      color: rgba(255,255,255,.94);
-      font-size: 12px;
-      font-weight: 800;
-      letter-spacing: .02em;
-      white-space: nowrap;
-    }
 
-    .result-dot {
-      width: 10px;
-      height: 10px;
-      border-radius: 50%;
-      flex: 0 0 auto;
-      box-shadow: 0 0 10px currentColor;
-    }
 
-    .result-dot.red { color: #ff4b67; background: currentColor; }
-    .result-dot.black { color: #a9adbc; background: currentColor; }
-    .result-dot.green { color: #3ff08b; background: currentColor; }
 
     .pointer {
       position: absolute;
@@ -351,76 +319,27 @@
       width: var(--tile-width);
       height: var(--tile-height);
       flex: 0 0 auto;
-      position: relative;
-      border-radius: 16px;
+      border-radius: 12px;
       display: block;
-      box-shadow: inset 0 2px 4px rgba(255,255,255,.18), inset 0 -6px 10px rgba(0,0,0,.25), 0 8px 18px rgba(0,0,0,.24);
+      box-shadow: inset 0 1px 2px rgba(255,255,255,.10), inset 0 -4px 8px rgba(0,0,0,.22), 0 8px 18px rgba(0,0,0,.18);
       transform: translateZ(0);
-      overflow: hidden;
-    }
-
-    .tile::before {
-      content: "";
-      position: absolute;
-      inset: 7px;
-      border-radius: 11px;
-      border: 1px solid rgba(255,255,255,.18);
-      opacity: .9;
-    }
-
-    .tile::after {
-      content: "";
-      position: absolute;
-      left: 8px;
-      right: 8px;
-      top: 8px;
-      height: 34%;
-      border-radius: 999px;
-      background: linear-gradient(180deg, rgba(255,255,255,.30), rgba(255,255,255,0));
-      opacity: .8;
     }
 
     .tile.red {
-      background: linear-gradient(135deg, var(--red-1), var(--red-2) 58%, var(--red-3));
-      border: 1px solid rgba(255,135,156,.96);
-      box-shadow: inset 0 2px 4px rgba(255,255,255,.28), inset 0 -8px 12px rgba(93,7,33,.34), 0 0 18px rgba(255,63,104,.26), 0 12px 22px rgba(0,0,0,.22);
+      background: linear-gradient(180deg, #ff6e81, #ff375f 58%, #8f1835);
     }
 
     .tile.black {
-      background: linear-gradient(135deg, var(--black-1), var(--black-2) 58%, var(--black-3));
-      border: 1px solid rgba(210,214,232,.24);
-      box-shadow: inset 0 2px 4px rgba(255,255,255,.14), inset 0 -8px 12px rgba(0,0,0,.38), 0 0 18px rgba(212,220,255,.10), 0 12px 22px rgba(0,0,0,.26);
+      background: linear-gradient(180deg, #6d7284, #2a2e3a 58%, #0d1017);
     }
 
     .tile.green {
-      background: linear-gradient(135deg, var(--green-1), var(--green-2) 55%, var(--green-3));
-      border: 1px solid rgba(165,255,189,.98);
-      box-shadow: inset 0 2px 4px rgba(255,255,255,.30), inset 0 -8px 12px rgba(6,91,48,.34), 0 0 18px rgba(39,255,128,.28), 0 12px 22px rgba(0,0,0,.22);
+      background: linear-gradient(180deg, #8aff9d, #1fd76e 58%, #0a8440);
     }
 
-    .flash {
-      position: absolute;
-      inset: -10%;
-      border-radius: 28px;
-      opacity: 0;
-      pointer-events: none;
-      z-index: 1;
-    }
 
-    .flash.win-red {
-      background: radial-gradient(circle, rgba(255,88,115,.50), rgba(255,88,115,.18) 45%, transparent 72%);
-      animation: resultFlash .72s ease-out;
-    }
 
-    .flash.win-black {
-      background: radial-gradient(circle, rgba(183,191,221,.44), rgba(183,191,221,.14) 45%, transparent 72%);
-      animation: resultFlash .72s ease-out;
-    }
 
-    .flash.win-green {
-      background: radial-gradient(circle, rgba(67,255,142,.58), rgba(67,255,142,.20) 45%, transparent 72%);
-      animation: resultFlash .82s ease-out;
-    }
 
     .controls,
     .history-panel {
@@ -447,41 +366,7 @@
       box-shadow: inset 0 0 0 1px rgba(255,255,255,.04), 0 18px 40px rgba(0,0,0,.44), 0 0 22px rgba(140,35,255,.14);
     }
 
-    .profit-panel {
-      min-height: 43px;
-      padding: 7px 10px;
-      display: grid;
-      grid-template-columns: .9fr 1.1fr;
-      gap: 8px;
-      align-items: center;
-      border-radius: 14px;
-    }
 
-    .profit-item {
-      min-width: 0;
-      display: flex;
-      flex-direction: column;
-      gap: 3px;
-    }
-
-    .profit-item span {
-      color: #fff;
-      font-size: 10px;
-      line-height: 1;
-      font-weight: 600;
-      white-space: nowrap;
-    }
-
-    .profit-item strong {
-      color: #fff;
-      font-size: clamp(13px, 3.5vw, 16px);
-      line-height: 1;
-      font-weight: 700;
-      letter-spacing: -0.03em;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
 
     .bet-panel {
       min-height: 132px;
@@ -817,12 +702,6 @@
       0% { transform: translate3d(0, 0, 0) scale(1); border-radius: 52% 48% 44% 56% / 46% 58% 42% 54%; }
       100% { transform: translate3d(-95px, -85px, 0) scale(1.16); border-radius: 42% 58% 55% 45% / 60% 44% 56% 40%; }
     }
-    @keyframes resultFlash {
-      0% { opacity: 0; transform: scale(.82); }
-      20% { opacity: 1; transform: scale(1); }
-      55% { opacity: .95; transform: scale(1.03); }
-      100% { opacity: 0; transform: scale(1.08); }
-    }
 
     @media (max-width: 480px) {
       :root {
@@ -929,9 +808,7 @@
     <section class="reel-zone" aria-label="Игровая лента">
       <div class="reel-shell">
         <div class="grid-glow"></div>
-        <div class="result-badge"><span class="result-dot red" id="resultDot"></span><span id="resultText">Готов к ставке</span></div>
         <div class="pointer" aria-hidden="true"></div>
-        <div class="flash" id="flash"></div>
         <div class="reel-window" id="reelWindow">
           <div class="center-highlight" aria-hidden="true"></div>
           <div class="reel-track" id="reelTrack"></div>
@@ -949,17 +826,6 @@
     </section>
 
     <section class="controls">
-      <div class="profit-panel" aria-label="Коэффициент и предварительный выигрыш">
-        <div class="profit-item">
-          <span>Коэффициент</span>
-          <strong id="profitCoef">x2.00</strong>
-        </div>
-        <div class="profit-item">
-          <span>Предварительный выигрыш</span>
-          <strong id="possibleWin">32 ₽</strong>
-        </div>
-      </div>
-
       <div class="bet-panel">
         <div class="stake-side">
           <div class="stake-box">
@@ -996,8 +862,6 @@
   <script>
     const amountInput = document.getElementById('amount');
     const balanceEl = document.getElementById('balance');
-    const possibleWinEl = document.getElementById('possibleWin');
-    const profitCoefEl = document.getElementById('profitCoef');
     const toast = document.getElementById('toast');
     const toastIcon = document.getElementById('toastIcon');
     const toastText = document.getElementById('toastText');
@@ -1007,9 +871,6 @@
     const choiceButtons = [...document.querySelectorAll('.choice')];
     const reelWindow = document.getElementById('reelWindow');
     const reelTrack = document.getElementById('reelTrack');
-    const resultText = document.getElementById('resultText');
-    const resultDot = document.getElementById('resultDot');
-    const flash = document.getElementById('flash');
 
     const PRELOADER_STARTED_AT = Date.now();
     const PRELOADER_MIN_MS = 2200;
@@ -1027,7 +888,7 @@
     let lastChoice = 'red';
     let currentTrackX = 0;
     let tileStep = 82;
-    let currentCenteredIndex = 24;
+    let currentCenteredIndex = 60;
 
     function hidePreloader() {
       const preloader = document.getElementById('preloader');
@@ -1064,11 +925,6 @@
 
     function updatePossibleWin(choice = lastChoice) {
       lastChoice = choice;
-      const bet = getAmount();
-      const multiplier = CHOICE_MULTIPLIERS[choice] || 2;
-      const possibleTotalWin = Math.max(0, bet * multiplier);
-      profitCoefEl.textContent = 'x' + multiplier.toFixed(2);
-      possibleWinEl.textContent = formatRub(possibleTotalWin);
     }
 
     function updateHistoryPosition() {
@@ -1135,10 +991,8 @@
     }
 
     function weightedResult() {
-      const roll = Math.random();
-      if (roll < 0.47) return 'red';
-      if (roll < 0.94) return 'black';
-      return 'green';
+      const pool = ['red','red','red','red','red','red','red','black','black','black','black','black','black','black','green'];
+      return pool[Math.floor(Math.random() * pool.length)];
     }
 
     function createTileMarkup(type) {
@@ -1147,34 +1001,24 @@
 
     function buildTrack() {
       const repeated = [];
-      for (let i = 0; i < 12; i++) repeated.push(...REEL_SYMBOLS);
+      for (let i = 0; i < 40; i++) repeated.push(...REEL_SYMBOLS);
       reelTrack.innerHTML = repeated.map(createTileMarkup).join('');
       const firstTile = reelTrack.querySelector('.tile');
       const gap = parseFloat(getComputedStyle(reelTrack).gap) || 0;
       tileStep = (firstTile ? firstTile.offsetWidth : 92) + gap;
 
-      currentCenteredIndex = 24;
+      currentCenteredIndex = 60;
       const centerX = reelWindow.clientWidth / 2;
       currentTrackX = centerX - (currentCenteredIndex * tileStep + (firstTile ? firstTile.offsetWidth / 2 : 46));
       reelTrack.style.transition = 'none';
       reelTrack.style.transform = `translate3d(${currentTrackX}px, -50%, 0)`;
     }
 
-    function setResultBadge(type, text) {
-      resultText.textContent = text;
-      resultDot.className = 'result-dot ' + type;
-    }
 
-    function flashResult(type) {
-      flash.className = 'flash';
-      void flash.offsetWidth;
-      flash.classList.add(type === 'red' ? 'win-red' : type === 'black' ? 'win-black' : 'win-green');
-      setTimeout(() => { flash.className = 'flash'; }, 820);
-    }
 
     function findNextIndex(resultType) {
       const tiles = [...reelTrack.children];
-      const minIndex = currentCenteredIndex + 28 + Math.floor(Math.random() * 10);
+      const minIndex = currentCenteredIndex + 34 + Math.floor(Math.random() * 14);
       for (let i = minIndex; i < tiles.length; i++) {
         if (tiles[i].dataset.type === resultType) return i;
       }
@@ -1225,24 +1069,20 @@
       const profit = Math.max(0, payout - bet);
 
       setBusy(true);
-      setResultBadge(choice, 'Крутится...');
       showToast('Ставка на ' + CHOICE_LABELS[choice], 'info');
 
       spinToResult(result, () => {
         if (isWin) {
           balance = balance - bet + payout;
-          setResultBadge(result, 'Выпало: ' + CHOICE_LABELS[result]);
-          flashResult(result);
           showToast('Выигрыш ' + formatRub(payout) + ' • Чистыми +' + formatRub(profit), 'win');
         } else {
           balance = balance - bet;
-          setResultBadge(result, 'Выпало: ' + CHOICE_LABELS[result]);
-          flashResult(result);
           showToast('Списано ' + formatRub(bet) + ' • Проигрыш', 'lose');
         }
 
         updateBalance(balance);
         addHistoryResult(result);
+        buildTrack();
         setTimeout(() => setBusy(false), 320);
       });
     }
