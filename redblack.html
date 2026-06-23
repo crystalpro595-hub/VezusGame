@@ -1057,6 +1057,26 @@
       background: linear-gradient(180deg, #89ff9e, #20d66f 58%, #0a7f3e) !important;
     }
 
+    .history-chip.newest {
+      animation: historyChipIn 420ms cubic-bezier(.18,.88,.25,1);
+      transform-origin: center;
+    }
+
+    @keyframes historyChipIn {
+      0% {
+        opacity: 0;
+        transform: translateY(-8px) scale(.82);
+      }
+      60% {
+        opacity: 1;
+        transform: translateY(0) scale(1.08);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
     .amount {
       font-size: clamp(21px, 5.6vw, 28px) !important;
     }
@@ -1336,8 +1356,8 @@
       if (!historyResults.length) {
         historyList.innerHTML = '<div class="history-empty">Пока ещё не было выпадений</div>';
       } else {
-        historyList.innerHTML = historyResults.map((item) => `
-          <div class="history-chip ${item}" aria-label="${CHOICE_LABELS[item]}"></div>
+        historyList.innerHTML = historyResults.map((item, index) => `
+          <div class="history-chip ${item}${index === 0 ? ' newest' : ''}" aria-label="${CHOICE_LABELS[item]}"></div>
         `).join('');
       }
       updateHistoryPosition();
@@ -1495,14 +1515,7 @@
       stopIdleMode();
       setBusy(true);
       balance -= bet;
-      ['mousedown', 'touchstart', 'keydown'].forEach((eventName) => {
-      document.addEventListener(eventName, () => {
-        if (isSpinning) return;
-        if (idleActive || idleStartTimer) scheduleIdleMode(1800);
-      }, { passive: true });
-    });
-
-    updateBalance(balance);
+      updateBalance(balance);
       showToast('Ставка ' + formatRub(bet) + ' на ' + CHOICE_LABELS[choice], 'info');
 
       spinToResult(result, () => {
@@ -1575,6 +1588,13 @@
         event.preventDefault();
       }
     }, { passive: false });
+
+    ['mousedown', 'touchstart', 'keydown'].forEach((eventName) => {
+      document.addEventListener(eventName, () => {
+        if (isSpinning) return;
+        if (idleActive || idleStartTimer) scheduleIdleMode(1800);
+      }, { passive: true });
+    });
 
     updateBalance(balance);
     setAmount(16);
