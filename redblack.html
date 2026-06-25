@@ -897,7 +897,7 @@
           <circle cx="43.2" cy="33" r="2.15" fill="#f5efff"/>
           <path d="M20 22H30" stroke="#fff" stroke-opacity="0.32" stroke-width="3" stroke-linecap="round" fill="none"/>
         </svg>
-        <span id="balance">5 000 ₽</span>
+        <span id="balance">0 ₽</span>
       </div>
     </header>
 
@@ -966,15 +966,24 @@
     const choiceButtons = [...document.querySelectorAll('.choice')];
     const reelWindow = document.getElementById('reelWindow');
     const reelTrack = document.getElementById('reelTrack');
+    const plusBtn = document.getElementById('plusBtn');
+    const minusBtn = document.getElementById('minusBtn');
+    const halfBtn = document.getElementById('halfBtn');
+    const doubleBtn = document.getElementById('doubleBtn');
+    const stakeButtons = [plusBtn, minusBtn, halfBtn, doubleBtn];
 
     const PRELOADER_STARTED_AT = Date.now();
     const PRELOADER_MIN_MS = 2200;
+    const RUB_FORMATTER = new Intl.NumberFormat('ru-RU', {
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0
+    });
 
     const REEL_SYMBOLS = ['red', 'black', 'red', 'black', 'red', 'black', 'green', 'red', 'black', 'red', 'black', 'red', 'black', 'red', 'black'];
     const CHOICE_LABELS = { red: 'Красное', black: 'Чёрное', green: 'Зелёное' };
     const CHOICE_MULTIPLIERS = { red: 2, black: 2, green: 14 };
 
-    let balance = 5000;
+    let balance = 0;
     let minBet = 8;
     let maxBet = 10000;
     let isSpinning = false;
@@ -1003,7 +1012,7 @@
 
     function formatRub(value) {
       const number = Math.floor(Number(value || 0));
-      return new Intl.NumberFormat('ru-RU', { minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(number) + ' ₽';
+      return RUB_FORMATTER.format(number) + ' ₽';
     }
 
     function updateBalance(value = balance) {
@@ -1162,10 +1171,7 @@
         button.style.pointerEvents = isBusy ? 'none' : '';
       });
       amountInput.disabled = isBusy;
-      document.getElementById('plusBtn').disabled = isBusy;
-      document.getElementById('minusBtn').disabled = isBusy;
-      document.getElementById('halfBtn').disabled = isBusy;
-      document.getElementById('doubleBtn').disabled = isBusy;
+      stakeButtons.forEach((button) => { button.disabled = isBusy; });
     }
 
     function weightedResult() {
@@ -1325,10 +1331,10 @@
       });
     }
 
-    document.getElementById('plusBtn').addEventListener('click', () => setAmount(getAmount() + 1));
-    document.getElementById('minusBtn').addEventListener('click', () => setAmount(getAmount() - 1));
-    document.getElementById('halfBtn').addEventListener('click', () => setAmount(getAmount() / 2));
-    document.getElementById('doubleBtn').addEventListener('click', () => setAmount(getAmount() * 2));
+    plusBtn.addEventListener('click', () => setAmount(getAmount() + 1));
+    minusBtn.addEventListener('click', () => setAmount(getAmount() - 1));
+    halfBtn.addEventListener('click', () => setAmount(getAmount() / 2));
+    doubleBtn.addEventListener('click', () => setAmount(getAmount() * 2));
 
     amountInput.addEventListener('focus', () => { amountInput.value = String(Math.floor(getAmount())); });
     amountInput.addEventListener('input', () => updatePossibleWin(lastChoice));
