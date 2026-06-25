@@ -877,6 +877,7 @@
     }
 
   </style>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
 <body>
   <main class="game">
@@ -978,10 +979,18 @@
       minimumFractionDigits: 0,
       maximumFractionDigits: 0
     });
+    const REDBLACK_API_URL = 'https://xcsjedwhqcrwdzmuahjl.supabase.co/functions/v1/redblack';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhjc2plZHdocWNyd2R6bXVhaGpsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgyNzk0ODYsImV4cCI6MjA5Mzg1NTQ4Nn0.M2ksKeWwDt0BQxgjxpGhLKLMNP_ve1dcZvQ0Ix88Ock';
+    const tg = window.Telegram?.WebApp || null;
+
+    try {
+      tg?.ready?.();
+      tg?.expand?.();
+    } catch (_error) {}
 
     const REEL_SYMBOLS = ['red', 'black', 'red', 'black', 'red', 'black', 'green', 'red', 'black', 'red', 'black', 'red', 'black', 'red', 'black'];
     const CHOICE_LABELS = { red: 'Красное', black: 'Чёрное', green: 'Зелёное' };
-    const CHOICE_MULTIPLIERS = { red: 2, black: 2, green: 14 };
+    let CHOICE_MULTIPLIERS = { red: 2, black: 2, green: 14 };
 
     let balance = 0;
     let minBet = 8;
@@ -1018,6 +1027,94 @@
     function updateBalance(value = balance) {
       balance = Math.floor(Number(value || 0));
       balanceEl.textContent = formatRub(balance);
+    }
+
+    function getTelegramInitData() {
+      return tg?.initData || '';
+    }
+
+    async function redblackApi(payload) {
+      const initData = getTelegramInitData();
+
+      if (!initData) {
+        throw new Error('Откройте игру через Telegram');
+      }
+
+      const response = await fetch(REDBLACK_API_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: 'Bearer ' + SUPABASE_ANON_KEY,
+          apikey: SUPABASE_ANON_KEY
+        },
+        body: JSON.stringify({ ...payload, initData })
+      });
+
+      const data = await response.json().catch(() => ({}));
+
+      if (!response.ok || data.ok === false || data.error) {
+        throw new Error(data.error || 'Ошибка игры');
+      }
+
+      return data;
+    }
+
+    function formatMultiplier(value) {
+      const numberValue = Number(value || 0);
+      if (!Number.isFinite(numberValue)) return '0';
+      return String(Math.round(numberValue * 100) / 100).replace(/\.00$/, '');
+    }
+
+    function normalizeHistoryResult(item) {
+      const value = typeof item === 'string' ? item : item?.result;
+      const result = String(value || '').trim().toLowerCase();
+      return CHOICE_LABELS[result] ? result : null;
+    }
+
+    function applyServerState(data, withHistory = true) {
+      if (!data || typeof data !== 'object') return;
+
+      const serverBalance = Number(data.balance ?? data.balance_after);
+      if (Number.isFinite(serverBalance)) updateBalance(serverBalance);
+
+      const serverMinBet = Math.floor(Number(data.min_bet ?? minBet));
+      const serverMaxBet = Math.floor(Number(data.max_bet ?? maxBet));
+
+      if (Number.isFinite(serverMinBet) && serverMinBet > 0) minBet = serverMinBet;
+      if (Number.isFinite(serverMaxBet) && serverMaxBet >= minBet) maxBet = serverMaxBet;
+
+      const ordinaryMultiplier = Number(data.multiplier ?? CHOICE_MULTIPLIERS.red);
+      if (Number.isFinite(ordinaryMultiplier) && ordinaryMultiplier > 1) {
+        CHOICE_MULTIPLIERS.red = ordinaryMultiplier;
+        CHOICE_MULTIPLIERS.black = ordinaryMultiplier;
+      }
+      CHOICE_MULTIPLIERS.green = 14;
+
+      const redCoef = document.querySelector('.choice.red small');
+      const blackCoef = document.querySelector('.choice.black small');
+      const greenCoef = document.querySelector('.choice.green small');
+      if (redCoef) redCoef.textContent = 'x' + formatMultiplier(CHOICE_MULTIPLIERS.red);
+      if (blackCoef) blackCoef.textContent = 'x' + formatMultiplier(CHOICE_MULTIPLIERS.black);
+      if (greenCoef) greenCoef.textContent = 'x14';
+
+      if (withHistory && Array.isArray(data.history)) {
+        historyResults = data.history.map(normalizeHistoryResult).filter(Boolean).slice(0, 10);
+        renderHistory();
+      }
+
+      const currentAmount = getAmount();
+      if (!currentAmount || currentAmount < minBet || currentAmount > maxBet) {
+        setAmount(Math.min(maxBet, Math.max(minBet, currentAmount || minBet)), false);
+      }
+    }
+
+    async function loadState(showError = false) {
+      try {
+        const data = await redblackApi({ action: 'state' });
+        applyServerState(data, true);
+      } catch (error) {
+        if (showError) showToast(error.message || 'Ошибка загрузки баланса', 'error');
+      }
     }
 
     function getAmount() {
@@ -1182,13 +1279,6 @@
       stakeButtons.forEach((button) => { button.disabled = isBusy; });
     }
 
-    function weightedResult() {
-      const roll = Math.random();
-      if (roll < 0.47) return 'red';
-      if (roll < 0.94) return 'black';
-      return 'green';
-    }
-
     function createTileMarkup(type) {
       return `<div class="tile ${type}" data-type="${type}"></div>`;
     }
@@ -1288,7 +1378,7 @@
       }, 5920);
     }
 
-    function settleRound(choice) {
+    async function settleRound(choice) {
       const bet = Math.floor(getAmount());
       if (bet < minBet) {
         showToast('Минимальная ставка ' + formatRub(minBet), 'error');
@@ -1306,26 +1396,43 @@
         return;
       }
 
-      const result = weightedResult();
-      const isWin = result === choice;
-      const payout = isWin ? bet * CHOICE_MULTIPLIERS[choice] : 0;
-      const profit = Math.max(0, payout - bet);
-
       stopIdleMode();
       setBusy(true);
       balance -= bet;
       updateBalance(balance);
       showToast('Ставка ' + formatRub(bet) + ' на ' + CHOICE_LABELS[choice], 'info');
 
+      let data;
+      try {
+        data = await redblackApi({ action: 'play', choice, bet });
+      } catch (error) {
+        balance += bet;
+        updateBalance(balance);
+        showToast(error.message || 'Ошибка игры', 'error');
+        flashRejectedChoice(choice);
+        setTimeout(() => {
+          setBusy(false);
+          scheduleIdleMode(1200);
+        }, 320);
+        loadState(false);
+        return;
+      }
+
+      applyServerState({ ...data, balance: undefined, balance_after: undefined }, false);
+
+      const result = normalizeHistoryResult(data.result) || 'red';
+      const isWin = data.is_win === true;
+      const payout = Number(data.payout_amount || 0);
+      const profit = Number(data.profit_amount || 0);
+
       spinToResult(result, () => {
         if (isWin) {
-          balance += payout;
-          showToast('Выигрыш ' + formatRub(payout) + ' • Чистыми +' + formatRub(profit), 'win');
+          showToast('Выигрыш ' + formatRub(payout) + ' • Чистыми +' + formatRub(Math.max(0, profit)), 'win');
         } else {
           showToast('Проигрыш • Списано ' + formatRub(bet), 'lose');
         }
 
-        updateBalance(balance);
+        updateBalance(Number(data.balance_after ?? data.balance ?? balance));
         addHistoryResult(result);
         recycleTrackIfNeeded();
 
@@ -1394,8 +1501,10 @@
       buildTrack();
       updateHistoryPosition();
       placeToastAbovePanel();
-      hidePreloader();
-      scheduleIdleMode(1800);
+      loadState(true).finally(() => {
+        hidePreloader();
+        scheduleIdleMode(1800);
+      });
     });
   </script>
 </body>
