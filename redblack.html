@@ -1017,8 +1017,18 @@
       return Number.isFinite(num) ? Math.floor(num) : 0;
     }
 
-    function setAmount(value) {
-      const normalized = Math.floor(Math.min(maxBet, Math.max(minBet, Number(value || 0))));
+    function setAmount(value, notifyLimit = true) {
+      const numericValue = Number(value || 0);
+
+      if (notifyLimit && numericValue < minBet) {
+        showToast('Минимальная ставка 8 ₽', 'info');
+      }
+
+      if (notifyLimit && numericValue > maxBet) {
+        showToast('Максимальная ставка 10 000 ₽', 'info');
+      }
+
+      const normalized = Math.floor(Math.min(maxBet, Math.max(minBet, numericValue)));
       amountInput.value = normalized + ' ₽';
       updatePossibleWin(lastChoice);
     }
@@ -1362,7 +1372,7 @@
     }, { passive: false });
 
     updateBalance(balance);
-    setAmount(16);
+    setAmount(16, false);
     renderHistory();
     requestAnimationFrame(() => {
       buildTrack();
@@ -1370,10 +1380,6 @@
       placeToastAbovePanel();
       hidePreloader();
       scheduleIdleMode(1800);
-
-      setTimeout(() => {
-        showToast('Мин. ставка 8 ₽ • Макс. ставка 10 000 ₽', 'info');
-      }, 2450);
     });
   </script>
 </body>
