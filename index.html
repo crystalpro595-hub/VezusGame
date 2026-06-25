@@ -6919,6 +6919,18 @@
       }
     }
 
+
+
+    /* Red Black card fallback image */
+    .redblack-card-fallback{
+      width:100%;
+      height:100%;
+      display:block;
+      border-radius:inherit;
+      background:
+        linear-gradient(90deg, #d91f4f 0 46%, #16c469 46% 54%, #11131c 54% 100%),
+        radial-gradient(circle at 50% 10%, rgba(255,255,255,.16), transparent 34%);
+    }
 </style>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <script>
@@ -7260,9 +7272,11 @@
           <img src="images/CoinFlip.jpg" alt="CoinFlip" decoding="async" loading="lazy">
         </a>
         <a class="game-card image-card" href="cups.html" data-game-frame="cups.html" data-game-title="Cups" aria-label="Открыть игру Cups">
-          <img src="images/Cupsicon.webp" alt="Cups" decoding="async" loading="lazy">
+          <img src="images/Cupsicongame" data-src-fallbacks="images/Cupsicongame.png|images/Cupsicongame.webp|images/Cupsicongame.jpg|images/Cupsicongame.jpeg" alt="Cups" decoding="async" loading="lazy">
         </a>
-        <article class="game-card image-card"></article>
+        <a class="game-card image-card" href="redblack.html" data-game-frame="redblack.html" data-game-title="Red Black" aria-label="Открыть игру Red Black">
+          <img src="images/Redblackicon" data-src-fallbacks="images/Redblackicon.png|images/Redblackicon.webp|images/Redblackicon.jpg|images/Redblackicon.jpeg" alt="Red Black" decoding="async" loading="lazy">
+        </a>
         <article class="game-card image-card"></article>
       </div>
     </section>
@@ -11736,5 +11750,19 @@ function resetWithdrawStep(){
 })();
 </script>
 
+
+<script>
+  (function(){
+    document.addEventListener('error', function(event){
+      var img = event.target;
+      if(!img || img.tagName !== 'IMG' || !img.dataset.srcFallbacks) return;
+      var fallbacks = img.dataset.srcFallbacks.split('|').filter(Boolean);
+      var index = Number(img.dataset.srcFallbackIndex || 0);
+      if(index >= fallbacks.length) return;
+      img.dataset.srcFallbackIndex = String(index + 1);
+      img.src = fallbacks[index];
+    }, true);
+  })();
+</script>
 </body>
 </html>
