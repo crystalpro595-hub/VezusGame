@@ -1052,6 +1052,14 @@
       });
     }
 
+    function flashRejectedChoice(choice, delay = 1300) {
+      selectChoice(choice);
+      clearTimeout(flashRejectedChoice.timer);
+      flashRejectedChoice.timer = setTimeout(() => {
+        selectChoice(null);
+      }, delay);
+    }
+
     function applyTrackTransform() {
       reelTrack.style.transform = `translate3d(${currentTrackX}px, -50%, 0)`;
     }
@@ -1283,15 +1291,18 @@
     function settleRound(choice) {
       const bet = Math.floor(getAmount());
       if (bet < minBet) {
-        showToast('Минимум ' + formatRub(minBet), 'error');
+        showToast('Минимальная ставка ' + formatRub(minBet), 'error');
+        flashRejectedChoice(choice);
         return;
       }
       if (bet > maxBet) {
-        showToast('Максимум ' + formatRub(maxBet), 'error');
+        showToast('Максимальная ставка ' + formatRub(maxBet), 'error');
+        flashRejectedChoice(choice);
         return;
       }
       if (bet > balance) {
         showToast('Недостаточно средств', 'error');
+        flashRejectedChoice(choice);
         return;
       }
 
@@ -1344,7 +1355,6 @@
       btn.addEventListener('click', () => {
         const choice = btn.dataset.choice;
         if (isSpinning) return;
-        stopIdleMode();
         selectChoice(choice);
         updatePossibleWin(choice);
         settleRound(choice);
