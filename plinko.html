@@ -232,6 +232,11 @@
       box-shadow: 0 0 16px rgba(157,77,255,.18);
     }
 
+
+    /* Чистое поле без надписи над шариком */
+    .drop-hint { display: none !important; }
+    .board-inner { justify-content: center; gap: 12px; }
+
     .board-area {
       position: relative;
       width: min(100%, 340px);
@@ -781,7 +786,6 @@
     <div class="plinko-wrap">
       <section class="board-panel">
         <div class="board-inner">
-          <div class="drop-hint">PLINKO</div>
           <div class="board-area" id="boardArea">
             <div class="pegs" id="pegs"></div>
             <div class="ball" id="ball"></div>
@@ -843,6 +847,7 @@
     const doubleBtn = document.getElementById('doubleBtn');
     const dropBtn = document.getElementById('dropBtn');
     const autoBtn = document.getElementById('autoBtn');
+    const betPanel = document.querySelector('.bet-panel');
     const historyPanel = document.getElementById('historyPanel');
     const historyList = document.getElementById('historyList');
     const balanceEl = document.getElementById('balance');
@@ -920,7 +925,8 @@
       toastText.textContent = text;
       toastIcon.innerHTML = getToastIcon(type);
       toast.className = 'toast ' + type;
-      const bottom = window.innerHeight - historyPanel.getBoundingClientRect().top + 112;
+      const betRect = betPanel.getBoundingClientRect();
+      const bottom = Math.max(12, window.innerHeight - betRect.top + 12);
       toast.style.bottom = bottom + 'px';
       requestAnimationFrame(() => toast.classList.add('show'));
       clearTimeout(showToast.timer);
@@ -993,8 +999,7 @@
         }
       }
 
-      const startX = width / 2;
-      ballEl.style.transform = `translate3d(${startX - 9}px, 8px, 0)`;
+      resetBall();
       renderBins();
     }
 
@@ -1011,53 +1016,109 @@
       setTimeout(() => node.classList.remove('hit'), 650);
     }
 
-    function animateBall(pathPoints, onDone) {
-      let step = 0;
-      function tick() {
-        const point = pathPoints[step];
-        if (point) {
-          ballEl.style.transform = `translate3d(${point.x - 9}px, ${point.y - 9}px, 0)`;
-          step += 1;
-          if (step < pathPoints.length) {
-            setTimeout(() => requestAnimationFrame(tick), step < pathPoints.length - 1 ? 78 : 94);
-          } else {
-            onDone?.();
-          }
-        }
-      }
-      requestAnimationFrame(tick);
+    function getBallRadius() {
+      return Math.max(7, (ballEl.offsetWidth || 18) / 2);
     }
 
-    function buildPath(targetIndex) {
+    function getPegRadius() {
+      const raw = getComputedStyle(document.documentElement).getPropertyValue('--peg-size').replace('px', '').trim();
+      return Math.max(4, (Number(raw) || 10) / 2);
+    }
+
+    function setBallPosition(x, y) {
+      const radius = getBallRadius();
+      ballEl.style.transform = `translate3d(${x - radius}px, ${y - radius}px, 0)`;
+    }
+
+    function resetBall() {
+      setBallPosition(boardArea.clientWidth / 2, 10);
+    }
+
+    function animatePhysicsBall(onDone) {
       const width = boardArea.clientWidth;
       const height = boardArea.clientHeight;
-      const rows = currentRows;
-      const verticalGap = (height - 54) / rows;
-      const maxPegs = rows + 1;
-      const horizontalGap = width / (maxPegs + 1);
-      const points = [];
-      let currentX = width / 2;
-      let rights = targetIndex;
+      const ballRadius = getBallRadius();
+      const pegRadius = getPegRadius();
+      const multipliers = getCurrentMultipliers();
+      const bottomLine = height - ballRadius - 7;
+      let x = width / 2 + (Math.random() - 0.5) * 7;
+      let y = 10;
+      let vx = (Math.random() - 0.5) * 0.42;
+      let vy = 0.18;
+      let lastTime = performance.now();
+      let finished = false;
+      let frameGuard = 0;
+      const gravity = 0.185;
+      const bounce = 0.46;
+      const wallBounce = 0.34;
+      const airDrag = 0.998;
+      const sidePush = 0.08;
 
-      points.push({ x: currentX, y: 10 });
-      for (let row = 0; row < rows; row++) {
-        const remainingRows = rows - row;
-        const mustGoRight = rights >= remainingRows;
-        const mustGoLeft = rights <= 0;
-        let goRight;
-        if (mustGoRight) goRight = true;
-        else if (mustGoLeft) goRight = false;
-        else {
-          const desired = targetIndex / rows;
-          goRight = Math.random() < desired;
-        }
-        currentX += goRight ? horizontalGap / 2 : -horizontalGap / 2;
-        rights += goRight ? -1 : 0;
-        points.push({ x: currentX, y: 20 + row * verticalGap });
+      function finish() {
+        if (finished) return;
+        finished = true;
+        const binIndex = Math.max(0, Math.min(multipliers.length - 1, Math.floor((x / width) * multipliers.length)));
+        setBallPosition(x, bottomLine);
+        onDone?.(binIndex);
       }
-      const finalX = width / (targetIndex + 2) * 0 + currentX;
-      points.push({ x: currentX, y: height - 16 });
-      return points;
+
+      function step(now) {
+        if (finished) return;
+        const dt = Math.min(1.75, Math.max(0.65, (now - lastTime) / 16.67));
+        lastTime = now;
+        frameGuard += 1;
+
+        vy += gravity * dt;
+        vx *= Math.pow(airDrag, dt);
+        vy *= Math.pow(0.999, dt);
+        x += vx * dt;
+        y += vy * dt;
+
+        if (x < ballRadius) {
+          x = ballRadius;
+          vx = Math.abs(vx) * wallBounce;
+        } else if (x > width - ballRadius) {
+          x = width - ballRadius;
+          vx = -Math.abs(vx) * wallBounce;
+        }
+
+        const minDistance = ballRadius + pegRadius + 0.8;
+        for (let i = 0; i < pegCoords.length; i += 1) {
+          const peg = pegCoords[i];
+          const dx = x - peg.x;
+          const dy = y - peg.y;
+          const distanceSq = dx * dx + dy * dy;
+          if (distanceSq > 0 && distanceSq < minDistance * minDistance) {
+            const distance = Math.sqrt(distanceSq);
+            const nx = dx / distance;
+            const ny = dy / distance;
+            const overlap = minDistance - distance;
+            x += nx * overlap;
+            y += ny * overlap;
+
+            const velocityIntoPeg = vx * nx + vy * ny;
+            if (velocityIntoPeg < 0.12) {
+              vx -= (1 + bounce) * velocityIntoPeg * nx;
+              vy -= (1 + bounce) * velocityIntoPeg * ny;
+              vx += (Math.random() - 0.5) * sidePush;
+              vx *= 0.92;
+              vy *= 0.78;
+              if (vy < 0.18) vy = 0.18;
+            }
+          }
+        }
+
+        if (y >= bottomLine || frameGuard > 420) {
+          finish();
+          return;
+        }
+
+        setBallPosition(x, y);
+        requestAnimationFrame(step);
+      }
+
+      setBallPosition(x, y);
+      requestAnimationFrame(step);
     }
 
     function setBusy(state) {
@@ -1074,17 +1135,15 @@
       if (isDropping) return;
 
       const multipliers = getCurrentMultipliers();
-      const targetIndex = gaussianIndex(multipliers.length);
-      const multiplier = multipliers[targetIndex];
-      const payout = Math.floor(bet * multiplier);
-      const profit = payout - bet;
-      const path = buildPath(targetIndex);
 
       setBusy(true);
       balance -= bet;
       updateBalance();
       showToast('Шар полетел', 'info');
-      animateBall(path, () => {
+      animatePhysicsBall((targetIndex) => {
+        const multiplier = multipliers[targetIndex];
+        const payout = Math.floor(bet * multiplier);
+        const profit = payout - bet;
         balance += payout;
         updateBalance();
         highlightBin(targetIndex);
