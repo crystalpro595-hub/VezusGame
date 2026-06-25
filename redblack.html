@@ -847,6 +847,28 @@
       .reel-zone { height: 53dvh; }
     }
 
+
+    /* Чуть крупнее сумма ставки */
+    .amount {
+      font-size: clamp(23px, 6vw, 30px);
+    }
+
+    @media (max-width: 390px) {
+      .amount { font-size: clamp(22px, 6.4vw, 25px); }
+    }
+
+    @media (min-width: 391px) and (max-width: 699px) {
+      .amount { font-size: clamp(24px, 5.6vw, 28px); }
+    }
+
+    @media (min-width: 700px) {
+      .amount { font-size: 30px; }
+    }
+
+    @media (max-height: 670px) {
+      .amount { font-size: clamp(21px, 5.4vw, 24px); }
+    }
+
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after {
         animation-duration: .18s;
@@ -1348,6 +1370,10 @@
       placeToastAbovePanel();
       hidePreloader();
       scheduleIdleMode(1800);
+
+      setTimeout(() => {
+        showToast('Мин. ставка 8 ₽ • Макс. ставка 10 000 ₽', 'info');
+      }, 2450);
     });
   </script>
 </body>
