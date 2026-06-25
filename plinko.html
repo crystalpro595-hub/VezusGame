@@ -1,0 +1,991 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <title>Plinko</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #07050d;
+      --stroke: rgba(166, 77, 255, 0.35);
+      --panel-side: 18px;
+      --panel-width: 410px;
+      --safe-bottom: env(safe-area-inset-bottom);
+      --safe-top: env(safe-area-inset-top);
+      --history-height: 58px;
+      --peg-size: 10px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: var(--bg);
+      color: #fff;
+      font-family: "Montserrat", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      overscroll-behavior: none;
+      touch-action: manipulation;
+      -webkit-text-size-adjust: 100%;
+    }
+
+    body {
+      background:
+        radial-gradient(circle at 50% 32%, rgba(255, 41, 88, 0.12), transparent 24%),
+        radial-gradient(circle at 50% 100%, rgba(141, 42, 255, 0.18), transparent 42%),
+        linear-gradient(180deg, #08050f 0%, #160020 52%, #0b0811 100%);
+    }
+
+    button, input, select { font: inherit; }
+    button { border: 0; cursor: pointer; }
+
+    .preloader {
+      position: fixed;
+      inset: 0;
+      z-index: 999999;
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+      background: linear-gradient(180deg, #040404 0%, #111111 38%, #1b1b1b 62%, #070707 100%);
+      color: #fff;
+      opacity: 1;
+      visibility: visible;
+      transition: opacity .42s ease, visibility .42s ease;
+    }
+
+    .preloader.hidden {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    .preloader::before,
+    .preloader::after {
+      content: "";
+      position: absolute;
+      z-index: 0;
+      width: 420px;
+      height: 420px;
+      border-radius: 46% 54% 58% 42% / 42% 46% 54% 58%;
+      filter: blur(44px);
+      opacity: .34;
+      pointer-events: none;
+    }
+
+    .preloader::before {
+      left: -110px;
+      top: -70px;
+      background: radial-gradient(circle at 35% 35%, rgba(255,255,255,.08), rgba(82,82,82,.28) 42%, rgba(22,22,22,.04) 76%);
+      animation: lavaBlobOne 6.4s ease-in-out infinite alternate;
+    }
+
+    .preloader::after {
+      right: -120px;
+      bottom: -90px;
+      width: 470px;
+      height: 470px;
+      background: radial-gradient(circle at 55% 45%, rgba(255,255,255,.06), rgba(96,96,96,.24) 40%, rgba(18,18,18,.03) 76%);
+      animation: lavaBlobTwo 7.2s ease-in-out infinite alternate;
+    }
+
+    .preloader-inner {
+      position: relative;
+      z-index: 2;
+      width: min(74vw, 300px);
+      display: grid;
+      justify-items: center;
+      transform: translateY(-4px);
+      animation: preloaderIn .36s ease both;
+    }
+
+    .preloader-logo {
+      width: 154px;
+      max-width: 54vw;
+      height: auto;
+      display: block;
+      object-fit: contain;
+      filter: drop-shadow(0 12px 24px rgba(0,0,0,.48));
+      animation: logoJump 1.18s ease-in-out infinite;
+    }
+
+    .loader-line {
+      width: min(220px, 68vw);
+      height: 4px;
+      margin-top: 22px;
+      overflow: hidden;
+      border-radius: 999px;
+      background: rgba(255,255,255,.10);
+    }
+
+    .loader-line span {
+      display: block;
+      width: 100%;
+      height: 100%;
+      border-radius: inherit;
+      transform: scaleX(0);
+      transform-origin: left center;
+      background: linear-gradient(90deg, #5f2cff 0%, #9d4dff 45%, #d946ef 100%);
+      box-shadow: 0 0 14px rgba(157,77,255,.28);
+      animation: cleanLine 2.05s cubic-bezier(.16,.84,.24,1) forwards;
+    }
+
+    .topbar {
+      position: fixed;
+      top: max(12px, var(--safe-top));
+      left: 16px;
+      z-index: 40;
+      display: flex;
+      align-items: center;
+    }
+
+    .balance {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      min-height: 40px;
+      color: #fff;
+      font-size: 16px;
+      line-height: 1;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      text-shadow: 0 0 10px rgba(255,255,255,.08);
+    }
+
+    .wallet {
+      width: 20px;
+      height: 20px;
+      color: #fff;
+    }
+
+    .wallet path, .wallet circle { fill: currentColor; }
+
+    .page {
+      position: relative;
+      width: 100%;
+      height: 100dvh;
+      padding: max(56px, calc(var(--safe-top) + 52px)) 14px calc(var(--history-height) + var(--safe-bottom) + 178px) 14px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .plinko-wrap {
+      width: min(100%, 460px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .board-panel,
+    .bet-panel,
+    .history-panel,
+    .controls-top {
+      width: 100%;
+      border: 1px solid var(--stroke);
+      background: linear-gradient(180deg, rgba(34,27,52,.94), rgba(22,15,34,.94));
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.04), 0 18px 40px rgba(0,0,0,.44), 0 0 22px rgba(140,35,255,.14);
+    }
+
+    .controls-top {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      padding: 9px;
+      border-radius: 16px;
+    }
+
+    .select-box {
+      min-height: 42px;
+      border: 1px solid rgba(255,255,255,.06);
+      border-radius: 10px;
+      background: linear-gradient(180deg, rgba(50,47,83,.98), rgba(43,39,70,.98));
+      padding: 0 12px;
+      color: #fff;
+      font-size: 13px;
+      font-weight: 700;
+      outline: none;
+      appearance: none;
+      background-image:
+        linear-gradient(45deg, transparent 50%, #d3baff 50%),
+        linear-gradient(135deg, #d3baff 50%, transparent 50%);
+      background-position:
+        calc(100% - 18px) 18px,
+        calc(100% - 12px) 18px;
+      background-size: 6px 6px, 6px 6px;
+      background-repeat: no-repeat;
+    }
+
+    .board-panel {
+      position: relative;
+      min-height: 386px;
+      border-radius: 22px;
+      padding: 16px 14px 14px;
+      overflow: hidden;
+      background:
+        radial-gradient(circle at 50% 0%, rgba(162, 89, 255, .12), transparent 35%),
+        linear-gradient(180deg, rgba(29,22,44,.97), rgba(12,9,22,.99));
+    }
+
+    .board-inner {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      min-height: 356px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .drop-hint {
+      width: 70px;
+      height: 26px;
+      border-radius: 999px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-size: 11px;
+      font-weight: 800;
+      border: 1px solid rgba(255,255,255,.09);
+      background: linear-gradient(180deg, rgba(77,54,122,.90), rgba(39,27,60,.95));
+      box-shadow: 0 0 16px rgba(157,77,255,.18);
+    }
+
+    .board-area {
+      position: relative;
+      width: min(100%, 340px);
+      height: 290px;
+      margin-top: 2px;
+    }
+
+    .pegs {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+    }
+
+    .peg {
+      position: absolute;
+      width: var(--peg-size);
+      height: var(--peg-size);
+      margin-left: calc(var(--peg-size) / -2);
+      margin-top: calc(var(--peg-size) / -2);
+      border-radius: 50%;
+      background: linear-gradient(180deg, #eee6ff, #b88eff 55%, #7a45f5);
+      box-shadow: 0 0 10px rgba(157,77,255,.20), inset 0 1px 0 rgba(255,255,255,.85);
+    }
+
+    .ball {
+      position: absolute;
+      width: 18px;
+      height: 18px;
+      margin-left: -9px;
+      margin-top: -9px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 35%, #fff6d0, #ffc94d 46%, #ff8d18 78%, #db5d00);
+      box-shadow: 0 0 18px rgba(255,161,54,.35), inset 0 2px 2px rgba(255,255,255,.55);
+      transform: translate3d(0, 0, 0);
+      will-change: transform;
+      z-index: 2;
+    }
+
+    .bins {
+      width: 100%;
+      display: grid;
+      gap: 6px;
+      align-items: end;
+      margin-top: 12px;
+    }
+
+    .bin {
+      min-width: 0;
+      height: 44px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: -.01em;
+      box-shadow: inset 0 2px 3px rgba(255,255,255,.18), inset 0 -5px 8px rgba(0,0,0,.22), 0 8px 15px rgba(0,0,0,.18);
+      transition: transform .16s ease, box-shadow .16s ease, filter .16s ease;
+    }
+
+    .bin.hit {
+      transform: translateY(-3px) scale(1.03);
+      filter: brightness(1.1);
+      box-shadow: inset 0 2px 3px rgba(255,255,255,.22), inset 0 -5px 8px rgba(0,0,0,.22), 0 0 18px rgba(255,177,52,.30), 0 10px 16px rgba(0,0,0,.20);
+    }
+
+    .bet-panel {
+      position: fixed;
+      left: var(--panel-side);
+      right: var(--panel-side);
+      bottom: calc(var(--history-height) + var(--safe-bottom) + 16px);
+      width: min(calc(100% - (var(--panel-side) * 2)), var(--panel-width));
+      margin: 0 auto;
+      border-radius: 17px;
+      min-height: 132px;
+      padding: 10px;
+      display: grid;
+      grid-template-columns: 1.08fr .92fr;
+      gap: 10px;
+      z-index: 20;
+    }
+
+    .stake-side {
+      min-width: 0;
+      display: grid;
+      grid-template-rows: 1fr 36px;
+      gap: 8px;
+    }
+
+    .stake-box {
+      position: relative;
+      min-height: 68px;
+      display: flex;
+      align-items: center;
+      padding: 10px 40px 10px 12px;
+      border: 1px solid rgba(255,255,255,.06);
+      border-radius: 8px;
+      background: linear-gradient(180deg, rgba(50,47,83,.98), rgba(43,39,70,.98));
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.035);
+    }
+
+    .amount {
+      width: 100%;
+      border: 0;
+      outline: none;
+      background: transparent;
+      color: #fff;
+      font-size: clamp(23px, 6vw, 30px);
+      font-weight: 700;
+      letter-spacing: -0.06em;
+    }
+
+    .pm {
+      position: absolute;
+      right: 9px;
+      width: 28px;
+      height: 25px;
+      display: grid;
+      place-items: center;
+      border: 1px solid rgba(255,255,255,.10);
+      border-radius: 6px;
+      background: linear-gradient(180deg, rgba(61,51,91,.96), rgba(29,21,48,.96));
+      color: #d3baff;
+      font-size: 18px;
+      line-height: 1;
+      font-weight: 700;
+    }
+
+    .pm.plus { top: 7px; }
+    .pm.minus { bottom: 7px; }
+
+    .quick-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+    }
+
+    .quick,
+    .action-button {
+      min-height: 36px;
+      border: 1px solid rgba(255,255,255,.055);
+      border-radius: 8px;
+      color: rgba(226,204,255,.95);
+      font-size: 16px;
+      line-height: 1;
+      font-weight: 800;
+      background: linear-gradient(180deg, rgba(42,34,67,.96), rgba(29,23,47,.96));
+    }
+
+    .action-side {
+      display: grid;
+      grid-template-rows: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .action-button.primary {
+      border: 1px solid rgba(255,179,86,.42);
+      background: linear-gradient(180deg, #ffb354, #ff7a1f 58%, #c54500);
+      color: #fff;
+      box-shadow: 0 0 18px rgba(255,124,33,.18), inset 0 2px 3px rgba(255,255,255,.26), inset 0 -6px 10px rgba(123,40,0,.26);
+    }
+
+    .action-button.secondary {
+      border: 1px solid rgba(181,114,255,.34);
+      background: linear-gradient(180deg, #ab66ff, #7c36ea 58%, #5117b0);
+      color: #fff;
+      box-shadow: 0 0 18px rgba(157,77,255,.18), inset 0 2px 3px rgba(255,255,255,.24), inset 0 -6px 10px rgba(68,14,154,.28);
+    }
+
+    .history-panel {
+      position: fixed;
+      left: var(--panel-side);
+      right: var(--panel-side);
+      bottom: max(16px, calc(var(--safe-bottom) + 8px));
+      width: min(calc(100% - (var(--panel-side) * 2)), var(--panel-width));
+      margin: 0 auto;
+      border-radius: 14px;
+      padding: 8px;
+      z-index: 18;
+      background: linear-gradient(180deg, rgba(27,21,41,.94), rgba(16,12,25,.96));
+    }
+
+    .history-title {
+      color: rgba(255,255,255,.82);
+      font-size: 10px;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    .history-list {
+      display: flex;
+      gap: 6px;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+
+    .history-list::-webkit-scrollbar { display: none; }
+
+    .history-empty,
+    .history-chip {
+      min-width: 40px;
+      height: 28px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 800;
+    }
+
+    .history-empty {
+      width: 100%;
+      border: 1px dashed rgba(255,255,255,.08);
+      color: rgba(255,255,255,.44);
+    }
+
+    .history-chip {
+      color: #fff;
+      box-shadow: inset 0 2px 3px rgba(255,255,255,.18), inset 0 -4px 8px rgba(0,0,0,.24), 0 4px 10px rgba(0,0,0,.18);
+      animation: chipIn .35s ease;
+    }
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: 226px;
+      z-index: 50;
+      min-height: 38px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 12px 7px 8px;
+      border: 1px solid rgba(255,255,255,.10);
+      border-radius: 13px;
+      background: linear-gradient(180deg, rgba(28,21,43,.96), rgba(14,10,24,.96));
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.04), 0 12px 32px rgba(0,0,0,.42), 0 0 20px rgba(140,35,255,.16);
+      color: #fff;
+      font-size: 12px;
+      font-weight: 700;
+      white-space: nowrap;
+      opacity: 0;
+      pointer-events: none;
+      transform: translate(-50%, 10px) scale(.98);
+      transition: opacity .20s ease, transform .20s ease;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translate(-50%, 0) scale(1);
+    }
+
+    .toast-icon {
+      width: 24px;
+      height: 24px;
+      min-width: 24px;
+      display: grid;
+      place-items: center;
+      border-radius: 8px;
+      background: linear-gradient(180deg, #b35cff, #6a1fd0);
+      box-shadow: 0 0 14px rgba(179,92,255,.34);
+      color: #fff;
+    }
+
+    .toast-icon svg {
+      width: 15px;
+      height: 15px;
+      display: block;
+    }
+
+    .toast.win .toast-icon {
+      background: linear-gradient(180deg, #31ff86, #089e45);
+      box-shadow: 0 0 14px rgba(38,255,120,.40);
+    }
+
+    .toast.error .toast-icon {
+      background: linear-gradient(180deg, #ff5a5a, #b80f23);
+      box-shadow: 0 0 14px rgba(255,59,59,.40);
+    }
+
+    .action-button:active,
+    .quick:active,
+    .pm:active { transform: scale(.97); filter: brightness(.95); }
+
+    @keyframes cleanLine { 0% { transform: scaleX(0); } 72% { transform: scaleX(.84); } 100% { transform: scaleX(1); } }
+    @keyframes preloaderIn { from { opacity: 0; transform: translateY(8px) scale(.985); } to { opacity: 1; transform: translateY(-4px) scale(1); } }
+    @keyframes logoJump { 0%,100% { transform: translateY(0) scale(1); } 42% { transform: translateY(-8px) scale(1.025); } 64% { transform: translateY(0) scale(.995); } }
+    @keyframes lavaBlobOne { 0% { transform: translate3d(0,0,0) scale(1); border-radius: 46% 54% 58% 42% / 42% 46% 54% 58%; } 100% { transform: translate3d(90px,70px,0) scale(1.18); border-radius: 58% 42% 47% 53% / 55% 40% 60% 45%; } }
+    @keyframes lavaBlobTwo { 0% { transform: translate3d(0,0,0) scale(1); border-radius: 52% 48% 44% 56% / 46% 58% 42% 54%; } 100% { transform: translate3d(-95px,-85px,0) scale(1.16); border-radius: 42% 58% 55% 45% / 60% 44% 56% 40%; } }
+    @keyframes chipIn { 0% { opacity: 0; transform: translateY(-8px) scale(.85); } 100% { opacity: 1; transform: translateY(0) scale(1); } }
+
+    @media (max-width: 390px) {
+      :root { --panel-side: 14px; }
+      .page { padding-left: 10px; padding-right: 10px; padding-bottom: calc(var(--history-height) + var(--safe-bottom) + 170px); }
+      .board-area { width: min(100%, 306px); height: 270px; }
+      .board-panel { min-height: 362px; padding: 14px 10px 12px; }
+      .controls-top { padding: 8px; }
+      .bet-panel { min-height: 126px; padding: 9px; gap: 8px; }
+      .stake-box { min-height: 64px; }
+      .action-button, .quick { font-size: 15px; }
+      .balance { font-size: 15px; }
+      .wallet { width: 18px; height: 18px; }
+    }
+
+    @media (max-height: 700px) {
+      .page { padding-bottom: calc(var(--history-height) + var(--safe-bottom) + 162px); }
+      .board-panel { min-height: 338px; }
+      .board-area { height: 246px; }
+      .bet-panel { bottom: calc(var(--history-height) + var(--safe-bottom) + 12px); }
+    }
+
+    @media (min-width: 700px) {
+      :root { --panel-width: 430px; }
+      .page { padding-bottom: calc(var(--history-height) + var(--safe-bottom) + 188px); }
+      .plinko-wrap { width: 460px; }
+      .board-panel { min-height: 406px; }
+      .board-area { width: 350px; height: 302px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: .18s !important;
+        transition-duration: .18s !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="preloader" class="preloader" aria-label="Загрузка игры">
+    <div class="preloader-inner">
+      <img class="preloader-logo" src="images/Logovezusgame.png" alt="Vezus Game">
+      <div class="loader-line"><span></span></div>
+    </div>
+  </div>
+
+  <header class="topbar">
+    <div class="balance" aria-label="Баланс">
+      <svg class="wallet" viewBox="0 0 64 64" fill="none" aria-hidden="true">
+        <path d="M12 17.6C12 13.96 14.96 11 18.6 11H42.5C47.05 11 50.75 14.7 50.75 19.25V20.8H43.6C36.86 20.8 31.4 26.26 31.4 33C31.4 39.74 36.86 45.2 43.6 45.2H50.75V46.75C50.75 51.3 47.05 55 42.5 55H18.6C14.96 55 12 52.04 12 48.4V17.6Z"/>
+        <path d="M16.5 10.9H39.4C42.68 10.9 45.35 13.57 45.35 16.85V17.7H17.1C13.92 17.7 12 15.92 12 15.92C12.78 12.98 14.38 10.9 16.5 10.9Z"/>
+        <path d="M39.8 24.65H52.5C55.12 24.65 57.25 26.78 57.25 29.4V36.6C57.25 39.22 55.12 41.35 52.5 41.35H39.8C35.2 41.35 31.5 37.62 31.5 33C31.5 28.38 35.2 24.65 39.8 24.65Z"/>
+        <circle cx="43.2" cy="33" r="4.05" fill="#171225"/>
+        <circle cx="43.2" cy="33" r="2.15" fill="#f5efff"/>
+      </svg>
+      <span id="balance">0 ₽</span>
+    </div>
+  </header>
+
+  <main class="page">
+    <div class="plinko-wrap">
+      <section class="controls-top">
+        <select id="rowsSelect" class="select-box" aria-label="Количество рядов">
+          <option value="8">8 рядов</option>
+          <option value="10" selected>10 рядов</option>
+          <option value="12">12 рядов</option>
+        </select>
+        <select id="riskSelect" class="select-box" aria-label="Уровень риска">
+          <option value="low">Риск: Низкий</option>
+          <option value="medium" selected>Риск: Средний</option>
+          <option value="high">Риск: Высокий</option>
+        </select>
+      </section>
+
+      <section class="board-panel">
+        <div class="board-inner">
+          <div class="drop-hint">PLINKO</div>
+          <div class="board-area" id="boardArea">
+            <div class="pegs" id="pegs"></div>
+            <div class="ball" id="ball"></div>
+          </div>
+          <div class="bins" id="bins"></div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <section class="bet-panel">
+    <div class="stake-side">
+      <div class="stake-box">
+        <input class="amount" id="amount" value="16 ₽" inputmode="numeric" aria-label="Ставка" />
+        <button class="pm plus" id="plusBtn" type="button">+</button>
+        <button class="pm minus" id="minusBtn" type="button">−</button>
+      </div>
+      <div class="quick-row">
+        <button class="quick" id="halfBtn" type="button">/2</button>
+        <button class="quick" id="doubleBtn" type="button">x2</button>
+      </div>
+    </div>
+    <div class="action-side">
+      <button class="action-button secondary" id="autoBtn" type="button">Авто: выкл</button>
+      <button class="action-button primary" id="dropBtn" type="button">Бросить шар</button>
+    </div>
+  </section>
+
+  <section class="history-panel" id="historyPanel">
+    <div class="history-title">История множителей</div>
+    <div class="history-list" id="historyList">
+      <div class="history-empty">Пока ещё не было выпадений</div>
+    </div>
+  </section>
+
+  <div class="toast info" id="toast" aria-live="polite">
+    <span class="toast-icon" id="toastIcon" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none">
+        <path d="M12 8.2V12.6" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/>
+        <path d="M12 16.2H12.01" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+        <path d="M12 3.5C7.3 3.5 3.5 7.3 3.5 12S7.3 20.5 12 20.5 20.5 16.7 20.5 12 16.7 3.5 12 3.5Z" stroke="currentColor" stroke-width="2"/>
+      </svg>
+    </span>
+    <span id="toastText">Готово</span>
+  </div>
+
+  <script>
+    const PRELOADER_STARTED_AT = Date.now();
+    const PRELOADER_MIN_MS = 2200;
+    const RUB_FORMATTER = new Intl.NumberFormat('ru-RU', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+    const rowsSelect = document.getElementById('rowsSelect');
+    const riskSelect = document.getElementById('riskSelect');
+    const pegsEl = document.getElementById('pegs');
+    const binsEl = document.getElementById('bins');
+    const boardArea = document.getElementById('boardArea');
+    const ballEl = document.getElementById('ball');
+    const amountInput = document.getElementById('amount');
+    const plusBtn = document.getElementById('plusBtn');
+    const minusBtn = document.getElementById('minusBtn');
+    const halfBtn = document.getElementById('halfBtn');
+    const doubleBtn = document.getElementById('doubleBtn');
+    const dropBtn = document.getElementById('dropBtn');
+    const autoBtn = document.getElementById('autoBtn');
+    const historyPanel = document.getElementById('historyPanel');
+    const historyList = document.getElementById('historyList');
+    const balanceEl = document.getElementById('balance');
+    const toast = document.getElementById('toast');
+    const toastText = document.getElementById('toastText');
+    const toastIcon = document.getElementById('toastIcon');
+
+    const multiplierMaps = {
+      8: {
+        low: [5.6, 2.1, 1.4, 1.2, 1, 1.2, 1.4, 2.1, 5.6],
+        medium: [9, 3.3, 1.8, 1.3, 0.9, 1.3, 1.8, 3.3, 9],
+        high: [16, 5.6, 2.3, 1.4, 0.5, 1.4, 2.3, 5.6, 16]
+      },
+      10: {
+        low: [8, 3.2, 1.8, 1.4, 1.1, 1, 1.1, 1.4, 1.8, 3.2, 8],
+        medium: [14, 5.4, 2.6, 1.6, 1.2, 0.7, 1.2, 1.6, 2.6, 5.4, 14],
+        high: [24, 8, 3.8, 2, 1.3, 0.3, 1.3, 2, 3.8, 8, 24]
+      },
+      12: {
+        low: [10, 4.5, 2.4, 1.8, 1.3, 1.1, 1, 1.1, 1.3, 1.8, 2.4, 4.5, 10],
+        medium: [18, 7, 3.4, 2, 1.4, 1.1, 0.5, 1.1, 1.4, 2, 3.4, 7, 18],
+        high: [32, 10, 5.2, 2.6, 1.6, 1.1, 0.2, 1.1, 1.6, 2.6, 5.2, 10, 32]
+      }
+    };
+
+    let balance = 0;
+    let minBet = 8;
+    let maxBet = 10000;
+    let isDropping = false;
+    let autoMode = false;
+    let history = [];
+    let currentRows = 10;
+    let currentRisk = 'medium';
+    let pegCoords = [];
+
+    function hidePreloader() {
+      const preloader = document.getElementById('preloader');
+      const elapsed = Date.now() - PRELOADER_STARTED_AT;
+      const wait = Math.max(0, PRELOADER_MIN_MS - elapsed);
+      setTimeout(() => {
+        preloader.classList.add('hidden');
+        setTimeout(() => preloader.remove(), 360);
+      }, wait);
+    }
+
+    function formatRub(value) {
+      return RUB_FORMATTER.format(Math.floor(Number(value || 0))) + ' ₽';
+    }
+
+    function updateBalance() {
+      balanceEl.textContent = formatRub(balance);
+    }
+
+    function getAmount() {
+      const raw = amountInput.value.replace(/[^0-9]/g, '');
+      const num = parseInt(raw, 10);
+      return Number.isFinite(num) ? Math.floor(num) : 0;
+    }
+
+    function setAmount(value, notify = true) {
+      const numericValue = Number(value || 0);
+      if (notify && numericValue < minBet) showToast('Минимальная ставка 8 ₽', 'error');
+      if (notify && numericValue > maxBet) showToast('Максимальная ставка 10 000 ₽', 'error');
+      const normalized = Math.floor(Math.min(maxBet, Math.max(minBet, numericValue)));
+      amountInput.value = normalized + ' ₽';
+    }
+
+    function getToastIcon(type) {
+      if (type === 'win') return '<svg viewBox="0 0 24 24" fill="none"><path d="M5 12.6L9.3 16.8L19 7.2" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+      if (type === 'error') return '<svg viewBox="0 0 24 24" fill="none"><path d="M7 7L17 17M17 7L7 17" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"/></svg>';
+      return '<svg viewBox="0 0 24 24" fill="none"><path d="M12 8.2V12.6" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/><path d="M12 16.2H12.01" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><path d="M12 3.5C7.3 3.5 3.5 7.3 3.5 12S7.3 20.5 12 20.5 20.5 16.7 20.5 12 16.7 3.5 12 3.5Z" stroke="currentColor" stroke-width="2"/></svg>';
+    }
+
+    function showToast(text, type = 'info') {
+      toastText.textContent = text;
+      toastIcon.innerHTML = getToastIcon(type);
+      toast.className = 'toast ' + type;
+      const bottom = window.innerHeight - historyPanel.getBoundingClientRect().top + 112;
+      toast.style.bottom = bottom + 'px';
+      requestAnimationFrame(() => toast.classList.add('show'));
+      clearTimeout(showToast.timer);
+      showToast.timer = setTimeout(() => toast.classList.remove('show'), 1600);
+    }
+
+    function getCurrentMultipliers() {
+      return multiplierMaps[currentRows][currentRisk];
+    }
+
+    function getBinGradient(multiplier, min, max) {
+      const mid = (min + max) / 2;
+      if (multiplier <= mid * 0.75) return 'linear-gradient(180deg, #6d7284, #2a2e3a 58%, #0d1017)';
+      if (multiplier >= max * 0.85) return 'linear-gradient(180deg, #ffb354, #ff7a1f 58%, #c54500)';
+      if (multiplier > mid) return 'linear-gradient(180deg, #ff7b8f, #ff375f 58%, #8f1835)';
+      return 'linear-gradient(180deg, #ab66ff, #7c36ea 58%, #5117b0)';
+    }
+
+    function renderBins() {
+      const multipliers = getCurrentMultipliers();
+      binsEl.style.gridTemplateColumns = `repeat(${multipliers.length}, minmax(0, 1fr))`;
+      const min = Math.min(...multipliers);
+      const max = Math.max(...multipliers);
+      binsEl.innerHTML = multipliers.map((mult, idx) => `
+        <div class="bin" data-index="${idx}" style="background:${getBinGradient(mult, min, max)}">x${mult}</div>
+      `).join('');
+    }
+
+    function renderHistory() {
+      if (!history.length) {
+        historyList.innerHTML = '<div class="history-empty">Пока ещё не было выпадений</div>';
+      } else {
+        historyList.innerHTML = history.map((item, idx) => `
+          <div class="history-chip" style="background:${getBinGradient(item.multiplier, 0, Math.max(2, item.multiplier))}">${idx === 0 ? 'x' + item.multiplier : 'x' + item.multiplier}</div>
+        `).join('');
+      }
+      document.documentElement.style.setProperty('--history-height', historyPanel.offsetHeight + 'px');
+    }
+
+    function addHistory(multiplier) {
+      history.unshift({ multiplier });
+      history = history.slice(0, 12);
+      renderHistory();
+    }
+
+    function layoutBoard() {
+      currentRows = Number(rowsSelect.value);
+      currentRisk = riskSelect.value;
+      const width = boardArea.clientWidth;
+      const height = boardArea.clientHeight;
+      const rows = currentRows;
+      const topOffset = 16;
+      const verticalGap = (height - 54) / rows;
+      const maxPegs = rows + 1;
+      const horizontalGap = width / (maxPegs + 1);
+      pegCoords = [];
+      pegsEl.innerHTML = '';
+
+      for (let row = 0; row < rows; row++) {
+        const count = row + 1;
+        const totalWidth = (count - 1) * horizontalGap;
+        const startX = width / 2 - totalWidth / 2;
+        for (let col = 0; col < count; col++) {
+          const x = startX + col * horizontalGap;
+          const y = topOffset + row * verticalGap;
+          pegCoords.push({ x, y, row, col });
+          const peg = document.createElement('div');
+          peg.className = 'peg';
+          peg.style.left = x + 'px';
+          peg.style.top = y + 'px';
+          pegsEl.appendChild(peg);
+        }
+      }
+
+      const startX = width / 2;
+      ballEl.style.transform = `translate3d(${startX - 9}px, 8px, 0)`;
+      renderBins();
+    }
+
+    function gaussianIndex(length) {
+      let sum = 0;
+      for (let i = 0; i < currentRows; i++) sum += Math.random() < 0.5 ? 0 : 1;
+      return Math.min(length - 1, Math.max(0, sum));
+    }
+
+    function highlightBin(index) {
+      const node = binsEl.querySelector(`[data-index="${index}"]`);
+      if (!node) return;
+      node.classList.add('hit');
+      setTimeout(() => node.classList.remove('hit'), 650);
+    }
+
+    function animateBall(pathPoints, onDone) {
+      let step = 0;
+      function tick() {
+        const point = pathPoints[step];
+        if (point) {
+          ballEl.style.transform = `translate3d(${point.x - 9}px, ${point.y - 9}px, 0)`;
+          step += 1;
+          if (step < pathPoints.length) {
+            setTimeout(() => requestAnimationFrame(tick), step < pathPoints.length - 1 ? 78 : 94);
+          } else {
+            onDone?.();
+          }
+        }
+      }
+      requestAnimationFrame(tick);
+    }
+
+    function buildPath(targetIndex) {
+      const width = boardArea.clientWidth;
+      const height = boardArea.clientHeight;
+      const rows = currentRows;
+      const verticalGap = (height - 54) / rows;
+      const maxPegs = rows + 1;
+      const horizontalGap = width / (maxPegs + 1);
+      const points = [];
+      let currentX = width / 2;
+      let rights = targetIndex;
+
+      points.push({ x: currentX, y: 10 });
+      for (let row = 0; row < rows; row++) {
+        const remainingRows = rows - row;
+        const mustGoRight = rights >= remainingRows;
+        const mustGoLeft = rights <= 0;
+        let goRight;
+        if (mustGoRight) goRight = true;
+        else if (mustGoLeft) goRight = false;
+        else {
+          const desired = targetIndex / rows;
+          goRight = Math.random() < desired;
+        }
+        currentX += goRight ? horizontalGap / 2 : -horizontalGap / 2;
+        rights += goRight ? -1 : 0;
+        points.push({ x: currentX, y: 20 + row * verticalGap });
+      }
+      const finalX = width / (targetIndex + 2) * 0 + currentX;
+      points.push({ x: currentX, y: height - 16 });
+      return points;
+    }
+
+    function setBusy(state) {
+      isDropping = state;
+      rowsSelect.disabled = state;
+      riskSelect.disabled = state;
+      amountInput.disabled = state;
+      [plusBtn, minusBtn, halfBtn, doubleBtn, dropBtn].forEach(button => button.disabled = state);
+    }
+
+    function doDrop() {
+      const bet = getAmount();
+      if (bet < minBet) { showToast('Минимальная ставка 8 ₽', 'error'); return; }
+      if (bet > maxBet) { showToast('Максимальная ставка 10 000 ₽', 'error'); return; }
+      if (bet > balance) { showToast('Недостаточно средств', 'error'); autoMode = false; autoBtn.textContent = 'Авто: выкл'; return; }
+      if (isDropping) return;
+
+      const multipliers = getCurrentMultipliers();
+      const targetIndex = gaussianIndex(multipliers.length);
+      const multiplier = multipliers[targetIndex];
+      const payout = Math.floor(bet * multiplier);
+      const profit = payout - bet;
+      const path = buildPath(targetIndex);
+
+      setBusy(true);
+      balance -= bet;
+      updateBalance();
+      showToast('Шар полетел', 'info');
+      animateBall(path, () => {
+        balance += payout;
+        updateBalance();
+        highlightBin(targetIndex);
+        addHistory(multiplier);
+        showToast(`Выпало x${multiplier} • ${profit >= 0 ? '+' : ''}${formatRub(profit)}`, profit >= 0 ? 'win' : 'error');
+        setBusy(false);
+        if (autoMode) setTimeout(doDrop, 520);
+      });
+    }
+
+    function toggleAuto() {
+      autoMode = !autoMode;
+      autoBtn.textContent = autoMode ? 'Авто: вкл' : 'Авто: выкл';
+      if (autoMode && !isDropping) doDrop();
+    }
+
+    plusBtn.addEventListener('click', () => setAmount(getAmount() + 1));
+    minusBtn.addEventListener('click', () => setAmount(getAmount() - 1));
+    halfBtn.addEventListener('click', () => setAmount(getAmount() / 2));
+    doubleBtn.addEventListener('click', () => setAmount(getAmount() * 2));
+    dropBtn.addEventListener('click', doDrop);
+    autoBtn.addEventListener('click', toggleAuto);
+    rowsSelect.addEventListener('change', () => { if (!isDropping) layoutBoard(); });
+    riskSelect.addEventListener('change', () => { if (!isDropping) renderBins(); });
+    amountInput.addEventListener('focus', () => { amountInput.value = String(Math.floor(getAmount())); });
+    amountInput.addEventListener('blur', () => setAmount(getAmount()));
+    amountInput.addEventListener('input', () => {
+      amountInput.value = amountInput.value.replace(/[^0-9]/g, '');
+    });
+
+    document.addEventListener('gesturestart', (event) => event.preventDefault());
+    document.addEventListener('dblclick', (event) => event.preventDefault(), { passive: false });
+    document.addEventListener('touchmove', (event) => {
+      if (event.touches.length > 1 || !event.target.closest('input')) event.preventDefault();
+    }, { passive: false });
+
+    window.addEventListener('resize', () => {
+      layoutBoard();
+      renderHistory();
+    });
+
+    updateBalance();
+    setAmount(16, false);
+    renderHistory();
+    requestAnimationFrame(() => {
+      layoutBoard();
+      renderHistory();
+      hidePreloader();
+    });
+  </script>
+</body>
+</html>
