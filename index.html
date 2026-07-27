@@ -7207,6 +7207,339 @@
   }
 </style>
 
+
+<style id="vezus-responsive-scroll-vignette-final">
+  /* Финальная адаптация: размеры экранов, корректный скролл и тёмная виньетка */
+  :root{
+    --page-max-width:1180px;
+    --page-side-gap:clamp(12px, 2.4vw, 32px);
+    --bottom-safe-gap:calc(var(--bottom-nav-height) + 34px + env(safe-area-inset-bottom));
+  }
+
+  html{
+    width:100%;
+    min-height:100%;
+    overflow-x:hidden !important;
+    overflow-y:auto !important;
+    scroll-behavior:smooth;
+    overscroll-behavior-y:auto !important;
+    -webkit-text-size-adjust:100%;
+    scrollbar-gutter:stable;
+  }
+
+  body{
+    width:100%;
+    min-height:100vh;
+    min-height:100dvh;
+    overflow-x:hidden !important;
+    overflow-y:auto !important;
+    touch-action:pan-y pinch-zoom !important;
+    overscroll-behavior-x:none !important;
+    overscroll-behavior-y:auto !important;
+    padding-bottom:var(--bottom-safe-gap) !important;
+    background:
+      radial-gradient(ellipse at center, transparent 34%, rgba(0,0,0,.18) 68%, rgba(0,0,0,.54) 100%),
+      radial-gradient(circle at 18% -10%, rgba(150,68,235,.25), transparent 34%),
+      radial-gradient(circle at 104% 12%, rgba(104,25,178,.22), transparent 35%),
+      radial-gradient(circle at 46% 112%, rgba(55,0,116,.28), transparent 44%),
+      linear-gradient(180deg, #120021 0%, #070011 48%, #020005 100%) !important;
+  }
+
+  body::before,
+  body::after{
+    opacity:.18 !important;
+    filter:none !important;
+  }
+
+  .app{
+    width:min(100%, var(--page-max-width)) !important;
+    margin-inline:auto !important;
+    padding-left:var(--page-side-gap) !important;
+    padding-right:var(--page-side-gap) !important;
+  }
+
+  .top-row{
+    width:100%;
+  }
+
+  .hero-slider,
+  .project-footer,
+  .page-footer{
+    width:100%;
+  }
+
+  .banner{
+    min-height:clamp(180px, 26vw, 300px) !important;
+    height:clamp(180px, 26vw, 300px) !important;
+  }
+
+  .banner-image-slot{
+    min-height:inherit !important;
+  }
+
+  .cards-row,
+  .history-tabs,
+  .history-list,
+  .payment-list{
+    -webkit-overflow-scrolling:touch;
+  }
+
+  .cards-row{
+    touch-action:pan-x pan-y !important;
+    overscroll-behavior-x:contain !important;
+    scroll-snap-type:x proximity !important;
+    scroll-padding-inline:var(--page-side-gap) !important;
+    padding-left:var(--page-side-gap) !important;
+    padding-right:var(--page-side-gap) !important;
+    margin-left:calc(-1 * var(--page-side-gap)) !important;
+    margin-right:calc(-1 * var(--page-side-gap)) !important;
+  }
+
+  .game-card{
+    scroll-snap-align:start;
+    flex:0 0 clamp(116px, 15vw, 170px) !important;
+    height:clamp(164px, 21vw, 238px) !important;
+  }
+
+  .bottom-nav{
+    width:min(calc(100% - 24px), 560px) !important;
+    bottom:calc(10px + env(safe-area-inset-bottom)) !important;
+  }
+
+  /* Скролл блокируется только во время реально открытого окна */
+  body.menu-open,
+  body.profile-open,
+  body.notifications-open,
+  body.deposit-open,
+  body.voucher-open,
+  body.history-open,
+  body.withdraw-open,
+  body.bonus-open,
+  body.iframe-freeze{
+    overflow:hidden !important;
+    touch-action:none !important;
+    overscroll-behavior:none !important;
+  }
+
+  .side-menu,
+  .notification-sheet,
+  .profile-sheet,
+  .ask-sheet,
+  .deposit-sheet,
+  .voucher-sheet,
+  .history-sheet,
+  .withdraw-sheet,
+  .bonus-sheet{
+    max-height:calc(100dvh - 20px - env(safe-area-inset-top) - env(safe-area-inset-bottom)) !important;
+  }
+
+  .side-menu,
+  .ask-sheet,
+  .deposit-sheet,
+  .voucher-sheet,
+  .history-sheet,
+  .withdraw-sheet{
+    overflow-y:auto !important;
+    -webkit-overflow-scrolling:touch;
+  }
+
+  /* Большие экраны */
+  @media (min-width:1200px){
+    :root{
+      --page-max-width:1280px;
+      --page-side-gap:36px;
+    }
+
+    .app{
+      padding-top:92px !important;
+    }
+
+    .top-row{
+      min-height:66px;
+    }
+
+    .brand-pill{
+      width:150px !important;
+      height:54px !important;
+    }
+
+    .balance-pill{
+      min-width:196px !important;
+      height:48px !important;
+    }
+
+    .section-title{
+      font-size:26px !important;
+    }
+
+    .game-card{
+      flex-basis:176px !important;
+      height:244px !important;
+    }
+  }
+
+  /* Средние экраны и планшеты */
+  @media (min-width:700px) and (max-width:1199px){
+    :root{
+      --page-side-gap:clamp(22px, 4vw, 32px);
+    }
+
+    .app{
+      padding-top:80px !important;
+    }
+
+    .banner{
+      height:clamp(220px, 32vw, 280px) !important;
+    }
+
+    .game-card{
+      flex-basis:148px !important;
+      height:208px !important;
+    }
+  }
+
+  /* Маленькие экраны */
+  @media (max-width:699px){
+    :root{
+      --page-side-gap:14px;
+    }
+
+    html{
+      scrollbar-gutter:auto;
+    }
+
+    .app{
+      padding-top:58px !important;
+    }
+
+    .top-row{
+      grid-template-columns:minmax(72px, .9fr) minmax(132px, auto) 42px !important;
+      gap:8px !important;
+    }
+
+    .brand-pill{
+      width:82px !important;
+      height:38px !important;
+    }
+
+    .balance-pill{
+      width:100%;
+      min-width:0 !important;
+      max-width:174px;
+      height:42px !important;
+      padding-left:12px !important;
+    }
+
+    .notify-pill{
+      width:42px !important;
+      height:42px !important;
+    }
+
+    .banner{
+      height:clamp(174px, 52vw, 210px) !important;
+      min-height:174px !important;
+      border-radius:22px !important;
+    }
+
+    .hero-slider{
+      border-radius:22px !important;
+    }
+
+    .section{
+      margin-top:24px !important;
+    }
+
+    .section-title{
+      font-size:20px !important;
+    }
+
+    .cards-row{
+      gap:9px !important;
+    }
+
+    .game-card{
+      flex-basis:122px !important;
+      height:172px !important;
+      border-radius:18px !important;
+    }
+
+    .bottom-nav{
+      width:calc(100% - 20px) !important;
+      min-height:72px !important;
+      padding:8px !important;
+      border-radius:24px !important;
+    }
+  }
+
+  /* Очень маленькие телефоны */
+  @media (max-width:359px){
+    :root{
+      --page-side-gap:10px;
+    }
+
+    .app{
+      padding-top:48px !important;
+    }
+
+    .top-row{
+      grid-template-columns:64px minmax(124px, 1fr) 38px !important;
+      gap:6px !important;
+    }
+
+    .brand-pill{
+      width:64px !important;
+      height:32px !important;
+    }
+
+    .balance-pill{
+      height:40px !important;
+      padding:5px 6px 5px 10px !important;
+    }
+
+    .balance-label{
+      font-size:8px !important;
+    }
+
+    .balance-value{
+      font-size:12px !important;
+    }
+
+    .wallet-btn{
+      width:30px !important;
+      height:30px !important;
+    }
+
+    .notify-pill{
+      width:38px !important;
+      height:38px !important;
+    }
+
+    .game-card{
+      flex-basis:108px !important;
+      height:156px !important;
+    }
+
+    .nav-item{
+      font-size:9px !important;
+    }
+  }
+
+  @media (orientation:landscape) and (max-height:560px){
+    .app{
+      padding-top:26px !important;
+    }
+
+    .banner{
+      height:170px !important;
+      min-height:170px !important;
+    }
+
+    .bottom-nav{
+      min-height:62px !important;
+    }
+  }
+</style>
+
 </head>
 
 <body class="site-unlocked">
