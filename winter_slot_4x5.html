@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Winter Fortune — слот 4×5</title>
+  <style>
+    :root{
+      --ice:#dff7ff;
+      --blue:#1b6ca8;
+      --deep:#062843;
+      --cyan:#64d8ff;
+      --gold:#ffd86b;
+      --panel:rgba(4,37,63,.78);
+      --line:rgba(255,255,255,.16);
+    }
+
+    *{box-sizing:border-box}
+
+    html,body{
+      min-height:100%;
+      margin:0;
+      font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+      color:#fff;
+      overflow-x:hidden;
+    }
+
+    body{
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      padding:24px;
+      background:
+        radial-gradient(circle at 50% 12%, rgba(123,216,255,.42), transparent 33%),
+        radial-gradient(circle at 12% 18%, rgba(255,255,255,.18), transparent 20%),
+        linear-gradient(155deg,#071a33 0%,#0a4c7d 45%,#0b2139 100%);
+      position:relative;
+    }
+
+    body::before{
+      content:"";
+      position:fixed;
+      inset:0;
+      pointer-events:none;
+      background:
+        radial-gradient(circle at center, transparent 35%, rgba(0,0,0,.45) 100%),
+        linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),
+        linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px);
+      background-size:auto,32px 32px,32px 32px;
+      z-index:0;
+    }
+
+    .snow{
+      position:fixed;
+      inset:0;
+      overflow:hidden;
+      pointer-events:none;
+      z-index:0;
+    }
+
+    .flake{
+      position:absolute;
+      top:-10vh;
+      color:#fff;
+      opacity:.72;
+      animation:fall linear infinite;
+      filter:drop-shadow(0 0 8px rgba(255,255,255,.8));
+    }
+
+    @keyframes fall{
+      to{transform:translate3d(40px,120vh,0) rotate(360deg)}
+    }
+
+    .game{
+      position:relative;
+      z-index:1;
+      width:min(980px,100%);
+      padding:20px;
+      border:1px solid rgba(255,255,255,.22);
+      border-radius:30px;
+      background:linear-gradient(180deg,rgba(17,82,125,.86),rgba(2,25,45,.92));
+      box-shadow:
+        0 30px 80px rgba(0,0,0,.55),
+        inset 0 1px 0 rgba(255,255,255,.22),
+        0 0 35px rgba(77,200,255,.18);
+      backdrop-filter:blur(14px);
+    }
+
+    .header{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:18px;
+      margin-bottom:16px;
+    }
+
+    .brand h1{
+      margin:0;
+      font-size:clamp(28px,5vw,54px);
+      letter-spacing:.05em;
+      text-transform:uppercase;
+      line-height:.95;
+      text-shadow:0 3px 0 #0a3c66,0 0 20px rgba(131,229,255,.6);
+    }
+
+    .brand p{
+      margin:8px 0 0;
+      color:#cceeff;
+      letter-spacing:.18em;
+      text-transform:uppercase;
+      font-size:12px;
+    }
+
+    .jackpot{
+      min-width:220px;
+      text-align:center;
+      padding:12px 18px;
+      border-radius:18px;
+      border:1px solid rgba(255,216,107,.48);
+      background:linear-gradient(180deg,rgba(255,219,112,.16),rgba(0,0,0,.18));
+      box-shadow:inset 0 0 24px rgba(255,220,115,.08);
+    }
+
+    .jackpot small{
+      display:block;
+      color:#ffeeb8;
+      text-transform:uppercase;
+      letter-spacing:.18em;
+      font-weight:700;
+    }
+
+    .jackpot strong{
+      display:block;
+      margin-top:4px;
+      color:var(--gold);
+      font-size:26px;
+      text-shadow:0 0 16px rgba(255,211,84,.5);
+    }
+
+    .machine{
+      position:relative;
+      padding:14px;
+      border-radius:24px;
+      background:linear-gradient(145deg,#b8edff,#397ba8 40%,#0a3151 100%);
+      box-shadow:
+        inset 0 2px 2px rgba(255,255,255,.8),
+        inset 0 -7px 20px rgba(0,20,40,.55),
+        0 12px 30px rgba(0,0,0,.45);
+    }
+
+    .reels{
+      display:grid;
+      grid-template-columns:repeat(5,1fr);
+      gap:8px;
+      padding:10px;
+      border-radius:17px;
+      background:#031c31;
+      border:2px solid rgba(255,255,255,.38);
+      overflow:hidden;
+    }
+
+    .cell{
+      aspect-ratio:1 / .93;
+      display:grid;
+      place-items:center;
+      position:relative;
+      overflow:hidden;
+      border-radius:13px;
+      background:
+        radial-gradient(circle at 50% 22%,rgba(255,255,255,.28),transparent 34%),
+        linear-gradient(180deg,#dff8ff 0%,#8fd8f2 46%,#3e8dbc 100%);
+      border:1px solid rgba(255,255,255,.75);
+      box-shadow:
+        inset 0 -8px 16px rgba(7,54,90,.32),
+        inset 0 2px 5px rgba(255,255,255,.65);
+      color:#082c46;
+      font-size:clamp(28px,6vw,62px);
+      text-shadow:0 2px 0 rgba(255,255,255,.8),0 5px 10px rgba(0,40,80,.24);
+      transform:translateZ(0);
+    }
+
+    .cell::after{
+      content:"";
+      position:absolute;
+      inset:0;
+      pointer-events:none;
+      background:linear-gradient(120deg,transparent 25%,rgba(255,255,255,.34) 45%,transparent 62%);
+      transform:translateX(-120%);
+    }
+
+    .cell.flash::after{animation:shine .55s ease}
+    .cell.win{
+      animation:pulse .7s ease-in-out infinite alternate;
+      box-shadow:inset 0 0 20px rgba(255,232,132,.65),0 0 18px rgba(255,216,107,.85);
+      border-color:#ffe48a;
+    }
+
+    @keyframes shine{to{transform:translateX(120%)}}
+    @keyframes pulse{to{transform:scale(.96);filter:brightness(1.18)}}
+
+    .spinning .cell{
+      animation:blur .13s linear infinite alternate;
+    }
+
+    @keyframes blur{
+      from{transform:translateY(-3px);filter:blur(0)}
+      to{transform:translateY(3px);filter:blur(1.5px)}
+    }
+
+    .status{
+      margin:14px 4px 0;
+      min-height:28px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      text-align:center;
+      font-weight:800;
+      letter-spacing:.06em;
+      color:#eafaff;
+      text-shadow:0 0 12px rgba(86,213,255,.8);
+    }
+
+    .status.wintext{color:#ffe48a}
+
+    .controls{
+      margin-top:14px;
+      display:grid;
+      grid-template-columns:1fr 1fr auto;
+      gap:12px;
+      align-items:stretch;
+    }
+
+    .info{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      padding:12px 16px;
+      border-radius:17px;
+      background:rgba(0,21,39,.56);
+      border:1px solid var(--line);
+    }
+
+    .info span{
+      display:block;
+      color:#a8dff7;
+      font-size:11px;
+      text-transform:uppercase;
+      letter-spacing:.14em;
+    }
+
+    .info strong{
+      display:block;
+      margin-top:3px;
+      font-size:22px;
+    }
+
+    .bet-buttons{
+      display:flex;
+      gap:6px;
+    }
+
+    button{
+      border:0;
+      color:#fff;
+      cursor:pointer;
+      font-weight:900;
+      font-size:17px;
+      transition:.18s ease;
+      -webkit-tap-highlight-color:transparent;
+    }
+
+    button:active{transform:translateY(2px)}
+    button:disabled{cursor:not-allowed;opacity:.55}
+
+    .mini{
+      width:38px;
+      height:38px;
+      border-radius:11px;
+      background:linear-gradient(180deg,#2b83ba,#0b456f);
+      border:1px solid rgba(255,255,255,.28);
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.25);
+    }
+
+    .spin{
+      min-width:174px;
+      border-radius:18px;
+      padding:0 28px;
+      text-transform:uppercase;
+      letter-spacing:.12em;
+      color:#06314f;
+      background:linear-gradient(180deg,#fff5a8 0%,#ffd34f 55%,#e99512 100%);
+      border:2px solid #fff0a0;
+      box-shadow:0 8px 0 #9e5e00,0 12px 28px rgba(255,188,36,.28),inset 0 2px 0 #fff;
+      text-shadow:0 1px 0 rgba(255,255,255,.75);
+    }
+
+    .spin:hover:not(:disabled){filter:brightness(1.07);transform:translateY(-2px)}
+    .spin:active:not(:disabled){transform:translateY(5px);box-shadow:0 3px 0 #9e5e00}
+
+    .paytable{
+      margin-top:14px;
+      display:flex;
+      flex-wrap:wrap;
+      justify-content:center;
+      gap:8px;
+      color:#ccefff;
+      font-size:12px;
+    }
+
+    .paytable span{
+      padding:7px 10px;
+      border-radius:999px;
+      background:rgba(255,255,255,.08);
+      border:1px solid rgba(255,255,255,.1);
+    }
+
+    @media (max-width:720px){
+      body{padding:10px}
+      .game{padding:12px;border-radius:22px}
+      .header{align-items:flex-start}
+      .jackpot{min-width:142px;padding:10px}
+      .jackpot strong{font-size:20px}
+      .brand p{font-size:9px}
+      .reels{gap:4px;padding:6px}
+      .cell{border-radius:9px;font-size:clamp(26px,10vw,44px)}
+      .controls{grid-template-columns:1fr 1fr}
+      .spin{grid-column:1/-1;min-height:62px}
+      .info{padding:10px 12px}
+    }
+
+    @media (max-width:440px){
+      .header{display:block}
+      .jackpot{margin-top:12px}
+      .machine{padding:8px}
+      .cell{aspect-ratio:1 / 1.12}
+      .info strong{font-size:18px}
+    }
+  </style>
+</head>
+<body>
+  <div class="snow" id="snow"></div>
+
+  <main class="game">
+    <header class="header">
+      <div class="brand">
+        <h1>Winter Fortune</h1>
+        <p>Ледяная удача • поле 4 × 5</p>
+      </div>
+      <div class="jackpot">
+        <small>Снежный джекпот</small>
+        <strong id="jackpot">12 500.00</strong>
+      </div>
+    </header>
+
+    <section class="machine">
+      <div class="reels" id="reels" aria-label="Игровое поле 4 на 5"></div>
+      <div class="status" id="status">Выберите ставку и нажмите «Крутить»</div>
+    </section>
+
+    <section class="controls">
+      <div class="info">
+        <div>
+          <span>Баланс</span>
+          <strong id="balance">1 000.00</strong>
+        </div>
+      </div>
+
+      <div class="info">
+        <div>
+          <span>Ставка</span>
+          <strong id="bet">10.00</strong>
+        </div>
+        <div class="bet-buttons">
+          <button class="mini" id="betDown" aria-label="Уменьшить ставку">−</button>
+          <button class="mini" id="betUp" aria-label="Увеличить ставку">+</button>
+        </div>
+      </div>
+
+      <button class="spin" id="spin">Крутить</button>
+    </section>
+
+    <div class="paytable">
+      <span>🎅 ×3 = 8 ставок</span>
+      <span>🎁 ×3 = 6 ставок</span>
+      <span>🦌 ×3 = 5 ставок</span>
+      <span>❄️ ×3 = 4 ставки</span>
+      <span>Горизонтальные линии</span>
+    </div>
+  </main>
+
+  <script>
+    const ROWS = 4;
+    const COLS = 5;
+    const symbols = [
+      { icon: "❄️", weight: 24, pay: 4 },
+      { icon: "⛄", weight: 20, pay: 4 },
+      { icon: "🎄", weight: 18, pay: 5 },
+      { icon: "🦌", weight: 14, pay: 5 },
+      { icon: "🎁", weight: 12, pay: 6 },
+      { icon: "🔔", weight: 8, pay: 7 },
+      { icon: "🎅", weight: 4, pay: 8 }
+    ];
+
+    let balance = 1000;
+    let bet = 10;
+    let spinning = false;
+
+    const reels = document.getElementById("reels");
+    const balanceEl = document.getElementById("balance");
+    const betEl = document.getElementById("bet");
+    const statusEl = document.getElementById("status");
+    const spinBtn = document.getElementById("spin");
+    const betDown = document.getElementById("betDown");
+    const betUp = document.getElementById("betUp");
+    const jackpotEl = document.getElementById("jackpot");
+
+    const cells = [];
+    for (let i = 0; i < ROWS * COLS; i++) {
+      const cell = document.createElement("div");
+      cell.className = "cell";
+      cell.textContent = randomSymbol().icon;
+      reels.appendChild(cell);
+      cells.push(cell);
+    }
+
+    function randomSymbol() {
+      const total = symbols.reduce((sum, s) => sum + s.weight, 0);
+      let value = Math.random() * total;
+      for (const symbol of symbols) {
+        value -= symbol.weight;
+        if (value <= 0) return symbol;
+      }
+      return symbols[0];
+    }
+
+    function format(value) {
+      return value.toLocaleString("ru-RU", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      });
+    }
+
+    function updateUI() {
+      balanceEl.textContent = format(balance);
+      betEl.textContent = format(bet);
+      spinBtn.disabled = spinning || balance < bet;
+      betDown.disabled = spinning;
+      betUp.disabled = spinning;
+    }
+
+    function getIndex(row, col) {
+      return row * COLS + col;
+    }
+
+    function evaluate(grid) {
+      let totalMultiplier = 0;
+      const winningIndexes = new Set();
+
+      for (let row = 0; row < ROWS; row++) {
+        const first = grid[row][0];
+        let count = 1;
+
+        for (let col = 1; col < COLS; col++) {
+          if (grid[row][col].icon === first.icon) count++;
+          else break;
+        }
+
+        if (count >= 3) {
+          const lengthBonus = count === 5 ? 4 : count === 4 ? 2 : 1;
+          totalMultiplier += first.pay * lengthBonus;
+          for (let col = 0; col < count; col++) {
+            winningIndexes.add(getIndex(row, col));
+          }
+        }
+      }
+
+      return {
+        win: bet * totalMultiplier,
+        winningIndexes
+      };
+    }
+
+    function spin() {
+      if (spinning || balance < bet) return;
+
+      spinning = true;
+      balance -= bet;
+      statusEl.className = "status";
+      statusEl.textContent = "Снежная буря крутит барабаны…";
+      cells.forEach(c => c.classList.remove("win"));
+      reels.classList.add("spinning");
+      updateUI();
+
+      let shuffleTimer = setInterval(() => {
+        cells.forEach(cell => {
+          cell.textContent = randomSymbol().icon;
+        });
+      }, 85);
+
+      setTimeout(() => {
+        clearInterval(shuffleTimer);
+
+        const grid = Array.from({ length: ROWS }, () =>
+          Array.from({ length: COLS }, () => randomSymbol())
+        );
+
+        grid.flat().forEach((symbol, index) => {
+          cells[index].textContent = symbol.icon;
+          cells[index].classList.add("flash");
+          setTimeout(() => cells[index].classList.remove("flash"), 600);
+        });
+
+        reels.classList.remove("spinning");
+        const result = evaluate(grid);
+
+        if (result.win > 0) {
+          balance += result.win;
+          statusEl.className = "status wintext";
+          statusEl.textContent = `Выигрыш: ${format(result.win)} ❄`;
+          result.winningIndexes.forEach(index => cells[index].classList.add("win"));
+        } else {
+          statusEl.className = "status";
+          statusEl.textContent = balance >= bet
+            ? "Попробуйте ещё раз — удача уже близко!"
+            : "Недостаточно средств для следующей ставки";
+        }
+
+        let jackpot = Number(jackpotEl.textContent.replace(/\s/g, "").replace(",", ".")) || 12500;
+        jackpot += bet * 0.03;
+        jackpotEl.textContent = format(jackpot);
+
+        spinning = false;
+        updateUI();
+      }, 1350);
+    }
+
+    betDown.addEventListener("click", () => {
+      bet = Math.max(1, bet / 2);
+      updateUI();
+    });
+
+    betUp.addEventListener("click", () => {
+      bet = Math.min(200, bet * 2);
+      updateUI();
+    });
+
+    spinBtn.addEventListener("click", spin);
+
+    document.addEventListener("keydown", event => {
+      if (event.code === "Space") {
+        event.preventDefault();
+        spin();
+      }
+    });
+
+    const snow = document.getElementById("snow");
+    for (let i = 0; i < 38; i++) {
+      const flake = document.createElement("div");
+      flake.className = "flake";
+      flake.textContent = Math.random() > .55 ? "❄" : "•";
+      flake.style.left = Math.random() * 100 + "vw";
+      flake.style.fontSize = (8 + Math.random() * 22) + "px";
+      flake.style.animationDuration = (7 + Math.random() * 10) + "s";
+      flake.style.animationDelay = (-Math.random() * 14) + "s";
+      snow.appendChild(flake);
+    }
+
+    updateUI();
+  </script>
+</body>
+</html>
